@@ -7,8 +7,8 @@ namespace Frenetic
 {
     public interface IScreenFactory
     {
-        GameplayScreen MakeGameplayScreen(IController serverGameSessionController, IController clientGameSessionController);
-        GameplayScreen MakeGameplayScreen(IController clientGameSessionController);
+        GameplayScreen MakeGameplayScreen(GameSessionControllerAndView serverGameSessionCandV, GameSessionControllerAndView clientGameSessionCandV);
+        GameplayScreen MakeGameplayScreen(GameSessionControllerAndView clientGameSessionCandV);
         MainMenuScreen MakeMainMenuScreen();
     }
 }

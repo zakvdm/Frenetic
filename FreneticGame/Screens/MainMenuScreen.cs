@@ -149,10 +149,10 @@ namespace Frenetic
         /// <param name="sessionType">The type of session to create.</param>
         void CreateSession()
         {
-            var serverGameSessionController = _gameSessionFactory.MakeServerGameSession();
-            var clientGameSessionController = _gameSessionFactory.MakeClientGameSession();
+            var serverGameSessionCandV = _gameSessionFactory.MakeServerGameSession();
+            var clientGameSessionCandV = _gameSessionFactory.MakeClientGameSession();
             
-            _screenFactory.MakeGameplayScreen(serverGameSessionController, clientGameSessionController);
+            _screenFactory.MakeGameplayScreen(serverGameSessionCandV, clientGameSessionCandV);
 
             #region Old Network Code
             /*
@@ -245,9 +245,9 @@ namespace Frenetic
 
         void JoinSession()
         {
-            var clientGameSessionController = _gameSessionFactory.MakeClientGameSession();
+            var clientGameSessionCandV = _gameSessionFactory.MakeClientGameSession();
 
-            _screenFactory.MakeGameplayScreen(clientGameSessionController);
+            _screenFactory.MakeGameplayScreen(clientGameSessionCandV);
         }
 
         /// <summary>

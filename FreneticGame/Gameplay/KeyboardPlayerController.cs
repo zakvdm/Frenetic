@@ -16,9 +16,9 @@ namespace Frenetic
         int count = 0;
         public void Process()
         {
-            if (count > 1000)
+            if (count > 300)
             {
-                Player.Position = new Vector2(rand.Next(500), rand.Next(500));
+                Player.Position = new Vector2(rand.Next(800), rand.Next(600));
                 count = 0;
             }
             count++;

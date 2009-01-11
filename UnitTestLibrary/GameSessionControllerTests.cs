@@ -24,19 +24,19 @@ namespace UnitTestLibrary
             var stubNS = MockRepository.GenerateStub<INetworkSession>();
             var stubMQ = MockRepository.GenerateStub<MessageQueue>(stubNS);
             var gameSession = new GameSession();
-            GameSessionController gsc = new GameSessionController(gameSession, stubMQ, stubNS);
+            GameSessionController gsc = new GameSessionController(gameSession, stubMQ, stubNS, null);
 
             Assert.AreEqual(1, gameSession.Controllers.Count);
             Assert.IsInstanceOfType(typeof(NetworkPlayerController), gameSession.Controllers[0]);
         }
 
         [Test]
-        public void CallsProcessAndGenerateOnAllGameSessionControllersAndViews()
+        public void CallsProcessOnAllGameSessionControllersAndViews()
         {
             var stubNS = MockRepository.GenerateStub<INetworkSession>();
             var stubMQ = MockRepository.GenerateStub<MessageQueue>(stubNS);
             var gameSession = new GameSession();
-            GameSessionController gsc = new GameSessionController(gameSession, stubMQ, stubNS);
+            GameSessionController gsc = new GameSessionController(gameSession, stubMQ, stubNS, null);
 
             var stubController1 = MockRepository.GenerateStub<IController>();
             var stubController2 = MockRepository.GenerateStub<IController>();
@@ -51,8 +51,8 @@ namespace UnitTestLibrary
 
             stubController1.AssertWasCalled(x => x.Process());
             stubController2.AssertWasCalled(x => x.Process());
-            stubView1.AssertWasCalled(x => x.Generate());
-            stubView2.AssertWasCalled(x => x.Generate());
+            stubView1.AssertWasNotCalled(x => x.Generate());
+            stubView2.AssertWasNotCalled(x => x.Generate());
         }
 
         [Test]
@@ -60,9 +60,12 @@ namespace UnitTestLibrary
         {
             var stubNS = MockRepository.GenerateStub<INetworkSession>();
             stubNS.Stub(x => x.IsServer).Return(false);
+            PlayerView pv = new PlayerView(null, null, null);
+            var stubVF = MockRepository.GenerateStub<IViewFactory>();
+            stubVF.Stub(x => x.MakePlayerView(Arg<Player>.Is.Anything)).Return(pv);
             var stubMQ = MockRepository.GenerateStub<MessageQueue>(stubNS);
             var gameSession = new GameSession();
-            GameSessionController gsc = new GameSessionController(gameSession, stubMQ, stubNS);
+            GameSessionController gsc = new GameSessionController(gameSession, stubMQ, stubNS, stubVF);
             queueMH.QueuedMessages.Enqueue(100);
             stubMQ.Stub(x => x.ReadMessage(Arg<MessageType>.Is.Equal(MessageType.NewPlayer))).Do(queueMH.GetNextQueuedMessage);
 
@@ -70,6 +73,7 @@ namespace UnitTestLibrary
 
             Assert.IsTrue(((NetworkPlayerController)gameSession.Controllers[0]).Players.ContainsKey(100));
             Assert.AreEqual(1, gameSession.Views.FindAll(x => x.GetType() == typeof(PlayerView)).Count);
+            Assert.IsTrue(gameSession.Views.Contains(pv));
         }
         [Test]
         public void HandlesNewPlayerMessageCorrectlyAsServer()
@@ -80,7 +84,7 @@ namespace UnitTestLibrary
             stubNS.Stub(x => x[100]).Return(stubINC);
             var stubMQ = MockRepository.GenerateStub<MessageQueue>(stubNS);
             var gameSession = new GameSession();
-            GameSessionController gsc = new GameSessionController(gameSession, stubMQ, stubNS);
+            GameSessionController gsc = new GameSessionController(gameSession, stubMQ, stubNS, null);
             queueMH.QueuedMessages.Enqueue(100);
             stubMQ.Stub(x => x.ReadMessage(Arg<MessageType>.Is.Equal(MessageType.NewPlayer))).Do(queueMH.GetNextQueuedMessage);
 
@@ -109,7 +113,7 @@ namespace UnitTestLibrary
             stubNS.Stub(x => x[300]).Return(stubINC300);
             var stubMQ = MockRepository.GenerateStub<MessageQueue>(stubNS);
             var gameSession = new GameSession();
-            GameSessionController gsc = new GameSessionController(gameSession, stubMQ, stubNS);
+            GameSessionController gsc = new GameSessionController(gameSession, stubMQ, stubNS, null);
             queueMH.QueuedMessages.Enqueue(100);
             queueMH.QueuedMessages.Enqueue(200);
             queueMH.QueuedMessages.Enqueue(300);
@@ -137,7 +141,7 @@ namespace UnitTestLibrary
             stubNS.Stub(x => x[300]).Return(stubINC300);
             var stubMQ = MockRepository.GenerateStub<MessageQueue>(stubNS);
             var gameSession = new GameSession();
-            GameSessionController gsc = new GameSessionController(gameSession, stubMQ, stubNS);
+            GameSessionController gsc = new GameSessionController(gameSession, stubMQ, stubNS, null);
             queueMH.QueuedMessages.Enqueue(100);
             queueMH.QueuedMessages.Enqueue(200);
             queueMH.QueuedMessages.Enqueue(300);
@@ -155,9 +159,12 @@ namespace UnitTestLibrary
         {
             var stubNS = MockRepository.GenerateStub<INetworkSession>();
             stubNS.Stub(x => x.IsServer).Return(false);
+            PlayerView pv = new PlayerView(null, null, null);
+            var stubVF = MockRepository.GenerateStub<IViewFactory>();
+            stubVF.Stub(x => x.MakePlayerView(Arg<Player>.Is.Anything)).Return(pv);
             var stubMQ = MockRepository.GenerateStub<MessageQueue>(stubNS);
             var gameSession = new GameSession();
-            GameSessionController gsc = new GameSessionController(gameSession, stubMQ, stubNS);
+            GameSessionController gsc = new GameSessionController(gameSession, stubMQ, stubNS, stubVF);
             queueMH.QueuedMessages.Enqueue(100);
             stubMQ.Stub(x => x.ReadMessage(Arg<MessageType>.Is.Equal(MessageType.SuccessfulJoin))).Do(queueMH.GetNextQueuedMessage);
 
@@ -166,6 +173,7 @@ namespace UnitTestLibrary
             Assert.IsInstanceOfType(typeof(KeyboardPlayerController), gameSession.Controllers[1]);
             Assert.AreEqual(1, gameSession.Views.FindAll(x => x.GetType() == typeof(NetworkPlayerView)).Count);
             Assert.AreEqual(1, gameSession.Views.FindAll(x => x.GetType() == typeof(PlayerView)).Count);
+            Assert.IsTrue(gameSession.Views.Contains(pv));
         }
     }
 }

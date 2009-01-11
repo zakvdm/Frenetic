@@ -11,8 +11,7 @@ namespace Frenetic
 {
     public class GameplayScreen : GameScreen, IDisposable
     {
-        private IController _clientGameSessionController;
-        private IController _serverGameSessionController;
+        
         #region Networking Data
         
         //private Server server;
@@ -62,18 +61,22 @@ namespace Frenetic
         WorldManager worldManager;
         #endregion
 
-        public GameplayScreen(IController clientGameSessionController)
+        public GameplayScreen(GameSessionControllerAndView clientGameSessionCandV)
         {
-            _clientGameSessionController = clientGameSessionController;
+            _clientGameSessionController = clientGameSessionCandV.GameSessionController;
+            _clientGameSessionView = clientGameSessionCandV.GameSessionView;
 
             // set the transition times
             TransitionOnTime = TimeSpan.FromSeconds(1.0);
             TransitionOffTime = TimeSpan.FromSeconds(1.0);
         }
-        public GameplayScreen(IController serverGameSessionController, IController clientGameSessionController)
+        public GameplayScreen(GameSessionControllerAndView serverGameSessionCandV, GameSessionControllerAndView clientGameSessionCandV)
         {
-            _serverGameSessionController = serverGameSessionController;
-            _clientGameSessionController = clientGameSessionController;
+            _serverGameSessionController = serverGameSessionCandV.GameSessionController;
+            _clientGameSessionController = clientGameSessionCandV.GameSessionController;
+
+            _serverGameSessionView = serverGameSessionCandV.GameSessionView;
+            _clientGameSessionView = clientGameSessionCandV.GameSessionView;
 
             // set the transition times
             TransitionOnTime = TimeSpan.FromSeconds(1.0);
@@ -248,6 +251,12 @@ namespace Frenetic
         #region Drawing Methods
         public override void Draw(GameTime gameTime)
         {
+            if (_serverGameSessionView != null)
+                _serverGameSessionView.Generate();
+
+            _clientGameSessionView.Generate();
+
+            /*
             if (networkSession != null)
             {
                 if ((worldManager != null) && !IsExiting)
@@ -255,6 +264,7 @@ namespace Frenetic
                     worldManager.Draw();
                 }
             }
+            */
         }
         #endregion
 
@@ -410,5 +420,9 @@ namespace Frenetic
 
         #endregion
 
+        private IController _clientGameSessionController;
+        private IController _serverGameSessionController;
+        private IView _clientGameSessionView;
+        private IView _serverGameSessionView;
     }
 }

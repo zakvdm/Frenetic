@@ -5,15 +5,13 @@ namespace Frenetic
 {
     public class GameSessionController : IController
     {
-        IGameSession _gameSession;
-        MessageQueue _messageQueue;
-        INetworkSession _networkSession;
-        NetworkPlayerController _networkPlayerController;
-        public GameSessionController(IGameSession gameSession, MessageQueue messageQueue, INetworkSession networkSession)
+        
+        public GameSessionController(IGameSession gameSession, MessageQueue messageQueue, INetworkSession networkSession, IViewFactory viewFactory)
         {
             _gameSession = gameSession;
             _messageQueue = messageQueue;
             _networkSession = networkSession;
+            _viewFactory = viewFactory;
             _networkPlayerController = new NetworkPlayerController(_messageQueue);
             _gameSession.Controllers.Add(_networkPlayerController);
         }
@@ -26,14 +24,10 @@ namespace Frenetic
             else
                 ReadMessagesAsClient();
 
-            // Update all controllers and views:
+            // Update all gamesession controllers:
             foreach (IController controller in _gameSession.Controllers)
             {
                 controller.Process();
-            }
-            foreach (IView view in _gameSession.Views)
-            {
-                view.Generate();
             }
         }
         #endregion
@@ -48,6 +42,8 @@ namespace Frenetic
                 int newID = (int)data;
                 Player newPlayer = new Player(newID);
                 
+                // TODO: Consider moving these sends into the GameSessionView?
+
                 // send ack to new player:
                 _networkSession.Send(new Message() { Type = MessageType.SuccessfulJoin, Data = newID }, NetChannel.ReliableInOrder1, _networkSession[newID]);
                 
@@ -75,7 +71,7 @@ namespace Frenetic
                 int ID = (int)data;
                 Player newPlayer = new Player(ID);
                 _networkPlayerController.Players.Add(ID, newPlayer);
-                _gameSession.Views.Add(new PlayerView(newPlayer));
+                _gameSession.Views.Add(_viewFactory.MakePlayerView(newPlayer));
             }
             while (true)
             {
@@ -87,9 +83,15 @@ namespace Frenetic
                 _gameSession.Controllers.Add(new KeyboardPlayerController(localPlayer));
                 //_networkPlayerController.Players.Add(ID, localPlayer);
                 _gameSession.Views.Add(new NetworkPlayerView(localPlayer, _networkSession));
-                _gameSession.Views.Add(new PlayerView(localPlayer));
+                _gameSession.Views.Add(_viewFactory.MakePlayerView(localPlayer));
             }
 
         }
+
+        IGameSession _gameSession;
+        MessageQueue _messageQueue;
+        INetworkSession _networkSession;
+        IViewFactory _viewFactory;
+        NetworkPlayerController _networkPlayerController;
     }
 }

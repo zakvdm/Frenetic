@@ -29,35 +29,35 @@ namespace UnitTestLibrary
         public void CanCreateAndStartServerGameSession()
         {
             var stubInputState = MockRepository.GenerateStub<IInputState>();
-            var stubGSCServer = MockRepository.GenerateStub<IController>();
-            var stubGSCClient = MockRepository.GenerateStub<IController>();
+            var serverGSCandV = new GameSessionControllerAndView(null, null);
+            var clientGSCandV = new GameSessionControllerAndView(null, null);
 
             stubInputState.Stub(x => x.MenuSelect).Return(true);
-            stubGameSessionFactory.Stub(x => x.MakeServerGameSession()).Return(stubGSCServer);
-            stubGameSessionFactory.Stub(x => x.MakeClientGameSession()).Return(stubGSCClient);
+            stubGameSessionFactory.Stub(x => x.MakeServerGameSession()).Return(serverGSCandV);
+            stubGameSessionFactory.Stub(x => x.MakeClientGameSession()).Return(clientGSCandV);
 
             mainMenuScreen.State = MainMenuScreen.MainMenuState.Network;
             mainMenuScreen.HandleInput(stubInputState);
 
-            stubScreenFactory.AssertWasCalled(x => x.MakeGameplayScreen(stubGSCServer, stubGSCClient));
+            stubScreenFactory.AssertWasCalled(x => x.MakeGameplayScreen(serverGSCandV, clientGSCandV));
         }
 
         [Test]
         public void CanCreateClientGameSession()
         {
             var stubInputState = MockRepository.GenerateStub<IInputState>();
-            var stubGSC = MockRepository.GenerateStub<IController>();
+            var clientGSCandV = new GameSessionControllerAndView(null, null);
 
             // Create network session is option 2:
             stubInputState.Stub(x => x.MenuDown).Return(true).Repeat.Once();
             stubInputState.Stub(x => x.MenuSelect).Return(true).Repeat.Once();
             
-            stubGameSessionFactory.Stub(x => x.MakeClientGameSession()).Return(stubGSC);
+            stubGameSessionFactory.Stub(x => x.MakeClientGameSession()).Return(clientGSCandV);
 
             mainMenuScreen.State = MainMenuScreen.MainMenuState.Network;
             mainMenuScreen.HandleInput(stubInputState);
 
-            stubScreenFactory.AssertWasCalled(x => x.MakeGameplayScreen(Arg<GameSessionController>.Is.Equal(stubGSC)));
+            stubScreenFactory.AssertWasCalled(x => x.MakeGameplayScreen(Arg<GameSessionControllerAndView>.Is.Equal(clientGSCandV)));
         }
     }
 }

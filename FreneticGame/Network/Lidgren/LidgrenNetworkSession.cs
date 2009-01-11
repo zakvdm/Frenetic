@@ -18,8 +18,6 @@ namespace Frenetic.Network.Lidgren
             _networkClient = networkClient;
         }
 
-        //public event EventHandler<GamerJoinedEventArgs> GamerJoined;
-
         public bool IsServer
         {
             get
