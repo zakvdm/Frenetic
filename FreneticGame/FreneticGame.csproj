@@ -41,23 +41,25 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\x86\Debug</OutputPath>
+    <OutputPath>..\..\build\game\bin\x86\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE;WINDOWS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <NoStdLib>true</NoStdLib>
     <UseVSHostingProcess>false</UseVSHostingProcess>
+    <BaseIntermediateOutputPath>..\..\build\game\obj</BaseIntermediateOutputPath>
     <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\x86\Release</OutputPath>
+    <OutputPath>..\..\build\game\bin\x86\Release</OutputPath>
     <DefineConstants>TRACE%3bWINDOWS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <NoStdLib>true</NoStdLib>
     <UseVSHostingProcess>false</UseVSHostingProcess>
+    <BaseIntermediateOutputPath>..\..\build\game\obj</BaseIntermediateOutputPath>
     <PlatformTarget>x86</PlatformTarget>
     <XnaCompressContent>True</XnaCompressContent>
   </PropertyGroup>
@@ -118,7 +120,6 @@
     <Compile Include="Gameplay\IGameSessionFactory.cs" />
     <Compile Include="Network\INetworkSessionFactory.cs" />
     <Compile Include="Network\IOutgoingMessageProcessor.cs" />
-    <Compile Include="Network\Lidgren\IMessage.cs" />
     <Compile Include="Network\Lidgren\INetClient.cs" />
     <Compile Include="Network\Lidgren\INetConnection.cs" />
     <Compile Include="Network\Lidgren\INetServer.cs" />
@@ -126,7 +127,6 @@
     <Compile Include="Network\Lidgren\LidgrenNetworkSession.cs" />
     <Compile Include="Network\Lidgren\NetClientWrapper.cs" />
     <Compile Include="Network\Lidgren\NetConnectionWrapper.cs" />
-    <Compile Include="Network\Lidgren\NetMessageWrapper.cs" />
     <Compile Include="Network\Lidgren\NetServerWrapper.cs" />
     <Compile Include="Network\MessageQueue.cs" />
     <Compile Include="Network\OutgoingMessageProcessor.cs" />

@@ -39,14 +39,4 @@ namespace Frenetic
         public MessageType Type { get; set; }
         public object Data { get; set; }
     }
-
-    public class GamerJoinedEventArgs : EventArgs
-    {
-        public GamerJoinedEventArgs(int playerID)
-        {
-            this.PlayerID = playerID;
-        }
-
-        public int PlayerID { get; private set; }
-    }
 }
