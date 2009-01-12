@@ -189,7 +189,7 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\lidgren-network-read-only\Lidgren.Network\Lidgren.Network.csproj">
+    <ProjectReference Include="..\Dependencies\Lidgren\Lidgren.Network\Lidgren.Network.csproj">
       <Project>{BA202214-F6F8-4853-BCC9-CA4F13C5F479}</Project>
       <Name>Lidgren.Network</Name>
     </ProjectReference>

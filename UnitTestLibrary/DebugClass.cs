@@ -3,14 +3,14 @@ using System;
 namespace UnitTestLibrary
 {
     // Written by blokeley
-    class NUnitConsoleRunner
+    /*class NUnitConsoleRunner
     {
         [STAThread]
         static void Main(string[] args)
         {
             NUnit.ConsoleRunner.Runner.Main(args);
         }
-    }
+    }*/
 
     /*
      There is an easy way to debug NUnit tests from Visual C# Express, which has the advantages of:
