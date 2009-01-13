@@ -33,7 +33,7 @@ namespace UnitTestLibrary
         public void CanSerializeAndDeserializeAMessageWithPlayerAsData()
         {
             XmlMessageSerializer serializer = new XmlMessageSerializer();
-            Player player = new Player(10);
+            Player player = new Player(10, null);
             Message msg = new Message() { Type = MessageType.PlayerData, Data = player };
 
             byte[] serializedMessage = serializer.Serialize(msg);

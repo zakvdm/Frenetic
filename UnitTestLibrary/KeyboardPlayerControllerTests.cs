@@ -12,7 +12,7 @@ namespace UnitTestLibrary
         [Test]
         public void CanConstruct()
         {
-            Player player = new Player(1);
+            Player player = new Player(1, null);
             KeyboardPlayerController kpc = new KeyboardPlayerController(player);
         }
 

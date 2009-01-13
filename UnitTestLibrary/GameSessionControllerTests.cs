@@ -24,7 +24,7 @@ namespace UnitTestLibrary
             var stubNS = MockRepository.GenerateStub<INetworkSession>();
             var stubMQ = MockRepository.GenerateStub<MessageQueue>(stubNS);
             var gameSession = new GameSession();
-            GameSessionController gsc = new GameSessionController(gameSession, stubMQ, stubNS, null);
+            GameSessionController gsc = new GameSessionController(gameSession, stubMQ, stubNS, null, null);
 
             Assert.AreEqual(1, gameSession.Controllers.Count);
             Assert.IsInstanceOfType(typeof(NetworkPlayerController), gameSession.Controllers[0]);
@@ -36,7 +36,7 @@ namespace UnitTestLibrary
             var stubNS = MockRepository.GenerateStub<INetworkSession>();
             var stubMQ = MockRepository.GenerateStub<MessageQueue>(stubNS);
             var gameSession = new GameSession();
-            GameSessionController gsc = new GameSessionController(gameSession, stubMQ, stubNS, null);
+            GameSessionController gsc = new GameSessionController(gameSession, stubMQ, stubNS, null, null);
 
             var stubController1 = MockRepository.GenerateStub<IController>();
             var stubController2 = MockRepository.GenerateStub<IController>();
@@ -63,14 +63,18 @@ namespace UnitTestLibrary
             PlayerView pv = new PlayerView(null, null, null);
             var stubVF = MockRepository.GenerateStub<IViewFactory>();
             stubVF.Stub(x => x.MakePlayerView(Arg<Player>.Is.Anything)).Return(pv);
+            bool playerFactoryWasUsedCorrectly = false;
+            // TODO: How can i check that ID was used correctly as factory parameter
+            Player.Factory playerFactory = delegate { playerFactoryWasUsedCorrectly = true; return null; };
             var stubMQ = MockRepository.GenerateStub<MessageQueue>(stubNS);
             var gameSession = new GameSession();
-            GameSessionController gsc = new GameSessionController(gameSession, stubMQ, stubNS, stubVF);
+            GameSessionController gsc = new GameSessionController(gameSession, stubMQ, stubNS, stubVF, playerFactory);
             queueMH.QueuedMessages.Enqueue(100);
             stubMQ.Stub(x => x.ReadMessage(Arg<MessageType>.Is.Equal(MessageType.NewPlayer))).Do(queueMH.GetNextQueuedMessage);
 
             gsc.Process();
 
+            Assert.IsTrue(playerFactoryWasUsedCorrectly);
             Assert.IsTrue(((NetworkPlayerController)gameSession.Controllers[0]).Players.ContainsKey(100));
             Assert.AreEqual(1, gameSession.Views.FindAll(x => x.GetType() == typeof(PlayerView)).Count);
             Assert.IsTrue(gameSession.Views.Contains(pv));
@@ -82,14 +86,18 @@ namespace UnitTestLibrary
             stubNS.Stub(x => x.IsServer).Return(true);
             var stubINC = MockRepository.GenerateStub<INetConnection>();
             stubNS.Stub(x => x[100]).Return(stubINC);
+            bool playerFactoryWasUsedCorrectly = false;
+            // TODO: How can i check that ID was used correctly as factory parameter
+            Player.Factory playerFactory = delegate { playerFactoryWasUsedCorrectly = true; return null; };
             var stubMQ = MockRepository.GenerateStub<MessageQueue>(stubNS);
             var gameSession = new GameSession();
-            GameSessionController gsc = new GameSessionController(gameSession, stubMQ, stubNS, null);
+            GameSessionController gsc = new GameSessionController(gameSession, stubMQ, stubNS, null, playerFactory);
             queueMH.QueuedMessages.Enqueue(100);
             stubMQ.Stub(x => x.ReadMessage(Arg<MessageType>.Is.Equal(MessageType.NewPlayer))).Do(queueMH.GetNextQueuedMessage);
 
             gsc.Process();
 
+            Assert.IsTrue(playerFactoryWasUsedCorrectly);
             Assert.IsTrue(((NetworkPlayerController)gameSession.Controllers[0]).Players.ContainsKey(100));
             Assert.IsInstanceOfType(typeof(NetworkPlayerView), gameSession.Views[0]);
 
@@ -113,7 +121,7 @@ namespace UnitTestLibrary
             stubNS.Stub(x => x[300]).Return(stubINC300);
             var stubMQ = MockRepository.GenerateStub<MessageQueue>(stubNS);
             var gameSession = new GameSession();
-            GameSessionController gsc = new GameSessionController(gameSession, stubMQ, stubNS, null);
+            GameSessionController gsc = new GameSessionController(gameSession, stubMQ, stubNS, null, delegate { return null; });
             queueMH.QueuedMessages.Enqueue(100);
             queueMH.QueuedMessages.Enqueue(200);
             queueMH.QueuedMessages.Enqueue(300);
@@ -141,7 +149,7 @@ namespace UnitTestLibrary
             stubNS.Stub(x => x[300]).Return(stubINC300);
             var stubMQ = MockRepository.GenerateStub<MessageQueue>(stubNS);
             var gameSession = new GameSession();
-            GameSessionController gsc = new GameSessionController(gameSession, stubMQ, stubNS, null);
+            GameSessionController gsc = new GameSessionController(gameSession, stubMQ, stubNS, null, delegate { return null; });
             queueMH.QueuedMessages.Enqueue(100);
             queueMH.QueuedMessages.Enqueue(200);
             queueMH.QueuedMessages.Enqueue(300);
@@ -162,14 +170,18 @@ namespace UnitTestLibrary
             PlayerView pv = new PlayerView(null, null, null);
             var stubVF = MockRepository.GenerateStub<IViewFactory>();
             stubVF.Stub(x => x.MakePlayerView(Arg<Player>.Is.Anything)).Return(pv);
+            bool playerFactoryWasUsedCorrectly = false;
+            // TODO: How can i check that ID was used correctly as factory parameter
+            Player.Factory playerFactory = delegate { playerFactoryWasUsedCorrectly = true; return null; };
             var stubMQ = MockRepository.GenerateStub<MessageQueue>(stubNS);
             var gameSession = new GameSession();
-            GameSessionController gsc = new GameSessionController(gameSession, stubMQ, stubNS, stubVF);
+            GameSessionController gsc = new GameSessionController(gameSession, stubMQ, stubNS, stubVF, playerFactory);
             queueMH.QueuedMessages.Enqueue(100);
             stubMQ.Stub(x => x.ReadMessage(Arg<MessageType>.Is.Equal(MessageType.SuccessfulJoin))).Do(queueMH.GetNextQueuedMessage);
 
             gsc.Process();
 
+            Assert.IsTrue(playerFactoryWasUsedCorrectly);
             Assert.IsInstanceOfType(typeof(KeyboardPlayerController), gameSession.Controllers[1]);
             Assert.AreEqual(1, gameSession.Views.FindAll(x => x.GetType() == typeof(NetworkPlayerView)).Count);
             Assert.AreEqual(1, gameSession.Views.FindAll(x => x.GetType() == typeof(PlayerView)).Count);

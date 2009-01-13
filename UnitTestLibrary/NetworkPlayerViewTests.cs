@@ -18,7 +18,7 @@ namespace UnitTestLibrary
         public void CanCreate()
         {
             var stubNS = MockRepository.GenerateStub<INetworkSession>();
-            NetworkPlayerView npView = new NetworkPlayerView(new Player(1), stubNS);
+            NetworkPlayerView npView = new NetworkPlayerView(new Player(1, null), stubNS);
 
             Assert.IsNotNull(npView);
         }
@@ -27,7 +27,7 @@ namespace UnitTestLibrary
         public void GenerateCallsNetworkSessionSendNetChannelUnreliable()
         {
             var stubNS = MockRepository.GenerateStub<INetworkSession>();
-            NetworkPlayerView npView = new NetworkPlayerView(new Player(1), stubNS);
+            NetworkPlayerView npView = new NetworkPlayerView(new Player(1, null), stubNS);
             stubNS.Stub(x => x.IsServer).Return(true);
 
             npView.Generate();
@@ -39,7 +39,7 @@ namespace UnitTestLibrary
         public void GenerateSendsPlayerToAllIfServer()
         {
             var stubNS = MockRepository.GenerateStub<INetworkSession>();
-            Player player = new Player(1);
+            Player player = new Player(1, null);
             player.Position = new Vector2(100, 200);
             NetworkPlayerView npView = new NetworkPlayerView(player, stubNS);
 
@@ -54,7 +54,7 @@ namespace UnitTestLibrary
         public void GenerateSendsToServerIfClient()
         {
             var stubNS = MockRepository.GenerateStub<INetworkSession>();
-            Player player = new Player(1);
+            Player player = new Player(1, null);
             player.Position = new Vector2(100, 200);
             NetworkPlayerView npView = new NetworkPlayerView(player, stubNS);
 

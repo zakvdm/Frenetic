@@ -4,8 +4,10 @@ using System.IO;
 using Microsoft.Xna.Framework;
 
 using Frenetic;
+using Frenetic.Physics;
 
 using NUnit.Framework;
+using Rhino.Mocks;
 
 namespace UnitTestLibrary
 {
@@ -13,20 +15,23 @@ namespace UnitTestLibrary
     public class PlayerTests
     {
         [Test]
-        public void CanGetAndSetPlayerPosition()
+        public void UpdateCallsIntegrate()
         {
-            Player player = new Player(1);
-            player.Position = new Vector2(100, 200);
+            var stubIntegrator = MockRepository.GenerateStub<IIntegrator>();
+            Player player = new Player(1, stubIntegrator);
+            Vector2 pos = new Vector2(100, 200);
+            player.Position = pos;
 
-            Assert.AreEqual(1, player.ID);
-            Assert.AreEqual(new Vector2(100, 200), player.Position);
+            player.Update();
+
+            stubIntegrator.AssertWasCalled(x => x.Integrate(Arg<Vector2>.Is.Equal(pos)));
         }
 
         [Test]
         public void CanSerialiseAndDeserialisePlayerPosition()
         {
             XmlSerializer serializer = new XmlSerializer(typeof(Player));
-            Player player = new Player(1);
+            Player player = new Player(1, null);
             player.Position = new Vector2(100, 200);
             MemoryStream stream = new MemoryStream();
 

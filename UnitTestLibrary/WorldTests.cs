@@ -23,7 +23,7 @@ namespace UnitTestLibrary
         public void CanAddPlayerToWorld()
         {
             World world = new World();
-            Player player = new Player(1);
+            Player player = new Player(1, null);
             world.AddPlayer(player);
 
             Assert.AreEqual(player, world.Players[0]);

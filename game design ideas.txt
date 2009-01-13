@@ -1,0 +1,47 @@
+NAME IDEAS:
+	Phantom
+		I like this because:
+			1) the name still hints at speed
+			2) i like the potential for visuals (eg shader effects to obscure what's behind player can be kind of spooky...)
+			3) gives the game some narrative (players start as just "phantoms" and as they level up they can customise their character, who slowly gets more and more definite features)
+
+
+
+
+
+
+WEAPONS:
+	Not too many guns (about 5 sounds right)
+	Each gun is:
+		1) Different from the rest
+		2) Improved somehow (in a unique way) when you go faster
+
+	ideas:
+		1) Rocket launcher - either bigger explosions or faster rockets depending on speed
+		2) Railgun - more damage
+		3) Shotgun - different spread
+		4) Lightning gun - longer shaft
+		5) WHAT ABOUT STARTING GUN?
+
+
+
+
+CAMERA:
+	Several camera motion options:
+		1) Camera moves with player always at centre
+		2) Camera generally follows player but sometimes lets player leave middle of screen (eg at the edges of levels)
+		3) Soldat style camera
+
+	Field of view:
+		everything behind player not visible -- probably needs some effect to make it obvious what's happening
+			possibility: fov narrows as you're going faster?
+
+
+
+
+
+ACHIEVEMENT SYSTEM:
+	One direction is to make ALL achievements have strictly visual impact ONLY (i.e. no unlocking better guns ala COD4)
+	Challenges provide various visual improvements, certain decisions are final (for specific character)
+		e.g. different colours, clothing, dog tags, hairstyles, tatoos, etc. (how big does player have to be for this to be visible?)
+	Weapon challenges also provide strictly aesthetic weapon improvements (to both actual gun and what it shoots)

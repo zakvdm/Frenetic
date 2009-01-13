@@ -2,6 +2,9 @@
 using Lidgren.Network;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Content;
+using Autofac.Builder;
+using Autofac;
+using Frenetic.Physics;
 
 namespace Frenetic
 {
@@ -12,6 +15,8 @@ namespace Frenetic
             _networkSessionFactory = networkSessionFactory;
             _graphicsDevice = graphicsDevice;
             _contentManager = contentManager;
+
+
         }
         #region IGameSessionFactory Members
 
@@ -21,10 +26,25 @@ namespace Frenetic
             _networkSession = _networkSessionFactory.MakeServerNetworkSession();
             _messageQueue = new MessageQueue(_networkSession);
             _gameSession = new GameSession();
-            _gameSessionController = new GameSessionController(_gameSession, _messageQueue, _networkSession, _viewFactory);
+            Player.Factory playerFactory = MakePlayerFactoryWithContainer();
+            _gameSessionController = new GameSessionController(_gameSession, _messageQueue, _networkSession, _viewFactory, playerFactory);
             var gameSessionView = new GameSessionView(_gameSession);
 
             return new GameSessionControllerAndView(_gameSessionController, gameSessionView);
+        }
+
+        private Player.Factory MakePlayerFactoryWithContainer()
+        {
+            var builder = new ContainerBuilder();
+
+            builder.Register<Player>().FactoryScoped();
+            builder.RegisterGeneratedFactory<Player.Factory>(new TypedService(typeof(Player)));
+            builder.Register<PhysicsValues>().SingletonScoped();
+            builder.Register<VerletIntegrator>().As<IIntegrator>().FactoryScoped();
+
+            var container = builder.Build();
+
+            return container.Resolve<Player.Factory>();
         }
 
         public GameSessionControllerAndView MakeClientGameSession()
@@ -33,7 +53,8 @@ namespace Frenetic
             _networkSession = _networkSessionFactory.MakeClientNetworkSession();
             _messageQueue = new MessageQueue(_networkSession);
             _gameSession = new GameSession();
-            _gameSessionController = new GameSessionController(_gameSession, _messageQueue, _networkSession, _viewFactory);
+            Player.Factory playerFactory = MakePlayerFactoryWithContainer();
+            _gameSessionController = new GameSessionController(_gameSession, _messageQueue, _networkSession, _viewFactory, playerFactory);
             var gameSessionView = new GameSessionView(_gameSession);
 
             return new GameSessionControllerAndView(_gameSessionController, gameSessionView);

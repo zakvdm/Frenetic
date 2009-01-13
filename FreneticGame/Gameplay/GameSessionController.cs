@@ -6,12 +6,13 @@ namespace Frenetic
     public class GameSessionController : IController
     {
         
-        public GameSessionController(IGameSession gameSession, MessageQueue messageQueue, INetworkSession networkSession, IViewFactory viewFactory)
+        public GameSessionController(IGameSession gameSession, MessageQueue messageQueue, INetworkSession networkSession, IViewFactory viewFactory, Player.Factory playerFactory)
         {
             _gameSession = gameSession;
             _messageQueue = messageQueue;
             _networkSession = networkSession;
             _viewFactory = viewFactory;
+            _playerFactory = playerFactory;
             _networkPlayerController = new NetworkPlayerController(_messageQueue);
             _gameSession.Controllers.Add(_networkPlayerController);
         }
@@ -40,7 +41,7 @@ namespace Frenetic
                 if (data == null)
                     break;
                 int newID = (int)data;
-                Player newPlayer = new Player(newID);
+                Player newPlayer = _playerFactory(newID);
                 
                 // TODO: Consider moving these sends into the GameSessionView?
 
@@ -69,7 +70,7 @@ namespace Frenetic
                 if (data == null)
                     break;
                 int ID = (int)data;
-                Player newPlayer = new Player(ID);
+                Player newPlayer = _playerFactory(ID);
                 _networkPlayerController.Players.Add(ID, newPlayer);
                 _gameSession.Views.Add(_viewFactory.MakePlayerView(newPlayer));
             }
@@ -79,7 +80,7 @@ namespace Frenetic
                 if (data == null)
                     break;
                 int ID = (int)data;
-                Player localPlayer = new Player(ID);
+                Player localPlayer = _playerFactory(ID);
                 _gameSession.Controllers.Add(new KeyboardPlayerController(localPlayer));
                 //_networkPlayerController.Players.Add(ID, localPlayer);
                 _gameSession.Views.Add(new NetworkPlayerView(localPlayer, _networkSession));
@@ -92,6 +93,7 @@ namespace Frenetic
         MessageQueue _messageQueue;
         INetworkSession _networkSession;
         IViewFactory _viewFactory;
+        Player.Factory _playerFactory;
         NetworkPlayerController _networkPlayerController;
     }
 }
