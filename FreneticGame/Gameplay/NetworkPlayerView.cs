@@ -4,10 +4,10 @@ namespace Frenetic
 {
     public class NetworkPlayerView : IView
     {
-        Player _player;
+        IPlayer _player;
         INetworkSession _networkSession;
 
-        public NetworkPlayerView(Player player, INetworkSession networkSession)
+        public NetworkPlayerView(IPlayer player, INetworkSession networkSession)
         {
             _player = player;
             _networkSession = networkSession;

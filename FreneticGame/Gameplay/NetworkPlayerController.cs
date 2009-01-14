@@ -8,10 +8,10 @@ namespace Frenetic
     public class NetworkPlayerController : IController
     {
         MessageQueue _messageQueue;
-        public Dictionary<int, Player> Players { get; private set; }
+        public Dictionary<int, IPlayer> Players { get; private set; }
         public NetworkPlayerController(MessageQueue messageQueue)
         {
-            Players = new Dictionary<int, Player>();
+            Players = new Dictionary<int, IPlayer>();
             _messageQueue = messageQueue;
         }
 

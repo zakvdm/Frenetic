@@ -7,7 +7,7 @@ namespace Frenetic
     public class PlayerView : IView
     {
         
-        public PlayerView(Player player, SpriteBatch spriteBatch, Texture2D texture)
+        public PlayerView(IPlayer player, SpriteBatch spriteBatch, Texture2D texture)
         {
             _player = player;
             _spriteBatch = spriteBatch;
@@ -41,7 +41,7 @@ namespace Frenetic
 
         #endregion
 
-        private Player _player;
+        private IPlayer _player;
         private SpriteBatch _spriteBatch;
         private Texture2D _texture;
         private Color _color;

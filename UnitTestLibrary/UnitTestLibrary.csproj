@@ -72,7 +72,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DebugClass.cs" />
     <Compile Include="GameplayScreenTests.cs" />
     <Compile Include="GameSessionControllerTests.cs" />
     <Compile Include="KeyboardPlayerControllerTests.cs" />
@@ -87,14 +86,12 @@
     <Compile Include="NetworkPlayerControllerTests.cs" />
     <Compile Include="NetworkPlayerViewTests.cs" />
     <Compile Include="NetworkWorldViewTests.cs" />
-    <Compile Include="OutgoingMessageProcessorTests.cs" />
     <Compile Include="PhysicsManagerTests.cs" />
     <Compile Include="OldPlayerTests.cs" />
     <Compile Include="PlayerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RailgunTests.cs" />
     <Compile Include="RayTracerTests.cs" />
-    <Compile Include="TestLidgren.cs" />
     <Compile Include="VerletIntegratorTests.cs" />
     <Compile Include="WorldTests.cs" />
     <Compile Include="XmlMessageSerializerTests.cs" />

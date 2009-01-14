@@ -3,6 +3,9 @@
 using Frenetic;
 
 using NUnit.Framework;
+using Frenetic.Physics;
+using Rhino.Mocks;
+using Microsoft.Xna.Framework;
 
 namespace UnitTestLibrary
 {
@@ -14,6 +17,17 @@ namespace UnitTestLibrary
         {
             Player player = new Player(1, null);
             KeyboardPlayerController kpc = new KeyboardPlayerController(player);
+        }
+
+        [Test]
+        public void ProcessCallsPlayerUpdate()
+        {
+            IPlayer stubPlayer = MockRepository.GenerateStub<IPlayer>();
+            KeyboardPlayerController kpc = new KeyboardPlayerController(stubPlayer);
+
+            kpc.Process();
+
+            stubPlayer.AssertWasCalled(x => x.Update());
         }
 
     }

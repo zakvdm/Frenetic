@@ -102,6 +102,7 @@
     <Compile Include="Gameplay\GameSessionView.cs" />
     <Compile Include="Gameplay\IController.cs" />
     <Compile Include="Gameplay\IGameSession.cs" />
+    <Compile Include="Gameplay\IPlayer.cs" />
     <Compile Include="Gameplay\IView.cs" />
     <Compile Include="Gameplay\IViewFactory.cs" />
     <Compile Include="Gameplay\KeyboardPlayerController.cs" />
@@ -118,13 +119,10 @@
     <Compile Include="Gameplay\OldPlayer.cs" />
     <Compile Include="Gameplay\PlayerInput.cs" />
     <Compile Include="Gameplay\World.cs" />
-    <Compile Include="Network\IIncomingMessageProcessor.cs" />
     <Compile Include="Network\IMessageSerializer.cs" />
-    <Compile Include="Network\IncomingMessageProcessor.cs" />
     <Compile Include="Network\INetworkSession.cs" />
     <Compile Include="Gameplay\IGameSessionFactory.cs" />
     <Compile Include="Network\INetworkSessionFactory.cs" />
-    <Compile Include="Network\IOutgoingMessageProcessor.cs" />
     <Compile Include="Network\Lidgren\INetClient.cs" />
     <Compile Include="Network\Lidgren\INetConnection.cs" />
     <Compile Include="Network\Lidgren\INetServer.cs" />
@@ -134,7 +132,6 @@
     <Compile Include="Network\Lidgren\NetConnectionWrapper.cs" />
     <Compile Include="Network\Lidgren\NetServerWrapper.cs" />
     <Compile Include="Network\MessageQueue.cs" />
-    <Compile Include="Network\OutgoingMessageProcessor.cs" />
     <Compile Include="Network\XmlMessageSerializer.cs" />
     <Compile Include="OperationCompletedEventArgs.cs" />
     <Compile Include="Physics\IIntegrator.cs" />

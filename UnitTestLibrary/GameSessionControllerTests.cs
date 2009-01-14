@@ -6,6 +6,7 @@ using NUnit.Framework;
 using Rhino.Mocks;
 using Frenetic.Network.Lidgren;
 using Lidgren.Network;
+using Frenetic.Physics;
 
 namespace UnitTestLibrary
 {
@@ -172,7 +173,7 @@ namespace UnitTestLibrary
             stubVF.Stub(x => x.MakePlayerView(Arg<Player>.Is.Anything)).Return(pv);
             bool playerFactoryWasUsedCorrectly = false;
             // TODO: How can i check that ID was used correctly as factory parameter
-            Player.Factory playerFactory = delegate { playerFactoryWasUsedCorrectly = true; return null; };
+            Player.Factory playerFactory = delegate { playerFactoryWasUsedCorrectly = true; return MockRepository.GenerateStub<IPlayer>(); };
             var stubMQ = MockRepository.GenerateStub<MessageQueue>(stubNS);
             var gameSession = new GameSession();
             GameSessionController gsc = new GameSessionController(gameSession, stubMQ, stubNS, stubVF, playerFactory);

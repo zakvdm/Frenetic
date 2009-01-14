@@ -5,17 +5,16 @@ using Frenetic.Physics;
 
 namespace Frenetic
 {
-    public class Player
+    public class Player : IPlayer
     {
-        public delegate Player Factory(int ID);
+        public delegate IPlayer Factory(int ID);
 
         public Player(int ID, IIntegrator integrator)
         {
             this.ID = ID;
             _integrator = integrator;
         }
-        // For XmlSerializer:
-        public Player(){}
+        public Player() { } // For XmlSerializer
 
         public int ID { get; set; }
         public Vector2 Position { get; set; }

@@ -41,7 +41,7 @@ namespace Frenetic
                 if (data == null)
                     break;
                 int newID = (int)data;
-                Player newPlayer = _playerFactory(newID);
+                IPlayer newPlayer = _playerFactory(newID);
                 
                 // TODO: Consider moving these sends into the GameSessionView?
 
@@ -70,7 +70,7 @@ namespace Frenetic
                 if (data == null)
                     break;
                 int ID = (int)data;
-                Player newPlayer = _playerFactory(ID);
+                IPlayer newPlayer = _playerFactory(ID);
                 _networkPlayerController.Players.Add(ID, newPlayer);
                 _gameSession.Views.Add(_viewFactory.MakePlayerView(newPlayer));
             }
@@ -80,7 +80,7 @@ namespace Frenetic
                 if (data == null)
                     break;
                 int ID = (int)data;
-                Player localPlayer = _playerFactory(ID);
+                IPlayer localPlayer = _playerFactory(ID);
                 _gameSession.Controllers.Add(new KeyboardPlayerController(localPlayer));
                 //_networkPlayerController.Players.Add(ID, localPlayer);
                 _gameSession.Views.Add(new NetworkPlayerView(localPlayer, _networkSession));

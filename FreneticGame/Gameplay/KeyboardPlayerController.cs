@@ -5,8 +5,8 @@ namespace Frenetic
 {
     public class KeyboardPlayerController : IController
     {
-        public Player Player { get; private set; }
-        public KeyboardPlayerController(Player player)
+        public IPlayer Player { get; private set; }
+        public KeyboardPlayerController(IPlayer player)
         {
             Player = player;
         }
@@ -22,6 +22,8 @@ namespace Frenetic
                 count = 0;
             }
             count++;
+
+            Player.Update();
         }
 
         #endregion

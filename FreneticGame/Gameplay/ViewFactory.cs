@@ -19,7 +19,7 @@ namespace Frenetic
 
         #region IViewFactory Members
         
-        public PlayerView MakePlayerView(Player player)
+        public PlayerView MakePlayerView(IPlayer player)
         {
             return new PlayerView(player, _spriteBatch, _playerTexture);
         }
