@@ -18,20 +18,29 @@ namespace UnitTestLibrary
         public void UpdateCallsIntegrate()
         {
             var stubIntegrator = MockRepository.GenerateStub<IIntegrator>();
-            Player player = new Player(1, stubIntegrator);
-            Vector2 pos = new Vector2(100, 200);
-            player.Position = pos;
+            Player player = new Player(1, stubIntegrator, MockRepository.GenerateStub<IBoundaryCollider>());
 
             player.Update();
 
-            stubIntegrator.AssertWasCalled(x => x.Integrate(Arg<Vector2>.Is.Equal(pos)));
+            stubIntegrator.AssertWasCalled(x => x.Integrate(Arg<Vector2>.Is.Equal(player.Position)));
+        }
+
+        [Test]
+        public void UpdateCallsMoveWithinBoundary()
+        {
+            var stubBoundaryCollider = MockRepository.GenerateStub<IBoundaryCollider>();
+            Player player = new Player(1, MockRepository.GenerateStub<IIntegrator>(), stubBoundaryCollider);
+
+            player.Update();
+
+            stubBoundaryCollider.AssertWasCalled(x => x.MoveWithinBoundary(Arg<Vector2>.Is.Equal(player.Position)));
         }
 
         [Test]
         public void CanSerialiseAndDeserialisePlayerPosition()
         {
             XmlSerializer serializer = new XmlSerializer(typeof(Player));
-            Player player = new Player(1, null);
+            Player player = new Player(1, null, null);
             player.Position = new Vector2(100, 200);
             MemoryStream stream = new MemoryStream();
 

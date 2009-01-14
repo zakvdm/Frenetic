@@ -9,10 +9,11 @@ namespace Frenetic
     {
         public delegate IPlayer Factory(int ID);
 
-        public Player(int ID, IIntegrator integrator)
+        public Player(int ID, IIntegrator integrator, IBoundaryCollider boundaryCollider)
         {
             this.ID = ID;
             _integrator = integrator;
+            _boundaryCollider = boundaryCollider;
         }
         public Player() { } // For XmlSerializer
 
@@ -22,8 +23,10 @@ namespace Frenetic
         public void Update()
         {
             Position = _integrator.Integrate(Position);
+            Position = _boundaryCollider.MoveWithinBoundary(Position);
         }
 
         IIntegrator _integrator;
+        IBoundaryCollider _boundaryCollider;
     }
 }

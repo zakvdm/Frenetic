@@ -134,8 +134,10 @@
     <Compile Include="Network\MessageQueue.cs" />
     <Compile Include="Network\XmlMessageSerializer.cs" />
     <Compile Include="OperationCompletedEventArgs.cs" />
+    <Compile Include="Physics\IBoundaryCollider.cs" />
     <Compile Include="Physics\IIntegrator.cs" />
     <Compile Include="Physics\VerletIntegrator.cs" />
+    <Compile Include="Physics\WorldBoundaryCollider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="FreneticGame.cs" />

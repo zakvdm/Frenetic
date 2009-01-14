@@ -41,6 +41,7 @@ namespace Frenetic
             builder.RegisterGeneratedFactory<Player.Factory>(new TypedService(typeof(Player)));
             builder.Register<PhysicsValues>().SingletonScoped();
             builder.Register<VerletIntegrator>().As<IIntegrator>().FactoryScoped();
+            builder.Register<WorldBoundaryCollider>().As<IBoundaryCollider>().FactoryScoped();
 
             var container = builder.Build();
 

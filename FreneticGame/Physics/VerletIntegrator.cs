@@ -49,10 +49,16 @@ namespace Frenetic.Physics
             Drag = 0.999999f;//0 means full drag, 1 is no drag
             Bounce = 0.3f;//must be in [0,1], where 1 means full bounce. but 1 seems to incite "the flubber effect" so use 0.9 as a practical upper bound
             Friction = 0.05f;
+
+            Width = 800;
+            Height = 600;
         }
         public float Gravity { get; set; }
         public float Drag { get; set; }
         public float Bounce { get; set; }
         public float Friction { get; set; }
+
+        public int Width { get; set; }
+        public int Height { get; set; }
     }
 }
