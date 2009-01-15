@@ -5,6 +5,10 @@ using Microsoft.Xna.Framework.Content;
 using Autofac.Builder;
 using Autofac;
 using Frenetic.Physics;
+using FarseerGames.FarseerPhysics;
+using FarseerGames.FarseerPhysics.Factories;
+using FarseerGames.FarseerPhysics.Dynamics;
+using FarseerGames.FarseerPhysics.Collisions;
 
 namespace Frenetic
 {
@@ -43,7 +47,26 @@ namespace Frenetic
             builder.Register<VerletIntegrator>().As<IIntegrator>().FactoryScoped();
             builder.Register<WorldBoundaryCollider>().As<IBoundaryCollider>().FactoryScoped();
 
+            builder.Register<PhysicsSimulator>().SingletonScoped();
+            // Body:
+            builder.Register((c, p) => BodyFactory.Instance.CreateRectangleBody(c.Resolve<PhysicsSimulator>(), p.Named<float>("width"), p.Named<float>("height"), p.Named<float>("mass"))).FactoryScoped();
+            // Geom:
+            builder.Register((c, p) => GeomFactory.Instance.CreateRectangleGeom(p.Named<Body>("body"), p.Named<float>("width"), p.Named<float>("height"))).FactoryScoped();
+
+            builder.Register((c,p) =>
+                {
+                    var width = new NamedParameter("width", 100f);
+                    var height = new NamedParameter("height", 200f);
+                    var mass = new NamedParameter("mass", 100f);
+                    var bod = c.Resolve<Body>(width, height, mass);
+                    var body = new NamedParameter("body", bod);
+                    var geom = c.Resolve<Geom>(body, width, height, mass);
+                    return new FarseerPhysicsComponent(bod, geom);
+                }).FactoryScoped();
+
             var container = builder.Build();
+
+            var test = container.Resolve<FarseerPhysicsComponent>();
 
             return container.Resolve<Player.Factory>();
         }

@@ -72,6 +72,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FarseerPhysicsComponentTests.cs" />
     <Compile Include="WorldBoundaryColliderTests.cs" />
     <Compile Include="GameplayScreenTests.cs" />
     <Compile Include="GameSessionControllerTests.cs" />
@@ -116,6 +117,10 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Dependencies\FarseerPhysics\FarseerPhysics.csproj">
+      <Project>{95B40504-C1C2-4FCD-98B3-B63AD35D6336}</Project>
+      <Name>FarseerPhysics</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Dependencies\Lidgren\Lidgren.Network\Lidgren.Network.csproj">
       <Project>{BA202214-F6F8-4853-BCC9-CA4F13C5F479}</Project>
       <Name>Lidgren.Network</Name>
