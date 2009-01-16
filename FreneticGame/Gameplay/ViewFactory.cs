@@ -10,11 +10,17 @@ namespace Frenetic
 
         public ViewFactory(GraphicsDevice graphicsDevice, ContentManager contentManager)
         {
-            _graphicsDevice = graphicsDevice;
-            _contentManager = contentManager;
+            if (graphicsDevice != null)
+            {
+                _graphicsDevice = graphicsDevice;
+                _spriteBatch = new SpriteBatch(_graphicsDevice);
+            }
 
-            _spriteBatch = new SpriteBatch(_graphicsDevice);
-            _playerTexture = _contentManager.Load<Texture2D>(playerTexturePath);
+            if (contentManager != null)
+            {
+                _contentManager = contentManager;
+                _playerTexture = _contentManager.Load<Texture2D>(playerTexturePath);
+            }
         }
 
         #region IViewFactory Members

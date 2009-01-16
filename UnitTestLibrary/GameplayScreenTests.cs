@@ -17,7 +17,7 @@ namespace UnitTestLibrary
         public void UpdateCallsGameSessionControllerProcessCorrectlyOnClient()
         {
             var stubGSC = MockRepository.GenerateStub<IController>();
-            GameplayScreen gpScreen = new GameplayScreen(new GameSessionControllerAndView(stubGSC, null));
+            GameplayScreen gpScreen = new GameplayScreen(new GameSessionControllerAndView(null, stubGSC, null));
 
             gpScreen.Update(new Microsoft.Xna.Framework.GameTime(), false, false);
 
@@ -28,7 +28,7 @@ namespace UnitTestLibrary
         public void DrawCallsGameSessionViewGenerateCorrectlyOnClient()
         {
             var stubGSV = MockRepository.GenerateStub<IView>();
-            GameplayScreen gpScreen = new GameplayScreen(new GameSessionControllerAndView(null, stubGSV));
+            GameplayScreen gpScreen = new GameplayScreen(new GameSessionControllerAndView(null, null, stubGSV));
 
             gpScreen.Draw(new Microsoft.Xna.Framework.GameTime());
 
@@ -40,8 +40,8 @@ namespace UnitTestLibrary
         {
             var stubGSCserver = MockRepository.GenerateStub<IController>();
             var stubGSCclient = MockRepository.GenerateStub<IController>();
-            GameplayScreen gpScreen = new GameplayScreen(new GameSessionControllerAndView(stubGSCserver, null),
-                                        new GameSessionControllerAndView(stubGSCclient, null));
+            GameplayScreen gpScreen = new GameplayScreen(new GameSessionControllerAndView(null, stubGSCserver, null),
+                                        new GameSessionControllerAndView(null, stubGSCclient, null));
 
             gpScreen.Update(new Microsoft.Xna.Framework.GameTime(), false, false);
 
@@ -54,8 +54,8 @@ namespace UnitTestLibrary
         {
             var stubGSVserver = MockRepository.GenerateStub<IView>();
             var stubGSVclient = MockRepository.GenerateStub<IView>();
-            GameplayScreen gpScreen = new GameplayScreen(new GameSessionControllerAndView(null, stubGSVserver),
-                                        new GameSessionControllerAndView(null, stubGSVclient));
+            GameplayScreen gpScreen = new GameplayScreen(new GameSessionControllerAndView(null, null, stubGSVserver),
+                                        new GameSessionControllerAndView(null, null, stubGSVclient));
 
             gpScreen.Draw(new Microsoft.Xna.Framework.GameTime());
 

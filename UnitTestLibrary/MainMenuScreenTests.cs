@@ -29,8 +29,8 @@ namespace UnitTestLibrary
         public void CanCreateAndStartServerGameSession()
         {
             var stubInputState = MockRepository.GenerateStub<IInputState>();
-            var serverGSCandV = new GameSessionControllerAndView(null, null);
-            var clientGSCandV = new GameSessionControllerAndView(null, null);
+            var serverGSCandV = new GameSessionControllerAndView(null, null, null);
+            var clientGSCandV = new GameSessionControllerAndView(null, null, null);
 
             stubInputState.Stub(x => x.MenuSelect).Return(true);
             stubGameSessionFactory.Stub(x => x.MakeServerGameSession()).Return(serverGSCandV);
@@ -46,7 +46,7 @@ namespace UnitTestLibrary
         public void CanCreateClientGameSession()
         {
             var stubInputState = MockRepository.GenerateStub<IInputState>();
-            var clientGSCandV = new GameSessionControllerAndView(null, null);
+            var clientGSCandV = new GameSessionControllerAndView(null, null, null);
 
             // Create network session is option 2:
             stubInputState.Stub(x => x.MenuDown).Return(true).Repeat.Once();

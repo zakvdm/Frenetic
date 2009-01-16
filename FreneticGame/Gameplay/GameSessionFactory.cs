@@ -19,8 +19,6 @@ namespace Frenetic
             _networkSessionFactory = networkSessionFactory;
             _graphicsDevice = graphicsDevice;
             _contentManager = contentManager;
-
-
         }
         #region IGameSessionFactory Members
 
@@ -30,14 +28,28 @@ namespace Frenetic
             _networkSession = _networkSessionFactory.MakeServerNetworkSession();
             _messageQueue = new MessageQueue(_networkSession);
             _gameSession = new GameSession();
-            Player.Factory playerFactory = MakePlayerFactoryWithContainer();
+            Player.Factory playerFactory = MakePlayerFactoryWithContainer(_gameSession);
             _gameSessionController = new GameSessionController(_gameSession, _messageQueue, _networkSession, _viewFactory, playerFactory);
             var gameSessionView = new GameSessionView(_gameSession);
 
-            return new GameSessionControllerAndView(_gameSessionController, gameSessionView);
+            return new GameSessionControllerAndView(_gameSession, _gameSessionController, gameSessionView);
         }
 
-        private Player.Factory MakePlayerFactoryWithContainer()
+        
+        public GameSessionControllerAndView MakeClientGameSession()
+        {
+            _viewFactory = new ViewFactory(_graphicsDevice, _contentManager);
+            _networkSession = _networkSessionFactory.MakeClientNetworkSession();
+            _messageQueue = new MessageQueue(_networkSession);
+            _gameSession = new GameSession();
+            Player.Factory playerFactory = MakePlayerFactoryWithContainer(_gameSession);
+            _gameSessionController = new GameSessionController(_gameSession, _messageQueue, _networkSession, _viewFactory, playerFactory);
+            var gameSessionView = new GameSessionView(_gameSession);
+
+            return new GameSessionControllerAndView(_gameSession, _gameSessionController, gameSessionView);
+        }
+
+        private Player.Factory MakePlayerFactoryWithContainer(IGameSession gameSession)
         {
             var builder = new ContainerBuilder();
 
@@ -46,43 +58,34 @@ namespace Frenetic
             builder.Register<PhysicsValues>().SingletonScoped();
             builder.Register<VerletIntegrator>().As<IIntegrator>().FactoryScoped();
             builder.Register<WorldBoundaryCollider>().As<IBoundaryCollider>().FactoryScoped();
-
-            builder.Register<PhysicsSimulator>().SingletonScoped();
+            
+            PhysicsSimulator physicsSimulator = new PhysicsSimulator(new FarseerGames.FarseerPhysics.Mathematics.Vector2(0f, 1f));
+            builder.Register<PhysicsSimulator>(physicsSimulator).SingletonScoped();
             // Body:
             builder.Register((c, p) => BodyFactory.Instance.CreateRectangleBody(c.Resolve<PhysicsSimulator>(), p.Named<float>("width"), p.Named<float>("height"), p.Named<float>("mass"))).FactoryScoped();
             // Geom:
             builder.Register((c, p) => GeomFactory.Instance.CreateRectangleGeom(p.Named<Body>("body"), p.Named<float>("width"), p.Named<float>("height"))).FactoryScoped();
 
-            builder.Register((c,p) =>
-                {
-                    var width = new NamedParameter("width", 100f);
-                    var height = new NamedParameter("height", 200f);
-                    var mass = new NamedParameter("mass", 100f);
-                    var bod = c.Resolve<Body>(width, height, mass);
-                    var body = new NamedParameter("body", bod);
-                    var geom = c.Resolve<Geom>(body, width, height, mass);
-                    return new FarseerPhysicsComponent(bod, geom);
-                }).FactoryScoped();
+            builder.Register((c, p) =>
+            {
+                var width = new NamedParameter("width", 100f);
+                var height = new NamedParameter("height", 200f);
+                var mass = new NamedParameter("mass", 100f);
+                var bod = c.Resolve<Body>(width, height, mass);
+                var body = new NamedParameter("body", bod);
+                var geom = c.Resolve<Geom>(body, width, height, mass);
+                return (IPhysicsComponent)new FarseerPhysicsComponent(bod, geom);
+            }).FactoryScoped();
+
+            builder.Register<FarseerPhysicsController>().SingletonScoped();
 
             var container = builder.Build();
 
-            var test = container.Resolve<FarseerPhysicsComponent>();
-
+            gameSession.Controllers.Add(container.Resolve<FarseerPhysicsController>());
+            
             return container.Resolve<Player.Factory>();
         }
 
-        public GameSessionControllerAndView MakeClientGameSession()
-        {
-            _viewFactory = new ViewFactory(_graphicsDevice, _contentManager);
-            _networkSession = _networkSessionFactory.MakeClientNetworkSession();
-            _messageQueue = new MessageQueue(_networkSession);
-            _gameSession = new GameSession();
-            Player.Factory playerFactory = MakePlayerFactoryWithContainer();
-            _gameSessionController = new GameSessionController(_gameSession, _messageQueue, _networkSession, _viewFactory, playerFactory);
-            var gameSessionView = new GameSessionView(_gameSession);
-
-            return new GameSessionControllerAndView(_gameSessionController, gameSessionView);
-        }
 
         #endregion
 
@@ -100,12 +103,14 @@ namespace Frenetic
 
     public class GameSessionControllerAndView
     {
-        public GameSessionControllerAndView(IController controller, IView view)
+        public GameSessionControllerAndView(IGameSession gameSession, IController controller, IView view)
         {
+            GameSession = gameSession;
             GameSessionController = controller;
             GameSessionView = view;
         }
 
+        public IGameSession GameSession { get; private set; }
         public IController GameSessionController { get; private set; }
         public IView GameSessionView { get; private set; }
     }

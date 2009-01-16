@@ -9,24 +9,41 @@ namespace Frenetic
     {
         public delegate IPlayer Factory(int ID);
 
-        public Player(int ID, IIntegrator integrator, IBoundaryCollider boundaryCollider)
+        public Player(int ID, IPhysicsComponent physicsComponent, IBoundaryCollider boundaryCollider)
         {
+            if (physicsComponent == null)
+                _physicsComponent = new DummyPhysicsComponent();
+            else
+                _physicsComponent = physicsComponent;
+
             this.ID = ID;
-            _integrator = integrator;
             _boundaryCollider = boundaryCollider;
         }
-        public Player() { } // For XmlSerializer
+        public Player() 
+        {
+            _physicsComponent = new DummyPhysicsComponent();
+        } // For XmlSerializer
+
+        public Vector2 Position 
+        { 
+            get
+            {
+                return _physicsComponent.Position;
+            } 
+            set
+            {
+                _physicsComponent.Position = value;
+            }
+        }
 
         public int ID { get; set; }
-        public Vector2 Position { get; set; }
 
         public void Update()
         {
-            Position = _integrator.Integrate(Position);
             Position = _boundaryCollider.MoveWithinBoundary(Position);
         }
 
-        IIntegrator _integrator;
+        IPhysicsComponent _physicsComponent;
         IBoundaryCollider _boundaryCollider;
     }
 }
