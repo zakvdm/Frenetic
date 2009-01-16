@@ -25,7 +25,7 @@ namespace UnitTestLibrary
             IPlayer stubPlayer = MockRepository.GenerateStub<IPlayer>();
             KeyboardPlayerController kpc = new KeyboardPlayerController(stubPlayer);
 
-            kpc.Process();
+            kpc.Process(1);
 
             stubPlayer.AssertWasCalled(x => x.Update());
         }

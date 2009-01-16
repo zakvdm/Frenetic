@@ -15,7 +15,7 @@ namespace Frenetic
             _messageQueue = messageQueue;
         }
 
-        public void Process()
+        public void Process(long ticks)
         {
             while (true)
             {

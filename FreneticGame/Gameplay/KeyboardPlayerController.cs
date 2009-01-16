@@ -14,7 +14,7 @@ namespace Frenetic
         
         Random rand = new Random();
         int count = 0;
-        public void Process()
+        public void Process(long ticks)
         {
             if (count > 300)
             {

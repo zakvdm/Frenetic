@@ -48,10 +48,10 @@ namespace UnitTestLibrary
             gameSession.Views.Add(stubView1);
             gameSession.Views.Add(stubView2);
 
-            gsc.Process();
+            gsc.Process(1);
 
-            stubController1.AssertWasCalled(x => x.Process());
-            stubController2.AssertWasCalled(x => x.Process());
+            stubController1.AssertWasCalled(x => x.Process(1));
+            stubController2.AssertWasCalled(x => x.Process(1));
             stubView1.AssertWasNotCalled(x => x.Generate());
             stubView2.AssertWasNotCalled(x => x.Generate());
         }
@@ -73,7 +73,7 @@ namespace UnitTestLibrary
             queueMH.QueuedMessages.Enqueue(100);
             stubMQ.Stub(x => x.ReadMessage(Arg<MessageType>.Is.Equal(MessageType.NewPlayer))).Do(queueMH.GetNextQueuedMessage);
 
-            gsc.Process();
+            gsc.Process(1);
 
             Assert.IsTrue(playerFactoryWasUsedCorrectly);
             Assert.IsTrue(((NetworkPlayerController)gameSession.Controllers[0]).Players.ContainsKey(100));
@@ -96,7 +96,7 @@ namespace UnitTestLibrary
             queueMH.QueuedMessages.Enqueue(100);
             stubMQ.Stub(x => x.ReadMessage(Arg<MessageType>.Is.Equal(MessageType.NewPlayer))).Do(queueMH.GetNextQueuedMessage);
 
-            gsc.Process();
+            gsc.Process(1);
 
             Assert.IsTrue(playerFactoryWasUsedCorrectly);
             Assert.IsTrue(((NetworkPlayerController)gameSession.Controllers[0]).Players.ContainsKey(100));
@@ -128,7 +128,7 @@ namespace UnitTestLibrary
             queueMH.QueuedMessages.Enqueue(300);
             stubMQ.Stub(x => x.ReadMessage(Arg<MessageType>.Is.Equal(MessageType.NewPlayer))).Do(queueMH.GetNextQueuedMessage);
 
-            gsc.Process();
+            gsc.Process(1);
 
             stubNS.AssertWasCalled(x => x.Send(Arg<Message>.Matches(y => y.Type == MessageType.NewPlayer && (int)y.Data == 100),
                 Arg<NetChannel>.Is.Equal(NetChannel.ReliableUnordered),
@@ -156,7 +156,7 @@ namespace UnitTestLibrary
             queueMH.QueuedMessages.Enqueue(300);
             stubMQ.Stub(x => x.ReadMessage(Arg<MessageType>.Is.Equal(MessageType.NewPlayer))).Do(queueMH.GetNextQueuedMessage);
 
-            gsc.Process();
+            gsc.Process(1);
 
             stubNS.AssertWasNotCalled(x => x.Send(Arg<Message>.Matches(y => y.Type == MessageType.NewPlayer && (int)y.Data == 300),
                 Arg<NetChannel>.Is.Equal(NetChannel.ReliableUnordered),
@@ -180,7 +180,7 @@ namespace UnitTestLibrary
             queueMH.QueuedMessages.Enqueue(100);
             stubMQ.Stub(x => x.ReadMessage(Arg<MessageType>.Is.Equal(MessageType.SuccessfulJoin))).Do(queueMH.GetNextQueuedMessage);
 
-            gsc.Process();
+            gsc.Process(1);
 
             Assert.IsTrue(playerFactoryWasUsedCorrectly);
             Assert.IsInstanceOfType(typeof(KeyboardPlayerController), gameSession.Controllers[1]);

@@ -17,7 +17,7 @@ namespace Frenetic
             _gameSession.Controllers.Add(_networkPlayerController);
         }
         #region IController Members
-        public void Process()
+        public void Process(long ticks)
         {
             // Handle GameSession level messages:
             if (_networkSession.IsServer)
@@ -28,7 +28,7 @@ namespace Frenetic
             // Update all gamesession controllers:
             foreach (IController controller in _gameSession.Controllers)
             {
-                controller.Process();
+                controller.Process(ticks);
             }
         }
         #endregion

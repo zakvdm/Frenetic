@@ -2,8 +2,8 @@ Iteration 1 Tasks:
 Player Input:  TERENCE
 	Player should be able to move around screen, jump, and (possibly) aim with the mouse.
 
-Player physics:  ZAK
+Player physics:
 	Player collides with level, player motion applied by physics engine
 
-Level:
+Level:  ZAK
 	Level built up out of farseer Body objects. Player collides against level. Level is rendered.

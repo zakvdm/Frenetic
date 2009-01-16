@@ -21,7 +21,7 @@ namespace UnitTestLibrary
 
             gpScreen.Update(new Microsoft.Xna.Framework.GameTime(), false, false);
 
-            stubGSC.AssertWasCalled(x => x.Process());
+            stubGSC.AssertWasCalled(x => x.Process(Arg<long>.Is.Anything));
         }
 
         [Test]
@@ -45,8 +45,8 @@ namespace UnitTestLibrary
 
             gpScreen.Update(new Microsoft.Xna.Framework.GameTime(), false, false);
 
-            stubGSCserver.AssertWasCalled(x => x.Process());
-            stubGSCclient.AssertWasCalled(x => x.Process());
+            stubGSCserver.AssertWasCalled(x => x.Process(Arg<long>.Is.Anything));
+            stubGSCclient.AssertWasCalled(x => x.Process(Arg<long>.Is.Anything));
         }
 
         [Test]

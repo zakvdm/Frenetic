@@ -140,10 +140,10 @@ namespace Frenetic
             base.Update(pGameTime, otherScreenHasFocus, coveredByOtherScreen);
 
             if (_serverGameSessionController != null)
-                _serverGameSessionController.Process();
+                _serverGameSessionController.Process(pGameTime.ElapsedGameTime.Ticks);
 
             if (_clientGameSessionController != null)
-                _clientGameSessionController.Process();
+                _clientGameSessionController.Process(pGameTime.ElapsedGameTime.Ticks);
             /*
             // if something else has canceled our game, then exit
             if ((networkSession == null) || (worldManager == null))

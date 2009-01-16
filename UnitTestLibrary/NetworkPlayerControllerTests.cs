@@ -34,7 +34,7 @@ namespace UnitTestLibrary
         {
             stubMQ.Stub(x => x.ReadMessage(Arg<MessageType>.Is.Anything)).Return(null);
 
-            npController.Process();
+            npController.Process(1);
 
             stubMQ.AssertWasCalled(x => x.ReadMessage(MessageType.PlayerData));
         }
@@ -49,7 +49,7 @@ namespace UnitTestLibrary
 
             Assert.AreEqual(Vector2.Zero, npController.Players[1].Position);
 
-            npController.Process();
+            npController.Process(1);
 
             Assert.AreEqual(new Vector2(100, 200), npController.Players[1].Position);
         }
@@ -69,7 +69,7 @@ namespace UnitTestLibrary
             Assert.AreEqual(Vector2.Zero, npController.Players[1].Position);
             Assert.AreEqual(Vector2.Zero, npController.Players[2].Position);
             
-            npController.Process();
+            npController.Process(1);
 
             Assert.AreEqual(new Vector2(100, 100), npController.Players[1].Position);
             Assert.AreEqual(new Vector2(-100, -100), npController.Players[2].Position);
@@ -88,7 +88,7 @@ namespace UnitTestLibrary
 
             Assert.AreEqual(Vector2.Zero, npController.Players[1].Position);
 
-            npController.Process();
+            npController.Process(1);
 
             Assert.AreEqual(new Vector2(100, 100), npController.Players[1].Position);
         }
