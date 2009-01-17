@@ -81,7 +81,7 @@ namespace Frenetic
                     break;
                 int ID = (int)data;
                 IPlayer localPlayer = _playerFactory(ID);
-                _gameSession.Controllers.Add(new KeyboardPlayerController(localPlayer));
+                _gameSession.Controllers.Add(new KeyboardPlayerController(localPlayer, new Keyboard()));
                 //_networkPlayerController.Players.Add(ID, localPlayer);
                 _gameSession.Views.Add(new NetworkPlayerView(localPlayer, _networkSession));
                 _gameSession.Views.Add(_viewFactory.MakePlayerView(localPlayer));

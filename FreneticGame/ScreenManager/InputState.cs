@@ -204,7 +204,7 @@ namespace Frenetic
             LastKeyboardState = CurrentKeyboardState;
             LastGamePadState = CurrentGamePadState;
 
-            CurrentKeyboardState = Keyboard.GetState();
+            //CurrentKeyboardState = Keyboard.GetState();
             CurrentGamePadState = GamePad.GetState(PlayerIndex.One);
         }
 

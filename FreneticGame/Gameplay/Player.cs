@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework;
 
 using Frenetic.Physics;
+using FarseerGames.FarseerPhysics.Dynamics;
 
 namespace Frenetic
 {
@@ -37,6 +38,7 @@ namespace Frenetic
         }
 
         public int ID { get; set; }
+        public Body Body { get; private set; }
 
         public void Update()
         {

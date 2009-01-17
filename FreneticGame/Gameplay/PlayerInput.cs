@@ -93,6 +93,7 @@ namespace Frenetic
         
         public void GetButtonInput()
         {
+            /*
             KeyboardState keyboardState = Keyboard.GetState();
             // check for movement action
             movementVector = Vector2.Zero;
@@ -120,6 +121,7 @@ namespace Frenetic
             {
                 fired = true;
             }
+            */
         }
 
 
