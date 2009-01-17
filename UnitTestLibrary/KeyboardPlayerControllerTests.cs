@@ -33,14 +33,7 @@ namespace UnitTestLibrary
         [Test]
         public void ProcessCallsPlayerUpdate()
         {
-/*<<<<<<< Updated upstream:UnitTestLibrary/KeyboardPlayerControllerTests.cs
-            IPlayer stubPlayer = MockRepository.GenerateStub<IPlayer>();
-            KeyboardPlayerController kpc = new KeyboardPlayerController(stubPlayer);
-
             kpc.Process(1);
-=======
-*/            kpc.Process(1);
-//>>>>>>> Stashed changes:UnitTestLibrary/KeyboardPlayerControllerTests.cs
 
             stubPlayer.AssertWasCalled(x => x.Update());
         }
