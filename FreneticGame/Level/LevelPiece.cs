@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Frenetic.Physics;
 
 namespace Frenetic.Level
 {
@@ -11,17 +12,33 @@ namespace Frenetic.Level
     {
         public delegate LevelPiece Factory(Vector2 position, Vector2 size);
 
-        public LevelPiece(Vector2 position, Vector2 size)
+        public LevelPiece(Vector2 position, Vector2 size, IPhysicsComponent physicsComponent)
         {
-            Position = position;
-            Size = size;
+            _physicsComponent = physicsComponent;
+            _physicsComponent.IsStatic = true;
+            _physicsComponent.Position = position;
+            _physicsComponent.Size = size;
             
             Random rnd = new Random();
             Color = new Color((float)rnd.NextDouble(), (float)rnd.NextDouble(), (float)rnd.NextDouble());
         }
 
-        public Vector2 Position { get; private set; }
-        public Vector2 Size { get; private set; }
+        public Vector2 Position 
+        {
+            get
+            {
+                return _physicsComponent.Position;
+            }
+        }
+        public Vector2 Size
+        {
+            get
+            {
+                return _physicsComponent.Size;
+            }
+        }
         public Color Color { get; private set; }    // TODO: This should rather be a property on the View...
+
+        IPhysicsComponent _physicsComponent;
     }
 }

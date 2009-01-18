@@ -71,12 +71,12 @@ namespace Frenetic
             // Body:
             builder.Register((c, p) => BodyFactory.Instance.CreateRectangleBody(c.Resolve<PhysicsSimulator>(), p.Named<float>("width"), p.Named<float>("height"), p.Named<float>("mass"))).FactoryScoped();
             // Geom:
-            builder.Register((c, p) => GeomFactory.Instance.CreateRectangleGeom(p.Named<Body>("body"), p.Named<float>("width"), p.Named<float>("height"))).FactoryScoped();
+            builder.Register((c, p) => GeomFactory.Instance.CreateRectangleGeom(c.Resolve<PhysicsSimulator>(), p.Named<Body>("body"), p.Named<float>("width"), p.Named<float>("height"))).FactoryScoped();
             // IPhysicsComponent:
             builder.Register((c, p) =>
             {
-                var width = new NamedParameter("width", 100f);
-                var height = new NamedParameter("height", 200f);
+                var width = new NamedParameter("width", 50f);
+                var height = new NamedParameter("height", 50f);
                 var mass = new NamedParameter("mass", 100f);
                 var bod = c.Resolve<Body>(width, height, mass);
                 var body = new NamedParameter("body", bod);

@@ -13,6 +13,17 @@ namespace Frenetic.Physics
             _geom = geom;
         }
 
+        public bool IsStatic
+        {
+            get
+            {
+                return _body.IsStatic;
+            }
+            set
+            {
+                _body.IsStatic = value;
+            }
+        }
         public Vector2 Position
         {
             get
@@ -25,6 +36,28 @@ namespace Frenetic.Physics
                 //_body.LinearVelocity = new FarseerGames.FarseerPhysics.Mathematics.Vector2(0, 0);
             }
         }
+        public Vector2 Size
+        {
+            get
+            {
+                return new Vector2(_geom.AABB.Width, _geom.AABB.Height);
+            }
+            set
+            {
+                /*
+                Vertices vertices = new Vertices();
+                vertices.Add(new FarseerGames.FarseerPhysics.Mathematics.Vector2(-value.X / 2f, -value.Y / 2f));
+                vertices.Add(new FarseerGames.FarseerPhysics.Mathematics.Vector2(-value.X / 2f, value.Y / 2f));
+                vertices.Add(new FarseerGames.FarseerPhysics.Mathematics.Vector2(value.X / 2f, value.Y / 2f));
+                vertices.Add(new FarseerGames.FarseerPhysics.Mathematics.Vector2(value.X / 2f, -value.Y / 2f));
+
+                _geom.SetVertices(vertices);
+                */
+                var geom = FarseerGames.FarseerPhysics.Factories.GeomFactory.Instance.CreateRectangleGeom(_body, value.X, value.Y);
+                _geom.SetVertices(geom.LocalVertices);
+            }
+        }
+        
 
         Body _body;
         Geom _geom;

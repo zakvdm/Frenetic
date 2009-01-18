@@ -5,6 +5,8 @@ using Frenetic.Level;
 using NUnit.Framework;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
+using Rhino.Mocks;
+using Frenetic.Physics;
 
 namespace UnitTestLibrary
 {
@@ -20,7 +22,7 @@ namespace UnitTestLibrary
 
         private LevelPiece MakeLevelPiece(Vector2 position, Vector2 size)
         {
-            return new LevelPiece(position, size);
+            return new LevelPiece(position, size, MockRepository.GenerateStub<IPhysicsComponent>());
         }
 
         [Test]

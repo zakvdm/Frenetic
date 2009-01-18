@@ -18,6 +18,8 @@ namespace Frenetic
 
             this.ID = ID;
             _boundaryCollider = boundaryCollider;
+
+            Position = new Vector2(300, 100);
         }
         public Player() 
         {

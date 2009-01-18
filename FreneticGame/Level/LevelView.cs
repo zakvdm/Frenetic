@@ -24,10 +24,8 @@ namespace Frenetic.Level
             _spriteBatch.Begin();
             foreach (LevelPiece piece in _level.Pieces)
             {
-                _spriteBatch.Draw(_texture, piece.Position, null, piece.Color, 0f,
-                    new Vector2(_texture.Height / 2f, _texture.Height / 2f),
-                    piece.Size,
-                    SpriteEffects.None, 0f);
+                _spriteBatch.Draw(_texture, new Vector2(piece.Position.X - (piece.Size.X / 2), piece.Position.Y - (piece.Size.Y / 2)),
+                    null, piece.Color, 0f, new Vector2(0, 0), piece.Size, SpriteEffects.None, 0f);
             }
             _spriteBatch.End();
         }
