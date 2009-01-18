@@ -26,7 +26,9 @@ namespace Frenetic
 
         public GameSessionControllerAndView MakeServerGameSession()
         {
-            _viewFactory = new ViewFactory(_graphicsDevice, _contentManager);
+            SpriteBatch spriteBatch = new SpriteBatch(_graphicsDevice);
+            Texture2D playerTexture = _contentManager.Load<Texture2D>("Content/Textures/ball");
+            _viewFactory = new ViewFactory(spriteBatch, playerTexture);
             _networkSession = _networkSessionFactory.MakeServerNetworkSession();
             _messageQueue = new MessageQueue(_networkSession);
             _gameSession = new GameSession();
@@ -40,7 +42,9 @@ namespace Frenetic
         
         public GameSessionControllerAndView MakeClientGameSession()
         {
-            _viewFactory = new ViewFactory(_graphicsDevice, _contentManager);
+            SpriteBatch spriteBatch = new SpriteBatch(_graphicsDevice);
+            Texture2D playerTexture = _contentManager.Load<Texture2D>("Content/Textures/ball");
+            _viewFactory = new ViewFactory(spriteBatch, playerTexture);
             _networkSession = _networkSessionFactory.MakeClientNetworkSession();
             _messageQueue = new MessageQueue(_networkSession);
             _gameSession = new GameSession();
@@ -90,7 +94,7 @@ namespace Frenetic
             builder.Register<LevelView>();
             ISpriteBatch spriteBatch = new XNASpriteBatch(new SpriteBatch(_graphicsDevice));
             builder.Register<ISpriteBatch>(spriteBatch);
-            ITexture texture = new XNATexture(_contentManager.Load<Texture2D>("Content/Textures/ball"));
+            ITexture texture = new XNATexture(_contentManager.Load<Texture2D>("Content/Textures/blank"));
             builder.Register<ITexture>(texture);
 
             var container = builder.Build();

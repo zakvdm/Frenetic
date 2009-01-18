@@ -1,13 +1,14 @@
 ﻿using System;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
+using Frenetic.Graphics;
 
 namespace Frenetic
 {
     public class PlayerView : IView
     {
         
-        public PlayerView(IPlayer player, SpriteBatch spriteBatch, Texture2D texture)
+        public PlayerView(IPlayer player, ISpriteBatch spriteBatch, ITexture texture)
         {
             _player = player;
             _spriteBatch = spriteBatch;
@@ -23,7 +24,7 @@ namespace Frenetic
         {
             if (_spriteBatch != null)
             {
-                _spriteBatch.Begin(SpriteBlendMode.AlphaBlend, SpriteSortMode.Deferred, SaveStateMode.None);
+                _spriteBatch.Begin();
                 _spriteBatch.Draw(_texture, _player.Position, null, _color, 0f,
                     new Vector2(_texture.Width / 2f, _texture.Height / 2f),
                     new Vector2(1, 1),
@@ -42,8 +43,8 @@ namespace Frenetic
         #endregion
 
         private IPlayer _player;
-        private SpriteBatch _spriteBatch;
-        private Texture2D _texture;
+        private ISpriteBatch _spriteBatch;
+        private ITexture _texture;
         private Color _color;
     }
 }

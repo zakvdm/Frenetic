@@ -11,5 +11,20 @@ namespace Frenetic.Graphics
         {
             Texture2D = texture;
         }
+
+        public int Width
+        {
+            get
+            {
+                return Texture2D.Width;
+            }
+        }
+        public int Height
+        {
+            get
+            {
+                return Texture2D.Height;
+            }
+        }
     }
 }
