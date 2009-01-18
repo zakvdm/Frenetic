@@ -22,6 +22,6 @@ namespace Frenetic.Level
 
         public Vector2 Position { get; private set; }
         public Vector2 Size { get; private set; }
-        public Color Color { get; private set; }
+        public Color Color { get; private set; }    // TODO: This should rather be a property on the View...
     }
 }
