@@ -13,17 +13,14 @@ namespace UnitTestLibrary
         [Test]
         public void CanConstruct()
         {
-            WorldBoundaryCollider wbc = new WorldBoundaryCollider(new PhysicsValues());
+            WorldBoundaryCollider wbc = new WorldBoundaryCollider(100, 200);
             Assert.IsNotNull(wbc);
         }
 
         [Test]
         public void MovesPositionBackIntoBoundary()
         {
-            PhysicsValues pv = new PhysicsValues();
-            pv.Width = 100;
-            pv.Height = 100;
-            WorldBoundaryCollider wbc = new WorldBoundaryCollider(pv);
+            WorldBoundaryCollider wbc = new WorldBoundaryCollider(100, 100);
 
             Vector2 pos = new Vector2(105, 30);
 
@@ -35,10 +32,7 @@ namespace UnitTestLibrary
         [Test]
         public void MovesIntoBoundaryForNegativeValues()
         {
-            PhysicsValues pv = new PhysicsValues();
-            pv.Width = 100;
-            pv.Height = 100;
-            WorldBoundaryCollider wbc = new WorldBoundaryCollider(pv);
+            WorldBoundaryCollider wbc = new WorldBoundaryCollider(100, 100);
 
             Vector2 pos = new Vector2(-20, -50);
 

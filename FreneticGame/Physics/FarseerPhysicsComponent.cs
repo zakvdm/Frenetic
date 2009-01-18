@@ -22,6 +22,7 @@ namespace Frenetic.Physics
             set
             {
                 _body.Position = new FarseerGames.FarseerPhysics.Mathematics.Vector2(value.X, value.Y);
+                //_body.LinearVelocity = new FarseerGames.FarseerPhysics.Mathematics.Vector2(0, 0);
             }
         }
 

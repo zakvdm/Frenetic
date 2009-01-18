@@ -5,18 +5,19 @@ namespace Frenetic.Physics
 {
     public class WorldBoundaryCollider : IBoundaryCollider
     {
-        public WorldBoundaryCollider(PhysicsValues physicsValues)
+        public WorldBoundaryCollider(int width, int height)
         {
-            _physicsValues = physicsValues;
+            _width = width;
+            _height = height;
         }
 
         public Vector2 MoveWithinBoundary(Vector2 position)
         {
-            if (position.X > _physicsValues.Width)
-                position.X = _physicsValues.Width;
+            if (position.X > _width)
+                position.X = _width;
 
-            if (position.Y > _physicsValues.Height)
-                position.Y = _physicsValues.Height;
+            if (position.Y > _height)
+                position.Y = _height;
 
             if (position.X < 0)
                 position.X = 0;
@@ -27,6 +28,7 @@ namespace Frenetic.Physics
             return position;
         }
 
-        PhysicsValues _physicsValues;
+        int _width;
+        int _height;
     }
 }

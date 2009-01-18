@@ -2,8 +2,11 @@ Iteration 1 Tasks:
 Player Input:  TERENCE
 	Player should be able to move around screen, jump, and (possibly) aim with the mouse.
 
-Player physics:
+Player physics: DONE?
 	Player collides with level, player motion applied by physics engine
 
 Level:  ZAK
 	Level built up out of farseer Body objects. Player collides against level. Level is rendered.
+
+Abstract Drawing Code: 
+	Make ISpriteBatch, with methods Draw(.....), then make an XNASpriteBatch : ISpriteBatch, that just wraps SpriteBatch's Draw methods (the one we need for now) and takes a XNA SpriteBatch in its constructor. This way we can unit test all the IViews.
