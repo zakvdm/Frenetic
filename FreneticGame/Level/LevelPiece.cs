@@ -14,11 +14,12 @@ namespace Frenetic.Level
 
         public LevelPiece(Vector2 position, Vector2 size, IPhysicsComponent physicsComponent)
         {
+            
             _physicsComponent = physicsComponent;
-            _physicsComponent.IsStatic = true;
             _physicsComponent.Position = position;
             _physicsComponent.Size = size;
-            
+            _physicsComponent.IsStatic = true;
+
             Random rnd = new Random();
             Color = new Color((float)rnd.NextDouble(), (float)rnd.NextDouble(), (float)rnd.NextDouble());
         }

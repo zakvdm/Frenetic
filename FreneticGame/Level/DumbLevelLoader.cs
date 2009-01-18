@@ -19,7 +19,9 @@ namespace Frenetic.Level
             levelPieces.Add(_levelPieceFactory(new Vector2(width - (BOUNDARY/2), height/2), new Vector2(BOUNDARY, height)));
             levelPieces.Add(_levelPieceFactory(new Vector2(width/2, height - (BOUNDARY/2)), new Vector2(width, BOUNDARY)));
 
-            levelPieces.Add(_levelPieceFactory(new Vector2(400, 400), new Vector2(500, 100)));
+            levelPieces.Add(_levelPieceFactory(new Vector2(200, 400), new Vector2(100, 30)));
+            levelPieces.Add(_levelPieceFactory(new Vector2(700, 300), new Vector2(50, 200)));
+            levelPieces.Add(_levelPieceFactory(new Vector2(400, 200), new Vector2(300, 10)));
         }
 
         LevelPiece.Factory _levelPieceFactory;

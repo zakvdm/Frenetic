@@ -147,6 +147,11 @@
     <Compile Include="Physics\DummyPhysicsComponent.cs" />
     <Compile Include="Physics\FarseerPhysicsComponent.cs" />
     <Compile Include="Physics\FarseerPhysicsController.cs" />
+    <Compile Include="Physics\Farseer\DrawingSystem\CircleBrush.cs" />
+    <Compile Include="Physics\Farseer\DrawingSystem\DrawingHelper.cs" />
+    <Compile Include="Physics\Farseer\DrawingSystem\LineBrush.cs" />
+    <Compile Include="Physics\Farseer\DrawingSystem\RectangleBrush.cs" />
+    <Compile Include="Physics\Farseer\PhysicsSimulatorView.cs" />
     <Compile Include="Physics\IBoundaryCollider.cs" />
     <Compile Include="Physics\IPhysicsComponent.cs" />
     <Compile Include="Physics\WorldBoundaryCollider.cs" />

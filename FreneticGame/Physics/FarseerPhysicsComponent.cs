@@ -32,7 +32,7 @@ namespace Frenetic.Physics
             }
             set
             {
-                _body.Position = new FarseerGames.FarseerPhysics.Mathematics.Vector2(value.X, value.Y);
+                _body.Position = value;
                 //_body.LinearVelocity = new FarseerGames.FarseerPhysics.Mathematics.Vector2(0, 0);
             }
         }
@@ -44,17 +44,10 @@ namespace Frenetic.Physics
             }
             set
             {
-                /*
-                Vertices vertices = new Vertices();
-                vertices.Add(new FarseerGames.FarseerPhysics.Mathematics.Vector2(-value.X / 2f, -value.Y / 2f));
-                vertices.Add(new FarseerGames.FarseerPhysics.Mathematics.Vector2(-value.X / 2f, value.Y / 2f));
-                vertices.Add(new FarseerGames.FarseerPhysics.Mathematics.Vector2(value.X / 2f, value.Y / 2f));
-                vertices.Add(new FarseerGames.FarseerPhysics.Mathematics.Vector2(value.X / 2f, -value.Y / 2f));
-
-                _geom.SetVertices(vertices);
-                */
                 var geom = FarseerGames.FarseerPhysics.Factories.GeomFactory.Instance.CreateRectangleGeom(_body, value.X, value.Y);
                 _geom.SetVertices(geom.LocalVertices);
+                _body.Position = _body.Position;
+                _geom.ComputeCollisionGrid();
             }
         }
         

@@ -19,7 +19,7 @@ namespace Frenetic
             this.ID = ID;
             _boundaryCollider = boundaryCollider;
 
-            Position = new Vector2(300, 100);
+            Position = new Vector2(400, 100);
         }
         public Player() 
         {

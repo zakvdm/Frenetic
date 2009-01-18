@@ -11,6 +11,8 @@ using FarseerGames.FarseerPhysics.Factories;
 using FarseerGames.FarseerPhysics.Dynamics;
 using FarseerGames.FarseerPhysics.Collisions;
 using Frenetic.Graphics;
+using Microsoft.Xna.Framework;
+using FarseerGames.GettingStarted;
 
 namespace Frenetic
 {
@@ -66,7 +68,7 @@ namespace Frenetic
             //builder.Register<WorldBoundaryCollider>().As<IBoundaryCollider>().FactoryScoped();
             
             // PHYSICS:
-            PhysicsSimulator physicsSimulator = new PhysicsSimulator(new FarseerGames.FarseerPhysics.Mathematics.Vector2(0f, 1f));
+            PhysicsSimulator physicsSimulator = new PhysicsSimulator(new Vector2(0f, 1f));
             builder.Register<PhysicsSimulator>(physicsSimulator).SingletonScoped();
             // Body:
             builder.Register((c, p) => BodyFactory.Instance.CreateRectangleBody(c.Resolve<PhysicsSimulator>(), p.Named<float>("width"), p.Named<float>("height"), p.Named<float>("mass"))).FactoryScoped();
@@ -92,7 +94,8 @@ namespace Frenetic
             builder.Register<Frenetic.Level.Level>();
             builder.Register<LevelController>();
             builder.Register<LevelView>();
-            ISpriteBatch spriteBatch = new XNASpriteBatch(new SpriteBatch(_graphicsDevice));
+            SpriteBatch realSpriteBatch = new SpriteBatch(_graphicsDevice);
+            ISpriteBatch spriteBatch = new XNASpriteBatch(realSpriteBatch);
             builder.Register<ISpriteBatch>(spriteBatch);
             ITexture texture = new XNATexture(_contentManager.Load<Texture2D>("Content/Textures/blank"));
             builder.Register<ITexture>(texture);
@@ -106,7 +109,12 @@ namespace Frenetic
                 gameSession.Views.Add(container.Resolve<LevelView>(new TypedParameter(typeof(Frenetic.Level.Level), level)));
             }
             gameSession.Controllers.Add(container.Resolve<LevelController>(new TypedParameter(typeof(Frenetic.Level.Level), level)));
-            
+
+            // DEBUG VIEW:
+            var debugView = new PhysicsSimulatorView(physicsSimulator, realSpriteBatch);
+            debugView.LoadContent(_graphicsDevice, _contentManager);
+            gameSession.Views.Add(debugView);
+
             return container.Resolve<Player.Factory>();
         }
 
