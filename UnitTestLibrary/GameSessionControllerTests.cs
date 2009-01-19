@@ -65,8 +65,7 @@ namespace UnitTestLibrary
             var stubVF = MockRepository.GenerateStub<IViewFactory>();
             stubVF.Stub(x => x.MakePlayerView(Arg<Player>.Is.Anything)).Return(pv);
             bool playerFactoryWasUsedCorrectly = false;
-            // TODO: How can i check that ID was used correctly as factory parameter
-            Player.Factory playerFactory = delegate { playerFactoryWasUsedCorrectly = true; return null; };
+            Player.Factory playerFactory = x => { if (x == 100) playerFactoryWasUsedCorrectly = true; return null; };
             var stubMQ = MockRepository.GenerateStub<MessageQueue>(stubNS);
             var gameSession = new GameSession();
             GameSessionController gsc = new GameSessionController(gameSession, stubMQ, stubNS, stubVF, playerFactory);
@@ -88,8 +87,7 @@ namespace UnitTestLibrary
             var stubINC = MockRepository.GenerateStub<INetConnection>();
             stubNS.Stub(x => x[100]).Return(stubINC);
             bool playerFactoryWasUsedCorrectly = false;
-            // TODO: How can i check that ID was used correctly as factory parameter
-            Player.Factory playerFactory = delegate { playerFactoryWasUsedCorrectly = true; return null; };
+            Player.Factory playerFactory = x => { if (x == 100) playerFactoryWasUsedCorrectly = true; return null; };
             var stubMQ = MockRepository.GenerateStub<MessageQueue>(stubNS);
             var gameSession = new GameSession();
             GameSessionController gsc = new GameSessionController(gameSession, stubMQ, stubNS, null, playerFactory);
@@ -172,8 +170,7 @@ namespace UnitTestLibrary
             var stubVF = MockRepository.GenerateStub<IViewFactory>();
             stubVF.Stub(x => x.MakePlayerView(Arg<Player>.Is.Anything)).Return(pv);
             bool playerFactoryWasUsedCorrectly = false;
-            // TODO: How can i check that ID was used correctly as factory parameter
-            Player.Factory playerFactory = delegate { playerFactoryWasUsedCorrectly = true; return MockRepository.GenerateStub<IPlayer>(); };
+            Player.Factory playerFactory = x => { if (x == 100) playerFactoryWasUsedCorrectly = true; return MockRepository.GenerateStub<IPlayer>(); };
             var stubMQ = MockRepository.GenerateStub<MessageQueue>(stubNS);
             var gameSession = new GameSession();
             GameSessionController gsc = new GameSessionController(gameSession, stubMQ, stubNS, stubVF, playerFactory);

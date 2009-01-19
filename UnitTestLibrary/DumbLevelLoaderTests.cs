@@ -34,7 +34,6 @@ namespace UnitTestLibrary
 
             dumbLevelLoader.LoadEmptyLevel(levelPieces, 400, 600);
 
-            Assert.AreEqual(4, levelPieces.Count);
             // level built clockwise starting on left
             Assert.AreEqual(new Vector2(10, 300), levelPieces[0].Position);
             Assert.AreEqual(new Vector2(20, 600), levelPieces[0].Size);
