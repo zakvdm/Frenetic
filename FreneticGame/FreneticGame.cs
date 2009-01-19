@@ -39,6 +39,8 @@ namespace Frenetic
             // initialize the screen manager
             screenManager = new ScreenManager(this);
             Components.Add(screenManager);
+
+            this.IsFixedTimeStep = false;
         }
 
         /// <summary>

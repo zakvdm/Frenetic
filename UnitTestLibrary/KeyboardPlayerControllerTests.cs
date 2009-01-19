@@ -8,7 +8,6 @@ using Rhino.Mocks;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using FarseerGames.FarseerPhysics.Dynamics;
-using FarseerVector2 = FarseerGames.FarseerPhysics.Mathematics.Vector2;
 
 namespace UnitTestLibrary
 {
@@ -43,11 +42,9 @@ namespace UnitTestLibrary
         {
             stubKeyboard.Stub(k => k.IsKeyDown(Arg<Keys>.Is.Equal(Keys.Space))).Return(true);
             var stubBody = MockRepository.GenerateStub<Body>();
-            stubPlayer.Stub(p => p.Body).Return(stubBody);
 
-            Assert.AreEqual(new FarseerVector2(0, 0), stubBody.Force);
             kpc.Process(1);
-            Assert.AreEqual(new FarseerVector2(0, 10), stubBody.Force);
+            stubPlayer.AssertWasCalled(p => p.Jump());
         }
 
         IPlayer stubPlayer;

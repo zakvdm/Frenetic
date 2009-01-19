@@ -31,13 +31,11 @@ namespace Frenetic
 
             if (Keyboard.IsKeyDown(Keys.Space))
             {
-                Player.Body.ApplyForce(JumpForce);
+                Player.Jump();
             }
 
             Player.Update();
         }
-
-        readonly FarseerGames.FarseerPhysics.Mathematics.Vector2 JumpForce = new FarseerGames.FarseerPhysics.Mathematics.Vector2(0, 10);
 
         #endregion
     }

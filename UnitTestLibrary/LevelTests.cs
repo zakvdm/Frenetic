@@ -1,61 +1,64 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System;
 
-using Frenetic;
+using Frenetic.Level;
 
 using NUnit.Framework;
-using Microsoft.Xna.Framework;
+using Autofac.Builder;
+using Autofac;
+using Frenetic;
+using Microsoft.Xna.Framework.Graphics;
+using Rhino.Mocks;
+using System.Collections.Generic;
+using Frenetic.Graphics;
 
 namespace UnitTestLibrary
 {
     [TestFixture]
     public class LevelTests
     {
-        private TileGrid level;
-        [TestFixtureSetUp]
-        public void CreateLevel()
+        [Test]
+        public void HasACollectionOfLevelPieces()
         {
+            Level level = new Level(null);
 
-            level = new TileGrid(null);
-            level.Rows = 5;
-            level.Columns = 10;
-            level.TileWidth = 10;
-            level.TileHeight = 20;
+            Assert.AreEqual(0, level.Pieces.Count);
+        }
+
+        [Test]
+        public void CanBuildWithAutofac()
+        {
+            var builder = new ContainerBuilder();
+            builder.Register<LevelPiece>().FactoryScoped();
+            builder.RegisterGeneratedFactory<LevelPiece.Factory>(new TypedService(typeof(LevelPiece)));
+            builder.Register<DumbLevelLoader>().As<ILevelLoader>().SingletonScoped();
+            builder.Register<Level>();
             
-            level.Initialize();
+            builder.Register<LevelView>();
+            ISpriteBatch spriteBatch = MockRepository.GenerateStub<ISpriteBatch>();
+            builder.Register<ISpriteBatch>(spriteBatch);
+            ITexture texture = MockRepository.GenerateStub<ITexture>();
+            builder.Register<ITexture>(texture);
 
-            Assert.AreEqual(12, level[0].Count);
-            Assert.IsNotNull(level[6]);
-            Assert.IsNull(level[7]);
+            var container = builder.Build();
+
+            Level level = container.Resolve<Level>();
+            LevelView levelView = container.Resolve<LevelView>(new TypedParameter(typeof(Level), level));
+
+            Assert.IsNotNull(level);
+            Assert.IsNotNull(levelView);
         }
 
         [Test]
-        public void TestInitialization()
+        public void CallsLoadEmptyLevelWhenNotLoaded()
         {
-            // Check border
-            Assert.AreEqual(level[0][0].Type, TileType.Solid);
-            Assert.AreEqual(level[0][11].Type, TileType.Solid);
-            Assert.AreEqual(level[6][0].Type, TileType.Solid);
-            Assert.AreEqual(level[6][11].Type, TileType.Solid);
-        }
+            var stubLevelLoader = MockRepository.GenerateStub<ILevelLoader>();
+            Level level = new Level(stubLevelLoader);
+            Assert.IsFalse(level.Loaded);
 
-        [Test]
-        public void TestGetTile()
-        {
-            Tile tile = level.GetTile(new Vector2(25.3f, 62.1f));
-            Assert.AreEqual(level[3][2], tile);
-        }
+            level.Load();
 
-        [Test]
-        public void TestNeighbours()
-        {
-            Tile tile = level.GetTile(new Vector2(25.3f, 62.1f));
-
-            Assert.AreSame(level[3][1], tile.Left);
-            Assert.AreEqual(level[3][3], tile.Right);
-            Assert.AreEqual(level[2][2], tile.Up);
-            Assert.AreEqual(level[4][2], tile.Down);
+            Assert.IsTrue(level.Loaded);
+            stubLevelLoader.AssertWasCalled(x => x.LoadEmptyLevel(Arg<List<LevelPiece>>.Is.Equal(level.Pieces), Arg<int>.Is.Equal(800), Arg<int>.Is.Equal(600)));
         }
     }
 }

@@ -52,7 +52,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>..\..\build\game\bin\x86\Release</OutputPath>
+    <OutputPath>bin\x86\Release</OutputPath>
     <DefineConstants>TRACE%3bWINDOWS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -119,6 +119,16 @@
     <Compile Include="Gameplay\OldPlayer.cs" />
     <Compile Include="Gameplay\PlayerInput.cs" />
     <Compile Include="Gameplay\World.cs" />
+    <Compile Include="Graphics\ISpriteBatch.cs" />
+    <Compile Include="Graphics\ITexture.cs" />
+    <Compile Include="Graphics\XNASpriteBatch.cs" />
+    <Compile Include="Graphics\XNATexture2D.cs" />
+    <Compile Include="Level\DumbLevelLoader.cs" />
+    <Compile Include="Level\ILevelLoader.cs" />
+    <Compile Include="Level\Level.cs" />
+    <Compile Include="Level\LevelController.cs" />
+    <Compile Include="Level\LevelPiece.cs" />
+    <Compile Include="Level\LevelView.cs" />
     <Compile Include="Network\IMessageSerializer.cs" />
     <Compile Include="Network\INetworkSession.cs" />
     <Compile Include="Gameplay\IGameSessionFactory.cs" />
@@ -137,10 +147,13 @@
     <Compile Include="Physics\DummyPhysicsComponent.cs" />
     <Compile Include="Physics\FarseerPhysicsComponent.cs" />
     <Compile Include="Physics\FarseerPhysicsController.cs" />
+    <Compile Include="Physics\Farseer\DrawingSystem\CircleBrush.cs" />
+    <Compile Include="Physics\Farseer\DrawingSystem\DrawingHelper.cs" />
+    <Compile Include="Physics\Farseer\DrawingSystem\LineBrush.cs" />
+    <Compile Include="Physics\Farseer\DrawingSystem\RectangleBrush.cs" />
+    <Compile Include="Physics\Farseer\PhysicsSimulatorView.cs" />
     <Compile Include="Physics\IBoundaryCollider.cs" />
-    <Compile Include="Physics\IIntegrator.cs" />
     <Compile Include="Physics\IPhysicsComponent.cs" />
-    <Compile Include="Physics\VerletIntegrator.cs" />
     <Compile Include="Physics\WorldBoundaryCollider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Program.cs" />

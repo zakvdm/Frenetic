@@ -1,4 +1,5 @@
 ﻿using System;
+using Microsoft.Xna.Framework;
 
 namespace Frenetic.Physics
 {
@@ -10,7 +11,13 @@ namespace Frenetic.Physics
         }
         #region IPhysicsComponent Members
 
-        public Microsoft.Xna.Framework.Vector2 Position { get; set; }
+        public bool IsStatic { get; set; }
+        public Vector2 Position { get; set; }
+        public Vector2 Size { get; set; }
+
+        public void ApplyImpulse(Vector2 impulse)
+        {
+        }
 
         #endregion
     }

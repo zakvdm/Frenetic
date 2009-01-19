@@ -19,6 +19,8 @@ namespace Frenetic
 
             this.ID = ID;
             _boundaryCollider = boundaryCollider;
+
+            Position = new Vector2(400, 100);
         }
         public Player() 
         {
@@ -38,14 +40,20 @@ namespace Frenetic
         }
 
         public int ID { get; set; }
-        public Body Body { get; private set; }
 
         public void Update()
         {
             Position = _boundaryCollider.MoveWithinBoundary(Position);
         }
 
+        public void Jump()
+        {
+            _physicsComponent.ApplyImpulse(JumpForce);
+        }
+
         IPhysicsComponent _physicsComponent;
         IBoundaryCollider _boundaryCollider;
+
+        static Vector2 JumpForce = new Vector2(0, -25000);
     }
 }

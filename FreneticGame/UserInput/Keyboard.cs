@@ -10,7 +10,7 @@ namespace Frenetic
     {
         public bool IsKeyDown(Keys key)
         {
-            return false;
+            return Microsoft.Xna.Framework.Input.Keyboard.GetState().IsKeyDown(key);
         }
     }
 }

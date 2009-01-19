@@ -8,6 +8,7 @@ using Frenetic.Physics;
 
 using NUnit.Framework;
 using Rhino.Mocks;
+using FarseerGames.FarseerPhysics.Dynamics;
 
 namespace UnitTestLibrary
 {
@@ -25,8 +26,8 @@ namespace UnitTestLibrary
         public void PositionImplementedInTermsOfPhysicsComponent()
         {
             var stubPhysicsComponent = MockRepository.GenerateStub<IPhysicsComponent>();
-            stubPhysicsComponent.Position = new Vector2(100, 200);
             Player player = new Player(1, stubPhysicsComponent, MockRepository.GenerateMock<IBoundaryCollider>());
+            stubPhysicsComponent.Position = new Vector2(100, 200);
 
             Assert.AreEqual(new Vector2(100, 200), player.Position);
         }
@@ -36,6 +37,7 @@ namespace UnitTestLibrary
         {
             var stubBoundaryCollider = MockRepository.GenerateStub<IBoundaryCollider>();
             Player player = new Player(1, MockRepository.GenerateStub<IPhysicsComponent>(), stubBoundaryCollider);
+            stubBoundaryCollider.Stub(x => x.MoveWithinBoundary(Arg<Vector2>.Is.Anything)).Return(player.Position);
 
             player.Update();
 
@@ -71,9 +73,18 @@ namespace UnitTestLibrary
             Player rebuiltPlayer = (Player)serializer.Deserialize(stream);
             rebuiltPlayer.Position = new Vector2(1, 2);
 
-            // TODO: WHY THE HELL DOESN'T THIS WORK????
-            //stubPhysicsComponent.AssertWasCalled(x => x.Position = new Vector2(100, 200));
             stubPhysicsComponent.AssertWasNotCalled(x => x.Position = new Vector2(1, 2));
+        }
+
+        [Test]
+        public void JumpAppliesTheJumpVectorAsAnImpulseToThePlayersBody()
+        {
+            var stubPhysicsComponent = MockRepository.GenerateStub<IPhysicsComponent>();
+            Player player = new Player(1, stubPhysicsComponent, null);
+
+            player.Jump();
+
+            stubPhysicsComponent.AssertWasCalled(pc => pc.ApplyImpulse(new Vector2(0, -25000)));
         }
     }
 }
