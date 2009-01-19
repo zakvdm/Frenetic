@@ -65,7 +65,6 @@ namespace Frenetic
             builder.Register<Player>().FactoryScoped();
             builder.RegisterGeneratedFactory<Player.Factory>(new TypedService(typeof(Player)));
             builder.Register((c) => (IBoundaryCollider)new WorldBoundaryCollider(800, 600));
-            //builder.Register<WorldBoundaryCollider>().As<IBoundaryCollider>().FactoryScoped();
             
             // PHYSICS:
             PhysicsSimulator physicsSimulator = new PhysicsSimulator(new Vector2(0f, 1f));
@@ -110,8 +109,9 @@ namespace Frenetic
             }
             gameSession.Controllers.Add(container.Resolve<LevelController>(new TypedParameter(typeof(Frenetic.Level.Level), level)));
 
-            // DEBUG VIEW:
+            // DEBUG VIEW:  // TODO: Write a controller for this...
             var debugView = new PhysicsSimulatorView(physicsSimulator, realSpriteBatch);
+            physicsSimulator.EnableDiagnostics = true;
             debugView.LoadContent(_graphicsDevice, _contentManager);
             gameSession.Views.Add(debugView);
 
