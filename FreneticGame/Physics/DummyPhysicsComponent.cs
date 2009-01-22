@@ -24,6 +24,8 @@ namespace Frenetic.Physics
         {
         }
 
+        public event CanJumpDelegate CanJump = delegate { };
+
         #endregion
     }
 }

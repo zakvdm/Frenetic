@@ -11,6 +11,12 @@ namespace Frenetic.Physics
         {
             _body = body;
             _geom = geom;
+
+            _geom.OnCollision += new Geom.CollisionEventHandler((body1, body2, contactList) =>
+                {
+                    CanJump();
+                    return true;
+                });
         }
 
         public bool IsStatic
@@ -67,6 +73,8 @@ namespace Frenetic.Physics
         {
             _body.ApplyForce(force);
         }
+
+        public event CanJumpDelegate CanJump = delegate { };
         
 
         Body _body;

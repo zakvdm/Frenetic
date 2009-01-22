@@ -77,14 +77,26 @@ namespace UnitTestLibrary
         }
 
         [Test]
-        public void JumpAppliesTheJumpVectorAsAnImpulseToThePlayersBody()
+        public void JumpAppliesTheJumpVectorAsAnImpulseToThePlayersBodyIfCanJumpIsTrue()
+        {
+            var stubPhysicsComponent = MockRepository.GenerateStub<IPhysicsComponent>();
+            Player player = new Player(1, stubPhysicsComponent, null);
+
+            player.CanJump = true;
+            player.Jump();
+
+            stubPhysicsComponent.AssertWasCalled(pc => pc.ApplyImpulse(Player.JumpImpulse));
+        }
+
+        [Test]
+        public void JumpAppliesNoImpulseToThePlayersBodyIfCanJumpIsFalse()
         {
             var stubPhysicsComponent = MockRepository.GenerateStub<IPhysicsComponent>();
             Player player = new Player(1, stubPhysicsComponent, null);
 
             player.Jump();
 
-            stubPhysicsComponent.AssertWasCalled(pc => pc.ApplyImpulse(new Vector2(0, -25000)));
+            stubPhysicsComponent.AssertWasNotCalled(pc => pc.ApplyImpulse(Player.JumpImpulse));
         }
 
         [Test]
@@ -95,7 +107,7 @@ namespace UnitTestLibrary
 
             player.MoveLeft();
 
-            stubPhysicsComponent.AssertWasCalled(pc => pc.ApplyForce(new Vector2(-2000, 0)));
+            stubPhysicsComponent.AssertWasCalled(pc => pc.ApplyForce(Player.MoveForce));
         }
 
         [Test]
@@ -106,7 +118,7 @@ namespace UnitTestLibrary
 
             player.MoveRight();
 
-            stubPhysicsComponent.AssertWasCalled(pc => pc.ApplyForce(new Vector2(2000, 0)));
+            stubPhysicsComponent.AssertWasCalled(pc => pc.ApplyForce(Player.MoveForce * -1));
         }
 
         [Test]
@@ -119,7 +131,7 @@ namespace UnitTestLibrary
 
             player.MoveLeft();
 
-            stubPhysicsComponent.AssertWasNotCalled(pc => pc.ApplyForce(new Vector2(-2000, 0)));
+            stubPhysicsComponent.AssertWasNotCalled(pc => pc.ApplyForce(Player.MoveForce));
         }
 
         [Test]
@@ -132,7 +144,7 @@ namespace UnitTestLibrary
 
             player.MoveRight();
 
-            stubPhysicsComponent.AssertWasNotCalled(pc => pc.ApplyForce(new Vector2(2000, 0)));
+            stubPhysicsComponent.AssertWasNotCalled(pc => pc.ApplyForce(Player.MoveForce * -1));
         }
     }
 }

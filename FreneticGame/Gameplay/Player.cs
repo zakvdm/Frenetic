@@ -17,6 +17,8 @@ namespace Frenetic
             else
                 _physicsComponent = physicsComponent;
 
+            _physicsComponent.CanJump += () => CanJump = true;
+
             this.ID = ID;
             _boundaryCollider = boundaryCollider;
 
@@ -40,6 +42,8 @@ namespace Frenetic
         }
 
         public int ID { get; set; }
+        public bool CanJump { get; set; }
+        private DateTime LastJumpTime { get; set; }
 
         public void Update()
         {
@@ -48,7 +52,16 @@ namespace Frenetic
 
         public void Jump()
         {
-            _physicsComponent.ApplyImpulse(JumpForce);
+            if ((DateTime.Now - LastJumpTime).TotalMilliseconds < JumpTimer)
+            {
+                CanJump = false;
+            }
+
+            if (CanJump)
+            {
+                LastJumpTime = DateTime.Now;
+                _physicsComponent.ApplyImpulse(JumpImpulse);
+            }
         }
 
         public void MoveLeft()
@@ -70,8 +83,9 @@ namespace Frenetic
         IPhysicsComponent _physicsComponent;
         IBoundaryCollider _boundaryCollider;
 
-        static Vector2 JumpForce = new Vector2(0, -25000);
-        static Vector2 MoveForce = new Vector2(-2000, 0);
+        public static Vector2 JumpImpulse = new Vector2(0, -500000);
+        public static Vector2 MoveForce = new Vector2(-2000, 0);
         static float MaxSpeed = 50;
+        static double JumpTimer = 200;
     }
 }

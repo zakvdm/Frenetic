@@ -7,6 +7,8 @@ namespace Frenetic
     {
         int ID { get; set; }
         Vector2 Position { get; set; }
+
+        bool CanJump { get; set; }
         
         void Update();
         void Jump();
