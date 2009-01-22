@@ -46,8 +46,7 @@ namespace UnitTestLibrary
             receivedPlayer.Position = new Vector2(100, 200);
             queueMH.QueuedMessages.Enqueue(receivedPlayer);
             stubMQ.Stub(x => x.ReadMessage(Arg<MessageType>.Is.Equal(MessageType.PlayerData))).Do(queueMH.GetNextQueuedMessage);
-
-            Assert.AreEqual(Vector2.Zero, npController.Players[1].Position);
+            npController.Players[1].Position = Vector2.Zero;
 
             npController.Process(1);
 
@@ -65,10 +64,9 @@ namespace UnitTestLibrary
             queueMH.QueuedMessages.Enqueue(receivedPlayer2);
             stubMQ.Stub(x => x.ReadMessage(Arg<MessageType>.Is.Anything)).Do(queueMH.GetNextQueuedMessage);
             npController.Players.Add(2, new Player(2, null, null));
+            npController.Players[1].Position = Vector2.Zero;
+            npController.Players[2].Position = Vector2.Zero;
 
-            Assert.AreEqual(Vector2.Zero, npController.Players[1].Position);
-            Assert.AreEqual(Vector2.Zero, npController.Players[2].Position);
-            
             npController.Process(1);
 
             Assert.AreEqual(new Vector2(100, 100), npController.Players[1].Position);
@@ -85,8 +83,7 @@ namespace UnitTestLibrary
             queueMH.QueuedMessages.Enqueue(receivedPlayer1);
             queueMH.QueuedMessages.Enqueue(receivedPlayer2);
             stubMQ.Stub(x => x.ReadMessage(Arg<MessageType>.Is.Anything)).Do(queueMH.GetNextQueuedMessage);
-
-            Assert.AreEqual(Vector2.Zero, npController.Players[1].Position);
+            npController.Players[1].Position = Vector2.Zero;
 
             npController.Process(1);
 
