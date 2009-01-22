@@ -19,6 +19,10 @@ namespace Frenetic.Physics
         {
         }
 
+        public void ApplyForce(Vector2 force)
+        {
+        }
+
         #endregion
     }
 }

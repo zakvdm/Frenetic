@@ -80,5 +80,18 @@ namespace UnitTestLibrary
             physicsSimulator.Update(1);
             Assert.AreEqual(new Vector2(0.000099999f, 0), body.Position);
         }
+
+        [Test]
+        public void CanApplyForce()
+        {
+            PhysicsSimulator physicsSimulator = new PhysicsSimulator();
+            Body body = BodyFactory.Instance.CreateRectangleBody(physicsSimulator, 10, 10, 100);
+            Geom geom = GeomFactory.Instance.CreateRectangleGeom(body, 10, 10);
+            FarseerPhysicsComponent farseerPComponent = new FarseerPhysicsComponent(body, geom);
+
+            Assert.AreEqual(Vector2.Zero, body.Force);
+            farseerPComponent.ApplyForce(Vector2.UnitX);
+            Assert.AreEqual(Vector2.UnitX, body.Force);
+        }
     }
 }

@@ -51,9 +51,20 @@ namespace Frenetic
             _physicsComponent.ApplyImpulse(JumpForce);
         }
 
+        public void MoveLeft()
+        {
+            _physicsComponent.ApplyForce(MoveForce);
+        }
+
+        public void MoveRight()
+        {
+            _physicsComponent.ApplyForce(MoveForce * -1);
+        }
+
         IPhysicsComponent _physicsComponent;
         IBoundaryCollider _boundaryCollider;
 
         static Vector2 JumpForce = new Vector2(0, -25000);
+        static Vector2 MoveForce = new Vector2(-2000, 0);
     }
 }

@@ -34,6 +34,16 @@ namespace Frenetic
                 Player.Jump();
             }
 
+            if (Keyboard.IsKeyDown(Keys.Left))
+            {
+                Player.MoveLeft();
+            }
+
+            if (Keyboard.IsKeyDown(Keys.Right))
+            {
+                Player.MoveRight();
+            }
+
             Player.Update();
         }
 

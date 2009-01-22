@@ -55,6 +55,11 @@ namespace Frenetic.Physics
         {
             _body.ApplyImpulse(impulse);
         }
+
+        public void ApplyForce(Vector2 force)
+        {
+            _body.ApplyForce(force);
+        }
         
 
         Body _body;

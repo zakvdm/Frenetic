@@ -13,5 +13,6 @@ namespace Frenetic.Physics
         Vector2 Size { get; set; }
 
         void ApplyImpulse(Vector2 impulse);
+        void ApplyForce(Vector2 force);
     }
 }

@@ -10,5 +10,7 @@ namespace Frenetic
         
         void Update();
         void Jump();
+        void MoveLeft();
+        void MoveRight();
     }
 }

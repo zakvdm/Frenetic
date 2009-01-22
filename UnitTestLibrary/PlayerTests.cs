@@ -86,5 +86,27 @@ namespace UnitTestLibrary
 
             stubPhysicsComponent.AssertWasCalled(pc => pc.ApplyImpulse(new Vector2(0, -25000)));
         }
+
+        [Test]
+        public void MoveLeftAppliesTheCorrectForceToThePlayersBodyWhenStationary()
+        {
+            var stubPhysicsComponent = MockRepository.GenerateStub<IPhysicsComponent>();
+            Player player = new Player(1, stubPhysicsComponent, null);
+
+            player.MoveLeft();
+
+            stubPhysicsComponent.AssertWasCalled(pc => pc.ApplyForce(new Vector2(-2000, 0)));
+        }
+
+        [Test]
+        public void MoveRightAppliesTheCorrectForceToThePlayersBodyWhenStationary()
+        {
+            var stubPhysicsComponent = MockRepository.GenerateStub<IPhysicsComponent>();
+            Player player = new Player(1, stubPhysicsComponent, null);
+
+            player.MoveRight();
+
+            stubPhysicsComponent.AssertWasCalled(pc => pc.ApplyForce(new Vector2(2000, 0)));
+        }
     }
 }

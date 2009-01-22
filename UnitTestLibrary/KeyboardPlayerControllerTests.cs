@@ -38,13 +38,33 @@ namespace UnitTestLibrary
         }
 
         [Test]
-        public void PressingTheSpacebarExertsJumpForceOnPlayer()
+        public void PressingTheSpacebarExertsJumpImpulseOnPlayer()
         {
             stubKeyboard.Stub(k => k.IsKeyDown(Arg<Keys>.Is.Equal(Keys.Space))).Return(true);
             var stubBody = MockRepository.GenerateStub<Body>();
 
             kpc.Process(1);
             stubPlayer.AssertWasCalled(p => p.Jump());
+        }
+
+        [Test]
+        public void PressingTheLeftArrowExertsMovementForceOnPlayer()
+        {
+            stubKeyboard.Stub(k => k.IsKeyDown(Arg<Keys>.Is.Equal(Keys.Left))).Return(true);
+            var stubBody = MockRepository.GenerateStub<Body>();
+
+            kpc.Process(1);
+            stubPlayer.AssertWasCalled(p => p.MoveLeft());
+        }
+
+        [Test]
+        public void PressingTheRightArrowExertsMovementForceOnPlayer()
+        {
+            stubKeyboard.Stub(k => k.IsKeyDown(Arg<Keys>.Is.Equal(Keys.Right))).Return(true);
+            var stubBody = MockRepository.GenerateStub<Body>();
+
+            kpc.Process(1);
+            stubPlayer.AssertWasCalled(p => p.MoveRight());
         }
 
         IPlayer stubPlayer;
