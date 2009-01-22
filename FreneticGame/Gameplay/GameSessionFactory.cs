@@ -67,7 +67,7 @@ namespace Frenetic
             builder.Register((c) => (IBoundaryCollider)new WorldBoundaryCollider(800, 600));
             
             // PHYSICS:
-            PhysicsSimulator physicsSimulator = new PhysicsSimulator(new Vector2(0f, 1f));
+            PhysicsSimulator physicsSimulator = new PhysicsSimulator(new Vector2(0, 6));
             builder.Register<PhysicsSimulator>(physicsSimulator).SingletonScoped();
             // Body:
             builder.Register((c, p) => BodyFactory.Instance.CreateRectangleBody(c.Resolve<PhysicsSimulator>(), p.Named<float>("width"), p.Named<float>("height"), p.Named<float>("mass"))).FactoryScoped();
