@@ -53,12 +53,18 @@ namespace Frenetic
 
         public void MoveLeft()
         {
-            _physicsComponent.ApplyForce(MoveForce);
+            if (_physicsComponent.LinearVelocity.X > -MaxSpeed)
+            {
+                _physicsComponent.ApplyForce(MoveForce);
+            }
         }
 
         public void MoveRight()
         {
-            _physicsComponent.ApplyForce(MoveForce * -1);
+            if (_physicsComponent.LinearVelocity.X < MaxSpeed)
+            {
+                _physicsComponent.ApplyForce(MoveForce * -1);
+            }
         }
 
         IPhysicsComponent _physicsComponent;
@@ -66,5 +72,6 @@ namespace Frenetic
 
         static Vector2 JumpForce = new Vector2(0, -25000);
         static Vector2 MoveForce = new Vector2(-2000, 0);
+        static float MaxSpeed = 50;
     }
 }

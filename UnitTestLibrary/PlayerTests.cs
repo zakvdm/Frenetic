@@ -108,5 +108,31 @@ namespace UnitTestLibrary
 
             stubPhysicsComponent.AssertWasCalled(pc => pc.ApplyForce(new Vector2(2000, 0)));
         }
+
+        [Test]
+        public void PlayerVelocityIsCappedToTheLeft()
+        {
+            var stubPhysicsComponent = MockRepository.GenerateStub<IPhysicsComponent>();
+            Player player = new Player(1, stubPhysicsComponent, null);
+
+            stubPhysicsComponent.Stub(spc => spc.LinearVelocity).Return(new Vector2(-50, 0));
+
+            player.MoveLeft();
+
+            stubPhysicsComponent.AssertWasNotCalled(pc => pc.ApplyForce(new Vector2(-2000, 0)));
+        }
+
+        [Test]
+        public void PlayerVelocityIsCappedToTheRight()
+        {
+            var stubPhysicsComponent = MockRepository.GenerateStub<IPhysicsComponent>();
+            Player player = new Player(1, stubPhysicsComponent, null);
+
+            stubPhysicsComponent.Stub(spc => spc.LinearVelocity).Return(new Vector2(50, 0));
+
+            player.MoveRight();
+
+            stubPhysicsComponent.AssertWasNotCalled(pc => pc.ApplyForce(new Vector2(2000, 0)));
+        }
     }
 }

@@ -36,6 +36,13 @@ namespace Frenetic.Physics
                 //_body.LinearVelocity = new FarseerGames.FarseerPhysics.Mathematics.Vector2(0, 0);
             }
         }
+        public Vector2 LinearVelocity
+        {
+            get
+            {
+                return new Vector2(_body.LinearVelocity.X, _body.LinearVelocity.Y);
+            }
+        }
         public Vector2 Size
         {
             get

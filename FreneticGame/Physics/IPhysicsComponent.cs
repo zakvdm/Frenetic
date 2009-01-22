@@ -10,6 +10,7 @@ namespace Frenetic.Physics
     {
         bool IsStatic { get; set; }
         Vector2 Position { get; set; }
+        Vector2 LinearVelocity { get; }
         Vector2 Size { get; set; }
 
         void ApplyImpulse(Vector2 impulse);
