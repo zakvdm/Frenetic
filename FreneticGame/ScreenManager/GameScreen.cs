@@ -172,6 +172,8 @@ namespace Frenetic
         #region Initialization
 
 
+        // TODO: REMOVE THESE CONTENT LOADING METHODS??
+
         /// <summary>
         /// Load graphics content for the screen.
         /// </summary>
@@ -277,7 +279,7 @@ namespace Frenetic
         /// is only called when the screen is active, and not when some other
         /// screen has taken the focus.
         /// </summary>
-        public virtual void HandleInput(IInputState input) { }
+        public virtual void HandleInput(InputState input) { }
 
 
         /// <summary>

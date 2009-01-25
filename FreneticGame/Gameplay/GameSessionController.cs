@@ -46,16 +46,16 @@ namespace Frenetic
                 // TODO: Consider moving these sends into the GameSessionView?
 
                 // send ack to new player:
-                _networkSession.Send(new Message() { Type = MessageType.SuccessfulJoin, Data = newID }, NetChannel.ReliableInOrder1, _networkSession[newID]);
+                _networkSession.SendTo(new Message() { Type = MessageType.SuccessfulJoin, Data = newID }, NetChannel.ReliableInOrder1, _networkSession[newID]);
                 
                 // send existent players' info to new player:
                 foreach (int currentID in _networkPlayerController.Players.Keys)
                 {
-                    _networkSession.Send(new Message() { Type = MessageType.NewPlayer, Data = currentID }, NetChannel.ReliableUnordered, _networkSession[newID]);
+                    _networkSession.SendTo(new Message() { Type = MessageType.NewPlayer, Data = currentID }, NetChannel.ReliableUnordered, _networkSession[newID]);
                 }
 
                 // tell existent players about new player:
-                _networkSession.SendToAll(new Message() { Type = MessageType.NewPlayer, Data = newID }, NetChannel.ReliableUnordered, _networkSession[newID]);
+                _networkSession.SendToAllExcept(new Message() { Type = MessageType.NewPlayer, Data = newID }, NetChannel.ReliableUnordered, _networkSession[newID]);
 
                 _networkPlayerController.Players.Add(newID, newPlayer);
                 _gameSession.Views.Add(new NetworkPlayerView(newPlayer, _networkSession));

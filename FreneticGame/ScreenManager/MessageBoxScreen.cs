@@ -35,7 +35,11 @@ namespace Frenetic
 
         bool pauseMenu = false;
         string message;
-        SpriteFont smallFont;
+        SpriteFont _smallFont;
+        SpriteFont _font;
+        Viewport _viewport;
+        SpriteBatch _spriteBatch;
+        Texture2D _blankTexture;
 
         #endregion
 
@@ -52,37 +56,21 @@ namespace Frenetic
         /// <summary>
         /// Constructor.
         /// </summary>
-        public MessageBoxScreen(string message)
+        public MessageBoxScreen(string message, bool pauseMenu, SpriteFont smallFont, SpriteFont font, Viewport viewport, SpriteBatch spriteBatch, Texture2D blankTexture)
         {
             this.message = message;
+            _smallFont = smallFont;
+            _font = font;
+            _viewport = viewport;
+            _spriteBatch = spriteBatch;
+            _blankTexture = blankTexture;
 
             IsPopup = true;
+            this.pauseMenu = pauseMenu;
 
             TransitionOnTime = TimeSpan.FromSeconds(0.25);
             TransitionOffTime = TimeSpan.FromSeconds(0.25);
         }
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public MessageBoxScreen(string message, bool pauseMenu)
-            : this(message)
-        {
-            this.pauseMenu = pauseMenu;
-        }
-
-
-        /// <summary>
-        /// Loads graphics content for this screen. This uses the shared ContentManager
-        /// provided by the ScreenManager, so the content will remain loaded forever.
-        /// Whenever a subsequent MessageBoxScreen tries to load this same content,
-        /// it will just get back another reference to the already loaded instance.
-        /// </summary>
-        public override void LoadContent()
-        {
-            smallFont = ScreenManager.Content.Load<SpriteFont>("Fonts/MessageBox");
-        }
-
 
         #endregion
 
@@ -92,10 +80,9 @@ namespace Frenetic
         /// <summary>
         /// Responds to user input, accepting or cancelling the message box.
         /// </summary>
-        public override void HandleInput(IInputState input)
+        public override void HandleInput(InputState input)
         {
-            throw new System.NotImplementedException();
-            /*if (input.MenuSelect && (!pauseMenu ||
+            if (input.MenuSelect && (!pauseMenu ||
                 (input.CurrentGamePadState.Buttons.A == ButtonState.Pressed)))
             {
                 // Raise the accepted event, then exit the message box.
@@ -112,7 +99,7 @@ namespace Frenetic
                     Cancelled(this, EventArgs.Empty);
 
                 ExitScreen();
-            }*/
+            }
         }
 
 
@@ -127,17 +114,16 @@ namespace Frenetic
         public override void Draw(GameTime gameTime)
         {
             // Darken down any other screens that were drawn beneath the popup.
-            ScreenManager.FadeBackBufferToBlack(TransitionAlpha * 2 / 3);
+            FadeBackBufferToBlack(TransitionAlpha * 2 / 3);
 
             // Center the message text in the viewport.
-            Viewport viewport = ScreenManager.GraphicsDevice.Viewport;
-            Vector2 viewportSize = new Vector2(viewport.Width, viewport.Height);
-            Vector2 textSize = ScreenManager.Font.MeasureString(message);
+            Vector2 viewportSize = new Vector2(_viewport.Width, _viewport.Height);
+            Vector2 textSize = _font.MeasureString(message);
             Vector2 textPosition = (viewportSize - textSize) / 2;
-            Vector2 usageTextSize = smallFont.MeasureString(usageText);
+            Vector2 usageTextSize = _smallFont.MeasureString(usageText);
             Vector2 usageTextPosition = (viewportSize - usageTextSize) / 2;
             usageTextPosition.Y = textPosition.Y +
-                ScreenManager.Font.LineSpacing * 1.1f;
+                _font.LineSpacing * 1.1f;
 
             // Fade the popup alpha during transitions.
             Color color = new Color(255, 255, 255, TransitionAlpha);
@@ -147,7 +133,7 @@ namespace Frenetic
                 (int)(Math.Min(usageTextPosition.X, textPosition.X)),
                 (int)(textPosition.Y),
                 (int)(Math.Max(usageTextSize.X, textSize.X)),
-                (int)(ScreenManager.Font.LineSpacing * 1.1f + usageTextSize.Y)
+                (int)(_font.LineSpacing * 1.1f + usageTextSize.Y)
                 );
             rect.X -= (int)(0.1f * rect.Width);
             rect.Y -= (int)(0.1f * rect.Height);
@@ -156,18 +142,35 @@ namespace Frenetic
 
             Rectangle rect2 = new Rectangle(rect.X - 1, rect.Y - 1,
                 rect.Width + 2, rect.Height + 2);
-            ScreenManager.DrawRectangle(rect2, new Color(128, 128, 128,
+            _spriteBatch.Begin();
+            _spriteBatch.Draw(_blankTexture, rect2, new Color(128, 128, 128,
                 (byte)(192.0f * (float)TransitionAlpha / 255.0f)));
-            ScreenManager.DrawRectangle(rect, new Color(0, 0, 0,
+            _spriteBatch.Draw(_blankTexture, rect, new Color(0, 0, 0,
                 (byte)(232.0f * (float)TransitionAlpha / 255.0f)));
+            _spriteBatch.End();
 
             // Draw the message box text.
-            ScreenManager.SpriteBatch.Begin();
-            ScreenManager.SpriteBatch.DrawString(ScreenManager.Font, message,
+            _spriteBatch.Begin();
+            _spriteBatch.DrawString(_font, message,
                                                  textPosition, color);
-            ScreenManager.SpriteBatch.DrawString(smallFont, usageText,
+            _spriteBatch.DrawString(_smallFont, usageText,
                                                  usageTextPosition, color);
-            ScreenManager.SpriteBatch.End();
+            _spriteBatch.End();
+        }
+
+        /// <summary>
+        /// Helper draws a translucent black fullscreen sprite, used for fading
+        /// screens in and out, and for darkening the background behind popups.
+        /// </summary>
+        private void FadeBackBufferToBlack(int alpha)
+        {
+            _spriteBatch.Begin();
+
+            _spriteBatch.Draw(_blankTexture,
+                             new Rectangle(0, 0, _viewport.Width, _viewport.Height),
+                             new Color(0, 0, 0, (byte)alpha));
+
+            _spriteBatch.End();
         }
 
 

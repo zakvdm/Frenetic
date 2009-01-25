@@ -24,7 +24,7 @@ namespace Frenetic
     /// <remarks>
     /// This public class is similar to one in the GameStateManagement sample.
     /// </remarks>
-    public class InputState : IInputState
+    public class InputState
     {
         #region Fields
 

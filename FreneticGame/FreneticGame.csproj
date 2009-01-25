@@ -159,7 +159,6 @@
     <Compile Include="Program.cs" />
     <Compile Include="FreneticGame.cs" />
     <Compile Include="ScreenManager\GameScreen.cs" />
-    <Compile Include="ScreenManager\IInputState.cs" />
     <Compile Include="ScreenManager\InputState.cs" />
     <Compile Include="ScreenManager\MessageBoxScreen.cs" />
     <Compile Include="ScreenManager\ScreenManager.cs" />

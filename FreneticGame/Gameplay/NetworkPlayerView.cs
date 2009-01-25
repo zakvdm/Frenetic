@@ -19,7 +19,7 @@ namespace Frenetic
             if (_networkSession.IsServer)
                 _networkSession.SendToAll(msg, Lidgren.Network.NetChannel.Unreliable);
             else
-                _networkSession.Send(msg, Lidgren.Network.NetChannel.Unreliable);
+                _networkSession.SendToServer(msg, Lidgren.Network.NetChannel.Unreliable);
         }
     }
 }

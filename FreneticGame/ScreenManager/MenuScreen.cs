@@ -51,7 +51,7 @@ namespace Frenetic
         /// Responds to user input, changing the selected entry and accepting
         /// or cancelling the menu.
         /// </summary>
-        public override void HandleInput(IInputState input)
+        public override void HandleInput(InputState input)
         {
             // Move to the previous menu entry?
             if (input.MenuUp)
@@ -91,13 +91,13 @@ namespace Frenetic
         /// <summary>
         /// Notifies derived classes that a menu entry has been chosen.
         /// </summary>
-        protected abstract void OnSelectEntry(int entryIndex);
+        public abstract void OnSelectEntry(int entryIndex);
 
 
         /// <summary>
         /// Notifies derived classes that the menu has been cancelled.
         /// </summary>
-        protected abstract void OnCancel();
+        public abstract void OnCancel();
 
 
         #endregion

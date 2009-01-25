@@ -355,22 +355,7 @@ namespace Frenetic
         }
 
 
-        /// <summary>
-        /// Helper draws a translucent black fullscreen sprite, used for fading
-        /// screens in and out, and for darkening the background behind popups.
-        /// </summary>
-        public void FadeBackBufferToBlack(int alpha)
-        {
-            Viewport viewport = GraphicsDevice.Viewport;
-
-            spriteBatch.Begin();
-
-            spriteBatch.Draw(blankTexture,
-                             new Rectangle(0, 0, viewport.Width, viewport.Height),
-                             new Color(0, 0, 0, (byte)alpha));
-
-            spriteBatch.End();
-        }
+       
 
 
         #endregion

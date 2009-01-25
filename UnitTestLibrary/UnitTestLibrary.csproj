@@ -82,6 +82,7 @@
     <Compile Include="LevelPieceTests.cs" />
     <Compile Include="LevelTests.cs" />
     <Compile Include="LevelViewTests.cs" />
+    <Compile Include="LidgrenNetworkSessionSendingTests.cs" />
     <Compile Include="PlayerViewTests.cs" />
     <Compile Include="WorldBoundaryColliderTests.cs" />
     <Compile Include="GameplayScreenTests.cs" />

@@ -183,64 +183,7 @@ namespace UnitTestLibrary
             Assert.AreEqual(10, msg.Data);
         }
 
-        [Test]
-        [ExpectedException(ExceptionType = typeof(System.InvalidOperationException),
-                            ExpectedMessage = "Client not connected to server")]
-        public void CantSendWhenNotConnected()
-        {
-            var stubNetClient = MockRepository.GenerateStub<INetClient>();
-            LidgrenNetworkSession clientNS = new LidgrenNetworkSession(stubNetClient);
-
-            clientNS.Send(new Message(), NetChannel.Unreliable);
-        }
-
-        [Test]
-        public void ClientProcessesAndSendsToServer()
-        {
-            var stubNetClient = MockRepository.GenerateStub<INetClient>();
-            LidgrenNetworkSession clientNetworkSession = new LidgrenNetworkSession(stubNetClient);
-
-            NetBuffer tmpBuffer = new NetBuffer();
-            Message msg = new Message() { Type = MessageType.PlayerData, Data = 10 };
-            stubNetClient.Stub(x => x.CreateBuffer(Arg<int>.Is.Anything)).Return(tmpBuffer);
-            stubNetClient.Stub(x => x.Connected).Return(true);
-
-            clientNetworkSession.Send(msg, NetChannel.ReliableUnordered);
-
-            stubNetClient.AssertWasCalled(x => x.CreateBuffer(Arg<int>.Is.Anything));
-            stubNetClient.AssertWasCalled(x => x.SendMessage(tmpBuffer, NetChannel.ReliableUnordered));
-
-            byte[] data = (new XmlMessageSerializer()).Serialize(msg);
-            Assert.AreEqual(data, tmpBuffer.ReadBytes(data.Length));
-        }
-
-        [Test]
-        [ExpectedException(ExceptionType = typeof(System.InvalidOperationException),
-                    ExpectedMessage = "Client can't send to all")]
-        public void OnlyServerCanSendToAll()
-        {
-            var stubNetClient = MockRepository.GenerateStub<INetClient>();
-            LidgrenNetworkSession clientNS = new LidgrenNetworkSession(stubNetClient);
-
-            clientNS.SendToAll(null, NetChannel.Unreliable);
-        }
-
-        [Test]
-        public void ServerCanSendMessagesToAllClients()
-        {
-            var stubNetServer = MockRepository.GenerateStub<INetServer>();
-            LidgrenNetworkSession serverNS = new LidgrenNetworkSession(stubNetServer);
-            Message msg = new Message() { Data = new byte[] { 1, 2, 3, 4 } };
-            NetBuffer tmpBuffer = new NetBuffer();
-
-            stubNetServer.Stub(x => x.CreateBuffer(Arg<int>.Is.Anything)).Return(tmpBuffer);
-
-            serverNS.SendToAll(msg, NetChannel.Unreliable);
-
-            stubNetServer.AssertWasCalled(x => x.SendToAll(Arg<NetBuffer>.Is.Equal(tmpBuffer),
-                                                        Arg<NetChannel>.Is.Anything));
-            Assert.AreEqual(new byte[] { 1, 2, 3, 4 }, (new XmlMessageSerializer()).Deserialize(tmpBuffer.ToArray()).Data);
-        }
+        
 
         [Test]
         public void ServerApprovesNewConnection()

@@ -62,7 +62,7 @@ namespace UnitTestLibrary
 
             npView.Generate();
 
-            stubNS.AssertWasCalled(x => x.Send(Arg<Message>.Matches(y => y.Type == MessageType.PlayerData && y.Data == player), Arg<NetChannel>.Is.Anything));
+            stubNS.AssertWasCalled(x => x.SendToServer(Arg<Message>.Matches(y => y.Type == MessageType.PlayerData && y.Data == player), Arg<NetChannel>.Is.Anything));
         }
     }
 }

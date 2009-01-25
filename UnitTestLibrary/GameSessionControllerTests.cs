@@ -100,10 +100,10 @@ namespace UnitTestLibrary
             Assert.IsTrue(((NetworkPlayerController)gameSession.Controllers[0]).Players.ContainsKey(100));
             Assert.IsInstanceOfType(typeof(NetworkPlayerView), gameSession.Views[0]);
 
-            stubNS.AssertWasCalled(x => x.Send(Arg<Message>.Matches(y => y.Type == MessageType.SuccessfulJoin && (int)y.Data == 100),
+            stubNS.AssertWasCalled(x => x.SendTo(Arg<Message>.Matches(y => y.Type == MessageType.SuccessfulJoin && (int)y.Data == 100),
                 Arg<NetChannel>.Is.Equal(NetChannel.ReliableInOrder1),
                 Arg<INetConnection>.Is.Equal(stubINC)));
-            stubNS.AssertWasCalled(x => x.SendToAll(Arg<Message>.Matches(y => y.Type == MessageType.NewPlayer && (int)y.Data == 100),
+            stubNS.AssertWasCalled(x => x.SendToAllExcept(Arg<Message>.Matches(y => y.Type == MessageType.NewPlayer && (int)y.Data == 100),
                 Arg<NetChannel>.Is.Equal(NetChannel.ReliableUnordered),
                 Arg<INetConnection>.Is.Equal(stubINC)));
         }
@@ -128,10 +128,10 @@ namespace UnitTestLibrary
 
             gsc.Process(1);
 
-            stubNS.AssertWasCalled(x => x.Send(Arg<Message>.Matches(y => y.Type == MessageType.NewPlayer && (int)y.Data == 100),
+            stubNS.AssertWasCalled(x => x.SendTo(Arg<Message>.Matches(y => y.Type == MessageType.NewPlayer && (int)y.Data == 100),
                 Arg<NetChannel>.Is.Equal(NetChannel.ReliableUnordered),
                 Arg<INetConnection>.Is.Equal(stubINC300)));
-            stubNS.AssertWasCalled(x => x.Send(Arg<Message>.Matches(y => y.Type == MessageType.NewPlayer && (int)y.Data == 200),
+            stubNS.AssertWasCalled(x => x.SendTo(Arg<Message>.Matches(y => y.Type == MessageType.NewPlayer && (int)y.Data == 200),
                 Arg<NetChannel>.Is.Equal(NetChannel.ReliableUnordered),
                 Arg<INetConnection>.Is.Equal(stubINC300)));
         }
@@ -156,7 +156,7 @@ namespace UnitTestLibrary
 
             gsc.Process(1);
 
-            stubNS.AssertWasNotCalled(x => x.Send(Arg<Message>.Matches(y => y.Type == MessageType.NewPlayer && (int)y.Data == 300),
+            stubNS.AssertWasNotCalled(x => x.SendTo(Arg<Message>.Matches(y => y.Type == MessageType.NewPlayer && (int)y.Data == 300),
                 Arg<NetChannel>.Is.Equal(NetChannel.ReliableUnordered),
                 Arg<INetConnection>.Is.Equal(stubINC300)));
         }

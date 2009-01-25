@@ -15,10 +15,10 @@ namespace Frenetic
         void Join(int port);
         void Shutdown(string reason);
 
-        void Send(Message msg, NetChannel channel);
-        void Send(Message msg, NetChannel channel, INetConnection connection);
+        void SendToServer(Message msg, NetChannel channel);
+        void SendTo(Message msg, NetChannel channel, INetConnection connection);
         void SendToAll(Message msg, NetChannel channel);
-        void SendToAll(Message msg, NetChannel channel, INetConnection excludedConnection);
+        void SendToAllExcept(Message msg, NetChannel channel, INetConnection excludedConnection);
         Message ReadMessage();
 
         INetConnection this[int playerID] { get; }

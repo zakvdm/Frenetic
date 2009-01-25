@@ -22,22 +22,20 @@ namespace UnitTestLibrary
         {
             stubGameSessionFactory = MockRepository.GenerateStub<IGameSessionFactory>();
             stubScreenFactory = MockRepository.GenerateStub<IScreenFactory>();
-            mainMenuScreen = new MainMenuScreen(new Viewport(), null, null, stubGameSessionFactory, stubScreenFactory);
+            mainMenuScreen = new MainMenuScreen(new Viewport(), null, null, stubGameSessionFactory, stubScreenFactory, null);
         }
         
         [Test]
         public void CanCreateAndStartServerGameSession()
         {
-            var stubInputState = MockRepository.GenerateStub<IInputState>();
             var serverGSCandV = new GameSessionControllerAndView(null, null, null);
             var clientGSCandV = new GameSessionControllerAndView(null, null, null);
 
-            stubInputState.Stub(x => x.MenuSelect).Return(true);
             stubGameSessionFactory.Stub(x => x.MakeServerGameSession()).Return(serverGSCandV);
             stubGameSessionFactory.Stub(x => x.MakeClientGameSession()).Return(clientGSCandV);
 
             mainMenuScreen.State = MainMenuScreen.MainMenuState.Network;
-            mainMenuScreen.HandleInput(stubInputState);
+            mainMenuScreen.OnSelectEntry(0);    // Create a session selected
 
             stubScreenFactory.AssertWasCalled(x => x.MakeGameplayScreen(serverGSCandV, clientGSCandV));
         }
@@ -45,19 +43,26 @@ namespace UnitTestLibrary
         [Test]
         public void CanCreateClientGameSession()
         {
-            var stubInputState = MockRepository.GenerateStub<IInputState>();
             var clientGSCandV = new GameSessionControllerAndView(null, null, null);
 
-            // Create network session is option 2:
-            stubInputState.Stub(x => x.MenuDown).Return(true).Repeat.Once();
-            stubInputState.Stub(x => x.MenuSelect).Return(true).Repeat.Once();
-            
             stubGameSessionFactory.Stub(x => x.MakeClientGameSession()).Return(clientGSCandV);
 
             mainMenuScreen.State = MainMenuScreen.MainMenuState.Network;
-            mainMenuScreen.HandleInput(stubInputState);
+            mainMenuScreen.OnSelectEntry(1);    // Join a session selected
 
             stubScreenFactory.AssertWasCalled(x => x.MakeGameplayScreen(Arg<GameSessionControllerAndView>.Is.Equal(clientGSCandV)));
+        }
+
+        [Test]
+        public void CanExitGame()
+        {
+            MessageBoxScreen mbs = new MessageBoxScreen("Exit Frenetic?", false, null, null, new Viewport(), null, null);
+            stubScreenFactory.Stub(x => x.MakeMessageBoxScreen(Arg<string>.Is.Anything)).Return(mbs);
+
+            mainMenuScreen.OnCancel();
+
+            stubScreenFactory.AssertWasCalled(x => x.MakeMessageBoxScreen(Arg<string>.Is.Equal("Exit Frenetic?")));
+            // TODO: How can i check that MainMenuScreen correctly registers event handlers?
         }
     }
 }

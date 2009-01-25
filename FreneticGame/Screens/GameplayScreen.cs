@@ -190,7 +190,7 @@ namespace Frenetic
         /// Lets the game respond to player input. Unlike the Update method,
         /// this will only be called when the gameplay screen is active.
         /// </summary>
-        public override void HandleInput(IInputState input)
+        public override void HandleInput(InputState input)
         {
             if (input == null)
                 throw new ArgumentNullException("input");
@@ -201,12 +201,15 @@ namespace Frenetic
                 {
                     if (input.PauseGame)
                     {
+                        // TODO: FIX
+                        /*
                         // If they pressed pause, bring up the pause menu screen.
                         const string message = "Exit the game?";
                         MessageBoxScreen messageBox = new MessageBoxScreen(message,
                             false);
                         messageBox.Accepted += ExitMessageBoxAccepted;
                         ScreenManager.AddScreen(messageBox);
+                        */
                     }
                     /*
                     if (input.MenuSelect)

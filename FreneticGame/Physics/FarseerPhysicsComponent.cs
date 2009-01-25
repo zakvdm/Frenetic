@@ -28,7 +28,7 @@ namespace Frenetic.Physics
         {
             get
             {
-                return new Vector2(_body.Position.X, _body.Position.Y);
+                return _body.Position;
             }
             set
             {
@@ -43,9 +43,13 @@ namespace Frenetic.Physics
             }
             set
             {
-                var geom = FarseerGames.FarseerPhysics.Factories.GeomFactory.Instance.CreateRectangleGeom(_body, value.X, value.Y);
-                _geom.SetVertices(geom.LocalVertices);
-                _body.Position = _body.Position;
+                for (int i = 0; i < _geom.LocalVertices.Count; i++)
+                {
+                    Vector2 vertex = _geom.LocalVertices[i];
+                    vertex.X = vertex.X / _geom.AABB.Width;
+                    vertex.Y = vertex.Y / _geom.AABB.Height;
+                    _geom.LocalVertices[i] = vertex * value;
+                }
                 _geom.ComputeCollisionGrid();
             }
         }

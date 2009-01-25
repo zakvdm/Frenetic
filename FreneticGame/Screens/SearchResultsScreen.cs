@@ -125,8 +125,9 @@ namespace Frenetic
         /// <summary>
         /// Responds to user menu selections.
         /// </summary>
-        protected override void OnSelectEntry(int entryIndex)
+        public override void OnSelectEntry(int entryIndex)
         {
+            /*
             if ((availableSessions != null) && (entryIndex >= 0) &&
                 (entryIndex < availableSessions.Count))
             {
@@ -166,13 +167,14 @@ namespace Frenetic
                         "Insufficient privilege to join session:  " + gpe.Message);
                 }
             }
+             */
         }
 
 
         /// <summary>
         /// When the user cancels the screen.
         /// </summary>
-        protected override void OnCancel()
+        public override void OnCancel()
         {
             if (availableSessions != null)
             {
@@ -252,6 +254,7 @@ namespace Frenetic
         /// </summary>
         internal void SessionsFound(object sender, OperationCompletedEventArgs e)
         {
+            /*
             try
             {
                 availableSessions = Microsoft.Xna.Framework.Net.NetworkSession.EndFind(e.AsyncResult);
@@ -297,6 +300,7 @@ namespace Frenetic
                     }
                 }
             }
+             */
         }
 
 
@@ -305,6 +309,7 @@ namespace Frenetic
         /// </summary>
         private void LoadGameplayScreen(object sender, OperationCompletedEventArgs e)
         {
+            /*
             Microsoft.Xna.Framework.Net.NetworkSession networkSession = null;
             try
             {
@@ -338,6 +343,7 @@ namespace Frenetic
                 gameplayScreen.ScreenManager = this.ScreenManager;
                 ScreenManager.AddScreen(gameplayScreen);
             }
+             */
         }
 
 

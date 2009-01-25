@@ -50,19 +50,23 @@ namespace Frenetic
         }
         #endregion
 
-        private IGameSessionFactory _gameSessionFactory = null;
-        private IScreenFactory _screenFactory = null;
+        private IGameSessionFactory _gameSessionFactory;
+        private IScreenFactory _screenFactory;
+        private Game _game;
 
         #region Initialization
 
         /// <summary>
         /// Constructs a new MainMenu object.
         /// </summary>
-        public MainMenuScreen(Viewport viewport, SpriteBatch spriteBatch, SpriteFont font, IGameSessionFactory gameSessionFactory, IScreenFactory screenFactory)
+        public MainMenuScreen(Viewport viewport, SpriteBatch spriteBatch, SpriteFont font, IGameSessionFactory gameSessionFactory, IScreenFactory screenFactory, Game game)
             : base(viewport, spriteBatch, font)
         {
+            // TODO: There must be a way to reduce the number of parameters here???
             _gameSessionFactory = gameSessionFactory;
             _screenFactory = screenFactory;
+            _game = game;
+
             // set the transition times
             TransitionOnTime = TimeSpan.FromSeconds(1.0);
             TransitionOffTime = TimeSpan.FromSeconds(0.0);
@@ -91,7 +95,7 @@ namespace Frenetic
         /// <summary>
         /// Responds to user menu selections.
         /// </summary>
-        protected override void OnSelectEntry(int entryIndex)
+        public override void OnSelectEntry(int entryIndex)
         {
             switch (state)
             {
@@ -121,12 +125,11 @@ namespace Frenetic
         /// <summary>
         /// When the user cancels the main menu, ask if they want to exit the sample.
         /// </summary>
-        protected override void OnCancel()
+        public override void OnCancel()
         {
             const string message = "Exit Frenetic?";
-            MessageBoxScreen messageBox = new MessageBoxScreen(message);
+            MessageBoxScreen messageBox = _screenFactory.MakeMessageBoxScreen(message);
             messageBox.Accepted += ExitMessageBoxAccepted;
-            ScreenManager.AddScreen(messageBox);
         }
 
 
@@ -136,7 +139,8 @@ namespace Frenetic
         /// </summary>
         void ExitMessageBoxAccepted(object sender, EventArgs e)
         {
-            ScreenManager.Game.Exit();
+            // TODO: Only using the reference to Game in this one method... this needs refactoring...
+            _game.Exit();   
         }
 
         #endregion
@@ -258,6 +262,7 @@ namespace Frenetic
         {
             throw new System.NotImplementedException(); // TODO: delete if not gonna use
             // create the new screen
+            /*
             SearchResultsScreen searchResultsScreen =
                new SearchResultsScreen(sessionType);
             searchResultsScreen.ScreenManager = this.ScreenManager;
@@ -298,6 +303,7 @@ namespace Frenetic
                 System.Console.WriteLine(
                     "Insufficient privilege to search for session:  " + gpe.Message);
             }
+             */
         }
         /// <summary>
         /// Callback when a session is quick-matched.

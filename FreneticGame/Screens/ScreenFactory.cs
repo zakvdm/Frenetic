@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace Frenetic
 {
@@ -14,6 +15,17 @@ namespace Frenetic
             _screenManager = screenManager;
         }
         #region IScreenFactory Members
+
+        public MessageBoxScreen MakeMessageBoxScreen(string message)
+        {
+            SpriteFont smallFont = _screenManager.Content.Load<SpriteFont>("Fonts/MessageBox");
+            Texture2D blankTexture = _screenManager.Content.Load<Texture2D>("Textures/blank");
+            MessageBoxScreen messageBoxScreen = new MessageBoxScreen(message, false, smallFont, _screenManager.Font,
+                                                        _screenManager.GraphicsDevice.Viewport, _screenManager.SpriteBatch,
+                                                        blankTexture);
+            _screenManager.AddScreen(messageBoxScreen);
+            return messageBoxScreen;
+        }
 
         public GameplayScreen MakeGameplayScreen(GameSessionControllerAndView serverGameSessionCandV, GameSessionControllerAndView clientGameSessionCandV)
         {
@@ -39,7 +51,7 @@ namespace Frenetic
                                     new Frenetic.Network.Lidgren.LidgrenNetworkSessionFactory(), 
                                     _screenManager.GraphicsDevice, new ContentManager(_screenManager.Game.Services)
                                 ), 
-                            this);
+                            this, _screenManager.Game);
             _screenManager.AddScreen(mainMenuScreen);
             return mainMenuScreen;
         }

@@ -64,8 +64,11 @@ namespace Frenetic.Network.Lidgren
             _networkClient.DiscoverLocalServers(port);
         }
 
-        public void Send(Message msg, NetChannel channel)
+        public void SendToServer(Message msg, NetChannel channel)
         {
+            if (IsServer)
+                throw new System.InvalidOperationException("Server can't send to server!");
+
             if (!Connected)
                 throw new System.InvalidOperationException("Client not connected to server");
 
@@ -75,11 +78,13 @@ namespace Frenetic.Network.Lidgren
 
             _networkClient.SendMessage(buffer, channel);
         }
-        public void Send(Message msg, NetChannel channel, INetConnection connection)
+        public void SendTo(Message msg, NetChannel channel, INetConnection connection)
         {
-            // TODO: unit test... Should check (connection != null) instead of !Connected???
-            if (!Connected)
-                throw new System.InvalidOperationException("Client not connected to server");
+            if (!IsServer)
+                throw new System.InvalidOperationException("Client can only send to Server");
+
+            if ((connection == null) || (connection.Status != NetConnectionStatus.Connected))
+                throw new System.InvalidOperationException("Not a valid Connection");
 
             byte[] data = _serializer.Serialize(msg);
             NetBuffer buffer = _networkServer.CreateBuffer(data.Length);
@@ -98,10 +103,13 @@ namespace Frenetic.Network.Lidgren
 
             _networkServer.SendToAll(buffer, channel);
         }
-        public void SendToAll(Message msg, NetChannel channel, INetConnection excludedConnection)
+        public void SendToAllExcept(Message msg, NetChannel channel, INetConnection excludedConnection)
         {
+            if (excludedConnection == null)
+                throw new System.InvalidOperationException("Excluded connection can't be null");
+
             if (!IsServer)
-                throw new System.InvalidOperationException("Client can't send to all");
+                throw new System.InvalidOperationException("Client can only send to the Server");
 
             byte[] data = _serializer.Serialize(msg);
             NetBuffer buffer = _networkServer.CreateBuffer(data.Length);
