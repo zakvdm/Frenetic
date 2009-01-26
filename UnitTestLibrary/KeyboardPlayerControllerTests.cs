@@ -44,7 +44,7 @@ namespace UnitTestLibrary
             var stubBody = MockRepository.GenerateStub<Body>();
 
             kpc.Process(1);
-            stubPlayer.AssertWasCalled(p => p.Jump());
+            stubPlayer.AssertWasCalled(p => p.Jump(1));
         }
 
         [Test]

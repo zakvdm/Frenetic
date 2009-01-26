@@ -6,7 +6,7 @@ using Microsoft.Xna.Framework;
 
 namespace Frenetic.Physics
 {
-    public delegate void CanJumpDelegate();
+    public delegate void CollidedWithWorldDelegate();
 
     public interface IPhysicsComponent
     {
@@ -18,6 +18,6 @@ namespace Frenetic.Physics
         void ApplyImpulse(Vector2 impulse);
         void ApplyForce(Vector2 force);
 
-        event CanJumpDelegate CanJump;
+        event CollidedWithWorldDelegate CollidedWithWorld;
     }
 }

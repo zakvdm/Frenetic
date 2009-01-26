@@ -16,22 +16,13 @@ namespace Frenetic
         }
         #region IController Members
         
-        Random rand = new Random();
-        int count = 0;
         public void Process(long ticks)
         {
-            /*
-            if (count > 300)
-            {
-                Player.Position = new Vector2(rand.Next(800), rand.Next(600));
-                count = 0;
-            }
-            count++;
-            */
+            TotalTicksElapsed += ticks;
 
             if (Keyboard.IsKeyDown(Keys.Space))
             {
-                Player.Jump();
+                Player.Jump(TotalTicksElapsed);
             }
 
             if (Keyboard.IsKeyDown(Keys.Left))
@@ -48,5 +39,7 @@ namespace Frenetic
         }
 
         #endregion
+
+        private long TotalTicksElapsed { get; set; }
     }
 }

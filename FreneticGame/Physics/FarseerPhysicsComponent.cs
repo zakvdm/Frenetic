@@ -14,7 +14,7 @@ namespace Frenetic.Physics
 
             _geom.OnCollision += new Geom.CollisionEventHandler((body1, body2, contactList) =>
                 {
-                    CanJump();
+                    CollidedWithWorld();
                     return true;
                 });
         }
@@ -74,7 +74,7 @@ namespace Frenetic.Physics
             _body.ApplyForce(force);
         }
 
-        public event CanJumpDelegate CanJump = delegate { };
+        public event CollidedWithWorldDelegate CollidedWithWorld = delegate { };
         
 
         Body _body;

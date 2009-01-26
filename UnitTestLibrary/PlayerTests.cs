@@ -82,10 +82,25 @@ namespace UnitTestLibrary
             var stubPhysicsComponent = MockRepository.GenerateStub<IPhysicsComponent>();
             Player player = new Player(1, stubPhysicsComponent, null);
 
-            player.CanJump = true;
-            player.Jump();
+            player.OnTheGround = true;
+            player.Jump(new TimeSpan(0, 0, 1).Ticks);
 
             stubPhysicsComponent.AssertWasCalled(pc => pc.ApplyImpulse(Player.JumpImpulse));
+        }
+
+        [Test]
+        public void SecondJumpMustBeDelayedForSomePeriodOfTime()
+        {
+            var stubPhysicsComponent = MockRepository.GenerateStub<IPhysicsComponent>();
+            Player player = new Player(1, stubPhysicsComponent, null);
+
+            player.OnTheGround = true;
+            player.Jump(new TimeSpan(0, 0, 0, 1).Ticks);
+
+            stubPhysicsComponent.AssertWasCalled(pc => pc.ApplyImpulse(Player.JumpImpulse));
+
+            Assert.IsFalse(player.CanJump(new TimeSpan(0, 0, 0, 1, 200).Ticks));
+            Assert.IsTrue(player.CanJump(new TimeSpan(0, 0, 0, 1, 1000).Ticks));
         }
 
         [Test]
@@ -94,7 +109,8 @@ namespace UnitTestLibrary
             var stubPhysicsComponent = MockRepository.GenerateStub<IPhysicsComponent>();
             Player player = new Player(1, stubPhysicsComponent, null);
 
-            player.Jump();
+            player.OnTheGround = false;
+            player.Jump(1);
 
             stubPhysicsComponent.AssertWasNotCalled(pc => pc.ApplyImpulse(Player.JumpImpulse));
         }
