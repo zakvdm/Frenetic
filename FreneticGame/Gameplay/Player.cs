@@ -17,7 +17,7 @@ namespace Frenetic
             else
                 _physicsComponent = physicsComponent;
 
-            _physicsComponent.CollidedWithWorld += () => OnTheGround = true;
+            _physicsComponent.CollidedWithWorld += () => InContactWithLevel = true;
 
             this.ID = ID;
             _boundaryCollider = boundaryCollider;
@@ -43,19 +43,20 @@ namespace Frenetic
 
         public int ID { get; set; }
         private long LastJumpTime { get; set; }
-        internal bool OnTheGround { get; set; }
+        internal bool InContactWithLevel { get; set; }
 
         public void Update()
         {
             Position = _boundaryCollider.MoveWithinBoundary(Position);
+            InContactWithLevel = false;
         }
 
         public void Jump(long time)
         {
-            if (CanJump(time) && OnTheGround)
+            if (CanJump(time) && InContactWithLevel)
             {
                 LastJumpTime = time;
-                OnTheGround = false;
+                InContactWithLevel = false;
                 _physicsComponent.ApplyImpulse(JumpImpulse);
             }
         }
