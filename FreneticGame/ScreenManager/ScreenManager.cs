@@ -220,7 +220,15 @@ namespace Frenetic
                 // Pop the topmost screen off the waiting list.
                 GameScreen screen = screensToUpdate[screensToUpdate.Count - 1];
 
+                
+                if (screen.ScreenState == ScreenState.Dead)
+                {
+                    RemoveScreen(screen);
+                    continue;
+                }
+
                 screensToUpdate.RemoveAt(screensToUpdate.Count - 1);
+
 
                 // Update the screen.
                 screen.Update(gameTime, otherScreenHasFocus, coveredByOtherScreen);

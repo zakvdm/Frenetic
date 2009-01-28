@@ -23,6 +23,7 @@ namespace Frenetic
         Active,
         TransitionOff,
         Hidden,
+        Dead
     }
 
 
@@ -208,8 +209,8 @@ namespace Frenetic
 
                 if (!UpdateTransition(gameTime, transitionOffTime, 1))
                 {
-                    // When the transition finishes, remove the screen.
-                    ScreenManager.RemoveScreen(this);
+                    // When the transition finishes, the screen manager can remove it.
+                    screenState = ScreenState.Dead;
 
                     isExiting = false;
                 }
@@ -303,7 +304,7 @@ namespace Frenetic
             if (TransitionOffTime == TimeSpan.Zero)
             {
                 // If the screen has a zero transition time, remove it immediately.
-                ScreenManager.RemoveScreen(this);
+                screenState = ScreenState.Dead;
             }
             else
             {
