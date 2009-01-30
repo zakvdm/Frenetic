@@ -109,6 +109,15 @@ namespace Frenetic
             }
             gameSession.Controllers.Add(container.Resolve<LevelController>(new TypedParameter(typeof(Frenetic.Level.Level), level)));
 
+            // TEMP:
+            //Body raybody = BodyFactory.Instance.CreateRectangleBody(700, 10, 10);
+            //Geom raygeom = GeomFactory.Instance.CreateRectangleGeom(physicsSimulator, raybody, 700, 10);
+            DumbRayCaster rayCaster = new DumbRayCaster(physicsSimulator);
+
+            TempController cntrler = new TempController(rayCaster);
+            gameSession.Controllers.Add(cntrler);
+            
+
             // DEBUG VIEW:  // TODO: Write a controller for this...
             var debugView = new PhysicsSimulatorView(physicsSimulator, realSpriteBatch);
             physicsSimulator.EnableDiagnostics = true;

@@ -144,6 +144,7 @@
     <Compile Include="Network\MessageQueue.cs" />
     <Compile Include="Network\XmlMessageSerializer.cs" />
     <Compile Include="OperationCompletedEventArgs.cs" />
+    <Compile Include="Physics\DumbRayCaster.cs" />
     <Compile Include="Physics\DummyPhysicsComponent.cs" />
     <Compile Include="Physics\FarseerPhysicsComponent.cs" />
     <Compile Include="Physics\FarseerPhysicsController.cs" />
