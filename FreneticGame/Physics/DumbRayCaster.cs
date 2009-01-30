@@ -12,9 +12,9 @@ using FarseerGames.FarseerPhysics.Factories;
 
 namespace Frenetic.Physics
 {
-    public class TempController : IController
+    public class DumbRayCasterTestController : IController
     {
-        public TempController(DumbRayCaster rayCaster)
+        public DumbRayCasterTestController(DumbRayCaster rayCaster)
         {
             _dumbRayCaster = rayCaster;
         }

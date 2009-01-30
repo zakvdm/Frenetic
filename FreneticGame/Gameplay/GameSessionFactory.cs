@@ -99,6 +99,10 @@ namespace Frenetic
             ITexture texture = new XNATexture(_contentManager.Load<Texture2D>("Content/Textures/blank"));
             builder.Register<ITexture>(texture);
 
+            // RAYCASTER:
+            builder.Register<DumbRayCaster>().SingletonScoped();
+            builder.Register<DumbRayCasterTestController>().FactoryScoped();
+
             var container = builder.Build();
 
             gameSession.Controllers.Add(container.Resolve<FarseerPhysicsController>());
@@ -106,17 +110,10 @@ namespace Frenetic
             if (IsClient)
             {
                 gameSession.Views.Add(container.Resolve<LevelView>(new TypedParameter(typeof(Frenetic.Level.Level), level)));
+
+                gameSession.Controllers.Add(container.Resolve<DumbRayCasterTestController>());
             }
             gameSession.Controllers.Add(container.Resolve<LevelController>(new TypedParameter(typeof(Frenetic.Level.Level), level)));
-
-            // TEMP:
-            //Body raybody = BodyFactory.Instance.CreateRectangleBody(700, 10, 10);
-            //Geom raygeom = GeomFactory.Instance.CreateRectangleGeom(physicsSimulator, raybody, 700, 10);
-            DumbRayCaster rayCaster = new DumbRayCaster(physicsSimulator);
-
-            TempController cntrler = new TempController(rayCaster);
-            gameSession.Controllers.Add(cntrler);
-            
 
             // DEBUG VIEW:  // TODO: Write a controller for this...
             var debugView = new PhysicsSimulatorView(physicsSimulator, realSpriteBatch);
