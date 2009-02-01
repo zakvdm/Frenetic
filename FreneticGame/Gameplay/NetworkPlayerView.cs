@@ -15,6 +15,9 @@ namespace Frenetic
 
         public void Generate()
         {
+            if (_player.ID == 0)
+                return;
+
             Message msg = new Message() { Type = MessageType.PlayerData, Data = _player };
             if (_networkSession.IsServer)
                 _networkSession.SendToAll(msg, Lidgren.Network.NetChannel.Unreliable);

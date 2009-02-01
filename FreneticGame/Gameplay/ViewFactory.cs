@@ -36,9 +36,9 @@ namespace Frenetic
 
         #region IViewFactory Members
         
-        public PlayerView MakePlayerView(IPlayer player)
+        public PlayerView MakePlayerView(IPlayer player, ICamera camera)
         {
-            return new PlayerView(player, new XNASpriteBatch(_spriteBatch), new XNATexture(_playerTexture));
+            return new PlayerView(player, new XNASpriteBatch(_spriteBatch), new XNATexture(_playerTexture), camera);
         }
 
         #endregion

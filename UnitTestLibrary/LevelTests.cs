@@ -42,7 +42,7 @@ namespace UnitTestLibrary
             var container = builder.Build();
 
             Level level = container.Resolve<Level>();
-            LevelView levelView = container.Resolve<LevelView>(new TypedParameter(typeof(Level), level));
+            LevelView levelView = container.Resolve<LevelView>(new TypedParameter(typeof(Level), level), new TypedParameter(typeof(ICamera), null));
 
             Assert.IsNotNull(level);
             Assert.IsNotNull(levelView);

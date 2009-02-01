@@ -4,48 +4,36 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Frenetic
 {
-    public class Camera
+    public class Camera : ICamera
     {
-        private Vector2 cameraPosition;
-        private Vector2 cameraOffset;
-        private Matrix transformMatrix;
+        public Camera(IPlayer player, Vector2 screenSize)
+        {
+            _player = player;
+            _screenSizeOffset = screenSize / 2;
+        }
+
+        public Vector2 ConvertToWorldCoordinates(Vector2 screenPosition)
+        {
+            return Vector2.Transform(screenPosition, Matrix.Invert(TranslationMatrix));
+        }
 
         public Vector2 Position
         {
-            get { return cameraPosition; }
-            set 
+            get
             {
-                cameraPosition = value;
-                transformMatrix = Matrix.CreateTranslation(-cameraPosition.X + cameraOffset.X, -cameraPosition.Y + cameraOffset.Y, 0.0f);
+                return _player.Position;
             }
         }
-        public Matrix TransformMatrix
+
+        public Matrix TranslationMatrix
         {
-            get { return transformMatrix; }
+            get
+            {
+                return Matrix.CreateTranslation(-Position.X + _screenSizeOffset.X, -Position.Y + _screenSizeOffset.Y, 0.0f);
+            }
         }
 
-        public Camera(Vector2 offset)
-        {
-            cameraOffset = offset;
-            cameraPosition = new Vector2();
-        }
-        public Camera(float x, float y)
-        {
-            cameraOffset = new Vector2(x, y);
-            cameraPosition = new Vector2();
-        }
-
-        /*
-        public Vector2 TransformPosition(Vector2 position)
-        {
-            return ((position - cameraPosition) + cameraOffset);
-        }
-        
-
-        public Vector2 TransformPosition(float x, float y)
-        {
-            return TransformPosition(new Vector2(x, y));
-        }
-        */
+        IPlayer _player;
+        Vector2 _screenSizeOffset;
     }
 }

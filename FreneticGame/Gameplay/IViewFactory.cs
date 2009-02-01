@@ -4,6 +4,6 @@ namespace Frenetic
 {
     public interface IViewFactory
     {
-        PlayerView MakePlayerView(IPlayer player);
+        PlayerView MakePlayerView(IPlayer player, ICamera camera);
     }
 }

@@ -64,5 +64,20 @@ namespace UnitTestLibrary
 
             stubNS.AssertWasCalled(x => x.SendToServer(Arg<Message>.Matches(y => y.Type == MessageType.PlayerData && y.Data == player), Arg<NetChannel>.Is.Anything));
         }
+
+        [Test]
+        public void GenerateDoesNothingIfPlayerNotYetConnectedToNetworkSession()
+        {
+            var stubNS = MockRepository.GenerateStub<INetworkSession>();
+            Player player = new Player(1, null, null);
+            player.ID = 0;
+            NetworkPlayerView npView = new NetworkPlayerView(player, stubNS);
+
+            stubNS.Stub(x => x.IsServer).Return(false);
+
+            npView.Generate();
+
+            stubNS.AssertWasNotCalled(x => x.SendToServer(Arg<Message>.Matches(y => y.Type == MessageType.PlayerData && y.Data == player), Arg<NetChannel>.Is.Anything));
+        }
     }
 }

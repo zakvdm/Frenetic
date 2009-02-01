@@ -76,6 +76,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CameraTests.cs" />
     <Compile Include="DumbLevelLoaderTests.cs" />
     <Compile Include="FarseerPhysicsComponentTests.cs" />
     <Compile Include="LevelControllerTests.cs" />

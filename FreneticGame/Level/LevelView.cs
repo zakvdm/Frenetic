@@ -10,18 +10,19 @@ namespace Frenetic.Level
 {
     public class LevelView : IView
     {
-        public LevelView(Level level, ISpriteBatch spriteBatch, ITexture texture)
+        public LevelView(Level level, ISpriteBatch spriteBatch, ITexture texture, ICamera camera)
         {
             _level = level;
             _spriteBatch = spriteBatch;
             _texture = texture;
+            _camera = camera;
         }
 
         #region IView Members
 
         public void Generate()
         {
-            _spriteBatch.Begin();
+            _spriteBatch.Begin(_camera.TranslationMatrix);
             foreach (LevelPiece piece in _level.Pieces)
             {
                 _spriteBatch.Draw(_texture, new Vector2(piece.Position.X - (piece.Size.X / 2), piece.Position.Y - (piece.Size.Y / 2)),
@@ -35,5 +36,6 @@ namespace Frenetic.Level
         Level _level;
         ISpriteBatch _spriteBatch;
         ITexture _texture;
+        ICamera _camera;
     }
 }

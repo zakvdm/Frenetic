@@ -112,10 +112,11 @@ namespace FarseerGames.GettingStarted
         private Vector2 _vectorTemp1;
         #endregion
 
-        public PhysicsSimulatorView(PhysicsSimulator physicsSimulator, SpriteBatch spriteBatch)
+        public PhysicsSimulatorView(PhysicsSimulator physicsSimulator, SpriteBatch spriteBatch, ICamera camera)
         {
             _physicsSimulator = physicsSimulator;
             _spriteBatch = spriteBatch;
+            _camera = camera;
 
             if (_performancePanelCount)
                 _performancePanelWidth = 360;
@@ -463,12 +464,20 @@ namespace FarseerGames.GettingStarted
 
         public void Generate()
         {
-            _spriteBatch.Begin();
+            _spriteBatch.Begin(SpriteBlendMode.AlphaBlend, SpriteSortMode.Deferred, SaveStateMode.None, _camera.TranslationMatrix);
             Draw(_spriteBatch);
             _spriteBatch.End();
+
+            if (_enablePerformancePanelView)
+            {
+                _spriteBatch.Begin();
+                DrawPerformancePanel(_spriteBatch);
+                _spriteBatch.End();
+            }
         }
 
         SpriteBatch _spriteBatch;
+        ICamera _camera;
 
         public void Draw(SpriteBatch spriteBatch)
         {
@@ -491,10 +500,6 @@ namespace FarseerGames.GettingStarted
             if (_enableContactView)
             {
                 DrawContacts(spriteBatch);
-            }
-            if (_enablePerformancePanelView)
-            {
-                DrawPerformancePanel(spriteBatch);
             }
             if (EnableSpringView)
             {

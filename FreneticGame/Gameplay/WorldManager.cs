@@ -81,7 +81,7 @@ namespace Frenetic
             level.Initialize();
             level.TempLoadLevel();
 
-            camera = new Camera(pGraphicsDevice.Viewport.Width / 2, pGraphicsDevice.Viewport.Height / 2);
+            camera = new Camera(null, new Vector2(pGraphicsDevice.Viewport.Width, pGraphicsDevice.Viewport.Height));
 
             Line.LoadContent(pContentManager);
             cursor = new Cursor(pContentManager.Load<Texture2D>("Textures/cursor"));
@@ -109,11 +109,11 @@ namespace Frenetic
             foreach (LocalNetworkGamer gamer in networkSession.LocalGamers)
             {
                 // should be only one for now...
-                camera.Position = (gamer.Tag as OldPlayer).Position;
+                //camera.Position = (gamer.Tag as OldPlayer).Position;
             }
 
             // Put cursor in World Coordinates
-            cursor.Position = Vector2.Transform(new Vector2(Mouse.GetState().X, Mouse.GetState().Y), Matrix.Invert(camera.TransformMatrix));
+            //cursor.Position = Vector2.Transform(new Vector2(Mouse.GetState().X, Mouse.GetState().Y), Matrix.Invert(camera.TransformMatrix));
 
             foreach (LocalNetworkGamer gamer in networkSession.LocalGamers)
             {
@@ -135,8 +135,8 @@ namespace Frenetic
         #region Drawing Methods
         public void Draw()
         {
-            spriteBatch.Begin(SpriteBlendMode.AlphaBlend, SpriteSortMode.Deferred,
-                SaveStateMode.None, camera.TransformMatrix);
+            //spriteBatch.Begin(SpriteBlendMode.AlphaBlend, SpriteSortMode.Deferred,
+            //    SaveStateMode.None, camera.TransformMatrix);
 
             cursor.Draw(spriteBatch);
 

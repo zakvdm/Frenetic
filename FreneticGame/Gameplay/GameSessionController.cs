@@ -6,13 +6,15 @@ namespace Frenetic
     public class GameSessionController : IController
     {
         
-        public GameSessionController(IGameSession gameSession, MessageQueue messageQueue, INetworkSession networkSession, IViewFactory viewFactory, Player.Factory playerFactory)
+        public GameSessionController(IGameSession gameSession, MessageQueue messageQueue, INetworkSession networkSession, IViewFactory viewFactory, Player.Factory playerFactory, IPlayer localPlayer, ICamera camera)
         {
             _gameSession = gameSession;
             _messageQueue = messageQueue;
             _networkSession = networkSession;
             _viewFactory = viewFactory;
             _playerFactory = playerFactory;
+            _localPlayer = localPlayer;
+            _camera = camera;
             _networkPlayerController = new NetworkPlayerController(_messageQueue);
             _gameSession.Controllers.Add(_networkPlayerController);
         }
@@ -72,7 +74,7 @@ namespace Frenetic
                 int ID = (int)data;
                 IPlayer newPlayer = _playerFactory(ID);
                 _networkPlayerController.Players.Add(ID, newPlayer);
-                _gameSession.Views.Add(_viewFactory.MakePlayerView(newPlayer));
+                _gameSession.Views.Add(_viewFactory.MakePlayerView(newPlayer, _camera));
             }
             while (true)
             {
@@ -80,11 +82,8 @@ namespace Frenetic
                 if (data == null)
                     break;
                 int ID = (int)data;
-                IPlayer localPlayer = _playerFactory(ID);
-                _gameSession.Controllers.Add(new KeyboardPlayerController(localPlayer));
-                //_networkPlayerController.Players.Add(ID, localPlayer);
-                _gameSession.Views.Add(new NetworkPlayerView(localPlayer, _networkSession));
-                _gameSession.Views.Add(_viewFactory.MakePlayerView(localPlayer));
+                _localPlayer.ID = ID;
+                _gameSession.Views.Add(_viewFactory.MakePlayerView(_localPlayer, _camera));
             }
 
         }
@@ -94,6 +93,8 @@ namespace Frenetic
         INetworkSession _networkSession;
         IViewFactory _viewFactory;
         Player.Factory _playerFactory;
+        IPlayer _localPlayer;
+        ICamera _camera;
         NetworkPlayerController _networkPlayerController;
     }
 }

@@ -15,8 +15,11 @@ namespace Frenetic.Graphics
 
         public void Begin()
         {
-            //_spriteBatch.Begin(SpriteBlendMode.AlphaBlend, SpriteSortMode.Deferred, SaveStateMode.None);
             _spriteBatch.Begin();
+        }
+        public void Begin(Matrix translationMatrix)
+        {
+            _spriteBatch.Begin(SpriteBlendMode.AlphaBlend, SpriteSortMode.Deferred, SaveStateMode.None, translationMatrix);
         }
 
         public void End()

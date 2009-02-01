@@ -16,7 +16,7 @@ Abstract Drawing Code: DONE
 ************
 ITERATION 2:
 ************
-2 - As the player, when I move the camera follows me so I'm always at the centre of the screen
+DONE - 2 - As the player, when I move the camera follows me so I'm always at the centre of the screen
 	Just calculates a simple transformation matrix (code already implemented). Needs to be given to every IView?
 
 5 - Client can move a crosshair around on the screen
