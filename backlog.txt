@@ -42,7 +42,7 @@ DONE - 2 - As the player, when I move the camera follows me so I'm always at the
 	Console fills half the screen with black, messages can be typed - 5 -
 	Read messages on console, and if valid, change the appropriate setting - 8 -
 
-Replay system: 40
+40 - Games can be recorded and played back 
 	STEP 1:
 	We need to investigate what effect Farseer has on this... Apparently it's not deterministic. Way around this? Do player physics manually?
 	STEP 2:
@@ -50,15 +50,18 @@ Replay system: 40
 	STEP 3:
 	Run game simulation from recorded files (instead of live input). Confirm that the game state reaches the expected 'summary' states.
 
+13 - As the client I can enter an IP address and port number to join a specific game.
+
 Key bindings: 8
 	Allow remapping of control keys.
 
 40 - Item pickups
-40 - Can load arbitrarily shaped polygons from textures
 40 - Can load a level format
 40 - Various level items (jump pads, teleporters, etc.)
+40 - Can load arbitrarily shaped polygons from textures
 40 - Player can use various techniques to move better/faster (trick jumping, strafe/circle jumping, wall/double jumping)
 100 - Particle system
 100 - Player character is animated
 40 - Can search for sessions, see information on each one, and join one
+100 - On the client, player movement, etc. is predicted to make the game seem smoother during online play
 100 - Players earn experience and can use this experience to modify their appearance
