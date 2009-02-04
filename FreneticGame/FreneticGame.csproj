@@ -87,6 +87,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Engine\Camera.cs" />
+    <Compile Include="Engine\Crosshair.cs" />
+    <Compile Include="Engine\CrosshairView.cs" />
     <Compile Include="Engine\ICamera.cs" />
     <Compile Include="Engine\Level\LevelCollisionChecker.cs" />
     <Compile Include="Engine\Level\Tile.cs" />

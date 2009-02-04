@@ -9,6 +9,7 @@ namespace Frenetic.Graphics
         void Begin();
         void Begin(Matrix translationMatrix);
         void End();
+        void Draw(ITexture texture, Rectangle destinationRectangle, Color color);
         void Draw(ITexture texture, Vector2 position, Rectangle? sourceRectangle, Color color, 
             float rotation, Vector2 origin, Vector2 scale, SpriteEffects effects, float layerDepth);
     }

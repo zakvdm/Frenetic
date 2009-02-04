@@ -136,12 +136,16 @@ namespace Frenetic
             builder.Register((c, p) => (ICamera)new Camera(p.TypedAs<IPlayer>(), new Vector2(_screenWidth, _screenHeight))).SingletonScoped();
             builder.Register<Camera>().As<ICamera>().SingletonScoped();
 
+            // CROSSHAIR:
+            builder.Register<Crosshair>().SingletonScoped();
+            builder.Register<CrosshairView>().SingletonScoped();
+
             return builder.Build();
         }
 
         private Player.Factory CreateGeneralComponents(IContainer container)
         {
-            ITexture playerTexture = container.Resolve<ITexture>(new TypedParameter(typeof(Texture2D), _contentManager.Load<Texture2D>("Content/Textures/blank")));
+            ITexture playerTexture = container.Resolve<ITexture>(new TypedParameter(typeof(Texture2D), _contentManager.Load<Texture2D>("Content/textures/ball")));
             IViewFactory viewFactory = container.Resolve<IViewFactory>(new TypedParameter(typeof(ITexture), playerTexture));
             MessageQueue messageQueue = container.Resolve<MessageQueue>();
             IGameSession gameSession = container.Resolve<IGameSession>();
@@ -176,6 +180,8 @@ namespace Frenetic
             ITexture levelTexture = container.Resolve<ITexture>(new TypedParameter(typeof(Texture2D), _contentManager.Load<Texture2D>("Content/Textures/blank")));
             gameSession.Views.Add(container.Resolve<LevelView>(new TypedParameter(typeof(ITexture), levelTexture)));
 
+            ITexture crosshairTexture = container.Resolve<ITexture>(new TypedParameter(typeof(Texture2D), _contentManager.Load<Texture2D>("Content/Textures/cursor")));
+            gameSession.Views.Add(container.Resolve<CrosshairView>(new TypedParameter(typeof(ITexture), crosshairTexture)));
 
             // TEMP CODE:
             // *********************************************************************************

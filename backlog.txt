@@ -19,8 +19,8 @@ SPRINT 2: Started on 2/02/2009
 DONE - 2 - As the player, when I move the camera follows me so I'm always at the centre of the screen
 	Just calculates a simple transformation matrix (code already implemented). Needs to be given to every IView?
 
-ZAK - 2 - Client can move a crosshair around on the screen
-3 - When I click the cursor position is written to the console.
+DONE - 2 - Client can move a crosshair around on the screen
+ZAK - 3 - When I click the cursor position is written to the console.
 
 DONE - 2 - Can exit from Main Menu
 1 - Can exit from Gameplay screen 
@@ -36,7 +36,7 @@ Client types in a message and this message is shown on the screen of all clients
 2 - Messages are written to the console
 
 
-******************************COMMITED UP TO HERE FOR SPRINT 2 (34 story points)
+******************************COMMITED UP TO HERE FOR SPRINT 2 (32 story points)
 
 20 - As the player, I can click on the screen and fire a railgun at the point where I click.
 	Player clicks somewhere on screen and client sends fire event to Server - 5 - 

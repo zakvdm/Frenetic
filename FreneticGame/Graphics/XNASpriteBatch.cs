@@ -25,6 +25,10 @@ namespace Frenetic.Graphics
             _spriteBatch.End();
         }
 
+        public void Draw(ITexture texture, Rectangle destinationRectangle, Color color)
+        {
+            _spriteBatch.Draw(texture.Texture2D, destinationRectangle, color);
+        }
         public void Draw(ITexture texture, Vector2 position, Nullable<Rectangle> sourceRectangle, Color color,
             float rotation, Vector2 origin, Vector2 scale, SpriteEffects effects, float layerDepth)
         {
