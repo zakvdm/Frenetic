@@ -12,6 +12,7 @@ namespace Frenetic
             Views = new List<IView>();
             Controllers = new List<IController>();
         }
+
         #region IGameSession Members
         #endregion
     }

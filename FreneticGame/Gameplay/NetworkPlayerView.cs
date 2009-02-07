@@ -1,16 +1,15 @@
 ﻿using System;
+using Frenetic.Network;
 
 namespace Frenetic
 {
     public class NetworkPlayerView : IView
     {
-        IPlayer _player;
-        INetworkSession _networkSession;
-
-        public NetworkPlayerView(IPlayer player, INetworkSession networkSession)
+        
+        public NetworkPlayerView(IPlayer player, IOutgoingMessageQueue outgoingMessageQueue)
         {
             _player = player;
-            _networkSession = networkSession;
+            _outgoingMessageQueue = outgoingMessageQueue;
         }
 
         public void Generate()
@@ -19,10 +18,10 @@ namespace Frenetic
                 return;
 
             Message msg = new Message() { Type = MessageType.PlayerData, Data = _player };
-            if (_networkSession.IsServer)
-                _networkSession.SendToAll(msg, Lidgren.Network.NetChannel.Unreliable);
-            else
-                _networkSession.SendToServer(msg, Lidgren.Network.NetChannel.Unreliable);
+            _outgoingMessageQueue.Write(msg, Lidgren.Network.NetChannel.Unreliable);
         }
+
+        IPlayer _player;
+        IOutgoingMessageQueue _outgoingMessageQueue;
     }
 }

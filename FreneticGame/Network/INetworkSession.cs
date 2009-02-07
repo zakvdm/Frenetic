@@ -4,24 +4,12 @@ using Lidgren.Network;
 using Frenetic.Network.Lidgren;
 using System.Xml.Serialization;
 
-namespace Frenetic
+namespace Frenetic.Network
 {
     public interface INetworkSession
     {
-        bool IsServer { get; }
-
-        void Create();
-        void Join(string IP, int port);
-        void Join(int port);
         void Shutdown(string reason);
-
-        void SendToServer(Message msg, NetChannel channel);
-        void SendTo(Message msg, NetChannel channel, INetConnection connection);
-        void SendToAll(Message msg, NetChannel channel);
-        void SendToAllExcept(Message msg, NetChannel channel, INetConnection excludedConnection);
         Message ReadMessage();
-
-        INetConnection this[int playerID] { get; }
     }
     
     public enum MessageType

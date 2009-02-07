@@ -4,7 +4,7 @@ using Microsoft.Xna.Framework.Input;
 
 namespace Frenetic
 {
-    public class Crosshair
+    public class Crosshair : ICrosshair
     {
         private const int CROSSHAIR_DEFAULT_SIZE = 16;
 

@@ -20,11 +20,11 @@ DONE - 2 - As the player, when I move the camera follows me so I'm always at the
 	Just calculates a simple transformation matrix (code already implemented). Needs to be given to every IView?
 
 DONE - 2 - Client can move a crosshair around on the screen
-ZAK - 3 - When I click the cursor position is written to the console.
+3 - When I click the cursor position is written to the console.
 
 DONE - 2 - Can exit from Main Menu
-1 - Can exit from Gameplay screen 
-2 - Resources (network sockets) properly disposed on exit 
+DONE - 1 - Can exit from Gameplay screen 
+ZAK - 2 - Resources (network sockets) properly disposed on exit 
 
 As the client I can bring down the console and type in a command
 5 - Console fills half the screen with black, messages can be typed
@@ -68,3 +68,7 @@ Client types in a message and this message is shown on the screen of all clients
 40 - Can search for sessions, see information on each one, and join one
 100 - On the client, player movement, etc. is predicted to make the game seem smoother during online play
 100 - Players earn experience and can use this experience to modify their appearance
+
+CONTENT
+Build +-5 levels
+Build menu stage

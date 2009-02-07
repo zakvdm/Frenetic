@@ -19,7 +19,11 @@ namespace Frenetic.Network.Lidgren
         }
 
         #region INetServer Members
-
+        public int Port
+        {
+            get { return _netServer.Configuration.Port; }
+            set { _netServer.Configuration.Port = value; }
+        }
         public bool IsListening
         {
             get { return _netServer.IsListening; }
@@ -67,7 +71,7 @@ namespace Frenetic.Network.Lidgren
 
         public void Shutdown(string reason)
         {
-            throw new NotImplementedException();
+            _netServer.Shutdown(reason);
         }
 
         #endregion

@@ -7,11 +7,12 @@ using NUnit.Framework;
 using Rhino.Mocks;
 using System.Xml.Serialization;
 using System.IO;
+using Frenetic.Network;
 
 namespace UnitTestLibrary
 {
     [TestFixture]
-    public class MessageQueueTests
+    public class IncomingMessageQueueTests
     {
         QueuedMessageHelper<Message> queueMH;
         [SetUp]
@@ -24,7 +25,7 @@ namespace UnitTestLibrary
         public void CanConstruct()
         {
             var stubNS = MockRepository.GenerateStub<INetworkSession>();
-            MessageQueue mq = new MessageQueue(stubNS);
+            IncomingMessageQueue mq = new IncomingMessageQueue(stubNS);
 
             Assert.IsNotNull(mq);
         }
@@ -33,7 +34,7 @@ namespace UnitTestLibrary
         public void EmptyQueueReturnsFalseOnMessageAvailable()
         {
             var stubNS = MockRepository.GenerateStub<INetworkSession>();
-            MessageQueue mq = new MessageQueue(stubNS);
+            IncomingMessageQueue mq = new IncomingMessageQueue(stubNS);
             stubNS.Stub(x => x.ReadMessage()).Return(null);
 
             Assert.IsNull(mq.ReadMessage(MessageType.PlayerData));
@@ -43,7 +44,7 @@ namespace UnitTestLibrary
         public void ReturnsMessageWhenAvailable()
         {
             var stubNS = MockRepository.GenerateStub<INetworkSession>();
-            MessageQueue mq = new MessageQueue(stubNS);
+            IncomingMessageQueue mq = new IncomingMessageQueue(stubNS);
             queueMH.QueuedMessages.Enqueue(new Message() { Type = MessageType.PlayerData, Data = new byte[3] { 1, 2, 3 } });
             stubNS.Stub(x => x.ReadMessage()).Do(queueMH.GetNextQueuedMessage);
 
@@ -54,7 +55,7 @@ namespace UnitTestLibrary
         public void CanQueueMoreThanOneMessage()
         {
             var stubNS = MockRepository.GenerateStub<INetworkSession>();
-            MessageQueue mq = new MessageQueue(stubNS);
+            IncomingMessageQueue mq = new IncomingMessageQueue(stubNS);
             queueMH.QueuedMessages.Enqueue(new Message() { Type = MessageType.PlayerData, Data = new byte[3] { 1, 2, 3 } });
             queueMH.QueuedMessages.Enqueue(new Message() { Type = MessageType.PlayerData, Data = new byte[2] { 4, 5 } });
             stubNS.Stub(x => x.ReadMessage()).Do(queueMH.GetNextQueuedMessage);
@@ -67,7 +68,7 @@ namespace UnitTestLibrary
         public void StoresSeperateQueuesForDifferentIDs()
         {
             var stubNS = MockRepository.GenerateStub<INetworkSession>();
-            var mq = new MessageQueue(stubNS);
+            var mq = new IncomingMessageQueue(stubNS);
             queueMH.QueuedMessages.Enqueue(new Message() { Type = MessageType.PlayerData, Data = new byte[3] { 1, 2, 3 } });
             queueMH.QueuedMessages.Enqueue(new Message() { Type = MessageType.Event, Data = new byte[2] { 4, 5 } });
             queueMH.QueuedMessages.Enqueue(new Message() { Type = MessageType.PlayerData, Data = new byte[3] { 6, 7, 8 } });

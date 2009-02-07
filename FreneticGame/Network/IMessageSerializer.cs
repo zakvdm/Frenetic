@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Frenetic
+namespace Frenetic.Network
 {
     public interface IMessageSerializer
     {

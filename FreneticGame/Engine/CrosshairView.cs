@@ -7,7 +7,7 @@ namespace Frenetic
 {
     public class CrosshairView : IView
     {
-        public CrosshairView(Crosshair crosshair, ISpriteBatch spriteBatch, ITexture texture)
+        public CrosshairView(ICrosshair crosshair, ISpriteBatch spriteBatch, ITexture texture)
         {
             _crosshair = crosshair;
             _spriteBatch = spriteBatch;
@@ -28,7 +28,7 @@ namespace Frenetic
 
         #endregion
 
-        Crosshair _crosshair;
+        ICrosshair _crosshair;
         ISpriteBatch _spriteBatch;
         ITexture _texture;
     }

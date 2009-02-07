@@ -13,6 +13,8 @@ using FarseerGames.FarseerPhysics.Collisions;
 using Frenetic.Graphics;
 using Microsoft.Xna.Framework;
 using FarseerGames.GettingStarted;
+using Frenetic.Network.Lidgren;
+using Frenetic.Network;
 
 namespace Frenetic
 {
@@ -22,9 +24,8 @@ namespace Frenetic
         const int _screenHeight = 600;
         Vector2 _gravity = new Vector2(0, 1);
 
-        public GameSessionFactory(INetworkSessionFactory networkSessionFactory, GraphicsDevice graphicsDevice, ContentManager contentManager)
+        public GameSessionFactory(GraphicsDevice graphicsDevice, ContentManager contentManager)
         {
-            _networkSessionFactory = networkSessionFactory;
             _graphicsDevice = graphicsDevice;
             _contentManager = contentManager;
         }
@@ -32,16 +33,29 @@ namespace Frenetic
 
         public GameSessionControllerAndView MakeServerGameSession()
         {
-            _networkSession = _networkSessionFactory.MakeServerNetworkSession();
-            
             IContainer container = RegisterAllComponents();
 
+            // TODO: Move this somewhere more appropriate
+            // Make queues for a SERVER network session:
+            // *****************************************
+            IServerNetworkSession serverNetworkSession = container.Resolve<IServerNetworkSession>();
+            NetworkSessionManager networkSessionManager = container.Resolve<NetworkSessionManager>(
+                    new TypedParameter(typeof(IClientNetworkSession), null));
+            IIncomingMessageQueue incomingMessageQueue = container.Resolve<IIncomingMessageQueue>(
+                    new TypedParameter(typeof(INetworkSession), serverNetworkSession));
+            IOutgoingMessageQueue outgoingMessageQueue = container.Resolve<IOutgoingMessageQueue>(
+                    new TypedParameter(typeof(IClientNetworkSession), null));
+            networkSessionManager.Start(14242);
+            // *****************************************
+
             CreateGeneralComponents(container);
+
 
             GameSessionController gameSessionController = container.Resolve<GameSessionController>
                             (
                             new TypedParameter(typeof(IPlayer), null),
-                            new TypedParameter(typeof(ICamera), null)
+                            new TypedParameter(typeof(ICamera), null),
+                            new TypedParameter(typeof(bool), true)
                             );
             GameSessionView gameSessionView = container.Resolve<GameSessionView>();
 
@@ -51,15 +65,28 @@ namespace Frenetic
         
         public GameSessionControllerAndView MakeClientGameSession()
         {
-            _networkSession = _networkSessionFactory.MakeClientNetworkSession();
-
             IContainer container = RegisterAllComponents();
+
+            // TODO: Move this somewhere more appropriate
+            // Make queues for a CLIENT network session:
+            // *****************************************
+            IClientNetworkSession clientNetworkSession = container.Resolve<IClientNetworkSession>();
+            NetworkSessionManager networkSessionManager = container.Resolve<NetworkSessionManager>(
+                    new TypedParameter(typeof(IServerNetworkSession), null));
+            IIncomingMessageQueue incomingMessageQueue = container.Resolve<IIncomingMessageQueue>(
+                    new TypedParameter(typeof(INetworkSession), clientNetworkSession));
+            IOutgoingMessageQueue outgoingMessageQueue = container.Resolve<IOutgoingMessageQueue>(
+                    new TypedParameter(typeof(IServerNetworkSession), null));
+            networkSessionManager.Join(14242);
+            // *****************************************
 
             IPlayer localPlayer = CreateClientComponents(container);
 
             CreateGeneralComponents(container);
 
-            GameSessionController gameSessionController = container.Resolve<GameSessionController>(new TypedParameter(typeof(IPlayer), localPlayer));
+            GameSessionController gameSessionController = container.Resolve<GameSessionController>(
+                                new TypedParameter(typeof(IPlayer), localPlayer),
+                                new TypedParameter(typeof(bool), false));
             GameSessionView gameSessionView = container.Resolve<GameSessionView>();
 
             return new GameSessionControllerAndView(container.Resolve<IGameSession>(), gameSessionController, gameSessionView);
@@ -70,8 +97,16 @@ namespace Frenetic
             var builder = new ContainerBuilder();
 
             #region Networking
-            builder.Register<MessageQueue>().SingletonScoped();
-            builder.Register(c => (INetworkSession)_networkSession);
+            builder.Register(new NetServer(new NetConfiguration("Frenetic"))).SingletonScoped();
+            builder.Register(new NetClient(new NetConfiguration("Frenetic"))).SingletonScoped();
+            builder.Register<NetServerWrapper>().As<INetServer>().SingletonScoped();
+            builder.Register<NetClientWrapper>().As<INetClient>().SingletonScoped();
+            builder.Register<LidgrenServerNetworkSession>().As<IServerNetworkSession>().SingletonScoped();
+            builder.Register<LidgrenClientNetworkSession>().As<IClientNetworkSession>().SingletonScoped();
+            builder.Register<NetworkSessionManager>().SingletonScoped();
+            builder.Register<IncomingMessageQueue>().As<IIncomingMessageQueue>().SingletonScoped();
+            builder.Register<OutgoingMessageQueue>().As<IOutgoingMessageQueue>().SingletonScoped();
+            builder.Register<XmlMessageSerializer>().As<IMessageSerializer>().SingletonScoped();
             #endregion
 
             #region ViewFactory
@@ -137,7 +172,7 @@ namespace Frenetic
             builder.Register<Camera>().As<ICamera>().SingletonScoped();
 
             // CROSSHAIR:
-            builder.Register<Crosshair>().SingletonScoped();
+            builder.Register<Crosshair>().As<ICrosshair>().SingletonScoped();
             builder.Register<CrosshairView>().SingletonScoped();
 
             return builder.Build();
@@ -147,7 +182,6 @@ namespace Frenetic
         {
             ITexture playerTexture = container.Resolve<ITexture>(new TypedParameter(typeof(Texture2D), _contentManager.Load<Texture2D>("Content/textures/ball")));
             IViewFactory viewFactory = container.Resolve<IViewFactory>(new TypedParameter(typeof(ITexture), playerTexture));
-            MessageQueue messageQueue = container.Resolve<MessageQueue>();
             IGameSession gameSession = container.Resolve<IGameSession>();
 
             gameSession.Controllers.Add(container.Resolve<FarseerPhysicsController>());
@@ -168,9 +202,8 @@ namespace Frenetic
             gameSession.Controllers.Add(container.Resolve<KeyboardPlayerController>(new TypedParameter(typeof(IPlayer), localPlayer)));
             gameSession.Views.Add(container.Resolve<NetworkPlayerView>
                             (
-                            new TypedParameter(typeof(IPlayer), localPlayer),
-                            new TypedParameter(typeof(INetworkSession), _networkSession))   // TODO: take this out
-                            );
+                            new TypedParameter(typeof(IPlayer), localPlayer)
+                            ));
             ICamera camera = container.Resolve<ICamera>
                                             (
                                             new TypedParameter(typeof(IPlayer), localPlayer),
@@ -204,14 +237,6 @@ namespace Frenetic
 
         GraphicsDevice _graphicsDevice;
         ContentManager _contentManager;
-
-        INetworkSessionFactory _networkSessionFactory;
-        IViewFactory _viewFactory;
-        INetworkSession _networkSession;
-        MessageQueue _messageQueue;
-        IGameSession _gameSession;
-        GameSessionController _gameSessionController;
-
     }
 
     public class GameSessionControllerAndView

@@ -8,35 +8,34 @@ using System.Xml.Serialization;
 using System.IO;
 using Microsoft.Xna.Framework;
 using System.Collections.Generic;
+using Frenetic.Network;
 
 namespace UnitTestLibrary
 {
     [TestFixture]
     public class NetworkPlayerControllerTests
     {
-        INetworkSession stubNS;
-        MessageQueue stubMQ;
+        IIncomingMessageQueue stubIncomingMessageQueue;
         NetworkPlayerController npController;
-        QueuedMessageHelper<object, MessageType> queueMH;
+        QueuedMessageHelper<object, MessageType> queueMessageHelper;
         [SetUp]
         public void SetUp()
         {
-            stubNS = MockRepository.GenerateStub<INetworkSession>();
-            stubMQ = MockRepository.GenerateStub<MessageQueue>(stubNS);
-            npController = new NetworkPlayerController(stubMQ);
+            stubIncomingMessageQueue = MockRepository.GenerateStub<IIncomingMessageQueue>();
+            npController = new NetworkPlayerController(stubIncomingMessageQueue);
             npController.Players.Add(1, new Player(1, null, null));
 
-            queueMH = new QueuedMessageHelper<object, MessageType>();
+            queueMessageHelper = new QueuedMessageHelper<object, MessageType>();
         }
 
         [Test]
         public void HandlesEmptyMessageQueueCorrectly()
         {
-            stubMQ.Stub(x => x.ReadMessage(Arg<MessageType>.Is.Anything)).Return(null);
+            stubIncomingMessageQueue.Stub(x => x.ReadMessage(Arg<MessageType>.Is.Anything)).Return(null);
 
             npController.Process(1);
 
-            stubMQ.AssertWasCalled(x => x.ReadMessage(MessageType.PlayerData));
+            stubIncomingMessageQueue.AssertWasCalled(x => x.ReadMessage(MessageType.PlayerData));
         }
 
         [Test]
@@ -44,8 +43,8 @@ namespace UnitTestLibrary
         {
             Player receivedPlayer = new Player(1, null, null);
             receivedPlayer.Position = new Vector2(100, 200);
-            queueMH.QueuedMessages.Enqueue(receivedPlayer);
-            stubMQ.Stub(x => x.ReadMessage(Arg<MessageType>.Is.Equal(MessageType.PlayerData))).Do(queueMH.GetNextQueuedMessage);
+            queueMessageHelper.QueuedMessages.Enqueue(receivedPlayer);
+            stubIncomingMessageQueue.Stub(x => x.ReadMessage(Arg<MessageType>.Is.Equal(MessageType.PlayerData))).Do(queueMessageHelper.GetNextQueuedMessage);
             npController.Players[1].Position = Vector2.Zero;
 
             npController.Process(1);
@@ -60,9 +59,9 @@ namespace UnitTestLibrary
             Player receivedPlayer2 = new Player(2, null, null);
             receivedPlayer1.Position = new Vector2(100, 100);
             receivedPlayer2.Position = new Vector2(-100, -100);
-            queueMH.QueuedMessages.Enqueue(receivedPlayer1);
-            queueMH.QueuedMessages.Enqueue(receivedPlayer2);
-            stubMQ.Stub(x => x.ReadMessage(Arg<MessageType>.Is.Anything)).Do(queueMH.GetNextQueuedMessage);
+            queueMessageHelper.QueuedMessages.Enqueue(receivedPlayer1);
+            queueMessageHelper.QueuedMessages.Enqueue(receivedPlayer2);
+            stubIncomingMessageQueue.Stub(x => x.ReadMessage(Arg<MessageType>.Is.Anything)).Do(queueMessageHelper.GetNextQueuedMessage);
             npController.Players.Add(2, new Player(2, null, null));
             npController.Players[1].Position = Vector2.Zero;
             npController.Players[2].Position = Vector2.Zero;
@@ -80,9 +79,9 @@ namespace UnitTestLibrary
             Player receivedPlayer2 = new Player(2, null, null);
             receivedPlayer1.Position = new Vector2(100, 100);
             receivedPlayer2.Position = new Vector2(-100, -100);
-            queueMH.QueuedMessages.Enqueue(receivedPlayer1);
-            queueMH.QueuedMessages.Enqueue(receivedPlayer2);
-            stubMQ.Stub(x => x.ReadMessage(Arg<MessageType>.Is.Anything)).Do(queueMH.GetNextQueuedMessage);
+            queueMessageHelper.QueuedMessages.Enqueue(receivedPlayer1);
+            queueMessageHelper.QueuedMessages.Enqueue(receivedPlayer2);
+            stubIncomingMessageQueue.Stub(x => x.ReadMessage(Arg<MessageType>.Is.Anything)).Do(queueMessageHelper.GetNextQueuedMessage);
             npController.Players[1].Position = Vector2.Zero;
 
             npController.Process(1);

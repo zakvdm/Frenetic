@@ -37,7 +37,7 @@ namespace UnitTestLibrary
             mainMenuScreen.State = MainMenuScreen.MainMenuState.Network;
             mainMenuScreen.OnSelectEntry(0);    // Create a session selected
 
-            stubScreenFactory.AssertWasCalled(x => x.MakeGameplayScreen(serverGSCandV, clientGSCandV));
+            stubScreenFactory.AssertWasCalled(x => x.MakeGameplayScreen(clientGSCandV, serverGSCandV));
         }
 
         [Test]
@@ -50,7 +50,7 @@ namespace UnitTestLibrary
             mainMenuScreen.State = MainMenuScreen.MainMenuState.Network;
             mainMenuScreen.OnSelectEntry(1);    // Join a session selected
 
-            stubScreenFactory.AssertWasCalled(x => x.MakeGameplayScreen(Arg<GameSessionControllerAndView>.Is.Equal(clientGSCandV)));
+            stubScreenFactory.AssertWasCalled(x => x.MakeGameplayScreen(Arg<GameSessionControllerAndView>.Is.Equal(clientGSCandV), Arg<GameSessionControllerAndView>.Is.Null));
         }
 
         [Test]

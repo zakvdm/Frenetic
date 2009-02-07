@@ -2,7 +2,7 @@
 using System.Xml.Serialization;
 using System.IO;
 
-namespace Frenetic
+namespace Frenetic.Network
 {
     public class XmlMessageSerializer : IMessageSerializer
     {

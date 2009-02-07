@@ -2,24 +2,23 @@
 using System.Xml.Serialization;
 using System.IO;
 using System.Collections.Generic;
+using Frenetic.Network;
 
 namespace Frenetic
 {
     public class NetworkPlayerController : IController
     {
-        MessageQueue _messageQueue;
-        public Dictionary<int, IPlayer> Players { get; private set; }
-        public NetworkPlayerController(MessageQueue messageQueue)
+        public NetworkPlayerController(IIncomingMessageQueue incomingMessageQueue)
         {
             Players = new Dictionary<int, IPlayer>();
-            _messageQueue = messageQueue;
+            _incomingMessageQueue = incomingMessageQueue;
         }
 
         public void Process(long ticks)
         {
             while (true)
             {
-                Player player = (Player)_messageQueue.ReadMessage(MessageType.PlayerData);
+                Player player = (Player)_incomingMessageQueue.ReadMessage(MessageType.PlayerData);
                 
                 if (player == null)
                     return;
@@ -30,5 +29,8 @@ namespace Frenetic
                 Players[player.ID].Position = player.Position;
             }
         }
+
+        IIncomingMessageQueue _incomingMessageQueue;
+        public Dictionary<int, IPlayer> Players { get; private set; }
     }
 }

@@ -27,15 +27,9 @@ namespace Frenetic
             return messageBoxScreen;
         }
 
-        public GameplayScreen MakeGameplayScreen(GameSessionControllerAndView serverGameSessionCandV, GameSessionControllerAndView clientGameSessionCandV)
+        public GameplayScreen MakeGameplayScreen(GameSessionControllerAndView clientGameSessionCandV, GameSessionControllerAndView serverGameSessionCandV)
         {
-            GameplayScreen gameplayScreen = new GameplayScreen(serverGameSessionCandV, clientGameSessionCandV);
-            _screenManager.AddScreen(gameplayScreen);
-            return gameplayScreen;
-        }
-        public GameplayScreen MakeGameplayScreen(GameSessionControllerAndView clientGameSessionCandV)
-        {
-            GameplayScreen gameplayScreen = new GameplayScreen(clientGameSessionCandV);
+            GameplayScreen gameplayScreen = new GameplayScreen(clientGameSessionCandV, serverGameSessionCandV, this);
             _screenManager.AddScreen(gameplayScreen);
             return gameplayScreen;
         }
@@ -48,8 +42,8 @@ namespace Frenetic
                             _screenManager.Font,
                             new GameSessionFactory
                                 (
-                                    new Frenetic.Network.Lidgren.LidgrenNetworkSessionFactory(), 
-                                    _screenManager.GraphicsDevice, new ContentManager(_screenManager.Game.Services)
+                                    _screenManager.GraphicsDevice, 
+                                    new ContentManager(_screenManager.Game.Services)
                                 ), 
                             this, _screenManager.Game);
             _screenManager.AddScreen(mainMenuScreen);

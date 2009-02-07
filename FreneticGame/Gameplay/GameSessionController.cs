@@ -1,28 +1,32 @@
 ﻿using System;
 using Lidgren.Network;
+using Frenetic.Network;
+using Frenetic.Network.Lidgren;
 
 namespace Frenetic
 {
     public class GameSessionController : IController
     {
-        
-        public GameSessionController(IGameSession gameSession, MessageQueue messageQueue, INetworkSession networkSession, IViewFactory viewFactory, Player.Factory playerFactory, IPlayer localPlayer, ICamera camera)
+
+        public GameSessionController(IGameSession gameSession, IIncomingMessageQueue incomingMessageQueue, IOutgoingMessageQueue outgoingMessageQueue, IViewFactory viewFactory, Player.Factory playerFactory, IPlayer localPlayer, ICamera camera, bool isServer)
         {
             _gameSession = gameSession;
-            _messageQueue = messageQueue;
-            _networkSession = networkSession;
+            _incomingMessageQueue = incomingMessageQueue;
+            _outgoingMessageQueue = outgoingMessageQueue;
             _viewFactory = viewFactory;
             _playerFactory = playerFactory;
             _localPlayer = localPlayer;
             _camera = camera;
-            _networkPlayerController = new NetworkPlayerController(_messageQueue);
+            _isServer = isServer;
+
+            _networkPlayerController = new NetworkPlayerController(_incomingMessageQueue);
             _gameSession.Controllers.Add(_networkPlayerController);
         }
         #region IController Members
         public void Process(long ticks)
         {
             // Handle GameSession level messages:
-            if (_networkSession.IsServer)
+            if (_isServer)
                 ReadMessagesAsServer();
             else
                 ReadMessagesAsClient();
@@ -39,7 +43,7 @@ namespace Frenetic
         {
             while (true)
             {
-                object data = _messageQueue.ReadMessage(MessageType.NewPlayer);
+                object data = _incomingMessageQueue.ReadMessage(MessageType.NewPlayer);
                 if (data == null)
                     break;
                 int newID = (int)data;
@@ -48,19 +52,19 @@ namespace Frenetic
                 // TODO: Consider moving these sends into the GameSessionView?
 
                 // send ack to new player:
-                _networkSession.SendTo(new Message() { Type = MessageType.SuccessfulJoin, Data = newID }, NetChannel.ReliableInOrder1, _networkSession[newID]);
+                _outgoingMessageQueue.WriteFor(new Message() { Type = MessageType.SuccessfulJoin, Data = newID }, NetChannel.ReliableInOrder1, newID);
                 
                 // send existent players' info to new player:
                 foreach (int currentID in _networkPlayerController.Players.Keys)
                 {
-                    _networkSession.SendTo(new Message() { Type = MessageType.NewPlayer, Data = currentID }, NetChannel.ReliableUnordered, _networkSession[newID]);
+                    _outgoingMessageQueue.WriteFor(new Message() { Type = MessageType.NewPlayer, Data = currentID }, NetChannel.ReliableUnordered, newID);
                 }
 
                 // tell existent players about new player:
-                _networkSession.SendToAllExcept(new Message() { Type = MessageType.NewPlayer, Data = newID }, NetChannel.ReliableUnordered, _networkSession[newID]);
+                _outgoingMessageQueue.WriteForAllExcept(new Message() { Type = MessageType.NewPlayer, Data = newID }, NetChannel.ReliableUnordered, newID);
 
                 _networkPlayerController.Players.Add(newID, newPlayer);
-                _gameSession.Views.Add(new NetworkPlayerView(newPlayer, _networkSession));
+                _gameSession.Views.Add(new NetworkPlayerView(newPlayer, _outgoingMessageQueue));
             }
         }
 
@@ -68,7 +72,7 @@ namespace Frenetic
         {
             while (true)
             {
-                object data = _messageQueue.ReadMessage(MessageType.NewPlayer);
+                object data = _incomingMessageQueue.ReadMessage(MessageType.NewPlayer);
                 if (data == null)
                     break;
                 int ID = (int)data;
@@ -78,7 +82,7 @@ namespace Frenetic
             }
             while (true)
             {
-                object data = _messageQueue.ReadMessage(MessageType.SuccessfulJoin);
+                object data = _incomingMessageQueue.ReadMessage(MessageType.SuccessfulJoin);
                 if (data == null)
                     break;
                 int ID = (int)data;
@@ -89,8 +93,9 @@ namespace Frenetic
         }
 
         IGameSession _gameSession;
-        MessageQueue _messageQueue;
-        INetworkSession _networkSession;
+        IIncomingMessageQueue _incomingMessageQueue;
+        IOutgoingMessageQueue _outgoingMessageQueue;
+        bool _isServer = false;
         IViewFactory _viewFactory;
         Player.Factory _playerFactory;
         IPlayer _localPlayer;

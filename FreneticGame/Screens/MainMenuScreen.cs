@@ -129,18 +129,8 @@ namespace Frenetic
         {
             const string message = "Exit Frenetic?";
             MessageBoxScreen messageBox = _screenFactory.MakeMessageBoxScreen(message);
-            messageBox.Accepted += ExitMessageBoxAccepted;
-        }
-
-
-        /// <summary>
-        /// Event handler for when the user selects ok on the "are you sure
-        /// you want to exit" message box.
-        /// </summary>
-        void ExitMessageBoxAccepted(object sender, EventArgs e)
-        {
             // TODO: Only using the reference to Game in this one method... this needs refactoring...
-            _game.Exit();   
+            messageBox.Accepted += (sender, e) => _game.Exit();
         }
 
         #endregion
@@ -155,8 +145,8 @@ namespace Frenetic
         {
             var serverGameSessionCandV = _gameSessionFactory.MakeServerGameSession();
             var clientGameSessionCandV = _gameSessionFactory.MakeClientGameSession();
-            
-            _screenFactory.MakeGameplayScreen(serverGameSessionCandV, clientGameSessionCandV);
+
+            _screenFactory.MakeGameplayScreen(clientGameSessionCandV, serverGameSessionCandV);
 
             #region Old Network Code
             /*
@@ -251,7 +241,7 @@ namespace Frenetic
         {
             var clientGameSessionCandV = _gameSessionFactory.MakeClientGameSession();
 
-            _screenFactory.MakeGameplayScreen(clientGameSessionCandV);
+            _screenFactory.MakeGameplayScreen(clientGameSessionCandV, null);
         }
 
         /// <summary>

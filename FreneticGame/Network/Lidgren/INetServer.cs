@@ -6,6 +6,7 @@ namespace Frenetic.Network.Lidgren
 {
     public interface INetServer
     {
+        int Port { get; set; }
         bool Connected { get; }
         bool IsListening { get; }
 

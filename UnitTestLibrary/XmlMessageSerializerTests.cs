@@ -5,6 +5,7 @@ using Frenetic;
 using NUnit.Framework;
 using System.Xml.Serialization;
 using System.IO;
+using Frenetic.Network;
 namespace UnitTestLibrary
 {
     [TestFixture]
