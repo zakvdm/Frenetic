@@ -159,7 +159,7 @@ namespace Frenetic
             // Tell each of the screens to load their content.
             foreach (GameScreen screen in screens)
             {
-                screen.LoadContent();
+                //screen.LoadContent();
             }
 
             // update the title-safe area
@@ -184,7 +184,7 @@ namespace Frenetic
             // Tell each of the screens to unload their content.
             foreach (GameScreen screen in screens)
             {
-                screen.UnloadContent();
+                //screen.UnloadContent();
             }
         }
 
@@ -324,7 +324,7 @@ namespace Frenetic
             if ((graphicsDeviceService != null) &&
                 (graphicsDeviceService.GraphicsDevice != null))
             {
-                screen.LoadContent();
+                //screen.LoadContent();
             }
 
             screens.Add(screen);
@@ -343,7 +343,7 @@ namespace Frenetic
             if ((graphicsDeviceService != null) &&
                 (graphicsDeviceService.GraphicsDevice != null))
             {
-                screen.UnloadContent();
+                //screen.UnloadContent();
             }
 
             screens.Remove(screen);

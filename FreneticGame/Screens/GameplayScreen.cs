@@ -9,7 +9,7 @@ using Microsoft.Xna.Framework.Input;
 
 namespace Frenetic
 {
-    public class GameplayScreen : GameScreen, IDisposable
+    public class GameplayScreen : GameScreen
     {
         public GameplayScreen(GameSessionControllerAndView clientGameSessionCandV, GameSessionControllerAndView serverGameSessionCandV, IScreenFactory screenFactory)
         {
@@ -26,12 +26,6 @@ namespace Frenetic
             // set the transition times
             TransitionOnTime = TimeSpan.FromSeconds(1.0);
             TransitionOffTime = TimeSpan.FromSeconds(1.0);
-        }
-
-        public override void LoadContent()
-        {
-            // TODO: Remove this
-            base.LoadContent();
         }
 
         public override void Update(GameTime pGameTime, bool otherScreenHasFocus, bool coveredByOtherScreen)
@@ -75,47 +69,6 @@ namespace Frenetic
 
             _clientGameSessionView.Generate();
         }
-        #endregion
-
-        #region IDisposable Implementation
-
-
-        /// <summary>
-        /// Finalizes the GameplayScreen object, calls Dispose(false)
-        /// </summary>
-        ~GameplayScreen()
-        {
-            Dispose(false);
-        }
-
-
-        /// <summary>
-        /// Disposes the GameplayScreen object.
-        /// </summary>
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-
-        /// <summary>
-        /// Disposes this object.
-        /// </summary>
-        /// <param name="disposing">
-        /// True if this method was called as part of the Dispose method.
-        /// </param>
-        protected virtual void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                lock (this)
-                {
-                }
-            }
-        }
-
-
         #endregion
 
         private IController _clientGameSessionController;

@@ -97,12 +97,13 @@ namespace Frenetic
         /// Whenever a subsequent NetworkBusyScreen tries to load this same content,
         /// it will just get back another reference to the already loaded data.
         /// </summary>
+        /*
         public override void LoadContent()
         {
             ContentManager content = ScreenManager.Game.Content;
 
             busyTexture = content.Load<Texture2D>("Textures/chatTalking");
-        }
+        }*/
 
 
         #endregion
@@ -141,6 +142,7 @@ namespace Frenetic
         /// </summary>
         public override void Draw(GameTime gameTime)
         {
+            /*
             SpriteBatch spriteBatch = ScreenManager.SpriteBatch;
             SpriteFont font = ScreenManager.Font;
 
@@ -196,6 +198,7 @@ namespace Frenetic
                 SpriteEffects.None, 0);
 
             spriteBatch.End();
+             */
         }
 
 

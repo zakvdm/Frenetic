@@ -3,7 +3,7 @@
 
 namespace Frenetic.Network
 {
-    public class NetworkSessionManager
+    public class NetworkSessionManager : IDisposable
     {
         public NetworkSessionManager(IClientNetworkSession clientNetworkSession, IServerNetworkSession serverNetworkSession)
         {
@@ -22,5 +22,23 @@ namespace Frenetic.Network
 
         IServerNetworkSession _serverNetworkSession;
         IClientNetworkSession _clientNetworkSession;
+
+        #region IDisposable Members
+
+        public void Dispose()
+        {
+            if (_clientNetworkSession != null)
+                _clientNetworkSession.Shutdown("Killing session...");
+            if (_serverNetworkSession != null)
+                _serverNetworkSession.Shutdown("Killing session...");
+            GC.SuppressFinalize(this);
+        }
+
+        ~NetworkSessionManager()
+        {
+            Console.WriteLine("WARNING: Dispose not called on NetworkSessionManager!");
+        }
+
+        #endregion
     }
 }

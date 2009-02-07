@@ -212,6 +212,7 @@ namespace Frenetic
             }
             else
             {
+                /*
                 Viewport viewport = ScreenManager.GraphicsDevice.Viewport;
                 Vector2 viewportSize = new Vector2(viewport.Width, viewport.Height);
 
@@ -239,6 +240,7 @@ namespace Frenetic
                                                      SpriteEffects.None, 0);
 
                 ScreenManager.SpriteBatch.End();
+                 */
             }
         }
 

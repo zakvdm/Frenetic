@@ -91,15 +91,8 @@
     <Compile Include="Engine\CrosshairView.cs" />
     <Compile Include="Engine\ICamera.cs" />
     <Compile Include="Engine\ICrosshair.cs" />
-    <Compile Include="Engine\Level\LevelCollisionChecker.cs" />
-    <Compile Include="Engine\Level\Tile.cs" />
-    <Compile Include="Engine\Level\TileGrid.cs" />
     <Compile Include="Engine\Line.cs" />
-    <Compile Include="Engine\Cursor.cs" />
-    <Compile Include="Engine\NetworkManager.cs" />
-    <Compile Include="Engine\SimpleRay.cs" />
     <Compile Include="Gameplay\GameplayObject.cs" />
-    <Compile Include="Gameplay\Gamer.cs" />
     <Compile Include="Gameplay\GameSession.cs" />
     <Compile Include="Gameplay\GameSessionController.cs" />
     <Compile Include="Gameplay\GameSessionFactory.cs" />
@@ -112,16 +105,9 @@
     <Compile Include="Gameplay\KeyboardPlayerController.cs" />
     <Compile Include="Gameplay\NetworkPlayerController.cs" />
     <Compile Include="Gameplay\NetworkPlayerView.cs" />
-    <Compile Include="Gameplay\NetworkWorldView.cs" />
     <Compile Include="Gameplay\Player.cs" />
     <Compile Include="Gameplay\PlayerView.cs" />
     <Compile Include="Gameplay\ViewFactory.cs" />
-    <Compile Include="Gameplay\Weapons\RailGun.cs" />
-    <Compile Include="Gameplay\Weapons\Weapon.cs" />
-    <Compile Include="Gameplay\WorldManager.cs" />
-    <Compile Include="Engine\PhysicsManager.cs" />
-    <Compile Include="Gameplay\OldPlayer.cs" />
-    <Compile Include="Gameplay\PlayerInput.cs" />
     <Compile Include="Gameplay\World.cs" />
     <Compile Include="Graphics\ISpriteBatch.cs" />
     <Compile Include="Graphics\ITexture.cs" />
@@ -226,6 +212,10 @@
       <Project>{BA202214-F6F8-4853-BCC9-CA4F13C5F479}</Project>
       <Name>Lidgren.Network</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Engine\Level\" />
+    <Folder Include="Gameplay\Weapons\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\XNA Game Studio\Microsoft.Xna.GameStudio.targets" Condition="" />

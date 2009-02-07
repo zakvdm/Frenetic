@@ -54,5 +54,15 @@ namespace UnitTestLibrary
 
             stubClientNetworkSession.AssertWasCalled(x => x.Join(Arg<int>.Is.Equal(30)));
         }
+
+        [Test]
+        public void CorrectlyShutsDownClientSession()
+        {
+            IClientNetworkSession stubClientNetworkSession = MockRepository.GenerateStub<IClientNetworkSession>();
+            new NetworkSessionManager(stubClientNetworkSession, null);
+            
+
+            stubClientNetworkSession.AssertWasCalled(x => x.Shutdown(Arg<string>.Is.Anything));
+        }
     }
 }

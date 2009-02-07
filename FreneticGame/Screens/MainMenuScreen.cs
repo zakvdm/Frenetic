@@ -89,6 +89,9 @@ namespace Frenetic
             State = MainMenuState.Network;
 
             base.Update(gameTime, otherScreenHasFocus, coveredByOtherScreen);
+
+            if (Microsoft.Xna.Framework.Input.Keyboard.GetState().IsKeyDown(Microsoft.Xna.Framework.Input.Keys.B))
+                GC.Collect();
         }
 
 
@@ -335,18 +338,6 @@ namespace Frenetic
                 LoadGameplayScreen(networkSession);
             }
              * */
-        }
-
-        /// <summary>
-        /// Load the gameplay screen with the new session.
-        /// </summary>
-        void LoadGameScreen(GameScreen gameScreen)
-        {
-            if (gameScreen != null)
-            {
-                gameScreen.ScreenManager = this.ScreenManager;
-                ScreenManager.AddScreen(gameScreen);
-            }
         }
 
         /// <summary>

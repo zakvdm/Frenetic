@@ -153,40 +153,6 @@ namespace Frenetic
 
         bool otherScreenHasFocus;
 
-
-        /// <summary>
-        /// Gets the manager that this screen belongs to.
-        /// </summary>
-        public ScreenManager ScreenManager
-        {
-            get {
-                throw new NotImplementedException();    // This whole property should be removed
-                return screenManager; }
-            internal set { screenManager = value; }
-        }
-
-        ScreenManager screenManager;
-
-
-        #endregion
-
-        #region Initialization
-
-
-        // TODO: REMOVE THESE CONTENT LOADING METHODS??
-
-        /// <summary>
-        /// Load graphics content for the screen.
-        /// </summary>
-        public virtual void LoadContent() { }
-
-
-        /// <summary>
-        /// Unload content for the screen.
-        /// </summary>
-        public virtual void UnloadContent() { }
-
-
         #endregion
 
         #region Update and Draw
