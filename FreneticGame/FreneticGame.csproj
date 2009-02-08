@@ -167,6 +167,8 @@
     <Compile Include="Screens\NetworkBusyScreen.cs" />
     <Compile Include="Screens\ScreenFactory.cs" />
     <Compile Include="Screens\SearchResultsScreen.cs" />
+    <Compile Include="UserInput\IKeyboard.cs" />
+    <Compile Include="UserInput\Keyboard.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Game.ico" />

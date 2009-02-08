@@ -23,7 +23,7 @@ namespace Frenetic
     {
         const int _screenWidth = 800;
         const int _screenHeight = 600;
-        Vector2 _gravity = new Vector2(0, 1);
+        Vector2 _gravity = new Vector2(0, 6);
 
         public GameSessionFactory(GraphicsDevice graphicsDevice, ContentManager contentManager)
         {
@@ -178,6 +178,9 @@ namespace Frenetic
             // CROSSHAIR:
             builder.Register<Crosshair>().As<ICrosshair>().SingletonScoped();
             builder.Register<CrosshairView>().SingletonScoped();
+
+            // KEYBOARD:
+            builder.Register<Keyboard>().As<IKeyboard>().SingletonScoped();
 
             return builder.Build();
         }

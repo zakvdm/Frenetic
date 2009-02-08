@@ -11,6 +11,12 @@ namespace Frenetic.Physics
         {
             _body = body;
             _geom = geom;
+
+            _geom.OnCollision += new Geom.CollisionEventHandler((body1, body2, contactList) =>
+                {
+                    CollidedWithWorld();
+                    return true;
+                });
         }
 
         public bool IsStatic
@@ -53,6 +59,25 @@ namespace Frenetic.Physics
                 _geom.ComputeCollisionGrid();
             }
         }
+        public Vector2 LinearVelocity
+        {
+            get
+            {
+                return new Vector2(_body.LinearVelocity.X, _body.LinearVelocity.Y);
+            }
+        }
+
+        public void ApplyImpulse(Vector2 impulse)
+        {
+            _body.ApplyImpulse(impulse);
+        }
+
+        public void ApplyForce(Vector2 force)
+        {
+            _body.ApplyForce(force);
+        }
+
+        public event CollidedWithWorldDelegate CollidedWithWorld = delegate { };
         
 
         Body _body;

@@ -1,31 +1,45 @@
 ﻿using System;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input;
 
 namespace Frenetic
 {
     public class KeyboardPlayerController : IController
     {
         public IPlayer Player { get; private set; }
-        public KeyboardPlayerController(IPlayer player)
+        IKeyboard Keyboard { get; set; }
+
+        public KeyboardPlayerController(IPlayer player, IKeyboard keyboard)
         {
             Player = player;
+            Keyboard = keyboard;
         }
         #region IController Members
         
-        Random rand = new Random();
-        int count = 0;
         public void Process(long ticks)
         {
-            if (count > 300)
+            TotalTicksElapsed += ticks;
+
+            if (Keyboard.IsKeyDown(Keys.Space))
             {
-                Player.Position = new Vector2(rand.Next(800), rand.Next(600));
-                count = 0;
+                Player.Jump(TotalTicksElapsed);
             }
-            count++;
+
+            if (Keyboard.IsKeyDown(Keys.Left))
+            {
+                Player.MoveLeft();
+            }
+
+            if (Keyboard.IsKeyDown(Keys.Right))
+            {
+                Player.MoveRight();
+            }
 
             Player.Update();
         }
 
         #endregion
+
+        private long TotalTicksElapsed { get; set; }
     }
 }

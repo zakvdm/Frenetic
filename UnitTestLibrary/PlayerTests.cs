@@ -8,6 +8,7 @@ using Frenetic.Physics;
 
 using NUnit.Framework;
 using Rhino.Mocks;
+using FarseerGames.FarseerPhysics.Dynamics;
 
 namespace UnitTestLibrary
 {
@@ -73,6 +74,93 @@ namespace UnitTestLibrary
             rebuiltPlayer.Position = new Vector2(1, 2);
 
             stubPhysicsComponent.AssertWasNotCalled(x => x.Position = new Vector2(1, 2));
+        }
+
+        [Test]
+        public void JumpAppliesTheJumpVectorAsAnImpulseToThePlayersBodyIfCanJumpIsTrue()
+        {
+            var stubPhysicsComponent = MockRepository.GenerateStub<IPhysicsComponent>();
+            Player player = new Player(1, stubPhysicsComponent, null);
+
+            player.InContactWithLevel = true;
+            player.Jump(new TimeSpan(0, 0, 1).Ticks);
+
+            stubPhysicsComponent.AssertWasCalled(pc => pc.ApplyImpulse(Player.JumpImpulse));
+        }
+
+        [Test]
+        public void SecondJumpMustBeDelayedForSomePeriodOfTime()
+        {
+            var stubPhysicsComponent = MockRepository.GenerateStub<IPhysicsComponent>();
+            Player player = new Player(1, stubPhysicsComponent, null);
+
+            player.InContactWithLevel = true;
+            player.Jump(new TimeSpan(0, 0, 0, 1).Ticks);
+
+            stubPhysicsComponent.AssertWasCalled(pc => pc.ApplyImpulse(Player.JumpImpulse));
+
+            Assert.IsFalse(player.CanJump(new TimeSpan(0, 0, 0, 1, 200).Ticks));
+            Assert.IsTrue(player.CanJump(new TimeSpan(0, 0, 0, 1, 1000).Ticks));
+        }
+
+        [Test]
+        public void JumpAppliesNoImpulseToThePlayersBodyIfCanJumpIsFalse()
+        {
+            var stubPhysicsComponent = MockRepository.GenerateStub<IPhysicsComponent>();
+            Player player = new Player(1, stubPhysicsComponent, null);
+
+            player.InContactWithLevel = false;
+            player.Jump(1);
+
+            stubPhysicsComponent.AssertWasNotCalled(pc => pc.ApplyImpulse(Player.JumpImpulse));
+        }
+
+        [Test]
+        public void MoveLeftAppliesTheCorrectForceToThePlayersBodyWhenStationary()
+        {
+            var stubPhysicsComponent = MockRepository.GenerateStub<IPhysicsComponent>();
+            Player player = new Player(1, stubPhysicsComponent, null);
+
+            player.MoveLeft();
+
+            stubPhysicsComponent.AssertWasCalled(pc => pc.ApplyForce(Player.MoveForce));
+        }
+
+        [Test]
+        public void MoveRightAppliesTheCorrectForceToThePlayersBodyWhenStationary()
+        {
+            var stubPhysicsComponent = MockRepository.GenerateStub<IPhysicsComponent>();
+            Player player = new Player(1, stubPhysicsComponent, null);
+
+            player.MoveRight();
+
+            stubPhysicsComponent.AssertWasCalled(pc => pc.ApplyForce(Player.MoveForce * -1));
+        }
+
+        [Test]
+        public void PlayerVelocityIsCappedToTheLeft()
+        {
+            var stubPhysicsComponent = MockRepository.GenerateStub<IPhysicsComponent>();
+            Player player = new Player(1, stubPhysicsComponent, null);
+
+            stubPhysicsComponent.Stub(spc => spc.LinearVelocity).Return(new Vector2(-50, 0));
+
+            player.MoveLeft();
+
+            stubPhysicsComponent.AssertWasNotCalled(pc => pc.ApplyForce(Player.MoveForce));
+        }
+
+        [Test]
+        public void PlayerVelocityIsCappedToTheRight()
+        {
+            var stubPhysicsComponent = MockRepository.GenerateStub<IPhysicsComponent>();
+            Player player = new Player(1, stubPhysicsComponent, null);
+
+            stubPhysicsComponent.Stub(spc => spc.LinearVelocity).Return(new Vector2(50, 0));
+
+            player.MoveRight();
+
+            stubPhysicsComponent.AssertWasNotCalled(pc => pc.ApplyForce(Player.MoveForce * -1));
         }
     }
 }

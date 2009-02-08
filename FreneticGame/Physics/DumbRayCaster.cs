@@ -23,7 +23,7 @@ namespace Frenetic.Physics
 
         public void Process(long ticks)
         {
-            KeyboardState kbState = Keyboard.GetState();
+            KeyboardState kbState = Microsoft.Xna.Framework.Input.Keyboard.GetState();
 
             if (kbState.IsKeyDown(Keys.T))
             {
