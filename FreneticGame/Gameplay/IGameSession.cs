@@ -7,5 +7,8 @@ namespace Frenetic
     {
         List<IView> Views { get; }
         List<IController> Controllers { get; }
+
+        IController GameSessionController { get; set; }
+        IView GameSessionView { get; set; }
     }
 }

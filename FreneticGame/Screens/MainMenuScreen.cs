@@ -94,7 +94,6 @@ namespace Frenetic
                 GC.Collect();
         }
 
-
         /// <summary>
         /// Responds to user menu selections.
         /// </summary>

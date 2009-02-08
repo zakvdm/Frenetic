@@ -15,6 +15,7 @@ using Microsoft.Xna.Framework;
 using FarseerGames.GettingStarted;
 using Frenetic.Network.Lidgren;
 using Frenetic.Network;
+using Frenetic.Autofac;
 
 namespace Frenetic
 {
@@ -134,6 +135,7 @@ namespace Frenetic
             #endregion
 
             #region Physics
+            /*
             PhysicsSimulator physicsSimulator = new PhysicsSimulator(_gravity);
             builder.Register<PhysicsSimulator>(physicsSimulator).SingletonScoped();
             // Body:
@@ -152,6 +154,8 @@ namespace Frenetic
                 return (IPhysicsComponent)new FarseerPhysicsComponent(bod, geom);
             }).FactoryScoped();
             builder.Register<FarseerPhysicsController>().SingletonScoped();
+             */
+            builder.RegisterModule(new PhysicsModule() { Gravity = _gravity });
             #endregion
 
             #region Level

@@ -86,6 +86,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Autofac\GameSessionModule.cs" />
+    <Compile Include="Autofac\PhysicsModule.cs" />
     <Compile Include="Engine\Camera.cs" />
     <Compile Include="Engine\Crosshair.cs" />
     <Compile Include="Engine\CrosshairView.cs" />

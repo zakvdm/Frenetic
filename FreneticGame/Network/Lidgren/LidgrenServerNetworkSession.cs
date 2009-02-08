@@ -62,7 +62,7 @@ namespace Frenetic.Network.Lidgren
 
         public void Shutdown(string reason)
         {
-            throw new NotImplementedException();
+            _netServer.Shutdown(reason);
         }
 
         public Message ReadMessage()
