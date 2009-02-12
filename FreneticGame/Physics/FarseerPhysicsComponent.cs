@@ -12,11 +12,11 @@ namespace Frenetic.Physics
             _body = body;
             _geom = geom;
 
-            _geom.OnCollision += new Geom.CollisionEventHandler((body1, body2, contactList) =>
+            _geom.OnCollision += new Geom.CollisionEventHandler((geom1, geom2, contactList) =>
                 {
                     CollidedWithWorld();
                     return true;
-                });
+                }); 
         }
 
         public bool IsStatic

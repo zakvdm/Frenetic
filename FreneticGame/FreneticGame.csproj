@@ -137,7 +137,6 @@
     <Compile Include="Network\Lidgren\NetConnectionWrapper.cs" />
     <Compile Include="Network\Lidgren\NetServerWrapper.cs" />
     <Compile Include="Network\IncomingMessageQueue.cs" />
-    <Compile Include="Network\NetworkSessionManager.cs" />
     <Compile Include="Network\OutgoingMessageQueue.cs" />
     <Compile Include="Network\XmlMessageSerializer.cs" />
     <Compile Include="OperationCompletedEventArgs.cs" />
