@@ -63,8 +63,8 @@ namespace Frenetic
             base.Initialize();
 
             ScreenFactory screenFactory = new ScreenFactory(screenManager);
-            IContainer container = BuildContainer();
-            MainMenuScreen = screenFactory.MakeMainMenuScreen(container);
+            Container = BuildContainer();
+            MainMenuScreen = screenFactory.MakeMainMenuScreen(Container);
         }
 
         /// <summary>
@@ -80,7 +80,14 @@ namespace Frenetic
 
         protected override void Dispose(bool disposing)
         {
-
+            if (MainMenuScreen != null)
+            {
+                MainMenuScreen.Dispose();
+            }
+            if (Container != null)
+            {
+                Container.Dispose();
+            }
             base.Dispose(disposing);
         }
 
@@ -158,6 +165,7 @@ namespace Frenetic
         }
 
         MainMenuScreen MainMenuScreen { get; set; }
+        IContainer Container { get; set; }
         const int _screenWidth = 800;
         const int _screenHeight = 600;
         Vector2 _gravity = new Vector2(0, 2);

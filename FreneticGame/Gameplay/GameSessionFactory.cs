@@ -129,7 +129,12 @@ namespace Frenetic
             // *********************************************************************************
 
             return localPlayer;
-           
+        }
+
+        public void Dispose()
+        {
+            ClientContainer.Dispose();
+            ServerContainer.Dispose();
         }
 
         #endregion
