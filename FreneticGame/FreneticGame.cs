@@ -8,6 +8,15 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Net;
 using Microsoft.Xna.Framework.Storage;
+using Autofac;
+using Autofac.Builder;
+using Lidgren.Network;
+using Frenetic.Network.Lidgren;
+using Frenetic.Network;
+using Frenetic.Graphics;
+using Frenetic.Physics;
+using Frenetic.Autofac;
+using Frenetic.Level;
 
 namespace Frenetic
 {
@@ -54,7 +63,8 @@ namespace Frenetic
             base.Initialize();
 
             ScreenFactory screenFactory = new ScreenFactory(screenManager);
-            screenFactory.MakeMainMenuScreen();
+            IContainer container = BuildContainer();
+            MainMenuScreen = screenFactory.MakeMainMenuScreen(container);
         }
 
         /// <summary>
@@ -67,5 +77,89 @@ namespace Frenetic
 
             base.Draw(gameTime);
         }
+
+        protected override void Dispose(bool disposing)
+        {
+
+            base.Dispose(disposing);
+        }
+
+        IContainer BuildContainer()
+        {
+            var builder = new ContainerBuilder();
+
+            #region Networking
+            builder.Register(new NetServer(new NetConfiguration("Frenetic")));
+            builder.Register(new NetClient(new NetConfiguration("Frenetic")));
+            builder.Register<NetServerWrapper>().As<INetServer>().ContainerScoped();
+            builder.Register<NetClientWrapper>().As<INetClient>().ContainerScoped();
+            builder.Register<LidgrenServerNetworkSession>().As<IServerNetworkSession>().ContainerScoped();
+            builder.Register<LidgrenClientNetworkSession>().As<IClientNetworkSession>().ContainerScoped();
+            builder.Register<IncomingMessageQueue>().As<IIncomingMessageQueue>().ContainerScoped();
+            builder.Register<OutgoingMessageQueue>().As<IOutgoingMessageQueue>().ContainerScoped();
+            builder.Register<XmlMessageSerializer>().As<IMessageSerializer>().ContainerScoped();
+            #endregion
+
+            #region ViewFactory
+            builder.Register<ViewFactory>().As<IViewFactory>().ContainerScoped();
+            #endregion
+
+            #region Graphics
+            builder.Register<SpriteBatch>(new SpriteBatch(graphics.GraphicsDevice));
+            //builder.Register<SpriteBatch>().FactoryScoped();
+            //builder.Register<GraphicsDevice>(_graphicsDevice).SingletonScoped();
+            builder.Register<XNASpriteBatch>().As<ISpriteBatch>().FactoryScoped();
+            builder.Register<XNATexture>().As<ITexture>().FactoryScoped();
+            #endregion
+
+            #region GameSession
+            builder.Register<GameSession>().As<IGameSession>().ContainerScoped();
+            builder.Register<GameSessionController>().ContainerScoped();
+            builder.Register<GameSessionView>().ContainerScoped();
+            #endregion
+
+            #region Player
+            builder.Register<Player>().FactoryScoped();
+            builder.RegisterGeneratedFactory<Player.Factory>(new TypedService(typeof(Player)));
+            builder.Register((c) => (IBoundaryCollider)new WorldBoundaryCollider(_screenWidth, _screenHeight));
+            builder.Register<KeyboardPlayerController>().ContainerScoped();
+            builder.Register<NetworkPlayerView>().FactoryScoped();
+            #endregion
+
+            #region Physics
+            builder.RegisterModule(new PhysicsModule() { Gravity = _gravity });
+            #endregion
+
+            #region Level
+            builder.Register<LevelPiece>().FactoryScoped();
+            builder.RegisterGeneratedFactory<LevelPiece.Factory>(new TypedService(typeof(LevelPiece)));
+            builder.Register<DumbLevelLoader>().As<ILevelLoader>().ContainerScoped();
+            builder.Register<Frenetic.Level.Level>().ContainerScoped();
+            builder.Register<LevelController>().ContainerScoped();
+            builder.Register<LevelView>().ContainerScoped();
+            #endregion
+
+            // RAYCASTER:
+            builder.Register<DumbRayCaster>().SingletonScoped();
+            builder.Register<DumbRayCasterTestController>().ContainerScoped();
+
+            // CAMERA:
+            builder.Register((c, p) => (ICamera)new Camera(p.TypedAs<IPlayer>(), new Vector2(_screenWidth, _screenHeight))).ContainerScoped();
+            //builder.Register<Camera>().As<ICamera>().FactoryScoped();
+
+            // CROSSHAIR:
+            builder.Register<Crosshair>().As<ICrosshair>().ContainerScoped();
+            builder.Register<CrosshairView>().ContainerScoped();
+
+            // KEYBOARD:
+            builder.Register<Keyboard>().As<IKeyboard>().SingletonScoped();
+
+            return builder.Build();
+        }
+
+        MainMenuScreen MainMenuScreen { get; set; }
+        const int _screenWidth = 800;
+        const int _screenHeight = 600;
+        Vector2 _gravity = new Vector2(0, 2);
     }
 }

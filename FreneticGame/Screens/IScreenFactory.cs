@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Autofac;
 
 namespace Frenetic
 {
@@ -9,6 +10,6 @@ namespace Frenetic
     {
         MessageBoxScreen MakeMessageBoxScreen(string message);
         GameplayScreen MakeGameplayScreen(GameSessionControllerAndView clientGameSessionCandV, GameSessionControllerAndView serverGameSessionCandV);
-        MainMenuScreen MakeMainMenuScreen();
+        MainMenuScreen MakeMainMenuScreen(IContainer container);
     }
 }
