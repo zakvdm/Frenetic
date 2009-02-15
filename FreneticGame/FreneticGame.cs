@@ -62,9 +62,9 @@ namespace Frenetic
         {
             base.Initialize();
 
-            ScreenFactory screenFactory = new ScreenFactory(screenManager);
             Container = BuildContainer();
-            MainMenuScreen = screenFactory.MakeMainMenuScreen(Container);
+
+            MainMenuScreen = Container.Resolve<IScreenFactory>().MakeMainMenuScreen(Container);
         }
 
         /// <summary>
@@ -94,6 +94,11 @@ namespace Frenetic
         IContainer BuildContainer()
         {
             var builder = new ContainerBuilder();
+
+            #region Menus
+            builder.Register<ScreenManager>(screenManager).SingletonScoped();
+            builder.Register<ScreenFactory>().As<IScreenFactory>().SingletonScoped();
+            #endregion
 
             #region Networking
             builder.Register(new NetServer(new NetConfiguration("Frenetic")));
