@@ -14,7 +14,7 @@ namespace Frenetic
     /// <summary>
     /// This is the main type for your game
     /// </summary>
-    public class FreneticGame : Microsoft.Xna.Framework.Game
+    public class FreneticGame : Game
     {
         GraphicsDeviceManager graphics;
 
@@ -39,6 +39,9 @@ namespace Frenetic
             // initialize the screen manager
             screenManager = new ScreenManager(this);
             Components.Add(screenManager);
+
+            // TODO: REMOVE:
+            Components.Add(new Frenetic.MyConsole.Components.FPS(this));
 
             this.IsFixedTimeStep = false;
         }

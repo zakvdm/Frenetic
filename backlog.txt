@@ -24,11 +24,11 @@ DONE - 2 - Client can move a crosshair around on the screen
 
 DONE - 2 - Can exit from Main Menu
 DONE - 1 - Can exit from Gameplay screen 
-ZAK - 2 - Resources (network sockets) properly disposed on exit 
+TERENCE - 2 - Resources (network sockets) properly disposed on exit 
 
 As the client I can bring down the console and type in a command
-5 - Console fills half the screen with black, messages can be typed
-5 - Read messages on console, and if valid, change the appropriate setting
+DONE - 5 - Console fills half the screen with black, messages can be typed
+ZAK - 5 - Read messages on console, and if valid, change the appropriate setting
 
 Client types in a message and this message is shown on the screen of all clients connected to the server.
 5 - Messages on console (i.e. not commands) are sent reliably to the server

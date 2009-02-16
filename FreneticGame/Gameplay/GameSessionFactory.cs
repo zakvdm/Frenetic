@@ -16,6 +16,7 @@ using FarseerGames.GettingStarted;
 using Frenetic.Network.Lidgren;
 using Frenetic.Network;
 using Frenetic.Autofac;
+using Frenetic.UserInput;
 
 namespace Frenetic
 {
@@ -116,8 +117,9 @@ namespace Frenetic
 
             #region Graphics
             builder.Register<SpriteBatch>(new SpriteBatch(_graphicsDevice));
-            builder.Register<XNASpriteBatch>().As<ISpriteBatch>().FactoryScoped();
-            builder.Register<XNATexture>().As<ITexture>().FactoryScoped();
+            builder.Register<XnaSpriteBatch>().As<ISpriteBatch>().FactoryScoped();
+            builder.Register<XnaTexture>().As<ITexture>().FactoryScoped();
+            builder.Register<XnaFont>().As<IFont>().FactoryScoped();
             #endregion
 
             #region GameSession
@@ -180,7 +182,12 @@ namespace Frenetic
             builder.Register<CrosshairView>().SingletonScoped();
 
             // KEYBOARD:
-            builder.Register<Keyboard>().As<IKeyboard>().SingletonScoped();
+            builder.Register<XNAKeyboard>().As<IKeyboard>().SingletonScoped();
+
+            // CONSOLE:
+            builder.Register<GameConsole>().As<IGameConsole>().SingletonScoped();
+            builder.Register<GameConsoleView>().SingletonScoped();
+            builder.Register<GameConsoleController>().SingletonScoped();
 
             return builder.Build();
         }
@@ -222,6 +229,27 @@ namespace Frenetic
 
             ITexture crosshairTexture = container.Resolve<ITexture>(new TypedParameter(typeof(Texture2D), _contentManager.Load<Texture2D>("Content/Textures/cursor")));
             gameSession.Views.Add(container.Resolve<CrosshairView>(new TypedParameter(typeof(ITexture), crosshairTexture)));
+
+            ITexture consoleTexture = container.Resolve<ITexture>(new TypedParameter(typeof(Texture2D), _contentManager.Load<Texture2D>("Content/Textures/blank")));
+            IFont consoleFont = container.Resolve<IFont>(new TypedParameter(typeof(SpriteFont), _contentManager.Load<SpriteFont>("Content/Fonts/detailsFont")));
+            int edgeGap = 4;
+            int inputWindowHeight = 24;
+            System.Collections.Generic.List<Command> commands = new System.Collections.Generic.List<Command>();
+            commands.Add(new Command("Test"));
+            commands.Add(new Command("Eat Shit"));
+            commands.Add(new Command("Wallow"));
+            commands.Add(new Command("Waver"));
+            commands.Add(new Command("Flipflop"));
+            commands.Add(new Command("Prematurely Ejaculate"));
+            commands.Add(new Command("Premedidate Ejaculation"));
+            container.Resolve<IGameConsole>(new NamedParameter("commandList", commands));
+
+            gameSession.Views.Add(container.Resolve<GameConsoleView>(
+                            new NamedParameter("inputWindow", new Rectangle(edgeGap, _screenHeight - edgeGap - inputWindowHeight, _screenWidth - 2 * edgeGap, inputWindowHeight)),
+                            new NamedParameter("commandWindow", new Rectangle(edgeGap, edgeGap, (_screenWidth / 2) - 30 - edgeGap, _screenHeight - inputWindowHeight - 3 * edgeGap)),
+                            new NamedParameter("messageWindow", new Rectangle((_screenWidth / 2) + 30 + edgeGap, edgeGap, (_screenWidth / 2) - 30 - 2*edgeGap, (_screenHeight / 2) - 2*edgeGap)),
+                            new TypedParameter(typeof(ITexture), consoleTexture), new TypedParameter(typeof(IFont), consoleFont)));
+            gameSession.Controllers.Add(container.Resolve<GameConsoleController>());
 
             // TEMP CODE:
             // *********************************************************************************

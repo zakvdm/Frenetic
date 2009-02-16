@@ -29,7 +29,7 @@ namespace Frenetic
                 _spriteBatch.Draw(_texture, _player.Position, null, _color, 0f,
                     new Vector2(_texture.Width / 2f, _texture.Height / 2f),
                     new Vector2(1, 1),
-                    SpriteEffects.None, 0f);
+                    SpriteEffects.None, 1f);
                 _spriteBatch.End();
             }
             

@@ -89,11 +89,17 @@
     <Compile Include="Autofac\GameSessionModule.cs" />
     <Compile Include="Autofac\PhysicsModule.cs" />
     <Compile Include="Engine\Camera.cs" />
+    <Compile Include="Engine\Command.cs" />
     <Compile Include="Engine\Crosshair.cs" />
     <Compile Include="Engine\CrosshairView.cs" />
+    <Compile Include="Engine\GameConsole.cs" />
+    <Compile Include="Engine\GameConsoleController.cs" />
+    <Compile Include="Engine\GameConsoleView.cs" />
     <Compile Include="Engine\ICamera.cs" />
     <Compile Include="Engine\ICrosshair.cs" />
+    <Compile Include="Engine\IGameConsole.cs" />
     <Compile Include="Engine\Line.cs" />
+    <Compile Include="FPS.cs" />
     <Compile Include="Gameplay\GameplayObject.cs" />
     <Compile Include="Gameplay\GameSession.cs" />
     <Compile Include="Gameplay\GameSessionController.cs" />
@@ -111,10 +117,12 @@
     <Compile Include="Gameplay\PlayerView.cs" />
     <Compile Include="Gameplay\ViewFactory.cs" />
     <Compile Include="Gameplay\World.cs" />
+    <Compile Include="Graphics\IFont.cs" />
     <Compile Include="Graphics\ISpriteBatch.cs" />
     <Compile Include="Graphics\ITexture.cs" />
-    <Compile Include="Graphics\XNASpriteBatch.cs" />
-    <Compile Include="Graphics\XNATexture2D.cs" />
+    <Compile Include="Graphics\XnaFont.cs" />
+    <Compile Include="Graphics\XnaSpriteBatch.cs" />
+    <Compile Include="Graphics\XnaTexture.cs" />
     <Compile Include="Level\DumbLevelLoader.cs" />
     <Compile Include="Level\ILevelLoader.cs" />
     <Compile Include="Level\Level.cs" />
@@ -168,7 +176,7 @@
     <Compile Include="Screens\ScreenFactory.cs" />
     <Compile Include="Screens\SearchResultsScreen.cs" />
     <Compile Include="UserInput\IKeyboard.cs" />
-    <Compile Include="UserInput\Keyboard.cs" />
+    <Compile Include="UserInput\XNAKeyboard.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Game.ico" />

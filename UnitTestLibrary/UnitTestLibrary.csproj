@@ -77,9 +77,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CameraTests.cs" />
+    <Compile Include="GameConsoleControllerTests.cs" />
+    <Compile Include="GameConsoleTests.cs" />
     <Compile Include="CrosshairTests.cs" />
     <Compile Include="DumbLevelLoaderTests.cs" />
     <Compile Include="FarseerPhysicsComponentTests.cs" />
+    <Compile Include="GameConsoleViewTests.cs" />
     <Compile Include="LevelControllerTests.cs" />
     <Compile Include="LevelPieceTests.cs" />
     <Compile Include="LevelTests.cs" />

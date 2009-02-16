@@ -8,6 +8,7 @@ using Rhino.Mocks;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using FarseerGames.FarseerPhysics.Dynamics;
+using Frenetic.UserInput;
 
 namespace UnitTestLibrary
 {
