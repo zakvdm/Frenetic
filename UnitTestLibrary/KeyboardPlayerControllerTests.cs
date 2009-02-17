@@ -46,7 +46,27 @@ namespace UnitTestLibrary
             var stubBody = MockRepository.GenerateStub<Body>();
 
             kpc.Process(1);
-            stubPlayer.AssertWasCalled(p => p.Jump(1));
+            stubPlayer.AssertWasCalled(p => p.Jump());
+        }
+
+        [Test]
+        public void PlayerCannotDoubleJump()
+        {
+            var fourHundredMilliseconds = new TimeSpan(0, 0, 0, 0, 400).Ticks;
+            var eightHundredMilliseconds = 2 * fourHundredMilliseconds;
+            int callCount = 0;
+            stubKeyboard.Stub(k => k.IsKeyDown(Arg<Keys>.Is.Equal(Keys.Space))).Return(true);
+            stubPlayer.Stub(p => p.Jump()).Do(new Func<bool>(() => { callCount++; return true; }));
+            kpc.Process(1);
+            Assert.AreEqual(1, callCount);
+            kpc.Process(fourHundredMilliseconds);
+            Assert.AreEqual(1, callCount);
+            kpc.Process(eightHundredMilliseconds);
+            Assert.AreEqual(2, callCount);
+            kpc.Process(fourHundredMilliseconds);
+            Assert.AreEqual(2, callCount);
+            kpc.Process(eightHundredMilliseconds);
+            Assert.AreEqual(3, callCount);
         }
 
         [Test]

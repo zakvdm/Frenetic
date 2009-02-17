@@ -9,7 +9,7 @@ namespace Frenetic
         Vector2 Position { get; set; }
 
         void Update();
-        void Jump(long time);
+        bool Jump();
         void MoveLeft();
         void MoveRight();
         void Shoot(Vector2 targetPosition);
