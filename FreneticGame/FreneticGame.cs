@@ -46,7 +46,7 @@ namespace Frenetic
             //Components.Add(new GamerServicesComponent(this));
 
             // initialize the screen manager
-            screenManager = new ScreenManager(this);
+            screenManager = new ScreenManager(this, Content);
             Components.Add(screenManager);
 
             this.IsFixedTimeStep = false;
@@ -96,8 +96,11 @@ namespace Frenetic
             var builder = new ContainerBuilder();
 
             #region Menus
+            builder.Register<Game>(this);
+            builder.Register<ContentManager>(Content);
             builder.Register<ScreenManager>(screenManager).SingletonScoped();
             builder.Register<ScreenFactory>().As<IScreenFactory>().SingletonScoped();
+            builder.Register<MainMenuScreen>().SingletonScoped();
             #endregion
 
             #region Networking
@@ -117,14 +120,16 @@ namespace Frenetic
             #endregion
 
             #region Graphics
-            builder.Register<SpriteBatch>(new SpriteBatch(graphics.GraphicsDevice));
-            //builder.Register<SpriteBatch>().FactoryScoped();
-            //builder.Register<GraphicsDevice>(_graphicsDevice).SingletonScoped();
+            builder.Register<GraphicsDevice>(graphics.GraphicsDevice);
+            builder.Register<Viewport>(graphics.GraphicsDevice.Viewport);
+            builder.Register<SpriteFont>(screenManager.Font);
+            builder.Register<SpriteBatch>(screenManager.SpriteBatch);
             builder.Register<XNASpriteBatch>().As<ISpriteBatch>().FactoryScoped();
             builder.Register<XNATexture>().As<ITexture>().FactoryScoped();
             #endregion
 
             #region GameSession
+            builder.Register<GameSessionFactory>().As<IGameSessionFactory>();
             builder.Register<GameSession>().As<IGameSession>().ContainerScoped();
             builder.Register<GameSessionController>().ContainerScoped();
             builder.Register<GameSessionView>().ContainerScoped();

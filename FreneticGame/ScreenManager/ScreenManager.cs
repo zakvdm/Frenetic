@@ -133,10 +133,10 @@ namespace Frenetic
         /// <summary>
         /// Constructs a new screen manager component.
         /// </summary>
-        public ScreenManager(Game game)
+        public ScreenManager(Game game, ContentManager contentManager)
             : base(game)
         {
-            content = new ContentManager(game.Services, "Content");
+            content = contentManager;
 
             graphicsDeviceService = (IGraphicsDeviceService)game.Services.GetService(
                                                         typeof(IGraphicsDeviceService));

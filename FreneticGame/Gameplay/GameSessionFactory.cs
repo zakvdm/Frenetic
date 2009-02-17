@@ -90,7 +90,7 @@ namespace Frenetic
 
         private IPlayer CreateClientComponents(IGameSession gameSession)
         {
-            ITexture playerTexture = ClientContainer.Resolve<ITexture>(new TypedParameter(typeof(Texture2D), _contentManager.Load<Texture2D>("Content/textures/ball")));
+            ITexture playerTexture = ClientContainer.Resolve<ITexture>(new TypedParameter(typeof(Texture2D), _contentManager.Load<Texture2D>("textures/ball")));
             IViewFactory viewFactory = ClientContainer.Resolve<IViewFactory>(new TypedParameter(typeof(ITexture), playerTexture));
 
             // Make local player:
@@ -108,10 +108,10 @@ namespace Frenetic
                                             new TypedParameter(typeof(Vector2), new Vector2(_screenWidth, _screenHeight))
                                             );
 
-            ITexture levelTexture = ClientContainer.Resolve<ITexture>(new TypedParameter(typeof(Texture2D), _contentManager.Load<Texture2D>("Content/Textures/blank")));
+            ITexture levelTexture = ClientContainer.Resolve<ITexture>(new TypedParameter(typeof(Texture2D), _contentManager.Load<Texture2D>("Textures/blank")));
             gameSession.Views.Add(ClientContainer.Resolve<LevelView>(new TypedParameter(typeof(ITexture), levelTexture)));
 
-            ITexture crosshairTexture = ClientContainer.Resolve<ITexture>(new TypedParameter(typeof(Texture2D), _contentManager.Load<Texture2D>("Content/Textures/cursor")));
+            ITexture crosshairTexture = ClientContainer.Resolve<ITexture>(new TypedParameter(typeof(Texture2D), _contentManager.Load<Texture2D>("Textures/cursor")));
             gameSession.Views.Add(ClientContainer.Resolve<CrosshairView>(new TypedParameter(typeof(ITexture), crosshairTexture)));
 
             // TEMP CODE:

@@ -37,19 +37,9 @@ namespace Frenetic
 
         public MainMenuScreen MakeMainMenuScreen(IContainer container)
         {
-            MainMenuScreen mainMenuScreen = new MainMenuScreen(
-                            _screenManager.GraphicsDevice.Viewport, 
-                            _screenManager.SpriteBatch, 
-                            _screenManager.Font,
-                            new GameSessionFactory
-                                (
-                                    _screenManager.GraphicsDevice, 
-                                    new ContentManager(_screenManager.Game.Services),
-                                    container
-                                ), 
-                            this, _screenManager.Game);
-            _screenManager.AddScreen(mainMenuScreen);
-            return mainMenuScreen;
+            var screen = container.Resolve<MainMenuScreen>();
+            _screenManager.AddScreen(screen);
+            return screen;
         }
         #endregion
     }
