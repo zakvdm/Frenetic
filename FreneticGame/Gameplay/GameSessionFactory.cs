@@ -182,6 +182,9 @@ namespace Frenetic
             // KEYBOARD:
             builder.Register<Keyboard>().As<IKeyboard>().SingletonScoped();
 
+            // MOUSE:
+            builder.Register<FreneticMouse>().As<IMouse>().SingletonScoped();
+
             return builder.Build();
         }
 
@@ -206,16 +209,18 @@ namespace Frenetic
 
             IGameSession gameSession = container.Resolve<IGameSession>();
 
-            gameSession.Controllers.Add(container.Resolve<KeyboardPlayerController>(new TypedParameter(typeof(IPlayer), localPlayer)));
-            gameSession.Views.Add(container.Resolve<NetworkPlayerView>
-                            (
-                            new TypedParameter(typeof(IPlayer), localPlayer)
-                            ));
             ICamera camera = container.Resolve<ICamera>
                                             (
                                             new TypedParameter(typeof(IPlayer), localPlayer),
                                             new TypedParameter(typeof(Vector2), new Vector2(_screenWidth, _screenHeight))
                                             );
+
+            gameSession.Controllers.Add(container.Resolve<KeyboardPlayerController>(new TypedParameter(typeof(IPlayer), localPlayer)));
+            gameSession.Views.Add(container.Resolve<NetworkPlayerView>
+                            (
+                            new TypedParameter(typeof(IPlayer), localPlayer)
+                            ));
+            
 
             ITexture levelTexture = container.Resolve<ITexture>(new TypedParameter(typeof(Texture2D), _contentManager.Load<Texture2D>("Content/Textures/blank")));
             gameSession.Views.Add(container.Resolve<LevelView>(new TypedParameter(typeof(ITexture), levelTexture)));

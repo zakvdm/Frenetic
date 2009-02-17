@@ -12,5 +12,6 @@ namespace Frenetic
         void Jump(long time);
         void MoveLeft();
         void MoveRight();
+        void Shoot(Vector2 targetPosition);
     }
 }

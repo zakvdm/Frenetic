@@ -19,14 +19,16 @@ namespace UnitTestLibrary
         {
             stubPlayer = MockRepository.GenerateStub<IPlayer>();
             stubKeyboard = MockRepository.GenerateStub<IKeyboard>();
-            kpc = new KeyboardPlayerController(stubPlayer, stubKeyboard);
+            stubMouse = MockRepository.GenerateStub<IMouse>();
+            stubCrosshair = MockRepository.GenerateStub<ICrosshair>();
+            kpc = new KeyboardPlayerController(stubPlayer, stubKeyboard, stubMouse, stubCrosshair);
         }
 
         [Test]
         public void CanConstruct()
         {
             Player player = new Player(1, null, null);
-            KeyboardPlayerController kpc = new KeyboardPlayerController(player, stubKeyboard);
+            KeyboardPlayerController kpc = new KeyboardPlayerController(player, stubKeyboard, stubMouse, stubCrosshair);
         }
 
         [Test]
@@ -65,10 +67,42 @@ namespace UnitTestLibrary
 
             kpc.Process(1);
             stubPlayer.AssertWasCalled(p => p.MoveRight());
+        }   
+
+        [Test]
+        public void PressingTheLeftMouseButtonGeneratesShotEvent()
+        {
+            stubMouse.Stub(m => m.LeftButtonIsDown()).Return(true);
+            stubCrosshair.Stub(c => c.WorldPosition).Return(Vector2.UnitX);
+            kpc.Process(1);
+            stubPlayer.AssertWasCalled(p => p.Shoot(Vector2.UnitX));
+        }
+
+        [Test]
+        public void PressingTheLeftMouseButtonASecondTimeTooSoonDoesNotRetriggerTheShot()
+        {
+            var oneHundredMilliseconds = new TimeSpan(0, 0, 0, 0, 100).Ticks;
+            var twoHundredMilliseconds = 2 * oneHundredMilliseconds;
+            int callCount = 0;
+            stubMouse.Stub(m => m.LeftButtonIsDown()).Return(true);
+            stubCrosshair.Stub(c => c.WorldPosition).Return(Vector2.UnitX);
+            stubPlayer.Stub(p => p.Shoot(Vector2.UnitX)).Do(new Action<Vector2>((pos) => callCount++));
+            kpc.Process(1);
+            Assert.AreEqual(1, callCount);
+            kpc.Process(oneHundredMilliseconds);
+            Assert.AreEqual(1, callCount);
+            kpc.Process(twoHundredMilliseconds);
+            Assert.AreEqual(2, callCount);
+            kpc.Process(oneHundredMilliseconds);
+            Assert.AreEqual(2, callCount);
+            kpc.Process(twoHundredMilliseconds);
+            Assert.AreEqual(3, callCount);
         }
 
         IPlayer stubPlayer;
         IKeyboard stubKeyboard;
+        IMouse stubMouse;
+        ICrosshair stubCrosshair;
         KeyboardPlayerController kpc;
     }
 }

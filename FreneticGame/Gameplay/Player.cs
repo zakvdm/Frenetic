@@ -41,10 +41,6 @@ namespace Frenetic
             }
         }
 
-        public int ID { get; set; }
-        private long LastJumpTime { get; set; }
-        internal bool InContactWithLevel { get; set; }
-
         public void Update()
         {
             Position = _boundaryCollider.MoveWithinBoundary(Position);
@@ -77,6 +73,11 @@ namespace Frenetic
             }
         }
 
+        public void Shoot(Vector2 targetPosition)
+        {
+            Console.WriteLine("Shot fired at {0}", targetPosition);
+        }
+
         internal bool CanJump(long time)
         {
             return time - LastJumpTime > JumpTimer;
@@ -85,9 +86,14 @@ namespace Frenetic
         IPhysicsComponent _physicsComponent;
         IBoundaryCollider _boundaryCollider;
 
+        public int ID { get; set; }
+        private long LastJumpTime { get; set; }
+        internal bool InContactWithLevel { get; set; }
+
         public static Vector2 JumpImpulse = new Vector2(0, -500000);
         public static Vector2 MoveForce = new Vector2(-2000, 0);
         static float MaxSpeed = 50;
         static long JumpTimer = 8000000;
+        
     }
 }
