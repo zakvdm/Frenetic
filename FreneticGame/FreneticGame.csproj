@@ -99,6 +99,7 @@
     <Compile Include="Engine\ICrosshair.cs" />
     <Compile Include="Engine\IGameConsole.cs" />
     <Compile Include="Engine\Line.cs" />
+    <Compile Include="Engine\Mediator.cs" />
     <Compile Include="FPS.cs" />
     <Compile Include="Gameplay\GameplayObject.cs" />
     <Compile Include="Gameplay\GameSession.cs" />
