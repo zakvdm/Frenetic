@@ -8,32 +8,55 @@ namespace Frenetic
     {
         public Mediator()
         {
-            Commands = new Dictionary<string, Func<string, string>>();
+            _commands = new Dictionary<string, WeakReference>();
         }
 
         public List<string> AvailableCommands
         {
             get
             {
-                return Commands.Keys.ToList();
+                return _commands.Keys.ToList();
             }
+        }
+        public void Register(string name, Func<string, string> command)
+        {
+            _commands.Add(name, new WeakReference(command));
         }
 
         public string Get(string propertyName)
         {
-            if (!Commands.ContainsKey(propertyName))
+            var command = GetCommand(propertyName);
+
+            if (command == null)
                 return null;
 
-            return Commands[propertyName](null);
+            // null argument is used to indicate a Property get
+            return command(null);
         }
         public string Do(string commandName, string argument)
         {
-            if (!Commands.ContainsKey(commandName))
+            var command = GetCommand(commandName);
+
+            if (command == null)
                 return null;
 
-            return Commands[commandName](argument);
+            return command(argument);
         }
 
-        public Dictionary<string, Func<string, string>> Commands { get; private set; }
+        private Func<string, string> GetCommand(string commandName)
+        {
+            if (!_commands.ContainsKey(commandName))
+                return null;
+
+            if (!_commands[commandName].IsAlive)
+            {
+                _commands.Remove(commandName);
+                return null;
+            }
+
+            return (Func<string, string>)_commands[commandName].Target;
+        }
+
+        private Dictionary<string, WeakReference> _commands;
     }
 }

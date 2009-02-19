@@ -12,7 +12,7 @@ namespace UnitTestLibrary
         public void CanGetProperties()
         {
             Mediator mediator = new Mediator();
-            mediator.Commands.Add("TestPropertyGet", (parameter) => "worked!");
+            mediator.Register("TestPropertyGet", (parameter) => "worked!");
 
             Assert.AreEqual("worked!", mediator.Get("TestPropertyGet"));
         }
@@ -21,8 +21,8 @@ namespace UnitTestLibrary
         public void CanGetAListOfPossibleCommands()
         {
             Mediator mediator = new Mediator();
-            mediator.Commands.Add("Property1", null);
-            mediator.Commands.Add("Method1", null);
+            mediator.Register("Property1", null);
+            mediator.Register("Method1", null);
 
             List<string> possibleCommands = mediator.AvailableCommands;
 
@@ -35,7 +35,7 @@ namespace UnitTestLibrary
         public void CanCallAMethod()
         {
             Mediator mediator = new Mediator();
-            mediator.Commands.Add("TestMethod", (parameter) => parameter);
+            mediator.Register("TestMethod", (parameter) => parameter);
 
             Assert.AreEqual("boo", mediator.Do("TestMethod", "boo"));
         }
@@ -47,6 +47,55 @@ namespace UnitTestLibrary
 
             Assert.IsNull(mediator.Get("NonExistentProperty"));
             Assert.IsNull(mediator.Do("NonExistentMethod", "argument1"));
+        }
+
+        [Test]
+        public void KeepsWeakReferencesToCommands()
+        {
+            Func<string, string> MethodDelegate = new Func<string,string>(Method);
+            Mediator mediator = new Mediator();
+            mediator.Register("Method", Method);
+
+            Assert.AreEqual("works", mediator.Get("Method"));
+
+            MethodDelegate = null;
+            GC.Collect();
+
+            Assert.IsNull(mediator.Get("Method"));
+        }
+        private string Method(string parameter)
+        {
+            return "works";
+        }
+
+        [Test]
+        public void WeakReferenceWorksForLamdaExpressions()
+        {
+            // WORKS:
+            Func<string, string> MethodDelegate = (input) => { if (this == null) return "broken"; else return "works"; };
+            Mediator mediator = new Mediator();
+            mediator.Register("Method", MethodDelegate);
+
+            Assert.AreEqual("works", mediator.Get("Method"));
+
+            MethodDelegate = null;
+            GC.Collect();
+
+            Assert.IsNull(mediator.Get("Method"));
+
+
+            // NOW TRY THIS:
+            MethodDelegate = (input) => { return "works"; };
+            mediator.Register("Method", MethodDelegate);
+
+            Assert.AreEqual("works", mediator.Get("Method"));
+
+            MethodDelegate = null;
+            GC.Collect();
+
+            Assert.IsNull(mediator.Get("Method"));
+
+            // NOTE THIS TEST DOESN'T WORK CURRENTLY BECAUSE OF THE LAMBDA EXPRESSION... IS THERE A WAY TO FIX THIS?
         }
     }
 }
