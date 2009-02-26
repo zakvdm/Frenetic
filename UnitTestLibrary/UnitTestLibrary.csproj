@@ -89,7 +89,8 @@
     <Compile Include="LevelViewTests.cs" />
     <Compile Include="LidgrenClientNetworkSessionTests.cs" />
     <Compile Include="LidgrenServerNetworkSessionTests.cs" />
-    <Compile Include="MediatorPhysicsSimulatorController.cs" />
+    <Compile Include="MediatorPhysicsSettingsControllerTests.cs" />
+    <Compile Include="MediatorPlayerSettingsTests.cs" />
     <Compile Include="MediatorTests.cs" />
     <Compile Include="NetworkSessionManagerTests.cs" />
     <Compile Include="OutgoingMessageQueueTests.cs" />

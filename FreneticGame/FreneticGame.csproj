@@ -89,7 +89,6 @@
     <Compile Include="Autofac\GameSessionModule.cs" />
     <Compile Include="Autofac\PhysicsModule.cs" />
     <Compile Include="Engine\Camera.cs" />
-    <Compile Include="Engine\Command.cs" />
     <Compile Include="Engine\Crosshair.cs" />
     <Compile Include="Engine\CrosshairView.cs" />
     <Compile Include="Engine\GameConsole.cs" />
@@ -98,6 +97,7 @@
     <Compile Include="Engine\ICamera.cs" />
     <Compile Include="Engine\ICrosshair.cs" />
     <Compile Include="Engine\IGameConsole.cs" />
+    <Compile Include="Engine\IMediator.cs" />
     <Compile Include="Engine\Line.cs" />
     <Compile Include="Engine\Mediator.cs" />
     <Compile Include="FPS.cs" />
@@ -112,9 +112,11 @@
     <Compile Include="Gameplay\IView.cs" />
     <Compile Include="Gameplay\IViewFactory.cs" />
     <Compile Include="Gameplay\KeyboardPlayerController.cs" />
+    <Compile Include="Gameplay\MediatorPlayerSettingsController.cs" />
     <Compile Include="Gameplay\NetworkPlayerController.cs" />
     <Compile Include="Gameplay\NetworkPlayerView.cs" />
     <Compile Include="Gameplay\Player.cs" />
+    <Compile Include="Gameplay\PlayerSettings.cs" />
     <Compile Include="Gameplay\PlayerView.cs" />
     <Compile Include="Gameplay\ViewFactory.cs" />
     <Compile Include="Gameplay\World.cs" />
@@ -154,6 +156,7 @@
     <Compile Include="Physics\DummyPhysicsComponent.cs" />
     <Compile Include="Physics\FarseerPhysicsComponent.cs" />
     <Compile Include="Physics\FarseerPhysicsController.cs" />
+    <Compile Include="Physics\FarseerPhysicsSimulator.cs" />
     <Compile Include="Physics\Farseer\DrawingSystem\CircleBrush.cs" />
     <Compile Include="Physics\Farseer\DrawingSystem\DrawingHelper.cs" />
     <Compile Include="Physics\Farseer\DrawingSystem\LineBrush.cs" />
@@ -161,6 +164,9 @@
     <Compile Include="Physics\Farseer\PhysicsSimulatorView.cs" />
     <Compile Include="Physics\IBoundaryCollider.cs" />
     <Compile Include="Physics\IPhysicsComponent.cs" />
+    <Compile Include="Physics\IPhysicsSimulator.cs" />
+    <Compile Include="Physics\MediatorPhysicsSettingsController.cs" />
+    <Compile Include="Physics\PhysicsSettings.cs" />
     <Compile Include="Physics\WorldBoundaryCollider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Program.cs" />

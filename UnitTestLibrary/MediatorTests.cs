@@ -50,52 +50,22 @@ namespace UnitTestLibrary
         }
 
         [Test]
-        public void KeepsWeakReferencesToCommands()
+        public void HoldsAReferenceToDelegates()
         {
             Func<string, string> MethodDelegate = new Func<string,string>(Method);
             Mediator mediator = new Mediator();
-            mediator.Register("Method", Method);
+            mediator.Register("Method", MethodDelegate);
 
             Assert.AreEqual("works", mediator.Get("Method"));
 
             MethodDelegate = null;
             GC.Collect();
 
-            Assert.IsNull(mediator.Get("Method"));
+            Assert.AreEqual("works", mediator.Get("Method"));
         }
         private string Method(string parameter)
         {
             return "works";
-        }
-
-        [Test]
-        public void WeakReferenceWorksForLamdaExpressions()
-        {
-            // WORKS:
-            Func<string, string> MethodDelegate = (input) => { if (this == null) return "broken"; else return "works"; };
-            Mediator mediator = new Mediator();
-            mediator.Register("Method", MethodDelegate);
-
-            Assert.AreEqual("works", mediator.Get("Method"));
-
-            MethodDelegate = null;
-            GC.Collect();
-
-            Assert.IsNull(mediator.Get("Method"));
-
-
-            // NOW TRY THIS:
-            MethodDelegate = (input) => { return "works"; };
-            mediator.Register("Method", MethodDelegate);
-
-            Assert.AreEqual("works", mediator.Get("Method"));
-
-            MethodDelegate = null;
-            GC.Collect();
-
-            Assert.IsNull(mediator.Get("Method"));
-
-            // NOTE THIS TEST DOESN'T WORK CURRENTLY BECAUSE OF THE LAMBDA EXPRESSION... IS THERE A WAY TO FIX THIS?
         }
     }
 }

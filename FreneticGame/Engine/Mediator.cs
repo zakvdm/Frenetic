@@ -4,11 +4,11 @@ using System.Collections.Generic;
 
 namespace Frenetic
 {
-    public class Mediator
+    public class Mediator : IMediator
     {
         public Mediator()
         {
-            _commands = new Dictionary<string, WeakReference>();
+            _commands = new Dictionary<string, Func<string, string>>();
         }
 
         public List<string> AvailableCommands
@@ -20,9 +20,9 @@ namespace Frenetic
         }
         public void Register(string name, Func<string, string> command)
         {
-            _commands.Add(name, new WeakReference(command));
+            _commands.Add(name, command);
         }
-
+        
         public string Get(string propertyName)
         {
             var command = GetCommand(propertyName);
@@ -48,15 +48,9 @@ namespace Frenetic
             if (!_commands.ContainsKey(commandName))
                 return null;
 
-            if (!_commands[commandName].IsAlive)
-            {
-                _commands.Remove(commandName);
-                return null;
-            }
-
-            return (Func<string, string>)_commands[commandName].Target;
+            return _commands[commandName];
         }
 
-        private Dictionary<string, WeakReference> _commands;
+        private Dictionary<string, Func<string, string>> _commands;
     }
 }

@@ -29,19 +29,18 @@ namespace Frenetic
             _physicsComponent = new DummyPhysicsComponent();
         } // For XmlSerializer
 
-        public Vector2 Position 
-        { 
+        public int ID { get; set; }
+        public Vector2 Position
+        {
             get
             {
                 return _physicsComponent.Position;
-            } 
+            }
             set
             {
                 _physicsComponent.Position = value;
             }
         }
-
-        public int ID { get; set; }
         private long LastJumpTime { get; set; }
         internal bool InContactWithLevel { get; set; }
 

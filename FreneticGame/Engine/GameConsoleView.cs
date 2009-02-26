@@ -55,13 +55,13 @@ namespace Frenetic
                 }
 
                 // POSSIBLE COMMAND WINDOW:
-                List<Command> possibleCommands = _console.FindPossibleInputCompletions();
+                List<string> possibleCommands = _console.FindPossibleInputCompletions();
                 if ((possibleCommands != null) && possibleCommands.Count > 0 && possibleCommands.Count < 10)
                 {
                     Rectangle possibleCommandWindow = new Rectangle(_commandWindow.Right + EdgeGap, (int)(_commandWindow.Bottom - 2 * TEXT_OFFSET.Y - (possibleCommands.Count * _font.LineSpacing)), _messageWindow.Width, (int)(2 * TEXT_OFFSET.Y + (possibleCommands.Count * _font.LineSpacing)));
 
                     DrawWindow(possibleCommandWindow, Color.White);
-                    DrawLog(possibleCommands.ConvertAll<string>((input) => input.ToString()), possibleCommandWindow, Color.Black);
+                    DrawLog(possibleCommands, possibleCommandWindow, Color.Black);
                 }
 
                 _spriteBatch.End();

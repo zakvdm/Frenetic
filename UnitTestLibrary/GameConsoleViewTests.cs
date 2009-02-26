@@ -91,7 +91,9 @@ namespace UnitTestLibrary
         [Test]
         public void DrawsCurrentInput()
         {
-            IGameConsole stubConsole = new GameConsole(null);
+            var stubMediator = MockRepository.GenerateStub<IMediator>();
+            stubMediator.Stub(x => x.AvailableCommands).Return(new List<string>());
+            IGameConsole stubConsole = new GameConsole(stubMediator);
             var stubSpriteBatch = MockRepository.GenerateStub<ISpriteBatch>();
             var stubFont = MockRepository.GenerateStub<IFont>();
             GameConsoleView consoleView = new GameConsoleView(stubConsole, new Rectangle(10, 20, 100, 200), new Rectangle(), new Rectangle(), stubSpriteBatch, null, stubFont);
@@ -152,7 +154,7 @@ namespace UnitTestLibrary
             Rectangle messageWindow = new Rectangle(30, 40, 300, 400);
             GameConsoleView consoleView = new GameConsoleView(stubConsole, new Rectangle(), commandWindow, messageWindow, stubSpriteBatch, null, stubFont);
             stubConsole.Active = true;
-            List<Command> possibleCommands = new List<Command>();
+            List<string> possibleCommands = new List<string>();
             stubConsole.Stub(x => x.FindPossibleInputCompletions()).Return(possibleCommands);
 
             consoleView.Generate();
@@ -177,9 +179,9 @@ namespace UnitTestLibrary
             GameConsoleView consoleView = new GameConsoleView(stubConsole, new Rectangle(), commandWindow, messageWindow, stubSpriteBatch, null, stubFont);
             stubFont.LineSpacing = 10;
             stubConsole.Active = true;
-            List<Command> possibleCommands = new List<Command>();
-            possibleCommands.Add(new Command("Hey"));
-            possibleCommands.Add(new Command("Yo"));
+            List<string> possibleCommands = new List<string>();
+            possibleCommands.Add("Hey");
+            possibleCommands.Add("Yo");
             stubConsole.Stub(x => x.FindPossibleInputCompletions()).Return(possibleCommands);
 
             consoleView.Generate();

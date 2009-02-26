@@ -7,7 +7,7 @@ namespace Frenetic
     {
         bool Active { get; set; }
         List<string> CommandLog { get; set; }
-        List<Command> FindPossibleInputCompletions();
+        List<string> FindPossibleInputCompletions();
         void TryToCompleteCurrentInput();
         string CurrentInput { get; set; }
         List<string> MessageLog { get; set; }

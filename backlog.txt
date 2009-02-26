@@ -43,6 +43,8 @@ Client types in a message and this message is shown on the screen of all clients
 	Server calculates all hits and modifies all players that were hit - 3 -
 	Server sends fire event to ALL clients to draw - 5 - 
 	Server notifies all clients when a player has been "hit"; clients change colour of hit players - 5 -
+
+13 - I can bring down the console and type "connect 196.21.23.4" and connect to a game hosted somewhere on the internet.
 	
 40 - Games can be recorded and played back 
 	STEP 1:
@@ -57,6 +59,8 @@ Client types in a message and this message is shown on the screen of all clients
 8 - As the client, I can reconfigure my keys
 8 - Write chat messages to the screen (not just in console)
 
+5 - Game can be run in fullscreen and windowed mode
+13 - The game is resolution independent
 40 - Item pickups
 40 - Can load a level format
 20 - Can load levels from menu

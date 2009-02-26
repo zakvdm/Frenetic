@@ -6,9 +6,9 @@ namespace Frenetic
 {
     public class GameConsole : IGameConsole
     {
-        public GameConsole(List<Command> commandList)
+        public GameConsole(IMediator mediator)
         {
-            _commandList = commandList;
+            _mediator = mediator;
 
             Active = false;
             CommandLog = new List<string>();
@@ -20,7 +20,17 @@ namespace Frenetic
         {
             if ((CurrentInput.Length > 0) && CurrentInput.StartsWith("/"))
             {
-                CommandLog.Add(CurrentInput.Substring(1)); // Remove the "/"
+                string commandLine = CurrentInput.Substring(1); // Remove the "/"
+                string[] pieces = commandLine.Split(new char[]{' '}, StringSplitOptions.RemoveEmptyEntries);
+                if (pieces.Length > 1)
+                {
+                    _mediator.Do(pieces[0], String.Join(" ", pieces, 1, pieces.Length - 1));
+                }
+                else
+                {
+                    _mediator.Get(pieces[0]);
+                }
+                CommandLog.Add(commandLine);
             }
             else
                 MessageLog.Add(CurrentInput);
@@ -28,10 +38,10 @@ namespace Frenetic
             CurrentInput = "";
         }
 
-        public List<Command> FindPossibleInputCompletions()
+        public List<string> FindPossibleInputCompletions()
         {
             // Early outs:
-            if (CurrentInput.Length == 0 || _commandList == null || _commandList.Count == 0)
+            if (CurrentInput.Length == 0 || _mediator.AvailableCommands.Count == 0)
                 return null;
 
             string searchString = CurrentInput.ToLower();
@@ -39,22 +49,22 @@ namespace Frenetic
             if (searchString.StartsWith("/"))
                 searchString = searchString.Substring(1);
             
-            return (from command in _commandList
+            return (from command in _mediator.AvailableCommands
                         where (command.ToString().Length >= searchString.Length)
                         where (command.ToString().Substring(0, searchString.Length).ToLower() == searchString)
-                        select command).ToList<Command>();
+                        select command).ToList<string>();
         }
 
         public void TryToCompleteCurrentInput()
         {
-            List<Command> possibleCommands = FindPossibleInputCompletions();
+            List<string> possibleCommands = FindPossibleInputCompletions();
 
             if (possibleCommands == null)
                 return;
 
             if (possibleCommands.Count == 1)
             {
-                CurrentInput = possibleCommands[0].ToString();
+                CurrentInput = possibleCommands[0].ToString() + " ";
             }
             else if (possibleCommands.Count > 1)
             {
@@ -78,6 +88,6 @@ namespace Frenetic
         public List<string> CommandLog { get; set; }
         public List<string> MessageLog { get; set; }
 
-        List<Command> _commandList;
+        IMediator _mediator;
     }
 }

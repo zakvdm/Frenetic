@@ -20,10 +20,46 @@ namespace UnitTestLibrary
         }
 
         [Test]
+        public void ForwardsCommandsToMediator()
+        {
+            var stubMediator = MockRepository.GenerateStub<IMediator>();
+            GameConsole console = new GameConsole(stubMediator);
+
+            console.CurrentInput = "/command 1";
+            console.ProcessInput();
+
+            stubMediator.AssertWasCalled(x => x.Do("command", "1"));
+        }
+
+        [Test]
+        public void ForwardsPropertyGetsToMediator()
+        {
+            var stubMediator = MockRepository.GenerateStub<IMediator>();
+            GameConsole console = new GameConsole(stubMediator);
+
+            console.CurrentInput = "/property";
+            console.ProcessInput();
+
+            stubMediator.AssertWasCalled(x => x.Get("property"));
+        }
+
+        [Test]
+        public void HandlesSpacesAndMultipleParameters()
+        {
+            var stubMediator = MockRepository.GenerateStub<IMediator>();
+            GameConsole console = new GameConsole(stubMediator);
+
+            console.CurrentInput = "/command  arg1   arg2 arg3";
+            console.ProcessInput();
+
+            stubMediator.AssertWasCalled(x => x.Do("command", "arg1 arg2 arg3"));
+        }
+
+        [Test]
         public void KeepsCommandsInCommandLog()
         {
             // COMMANDS need a prefixing "/"
-            GameConsole console = new GameConsole(null);
+            GameConsole console = new GameConsole(MockRepository.GenerateStub<IMediator>());
             console.CurrentInput = "/command1";
             console.ProcessInput();
             console.CurrentInput = "/command2";
@@ -53,46 +89,48 @@ namespace UnitTestLibrary
         [Test]
         public void CompletesCommandWhenUnambiguousCompletionAvailable()
         {
-            List<Command> commandList = new List<Command>();
-            commandList.Add(new Command("Eat"));
-            commandList.Add(new Command("Die"));
-            GameConsole console = new GameConsole(commandList);
+            Mediator mediator = new Mediator();
+            mediator.Register("Eat", (input) => "");
+            mediator.Register("Die", (input) => "");
+            GameConsole console = new GameConsole(mediator);
             console.CurrentInput = "E";
 
             console.TryToCompleteCurrentInput();
 
-            Assert.AreEqual("/Eat", console.CurrentInput);
+            Assert.AreEqual("/Eat ", console.CurrentInput);
         }
+
         [Test]
         public void CompleteHandlesASlashInFront()
         {
-            List<Command> commandList = new List<Command>();
-            commandList.Add(new Command("Eat"));
-            GameConsole console = new GameConsole(commandList);
+            Mediator mediator = new Mediator();
+            mediator.Register("Eat", (input) => "");
+            GameConsole console = new GameConsole(mediator);
+
             console.CurrentInput = "/E";
 
             console.TryToCompleteCurrentInput();
 
-            Assert.AreEqual("/Eat", console.CurrentInput);
+            Assert.AreEqual("/Eat ", console.CurrentInput);
         }
         [Test]
         public void CompleteIgnoresCaseVariations()
         {
-            List<Command> commandList = new List<Command>();
-            commandList.Add(new Command("EaT"));
-            GameConsole console = new GameConsole(commandList);
+            Mediator mediator = new Mediator();
+            mediator.Register("EaT", (x) => "");
+            GameConsole console = new GameConsole(mediator);
             console.CurrentInput = "eAt";
 
             console.TryToCompleteCurrentInput();
 
-            Assert.AreEqual("/EaT", console.CurrentInput);
+            Assert.AreEqual("/EaT ", console.CurrentInput);
         }
         [Test]
         public void HandlesCurrentInputLongerThanCommandWithoutFailing()
         {
-            List<Command> commandList = new List<Command>();
-            commandList.Add(new Command("Eat"));
-            GameConsole console = new GameConsole(commandList);
+            Mediator mediator = new Mediator();
+            mediator.Register("Eat", (x) => "");
+            GameConsole console = new GameConsole(mediator);
             console.CurrentInput = "Eat shit";
 
             console.TryToCompleteCurrentInput();
@@ -102,10 +140,10 @@ namespace UnitTestLibrary
         [Test]
         public void DoesAPartialCompleteWhenAppropriate()
         {
-            List<Command> commandList = new List<Command>();
-            commandList.Add(new Command("GiveX"));
-            commandList.Add(new Command("GiveY"));
-            GameConsole console = new GameConsole(commandList);
+            Mediator mediator = new Mediator();
+            mediator.Register("GiveX", (x) => "");
+            mediator.Register("GiveY", (x) => "");
+            GameConsole console = new GameConsole(mediator);
             console.CurrentInput = "gi";
 
             console.TryToCompleteCurrentInput();
@@ -127,14 +165,14 @@ namespace UnitTestLibrary
         [Test]
         public void ReturnsListOfAllPossibleCompletions()
         {
-            List<Command> commandList = new List<Command>();
-            commandList.Add(new Command("Eat"));
-            commandList.Add(new Command("Endear"));
-            commandList.Add(new Command("Die"));
-            GameConsole console = new GameConsole(commandList);
+            Mediator mediator = new Mediator();
+            mediator.Register("Eat", (x) => "");
+            mediator.Register("Endear", (x) => "");
+            mediator.Register("Die", (x) => "");
+            GameConsole console = new GameConsole(mediator);
             console.CurrentInput = "E";
 
-            List<Command> possibleCommands = console.FindPossibleInputCompletions();
+            List<string> possibleCommands = console.FindPossibleInputCompletions();
 
             Assert.AreEqual(2, possibleCommands.Count);
             Assert.IsTrue(possibleCommands.Exists((x) => x.ToString() == "Eat"));
@@ -144,12 +182,12 @@ namespace UnitTestLibrary
         [Test]
         public void DoesntReturnAnyCompletionsWhenCurrentInputIsEmpty()
         {
-            List<Command> commandList = new List<Command>();
-            commandList.Add(new Command("Eat"));
-            GameConsole console = new GameConsole(commandList);
+            Mediator mediator = new Mediator();
+            mediator.Register("Eat", (x) => "");
+            GameConsole console = new GameConsole(mediator);
             console.CurrentInput = "";
 
-            List<Command> possibleCommands = console.FindPossibleInputCompletions();
+            List<string> possibleCommands = console.FindPossibleInputCompletions();
 
             Assert.IsNull(possibleCommands);
         }
@@ -157,12 +195,12 @@ namespace UnitTestLibrary
         [Test]
         public void FindPossibleCompletionsDoesntRemoveSlash()
         {
-            List<Command> commandList = new List<Command>();
-            commandList.Add(new Command("Eat"));
-            GameConsole console = new GameConsole(commandList);
+            Mediator mediator = new Mediator();
+            mediator.Register("Eat", (x) => "");
+            GameConsole console = new GameConsole(mediator);
             console.CurrentInput = "/B";
 
-            List<Command> possibleCommands = console.FindPossibleInputCompletions();
+            List<string> possibleCommands = console.FindPossibleInputCompletions();
 
             Assert.AreEqual("/B", console.CurrentInput);
         }

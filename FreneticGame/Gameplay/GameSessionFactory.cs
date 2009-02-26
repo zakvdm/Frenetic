@@ -129,6 +129,7 @@ namespace Frenetic
             #endregion
 
             #region Player
+            builder.Register<PlayerSettings>().SingletonScoped();
             builder.Register<Player>().FactoryScoped();
             builder.RegisterGeneratedFactory<Player.Factory>(new TypedService(typeof(Player)));
             builder.Register((c) => (IBoundaryCollider)new WorldBoundaryCollider(_screenWidth, _screenHeight));
@@ -185,9 +186,12 @@ namespace Frenetic
             builder.Register<XNAKeyboard>().As<IKeyboard>().SingletonScoped();
 
             // CONSOLE:
+            builder.Register<Mediator>().As<IMediator>().SingletonScoped();
             builder.Register<GameConsole>().As<IGameConsole>().SingletonScoped();
             builder.Register<GameConsoleView>().SingletonScoped();
             builder.Register<GameConsoleController>().SingletonScoped();
+            // MEDIATOR CONTROLLERS:
+            builder.Register<MediatorPlayerSettingsController>().SingletonScoped();
 
             return builder.Build();
         }
@@ -234,22 +238,15 @@ namespace Frenetic
             IFont consoleFont = container.Resolve<IFont>(new TypedParameter(typeof(SpriteFont), _contentManager.Load<SpriteFont>("Content/Fonts/detailsFont")));
             int edgeGap = 4;
             int inputWindowHeight = 24;
-            System.Collections.Generic.List<Command> commands = new System.Collections.Generic.List<Command>();
-            commands.Add(new Command("Test"));
-            commands.Add(new Command("Eat Shit"));
-            commands.Add(new Command("Wallow"));
-            commands.Add(new Command("Waver"));
-            commands.Add(new Command("Flipflop"));
-            commands.Add(new Command("Prematurely Ejaculate"));
-            commands.Add(new Command("Premedidate Ejaculation"));
-            container.Resolve<IGameConsole>(new NamedParameter("commandList", commands));
-
+            container.Resolve<IGameConsole>();
             gameSession.Views.Add(container.Resolve<GameConsoleView>(
                             new NamedParameter("inputWindow", new Rectangle(edgeGap, _screenHeight - edgeGap - inputWindowHeight, _screenWidth - 2 * edgeGap, inputWindowHeight)),
                             new NamedParameter("commandWindow", new Rectangle(edgeGap, edgeGap, (_screenWidth / 2) - 30 - edgeGap, _screenHeight - inputWindowHeight - 3 * edgeGap)),
                             new NamedParameter("messageWindow", new Rectangle((_screenWidth / 2) + 30 + edgeGap, edgeGap, (_screenWidth / 2) - 30 - 2*edgeGap, (_screenHeight / 2) - 2*edgeGap)),
                             new TypedParameter(typeof(ITexture), consoleTexture), new TypedParameter(typeof(IFont), consoleFont)));
             gameSession.Controllers.Add(container.Resolve<GameConsoleController>());
+            // Mediator Controllers:
+            _mediatorPlayerController = container.Resolve<MediatorPlayerSettingsController>();
 
             // TEMP CODE:
             // *********************************************************************************
@@ -268,6 +265,7 @@ namespace Frenetic
             return localPlayer;
         }
 
+        MediatorPlayerSettingsController _mediatorPlayerController;
         #endregion
 
         GraphicsDevice _graphicsDevice;
