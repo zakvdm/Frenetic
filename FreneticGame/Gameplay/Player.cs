@@ -85,9 +85,9 @@ namespace Frenetic
         IPhysicsComponent _physicsComponent;
         IBoundaryCollider _boundaryCollider;
 
-        public static Vector2 JumpImpulse = new Vector2(0, -500000);
+        public static Vector2 JumpImpulse = new Vector2(0, -300000);
         public static Vector2 MoveForce = new Vector2(-2000, 0);
-        static float MaxSpeed = 50;
+        static float MaxSpeed = 30;
         static long JumpTimer = 8000000;
     }
 }

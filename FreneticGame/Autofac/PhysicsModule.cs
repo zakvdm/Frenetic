@@ -16,8 +16,7 @@ namespace Frenetic.Autofac
 
         protected override void Load(ContainerBuilder builder)
         {
-            PhysicsSimulator physicsSimulator = new PhysicsSimulator(Gravity);
-            builder.Register<PhysicsSimulator>(physicsSimulator).SingletonScoped();
+            builder.Register((c) => new PhysicsSimulator(Gravity)).As<PhysicsSimulator>().ContainerScoped();
             // Body:
             builder.Register((c, p) => BodyFactory.Instance.CreateRectangleBody(c.Resolve<PhysicsSimulator>(), p.Named<float>("width"), p.Named<float>("height"), p.Named<float>("mass"))).FactoryScoped();
             // Geom:
@@ -33,7 +32,7 @@ namespace Frenetic.Autofac
                 var geom = c.Resolve<Geom>(body, width, height, mass);
                 return (IPhysicsComponent)new FarseerPhysicsComponent(bod, geom);
             }).FactoryScoped();
-            builder.Register<FarseerPhysicsController>().SingletonScoped();
+            builder.Register<FarseerPhysicsController>().ContainerScoped();
         }
     }
 }

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Autofac;
 
 namespace Frenetic
 {
@@ -34,20 +35,11 @@ namespace Frenetic
             return gameplayScreen;
         }
 
-        public MainMenuScreen MakeMainMenuScreen()
+        public MainMenuScreen MakeMainMenuScreen(IContainer container)
         {
-            MainMenuScreen mainMenuScreen = new MainMenuScreen(
-                            _screenManager.GraphicsDevice.Viewport, 
-                            _screenManager.SpriteBatch, 
-                            _screenManager.Font,
-                            new GameSessionFactory
-                                (
-                                    _screenManager.GraphicsDevice, 
-                                    new ContentManager(_screenManager.Game.Services)
-                                ), 
-                            this, _screenManager.Game);
-            _screenManager.AddScreen(mainMenuScreen);
-            return mainMenuScreen;
+            var screen = container.Resolve<MainMenuScreen>();
+            _screenManager.AddScreen(screen);
+            return screen;
         }
         #endregion
     }

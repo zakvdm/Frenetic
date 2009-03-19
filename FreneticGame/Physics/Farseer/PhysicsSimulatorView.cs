@@ -385,7 +385,7 @@ namespace FarseerGames.GettingStarted
             _performancePanelTexture = DrawingHelper.CreateRectangleTexture(graphicsDevice, _performancePanelWidth,
                                                                             _performancePanelHeight,
                                                                             new Color(0, 0, 0, 155));
-            _spriteFont = content.Load<SpriteFont>(@"Content\Fonts\diagnosticFont");
+            _spriteFont = content.Load<SpriteFont>(@"Fonts/diagnosticFont");
         }
 
         private void LoadContactContent(GraphicsDevice graphicsDevice)

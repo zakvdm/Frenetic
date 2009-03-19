@@ -7,6 +7,10 @@ namespace Frenetic
 {
     public class GameSessionController : IController
     {
+        public GameSessionController(IGameSession gameSession, IIncomingMessageQueue incomingMessageQueue, IOutgoingMessageQueue outgoingMessageQueue, Player.Factory playerFactory, IPlayer localPlayer)
+            : this(gameSession, incomingMessageQueue, outgoingMessageQueue, null, playerFactory, localPlayer, null, true)
+        {
+        }
 
         public GameSessionController(IGameSession gameSession, IIncomingMessageQueue incomingMessageQueue, IOutgoingMessageQueue outgoingMessageQueue, IViewFactory viewFactory, Player.Factory playerFactory, IPlayer localPlayer, ICamera camera, bool isServer)
         {

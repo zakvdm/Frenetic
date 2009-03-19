@@ -32,37 +32,5 @@ namespace UnitTestLibrary
             var clientNetworkSession = container.Resolve<LidgrenClientNetworkSession>();
             Assert.IsNotNull(clientNetworkSession);
         }
-        
-        [Test]
-        public void CorrectlyStartsServerNetworkSession()
-        {
-            IServerNetworkSession stubServerNetworkSession = MockRepository.GenerateStub<IServerNetworkSession>();
-            NetworkSessionManager networkSessionManager = new NetworkSessionManager(null, stubServerNetworkSession);
-
-            networkSessionManager.Start(20);
-
-            stubServerNetworkSession.AssertWasCalled(x => x.Create(20));
-        }
-
-        [Test]
-        public void CorrectlyJoinsNetworkSession()
-        {
-            IClientNetworkSession stubClientNetworkSession = MockRepository.GenerateStub<IClientNetworkSession>();
-            NetworkSessionManager networkSessionManager = new NetworkSessionManager(stubClientNetworkSession, null);
-
-            networkSessionManager.Join(30);
-
-            stubClientNetworkSession.AssertWasCalled(x => x.Join(Arg<int>.Is.Equal(30)));
-        }
-
-        [Test]
-        public void CorrectlyShutsDownClientSession()
-        {
-            IClientNetworkSession stubClientNetworkSession = MockRepository.GenerateStub<IClientNetworkSession>();
-            new NetworkSessionManager(stubClientNetworkSession, null);
-            
-
-            stubClientNetworkSession.AssertWasCalled(x => x.Shutdown(Arg<string>.Is.Anything));
-        }
     }
 }
