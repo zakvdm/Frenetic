@@ -83,34 +83,19 @@ namespace UnitTestLibrary
             Player player = new Player(1, stubPhysicsComponent, null);
 
             player.InContactWithLevel = true;
-            player.Jump(new TimeSpan(0, 0, 1).Ticks);
+            player.Jump();
 
             stubPhysicsComponent.AssertWasCalled(pc => pc.ApplyImpulse(Player.JumpImpulse));
         }
 
         [Test]
-        public void SecondJumpMustBeDelayedForSomePeriodOfTime()
-        {
-            var stubPhysicsComponent = MockRepository.GenerateStub<IPhysicsComponent>();
-            Player player = new Player(1, stubPhysicsComponent, null);
-
-            player.InContactWithLevel = true;
-            player.Jump(new TimeSpan(0, 0, 0, 1).Ticks);
-
-            stubPhysicsComponent.AssertWasCalled(pc => pc.ApplyImpulse(Player.JumpImpulse));
-
-            Assert.IsFalse(player.CanJump(new TimeSpan(0, 0, 0, 1, 200).Ticks));
-            Assert.IsTrue(player.CanJump(new TimeSpan(0, 0, 0, 1, 1000).Ticks));
-        }
-
-        [Test]
-        public void JumpAppliesNoImpulseToThePlayersBodyIfCanJumpIsFalse()
+        public void JumpAppliesNoImpulseToThePlayersBodyIfNotInContactWithTheLevel()
         {
             var stubPhysicsComponent = MockRepository.GenerateStub<IPhysicsComponent>();
             Player player = new Player(1, stubPhysicsComponent, null);
 
             player.InContactWithLevel = false;
-            player.Jump(1);
+            player.Jump();
 
             stubPhysicsComponent.AssertWasNotCalled(pc => pc.ApplyImpulse(Player.JumpImpulse));
         }

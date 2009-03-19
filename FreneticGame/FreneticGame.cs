@@ -171,6 +171,10 @@ namespace Frenetic
             // KEYBOARD:
             builder.Register<Keyboard>().As<IKeyboard>().SingletonScoped();
 
+            // MOUSE:
+            builder.Register<FreneticMouse>().As<IMouse>().SingletonScoped();
+
+
             return builder.Build();
         }
 

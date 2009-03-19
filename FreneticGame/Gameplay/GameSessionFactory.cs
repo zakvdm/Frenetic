@@ -100,13 +100,13 @@ namespace Frenetic
             Frenetic.Level.Level level = ClientContainer.Resolve<Frenetic.Level.Level>();
             gameSession.Controllers.Add(ClientContainer.Resolve<LevelController>(new TypedParameter(typeof(Frenetic.Level.Level), level)));
 
-            gameSession.Controllers.Add(ClientContainer.Resolve<KeyboardPlayerController>(new TypedParameter(typeof(IPlayer), localPlayer)));
-            gameSession.Views.Add(ClientContainer.Resolve<NetworkPlayerView>(new TypedParameter(typeof(IPlayer), localPlayer)));
             ICamera camera = ClientContainer.Resolve<ICamera>
                                             (
                                             new TypedParameter(typeof(IPlayer), localPlayer),
                                             new TypedParameter(typeof(Vector2), new Vector2(_screenWidth, _screenHeight))
                                             );
+            gameSession.Controllers.Add(ClientContainer.Resolve<KeyboardPlayerController>(new TypedParameter(typeof(IPlayer), localPlayer)));
+            gameSession.Views.Add(ClientContainer.Resolve<NetworkPlayerView>(new TypedParameter(typeof(IPlayer), localPlayer)));
 
             ITexture levelTexture = ClientContainer.Resolve<ITexture>(new TypedParameter(typeof(Texture2D), _contentManager.Load<Texture2D>("Textures/blank")));
             gameSession.Views.Add(ClientContainer.Resolve<LevelView>(new TypedParameter(typeof(ITexture), levelTexture)));
