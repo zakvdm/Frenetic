@@ -22,7 +22,7 @@ namespace Frenetic
                                                     (int)(_crosshair.ViewPosition.X - (_crosshair.Size / 2)), 
                                                     (int)(_crosshair.ViewPosition.Y - (_crosshair.Size / 2)),
                                                     _crosshair.Size, _crosshair.Size);
-            _spriteBatch.Draw(_texture, destinationRectangle, Color.White);
+            _spriteBatch.Draw(_texture, destinationRectangle, Color.White, 1);
             _spriteBatch.End();
         }
 

@@ -29,12 +29,12 @@ namespace Frenetic
             _physicsComponent = new DummyPhysicsComponent();
         } // For XmlSerializer
 
-        public Vector2 Position 
-        { 
+        public Vector2 Position
+        {
             get
             {
                 return _physicsComponent.Position;
-            } 
+            }
             set
             {
                 _physicsComponent.Position = value;

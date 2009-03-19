@@ -7,16 +7,14 @@ namespace Frenetic
 {
     public class PlayerView : IView
     {
+        public delegate PlayerView Factory(IPlayer player);
         
-        public PlayerView(IPlayer player, ISpriteBatch spriteBatch, ITexture texture, ICamera camera)
+        public PlayerView(IPlayer player, PlayerSettings playerSettings, ISpriteBatch spriteBatch, ICamera camera)
         {
             _player = player;
+            _playerSettings = playerSettings;
             _spriteBatch = spriteBatch;
-            _texture = texture;
             _camera = camera;
-
-            Random rnd = new Random();
-            _color = new Color((float)rnd.NextDouble(), (float)rnd.NextDouble(), (float)rnd.NextDouble());
         }
         #region IView Members
 
@@ -26,10 +24,10 @@ namespace Frenetic
             if (_spriteBatch != null)
             {
                 _spriteBatch.Begin(_camera.TranslationMatrix);
-                _spriteBatch.Draw(_texture, _player.Position, null, _color, 0f,
-                    new Vector2(_texture.Width / 2f, _texture.Height / 2f),
+                _spriteBatch.Draw(_playerSettings.Texture, _player.Position, null, _playerSettings.Color, 0f,
+                    new Vector2(_playerSettings.Texture.Width / 2f, _playerSettings.Texture.Height / 2f),
                     new Vector2(1, 1),
-                    SpriteEffects.None, 0f);
+                    SpriteEffects.None, 1f);
                 _spriteBatch.End();
             }
             
@@ -44,9 +42,8 @@ namespace Frenetic
         #endregion
 
         private IPlayer _player;
+        private PlayerSettings _playerSettings;
         private ISpriteBatch _spriteBatch;
-        private ITexture _texture;
         private ICamera _camera;
-        private Color _color;
     }
 }

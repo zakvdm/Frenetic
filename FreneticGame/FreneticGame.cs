@@ -17,13 +17,14 @@ using Frenetic.Graphics;
 using Frenetic.Physics;
 using Frenetic.Autofac;
 using Frenetic.Level;
+using Frenetic.UserInput;
 
 namespace Frenetic
 {
     /// <summary>
     /// This is the main type for your game
     /// </summary>
-    public class FreneticGame : Microsoft.Xna.Framework.Game
+    public class FreneticGame : Game
     {
         GraphicsDeviceManager graphics;
 
@@ -48,6 +49,9 @@ namespace Frenetic
             // initialize the screen manager
             screenManager = new ScreenManager(this, Content);
             Components.Add(screenManager);
+
+            // TODO: REMOVE:
+            Components.Add(new Frenetic.MyConsole.Components.FPS(this));
 
             this.IsFixedTimeStep = false;
         }
@@ -115,17 +119,14 @@ namespace Frenetic
             builder.Register<XmlMessageSerializer>().As<IMessageSerializer>().ContainerScoped();
             #endregion
 
-            #region ViewFactory
-            builder.Register<ViewFactory>().As<IViewFactory>().ContainerScoped();
-            #endregion
-
             #region Graphics
             builder.Register<GraphicsDevice>(graphics.GraphicsDevice);
             builder.Register<Viewport>(graphics.GraphicsDevice.Viewport);
             builder.Register<SpriteFont>(screenManager.Font);
             builder.Register<SpriteBatch>(screenManager.SpriteBatch);
-            builder.Register<XNASpriteBatch>().As<ISpriteBatch>().FactoryScoped();
-            builder.Register<XNATexture>().As<ITexture>().FactoryScoped();
+            builder.Register<XnaSpriteBatch>().As<ISpriteBatch>().FactoryScoped();
+            builder.Register<XnaTexture>().As<ITexture>().FactoryScoped();
+            builder.Register<XnaFont>().As<IFont>().FactoryScoped();
             #endregion
 
             #region GameSession
@@ -136,8 +137,11 @@ namespace Frenetic
             #endregion
 
             #region Player
-            builder.Register<Player>().FactoryScoped();
-            builder.RegisterGeneratedFactory<Player.Factory>(new TypedService(typeof(Player)));
+            builder.Register<PlayerSettings>().SingletonScoped();
+            builder.Register<Player>().As<IPlayer>().FactoryScoped();
+            builder.Register<PlayerView>().FactoryScoped();
+            builder.RegisterGeneratedFactory<Player.Factory>(new TypedService(typeof(IPlayer)));
+            builder.RegisterGeneratedFactory<PlayerView.Factory>(new TypedService(typeof(PlayerView)));
             builder.Register((c) => (IBoundaryCollider)new WorldBoundaryCollider(_screenWidth, _screenHeight));
             builder.Register<KeyboardPlayerController>().ContainerScoped();
             builder.Register<NetworkPlayerView>().FactoryScoped();
@@ -156,6 +160,18 @@ namespace Frenetic
             builder.Register<LevelView>().ContainerScoped();
             #endregion
 
+            #region Console
+            builder.Register<Mediator>().As<IMediator>().SingletonScoped();
+            builder.Register<GameConsole>().As<IGameConsole>().SingletonScoped();
+            builder.Register<GameConsoleView>().SingletonScoped();
+            builder.Register<GameConsoleController>().SingletonScoped();
+            #endregion
+
+            #region Mediator Controllers
+            builder.Register<MediatorPlayerSettingsController>().SingletonScoped();
+            builder.Register<MediatorPhysicsSettingsController>().SingletonScoped();
+            #endregion
+
             // RAYCASTER:
             builder.Register<DumbRayCaster>().SingletonScoped();
             builder.Register<DumbRayCasterTestController>().ContainerScoped();
@@ -169,7 +185,7 @@ namespace Frenetic
             builder.Register<CrosshairView>().ContainerScoped();
 
             // KEYBOARD:
-            builder.Register<Keyboard>().As<IKeyboard>().SingletonScoped();
+            builder.Register<XnaKeyboard>().As<IKeyboard>().SingletonScoped();
 
             // MOUSE:
             builder.Register<FreneticMouse>().As<IMouse>().SingletonScoped();

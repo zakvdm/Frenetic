@@ -16,6 +16,7 @@ using FarseerGames.GettingStarted;
 using Frenetic.Network.Lidgren;
 using Frenetic.Network;
 using Frenetic.Autofac;
+using Frenetic.UserInput;
 
 namespace Frenetic
 {
@@ -91,10 +92,15 @@ namespace Frenetic
         private IPlayer CreateClientComponents(IGameSession gameSession)
         {
             ITexture playerTexture = ClientContainer.Resolve<ITexture>(new TypedParameter(typeof(Texture2D), _contentManager.Load<Texture2D>("textures/ball")));
-            IViewFactory viewFactory = ClientContainer.Resolve<IViewFactory>(new TypedParameter(typeof(ITexture), playerTexture));
+            PlayerSettings playerSettings = ClientContainer.Resolve<PlayerSettings>(new TypedParameter(typeof(ITexture), playerTexture));
+            //IViewFactory viewFactory = ClientContainer.Resolve<IViewFactory>(new TypedParameter(typeof(ITexture), playerTexture));
+
+            // Mediator Controllers:
+            _mediatorPlayerController = ClientContainer.Resolve<MediatorPlayerSettingsController>();
+            _mediatorPhysicsController = ClientContainer.Resolve<MediatorPhysicsSettingsController>();
 
             // Make local player:
-            IPlayer localPlayer = ClientContainer.Resolve<Player>(new TypedParameter(typeof(int), 0));
+            IPlayer localPlayer = ClientContainer.Resolve<IPlayer>(new TypedParameter(typeof(int), 0));
 
             gameSession.Controllers.Add(ClientContainer.Resolve<FarseerPhysicsController>());
             Frenetic.Level.Level level = ClientContainer.Resolve<Frenetic.Level.Level>();
@@ -114,10 +120,21 @@ namespace Frenetic
             ITexture crosshairTexture = ClientContainer.Resolve<ITexture>(new TypedParameter(typeof(Texture2D), _contentManager.Load<Texture2D>("Textures/cursor")));
             gameSession.Views.Add(ClientContainer.Resolve<CrosshairView>(new TypedParameter(typeof(ITexture), crosshairTexture)));
 
+            ITexture consoleTexture = ClientContainer.Resolve<ITexture>(new TypedParameter(typeof(Texture2D), _contentManager.Load<Texture2D>("Textures/blank")));
+            IFont consoleFont = ClientContainer.Resolve<IFont>(new TypedParameter(typeof(SpriteFont), _contentManager.Load<SpriteFont>("Fonts/detailsFont")));
+            int edgeGap = 4;
+            int inputWindowHeight = 24;
+            ClientContainer.Resolve<IGameConsole>();
+            gameSession.Views.Add(ClientContainer.Resolve<GameConsoleView>(
+                            new NamedParameter("inputWindow", new Rectangle(edgeGap, _screenHeight - edgeGap - inputWindowHeight, _screenWidth - 2 * edgeGap, inputWindowHeight)),
+                            new NamedParameter("commandWindow", new Rectangle(edgeGap, edgeGap, (_screenWidth / 2) - 30 - edgeGap, _screenHeight - inputWindowHeight - 3 * edgeGap)),
+                            new NamedParameter("messageWindow", new Rectangle((_screenWidth / 2) + 30 + edgeGap, edgeGap, (_screenWidth / 2) - 30 - 2*edgeGap, (_screenHeight / 2) - 2*edgeGap)),
+                            new TypedParameter(typeof(ITexture), consoleTexture), new TypedParameter(typeof(IFont), consoleFont)));
+            gameSession.Controllers.Add(ClientContainer.Resolve<GameConsoleController>());
+            
             // TEMP CODE:
             // *********************************************************************************
             //gameSession.Controllers.Add(ClientContainer.Resolve<DumbRayCasterTestController>());
-
 
             // DEBUG VIEW:  // TODO: Write a controller for this...
             // TODO: Instantiate with Autofac
@@ -143,6 +160,10 @@ namespace Frenetic
         ContentManager _contentManager;
         IContainer ClientContainer { get; set; }
         IContainer ServerContainer { get; set; }
+
+        // CAN BE REMOVED?
+        MediatorPlayerSettingsController _mediatorPlayerController;
+        MediatorPhysicsSettingsController _mediatorPhysicsController;
     }
 
     public class GameSessionControllerAndView

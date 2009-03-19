@@ -77,15 +77,21 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CameraTests.cs" />
+    <Compile Include="GameConsoleControllerTests.cs" />
+    <Compile Include="GameConsoleTests.cs" />
     <Compile Include="CrosshairTests.cs" />
     <Compile Include="DumbLevelLoaderTests.cs" />
     <Compile Include="FarseerPhysicsComponentTests.cs" />
+    <Compile Include="GameConsoleViewTests.cs" />
     <Compile Include="LevelControllerTests.cs" />
     <Compile Include="LevelPieceTests.cs" />
     <Compile Include="LevelTests.cs" />
     <Compile Include="LevelViewTests.cs" />
     <Compile Include="LidgrenClientNetworkSessionTests.cs" />
     <Compile Include="LidgrenServerNetworkSessionTests.cs" />
+    <Compile Include="MediatorPhysicsSettingsControllerTests.cs" />
+    <Compile Include="MediatorPlayerSettingsTests.cs" />
+    <Compile Include="MediatorTests.cs" />
     <Compile Include="NetworkSessionManagerTests.cs" />
     <Compile Include="OutgoingMessageQueueTests.cs" />
     <Compile Include="PlayerViewTests.cs" />

@@ -20,6 +20,7 @@ namespace UnitTestLibrary
         {
             Crosshair crosshair = new Crosshair(null);
 
+            // TODO: Wrap Mouse so that this test can be made robust even when mouse is moving...
             Vector2 mousePosition = new Vector2(Mouse.GetState().X, Mouse.GetState().Y);
             Assert.AreEqual(mousePosition, crosshair.ViewPosition);
         }
@@ -64,7 +65,7 @@ namespace UnitTestLibrary
                                         (
                                         Arg<ITexture>.Is.Equal(stubTexture),
                                         Arg<Rectangle>.Is.Equal(new Rectangle(95, 195, 10, 10)),
-                                        Arg<Color>.Is.Equal(Color.White)
+                                        Arg<Color>.Is.Equal(Color.White), Arg<float>.Is.Equal(1f)
                                         ));
             stubSpriteBatch.AssertWasCalled(x => x.End());
 

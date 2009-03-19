@@ -1,6 +1,6 @@
 ﻿using Microsoft.Xna.Framework.Input;
 
-namespace Frenetic
+namespace Frenetic.UserInput
 {
     public class FreneticMouse : IMouse
     {
