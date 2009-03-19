@@ -147,7 +147,7 @@ namespace UnitTestLibrary
         }
 
         [Test]
-        public void EnterCallProcessOnCurrentCommand()
+        public void EnterCallsProcessOnCurrentCommand()
         {
             GameConsole console = new GameConsole(null);
             console.Active = true;
@@ -176,6 +176,34 @@ namespace UnitTestLibrary
             consoleController.Process(1);
 
             Assert.AreEqual("C", console.CurrentInput);
+        }
+
+        [Test]
+        public void AcceptsNumbers()
+        {
+            GameConsole console = new GameConsole(null);
+            console.Active = true;
+            var stubKeyboard = MockRepository.GenerateStub<IKeyboard>();
+            stubKeyboard.Stub(x => x.IsKeyDown(Keys.D1)).Return(true);
+            GameConsoleController consoleController = new GameConsoleController(console, stubKeyboard);
+
+            consoleController.Process(1);
+
+            Assert.AreEqual("1", console.CurrentInput);
+        }
+
+        [Test]
+        public void AcceptsNumPadNumbers()
+        {
+            GameConsole console = new GameConsole(null);
+            console.Active = true;
+            var stubKeyboard = MockRepository.GenerateStub<IKeyboard>();
+            stubKeyboard.Stub(x => x.IsKeyDown(Keys.NumPad6)).Return(true);
+            GameConsoleController consoleController = new GameConsoleController(console, stubKeyboard);
+
+            consoleController.Process(1);
+
+            Assert.AreEqual("6", console.CurrentInput);
         }
 
         [Test]

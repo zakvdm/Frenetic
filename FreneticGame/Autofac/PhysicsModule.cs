@@ -16,6 +16,7 @@ namespace Frenetic.Autofac
 
         protected override void Load(ContainerBuilder builder)
         {
+            builder.Register<PhysicsSettings>().SingletonScoped();
             PhysicsSimulator physicsSimulator = new PhysicsSimulator(Gravity);
             builder.Register<PhysicsSimulator>(physicsSimulator).SingletonScoped();
             // Body:

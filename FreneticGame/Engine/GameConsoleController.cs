@@ -34,9 +34,10 @@ namespace Frenetic
                 {
                     // Check if it's upper or lower case
                     if (_keyboard.IsKeyDown(Keys.LeftShift) || _keyboard.IsKeyDown(Keys.RightShift))
-                        _console.CurrentInput += key.ToString();
+                        _console.CurrentInput += key.GetStringValue();
                     else
-                        _console.CurrentInput += key.ToString().ToLower();
+                        _console.CurrentInput += key.GetStringValue().ToLower();
+                    
                 }
             }
 

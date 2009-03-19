@@ -111,10 +111,6 @@ namespace Frenetic
             builder.Register<XmlMessageSerializer>().As<IMessageSerializer>().SingletonScoped();
             #endregion
 
-            #region ViewFactory
-            builder.Register<ViewFactory>().As<IViewFactory>().SingletonScoped();
-            #endregion
-
             #region Graphics
             builder.Register<SpriteBatch>(new SpriteBatch(_graphicsDevice));
             builder.Register<XnaSpriteBatch>().As<ISpriteBatch>().FactoryScoped();
@@ -130,34 +126,16 @@ namespace Frenetic
 
             #region Player
             builder.Register<PlayerSettings>().SingletonScoped();
-            builder.Register<Player>().FactoryScoped();
-            builder.RegisterGeneratedFactory<Player.Factory>(new TypedService(typeof(Player)));
+            builder.Register<Player>().As<IPlayer>().FactoryScoped();
+            builder.Register<PlayerView>().FactoryScoped();
+            builder.RegisterGeneratedFactory<Player.Factory>(new TypedService(typeof(IPlayer)));
+            builder.RegisterGeneratedFactory<PlayerView.Factory>(new TypedService(typeof(PlayerView)));
             builder.Register((c) => (IBoundaryCollider)new WorldBoundaryCollider(_screenWidth, _screenHeight));
             builder.Register<KeyboardPlayerController>().SingletonScoped();
             builder.Register<NetworkPlayerView>().SingletonScoped();
             #endregion
 
             #region Physics
-            /*
-            PhysicsSimulator physicsSimulator = new PhysicsSimulator(_gravity);
-            builder.Register<PhysicsSimulator>(physicsSimulator).SingletonScoped();
-            // Body:
-            builder.Register((c, p) => BodyFactory.Instance.CreateRectangleBody(c.Resolve<PhysicsSimulator>(), p.Named<float>("width"), p.Named<float>("height"), p.Named<float>("mass"))).FactoryScoped();
-            // Geom:
-            builder.Register((c, p) => GeomFactory.Instance.CreateRectangleGeom(c.Resolve<PhysicsSimulator>(), p.Named<Body>("body"), p.Named<float>("width"), p.Named<float>("height"))).FactoryScoped();
-            // IPhysicsComponent:
-            builder.Register((c, p) =>
-            {
-                var width = new NamedParameter("width", 50f);
-                var height = new NamedParameter("height", 50f);
-                var mass = new NamedParameter("mass", 100f);
-                var bod = c.Resolve<Body>(width, height, mass);
-                var body = new NamedParameter("body", bod);
-                var geom = c.Resolve<Geom>(body, width, height, mass);
-                return (IPhysicsComponent)new FarseerPhysicsComponent(bod, geom);
-            }).FactoryScoped();
-            builder.Register<FarseerPhysicsController>().SingletonScoped();
-             */
             builder.RegisterModule(new PhysicsModule() { Gravity = _gravity });
             #endregion
 
@@ -192,6 +170,7 @@ namespace Frenetic
             builder.Register<GameConsoleController>().SingletonScoped();
             // MEDIATOR CONTROLLERS:
             builder.Register<MediatorPlayerSettingsController>().SingletonScoped();
+            builder.Register<MediatorPhysicsSettingsController>().SingletonScoped();
 
             return builder.Build();
         }
@@ -199,7 +178,12 @@ namespace Frenetic
         private Player.Factory CreateGeneralComponents(IContainer container)
         {
             ITexture playerTexture = container.Resolve<ITexture>(new TypedParameter(typeof(Texture2D), _contentManager.Load<Texture2D>("Content/textures/ball")));
-            IViewFactory viewFactory = container.Resolve<IViewFactory>(new TypedParameter(typeof(ITexture), playerTexture));
+            PlayerSettings playerSettings = container.Resolve<PlayerSettings>(new TypedParameter(typeof(ITexture), playerTexture));
+
+            // Mediator Controllers:
+            _mediatorPlayerController = container.Resolve<MediatorPlayerSettingsController>();
+            _mediatorPhysicsController = container.Resolve<MediatorPhysicsSettingsController>();
+            
             IGameSession gameSession = container.Resolve<IGameSession>();
 
             gameSession.Controllers.Add(container.Resolve<FarseerPhysicsController>());
@@ -213,7 +197,7 @@ namespace Frenetic
         private IPlayer CreateClientComponents(IContainer container)
         {
             // Make local player:
-            IPlayer localPlayer = container.Resolve<Player>(new TypedParameter(typeof(int), 0));
+            IPlayer localPlayer = container.Resolve<IPlayer>(new TypedParameter(typeof(int), 0));
 
             IGameSession gameSession = container.Resolve<IGameSession>();
 
@@ -245,12 +229,10 @@ namespace Frenetic
                             new NamedParameter("messageWindow", new Rectangle((_screenWidth / 2) + 30 + edgeGap, edgeGap, (_screenWidth / 2) - 30 - 2*edgeGap, (_screenHeight / 2) - 2*edgeGap)),
                             new TypedParameter(typeof(ITexture), consoleTexture), new TypedParameter(typeof(IFont), consoleFont)));
             gameSession.Controllers.Add(container.Resolve<GameConsoleController>());
-            // Mediator Controllers:
-            _mediatorPlayerController = container.Resolve<MediatorPlayerSettingsController>();
-
+            
             // TEMP CODE:
             // *********************************************************************************
-            gameSession.Controllers.Add(container.Resolve<DumbRayCasterTestController>());
+            //gameSession.Controllers.Add(container.Resolve<DumbRayCasterTestController>());
 
 
             // DEBUG VIEW:  // TODO: Write a controller for this...
@@ -266,6 +248,7 @@ namespace Frenetic
         }
 
         MediatorPlayerSettingsController _mediatorPlayerController;
+        MediatorPhysicsSettingsController _mediatorPhysicsController;
         #endregion
 
         GraphicsDevice _graphicsDevice;

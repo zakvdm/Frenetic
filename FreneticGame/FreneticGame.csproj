@@ -110,7 +110,6 @@
     <Compile Include="Gameplay\IGameSession.cs" />
     <Compile Include="Gameplay\IPlayer.cs" />
     <Compile Include="Gameplay\IView.cs" />
-    <Compile Include="Gameplay\IViewFactory.cs" />
     <Compile Include="Gameplay\KeyboardPlayerController.cs" />
     <Compile Include="Gameplay\MediatorPlayerSettingsController.cs" />
     <Compile Include="Gameplay\NetworkPlayerController.cs" />
@@ -118,7 +117,6 @@
     <Compile Include="Gameplay\Player.cs" />
     <Compile Include="Gameplay\PlayerSettings.cs" />
     <Compile Include="Gameplay\PlayerView.cs" />
-    <Compile Include="Gameplay\ViewFactory.cs" />
     <Compile Include="Gameplay\World.cs" />
     <Compile Include="Graphics\IFont.cs" />
     <Compile Include="Graphics\ISpriteBatch.cs" />

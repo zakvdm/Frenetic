@@ -8,13 +8,13 @@ namespace Frenetic
     public class GameSessionController : IController
     {
 
-        public GameSessionController(IGameSession gameSession, IIncomingMessageQueue incomingMessageQueue, IOutgoingMessageQueue outgoingMessageQueue, IViewFactory viewFactory, Player.Factory playerFactory, IPlayer localPlayer, ICamera camera, bool isServer)
+        public GameSessionController(IGameSession gameSession, IIncomingMessageQueue incomingMessageQueue, IOutgoingMessageQueue outgoingMessageQueue, Player.Factory playerFactory, PlayerView.Factory playerViewFactory, IPlayer localPlayer, ICamera camera, bool isServer)
         {
             _gameSession = gameSession;
             _incomingMessageQueue = incomingMessageQueue;
             _outgoingMessageQueue = outgoingMessageQueue;
-            _viewFactory = viewFactory;
             _playerFactory = playerFactory;
+            _playerViewFactory = playerViewFactory;
             _localPlayer = localPlayer;
             _camera = camera;
             _isServer = isServer;
@@ -78,7 +78,7 @@ namespace Frenetic
                 int ID = (int)data;
                 IPlayer newPlayer = _playerFactory(ID);
                 _networkPlayerController.Players.Add(ID, newPlayer);
-                _gameSession.Views.Add(_viewFactory.MakePlayerView(newPlayer, _camera));
+                _gameSession.Views.Add(_playerViewFactory(newPlayer));
             }
             while (true)
             {
@@ -87,7 +87,7 @@ namespace Frenetic
                     break;
                 int ID = (int)data;
                 _localPlayer.ID = ID;
-                _gameSession.Views.Add(_viewFactory.MakePlayerView(_localPlayer, _camera));
+                _gameSession.Views.Add(_playerViewFactory(_localPlayer));
             }
 
         }
@@ -96,8 +96,8 @@ namespace Frenetic
         IIncomingMessageQueue _incomingMessageQueue;
         IOutgoingMessageQueue _outgoingMessageQueue;
         bool _isServer = false;
-        IViewFactory _viewFactory;
         Player.Factory _playerFactory;
+        PlayerView.Factory _playerViewFactory;
         IPlayer _localPlayer;
         ICamera _camera;
         NetworkPlayerController _networkPlayerController;
