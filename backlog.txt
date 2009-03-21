@@ -19,24 +19,48 @@ SPRINT 2: Started on 2/02/2009
 DONE - 2 - As the player, when I move the camera follows me so I'm always at the centre of the screen
 	Just calculates a simple transformation matrix (code already implemented). Needs to be given to every IView?
 
-DONE - 2 - Client can move a crosshair around on the screen
-3 - When I click the cursor position is written to the console.
+DONE - 5 -Move crosshair and click to print position
+  DONE Client can move a crosshair around on the screen
+  DONE When I click the cursor position is written to the console.
 
-DONE - 2 - Can exit from Main Menu
-DONE - 1 - Can exit from Gameplay screen 
-TERENCE - 2 - Resources (network sockets) properly disposed on exit 
+DONE - 3 - Can properly exit game
+  DONE - Can exit from Main Menu
+  DONE - Can exit from Gameplay screen
 
-As the client I can bring down the console and type in a command
-DONE - 5 - Console fills half the screen with black, messages can be typed
-ZAK - 5 - Read messages on console, and if valid, change the appropriate setting
+DONE - 5 - Resources (network sockets) properly disposed on exit 
+2 - Can recreate a game session once you've exited a running game
 
-Client types in a message and this message is shown on the screen of all clients connected to the server.
-5 - Messages on console (i.e. not commands) are sent reliably to the server
-3 - Server sends messages reliably to all clients
-2 - Messages are written to the console
+DONE - 13 - As the client I can bring down the console and type in a command
+  DONE - Console fills half the screen with black, messages can be typed
+  DONE - Read messages on console, and if valid, change the appropriate setting
 
+13 - Client types in a message and this message is shown on the screen of all clients connected to the server.
+  Messages on console (i.e. not commands) are sent reliably to the server
+  Server sends messages reliably to all clients
+  Messages are written to the console
 
-******************************COMMITED UP TO HERE FOR SPRINT 2 (32 story points)
+******************************COMMITED UP TO HERE FOR SPRINT 2 (32 sp commited to -- 28 sp completed in about 6 weeks)
+
+*******************************
+SPRINT 3: Started on 21/03/2009
+*******************************
+3 - Console lifetime is changed to match game lifetime (so console can be used during menus and settings are sustained through multiple sessions)
+
+5 - Player settings are synchronized over the network (eg. I can change my player name via the console, and all clients in the current game are notified of this)
+
+CARRIED OVER FROM PREVIOUS SPRINT:
+2 - Can recreate a game session once you've exited a running game
+
+CARRIED OVER FROM PREVIOUS SPRINT:
+13 - Client types in a message and this message is shown on the screen of all clients connected to the server.
+  Messages on console (i.e. not commands) are sent reliably to the server
+  Server sends messages reliably to all clients
+  Messages are written to the console
+
+8 - Player settings are saved over multiple game sessions
+
+******************************COMMITED UP TO HERE FOR SPRINT 3 (31 sp commited to -- x sp completed in about x weeks)
+
 
 20 - As the player, I can click on the screen and fire a railgun at the point where I click.
 	Player clicks somewhere on screen and client sends fire event to Server - 5 - 
@@ -57,7 +81,7 @@ Client types in a message and this message is shown on the screen of all clients
 13 - As the client I can enter an IP address and port number to join a specific game.
 
 8 - As the client, I can reconfigure my keys
-8 - Write chat messages to the screen (not just in console)
+3 - Write chat messages to the screen (not just in console)
 
 5 - Game can be run in fullscreen and windowed mode
 13 - The game is resolution independent
