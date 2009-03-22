@@ -14,7 +14,7 @@ namespace UnitTestLibrary
         public void PlayerNamePropertyRegisteredAndWorks()
         {
             Mediator mediator = new Mediator();
-            PlayerSettings playerSettings = new PlayerSettings(null);
+            PlayerSettings playerSettings = new PlayerSettings();
 
             new MediatorPlayerSettingsController(playerSettings, mediator);
 
@@ -29,7 +29,7 @@ namespace UnitTestLibrary
         public void PlayerColorPropertyRegisteredAndWorks()
         {
             Mediator mediator = new Mediator();
-            PlayerSettings playerSettings = new PlayerSettings(null);
+            PlayerSettings playerSettings = new PlayerSettings();
 
             new MediatorPlayerSettingsController(playerSettings, mediator);
 
@@ -44,7 +44,7 @@ namespace UnitTestLibrary
         public void ColorNotCorruptedByInvalidInput()
         {
             Mediator mediator = new Mediator();
-            PlayerSettings playerSettings = new PlayerSettings(null);
+            PlayerSettings playerSettings = new PlayerSettings();
             Color tmp = playerSettings.Color;
             tmp.R = 10;
             tmp.G = 20;

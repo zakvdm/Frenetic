@@ -179,7 +179,7 @@ namespace Frenetic
         protected override void UnloadContent()
         {
             // Unload content belonging to the screen manager.
-            content.Unload();
+            //content.Unload();
 
             // Tell each of the screens to unload their content.
             foreach (GameScreen screen in screens)

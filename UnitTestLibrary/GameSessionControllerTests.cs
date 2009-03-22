@@ -58,7 +58,7 @@ namespace UnitTestLibrary
         public void HandlesNewPlayerMessageCorrectlyAsClient()
         {
             //var stubNS = MockRepository.GenerateStub<INetworkSession>();
-            PlayerView pv = new PlayerView(null, null, null, null);
+            PlayerView pv = new PlayerView(null, null, null, null, null);
             var stubPlayer = MockRepository.GenerateStub<IPlayer>();
             bool playerFactoryWasUsedCorrectly = false;
             bool playerViewFactoryWasUsedCorrectly = false;
@@ -152,7 +152,7 @@ namespace UnitTestLibrary
         {
             IPlayer localPlayer = MockRepository.GenerateStub<IPlayer>();
             Camera camera = new Camera(localPlayer, new Vector2(1, 2));
-            PlayerView pv = new PlayerView(null, null, null, null);
+            PlayerView pv = new PlayerView(null, null, null, null, null);
             PlayerView.Factory playerViewFactory = x => { if (x == localPlayer) return pv; else return null; };
             var stubIncomingMessageQueue = MockRepository.GenerateStub<IIncomingMessageQueue>();
             var gameSession = new GameSession();

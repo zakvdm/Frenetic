@@ -26,13 +26,15 @@ namespace Frenetic
         const int _screenHeight = 600;
         Vector2 _gravity = new Vector2(0, 2);
 
-        public GameSessionFactory(GraphicsDevice graphicsDevice, ContentManager contentManager, IContainer container)
+        public GameSessionFactory(GraphicsDevice graphicsDevice, ContentManager contentManager, IContainer container, PlayerSettings localPlayerSettings)
         {
             _graphicsDevice = graphicsDevice;
             _contentManager = contentManager;
 
             ClientContainer = container.CreateInnerContainer();
             ServerContainer = container.CreateInnerContainer();
+
+            _localPlayerSettings = localPlayerSettings;
         }
         #region IGameSessionFactory Members
 
@@ -91,14 +93,6 @@ namespace Frenetic
 
         private IPlayer CreateClientComponents(IGameSession gameSession)
         {
-            ITexture playerTexture = ClientContainer.Resolve<ITexture>(new TypedParameter(typeof(Texture2D), _contentManager.Load<Texture2D>("textures/ball")));
-            PlayerSettings playerSettings = ClientContainer.Resolve<PlayerSettings>(new TypedParameter(typeof(ITexture), playerTexture));
-            //IViewFactory viewFactory = ClientContainer.Resolve<IViewFactory>(new TypedParameter(typeof(ITexture), playerTexture));
-
-            // Mediator Controllers:
-            _mediatorPlayerController = ClientContainer.Resolve<MediatorPlayerSettingsController>();
-            _mediatorPhysicsController = ClientContainer.Resolve<MediatorPhysicsSettingsController>();
-
             // Make local player:
             IPlayer localPlayer = ClientContainer.Resolve<IPlayer>(new TypedParameter(typeof(int), 0));
 
@@ -111,6 +105,10 @@ namespace Frenetic
                                             new TypedParameter(typeof(IPlayer), localPlayer),
                                             new TypedParameter(typeof(Vector2), new Vector2(_screenWidth, _screenHeight))
                                             );
+
+            PlayerView localPlayerView = ClientContainer.Resolve<PlayerView>(new TypedParameter(typeof(IPlayer), localPlayer), new TypedParameter(typeof(PlayerSettings), _localPlayerSettings));
+            gameSession.Views.Add(localPlayerView);
+
             gameSession.Controllers.Add(ClientContainer.Resolve<KeyboardPlayerController>(new TypedParameter(typeof(IPlayer), localPlayer)));
             gameSession.Views.Add(ClientContainer.Resolve<NetworkPlayerView>(new TypedParameter(typeof(IPlayer), localPlayer)));
 
@@ -120,18 +118,6 @@ namespace Frenetic
             ITexture crosshairTexture = ClientContainer.Resolve<ITexture>(new TypedParameter(typeof(Texture2D), _contentManager.Load<Texture2D>("Textures/cursor")));
             gameSession.Views.Add(ClientContainer.Resolve<CrosshairView>(new TypedParameter(typeof(ITexture), crosshairTexture)));
 
-            ITexture consoleTexture = ClientContainer.Resolve<ITexture>(new TypedParameter(typeof(Texture2D), _contentManager.Load<Texture2D>("Textures/blank")));
-            IFont consoleFont = ClientContainer.Resolve<IFont>(new TypedParameter(typeof(SpriteFont), _contentManager.Load<SpriteFont>("Fonts/detailsFont")));
-            int edgeGap = 4;
-            int inputWindowHeight = 24;
-            ClientContainer.Resolve<IGameConsole>();
-            gameSession.Views.Add(ClientContainer.Resolve<GameConsoleView>(
-                            new NamedParameter("inputWindow", new Rectangle(edgeGap, _screenHeight - edgeGap - inputWindowHeight, _screenWidth - 2 * edgeGap, inputWindowHeight)),
-                            new NamedParameter("commandWindow", new Rectangle(edgeGap, edgeGap, (_screenWidth / 2) - 30 - edgeGap, _screenHeight - inputWindowHeight - 3 * edgeGap)),
-                            new NamedParameter("messageWindow", new Rectangle((_screenWidth / 2) + 30 + edgeGap, edgeGap, (_screenWidth / 2) - 30 - 2*edgeGap, (_screenHeight / 2) - 2*edgeGap)),
-                            new TypedParameter(typeof(ITexture), consoleTexture), new TypedParameter(typeof(IFont), consoleFont)));
-            gameSession.Controllers.Add(ClientContainer.Resolve<GameConsoleController>());
-            
             // TEMP CODE:
             // *********************************************************************************
             //gameSession.Controllers.Add(ClientContainer.Resolve<DumbRayCasterTestController>());
@@ -161,9 +147,7 @@ namespace Frenetic
         IContainer ClientContainer { get; set; }
         IContainer ServerContainer { get; set; }
 
-        // CAN BE REMOVED?
-        MediatorPlayerSettingsController _mediatorPlayerController;
-        MediatorPhysicsSettingsController _mediatorPhysicsController;
+        PlayerSettings _localPlayerSettings;
     }
 
     public class GameSessionControllerAndView

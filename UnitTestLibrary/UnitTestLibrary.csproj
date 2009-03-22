@@ -94,6 +94,7 @@
     <Compile Include="MediatorTests.cs" />
     <Compile Include="NetworkSessionManagerTests.cs" />
     <Compile Include="OutgoingMessageQueueTests.cs" />
+    <Compile Include="PlayerTextureBankTests.cs" />
     <Compile Include="PlayerViewTests.cs" />
     <Compile Include="WorldBoundaryColliderTests.cs" />
     <Compile Include="GameplayScreenTests.cs" />

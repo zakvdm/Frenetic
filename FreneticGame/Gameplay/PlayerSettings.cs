@@ -6,15 +6,15 @@ namespace Frenetic
 {
     public class PlayerSettings
     {
-        public PlayerSettings(ITexture texture)
+        public PlayerSettings()
         {
-            Texture = texture;
+            Texture = PlayerTextures.Ball;
 
             Random rnd = new Random();
             Color = new Color((float)rnd.NextDouble(), (float)rnd.NextDouble(), (float)rnd.NextDouble());
         }
         public string Name { get; set; }
         public Color Color { get; set; }
-        public ITexture Texture { get; set; }
+        public PlayerTextures Texture { get; set; }
     }
 }

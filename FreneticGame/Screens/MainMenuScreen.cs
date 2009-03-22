@@ -7,7 +7,7 @@ using Microsoft.Xna.Framework.GamerServices;
 
 namespace Frenetic
 {
-    public class MainMenuScreen : MenuScreen, IDisposable
+    public class MainMenuScreen : MenuScreen
     {
         #region State Data
 
@@ -344,16 +344,6 @@ namespace Frenetic
         /// message box.
         /// </summary>
         void FailedMessageBox(object sender, EventArgs e) { }
-        #endregion
-
-
-        #region IDisposable Members
-
-        public void Dispose()
-        {
-            _gameSessionFactory.Dispose();
-        }
-
         #endregion
     }
 }

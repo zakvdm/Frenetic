@@ -91,7 +91,7 @@ namespace Frenetic
                     break;
                 int ID = (int)data;
                 _localPlayer.ID = ID;
-                _gameSession.Views.Add(_playerViewFactory(_localPlayer));
+                //_gameSession.Views.Add(_playerViewFactory(_localPlayer));
             }
 
         }

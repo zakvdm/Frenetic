@@ -118,9 +118,13 @@
     <Compile Include="Gameplay\PlayerSettings.cs" />
     <Compile Include="Gameplay\PlayerView.cs" />
     <Compile Include="Gameplay\World.cs" />
+    <Compile Include="Graphics\IContentManager.cs" />
     <Compile Include="Graphics\IFont.cs" />
     <Compile Include="Graphics\ISpriteBatch.cs" />
     <Compile Include="Graphics\ITexture.cs" />
+    <Compile Include="Graphics\ITextureBank.cs" />
+    <Compile Include="Graphics\XnaTextureBank.cs" />
+    <Compile Include="Graphics\XnaContentManager.cs" />
     <Compile Include="Graphics\XnaFont.cs" />
     <Compile Include="Graphics\XnaSpriteBatch.cs" />
     <Compile Include="Graphics\XnaTexture.cs" />
