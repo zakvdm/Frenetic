@@ -18,7 +18,7 @@ namespace UnitTestLibrary
         [Test]
         public void RequiresAPhysicsComponent()
         {
-            Player player = new Player(1, null, MockRepository.GenerateMock<IBoundaryCollider>());
+            Player player = new Player(1, null, null, MockRepository.GenerateMock<IBoundaryCollider>());
             Assert.IsNotNull(player);
         }
 
@@ -26,7 +26,7 @@ namespace UnitTestLibrary
         public void PositionImplementedInTermsOfPhysicsComponent()
         {
             var stubPhysicsComponent = MockRepository.GenerateStub<IPhysicsComponent>();
-            Player player = new Player(1, stubPhysicsComponent, MockRepository.GenerateMock<IBoundaryCollider>());
+            Player player = new Player(1, null, stubPhysicsComponent, MockRepository.GenerateMock<IBoundaryCollider>());
             stubPhysicsComponent.Position = new Vector2(100, 200);
 
             Assert.AreEqual(new Vector2(100, 200), player.Position);
@@ -36,7 +36,7 @@ namespace UnitTestLibrary
         public void UpdateCallsMoveWithinBoundary()
         {
             var stubBoundaryCollider = MockRepository.GenerateStub<IBoundaryCollider>();
-            Player player = new Player(1, MockRepository.GenerateStub<IPhysicsComponent>(), stubBoundaryCollider);
+            Player player = new Player(1, null, MockRepository.GenerateStub<IPhysicsComponent>(), stubBoundaryCollider);
             stubBoundaryCollider.Stub(x => x.MoveWithinBoundary(Arg<Vector2>.Is.Anything)).Return(player.Position);
 
             player.Update();
@@ -48,7 +48,7 @@ namespace UnitTestLibrary
         public void CanSerialiseAndDeserialisePlayerPosition()
         {
             XmlSerializer serializer = new XmlSerializer(typeof(Player));
-            Player player = new Player(1, null, null);
+            Player player = new Player(1, null, null, null);
             player.Position = new Vector2(100, 200);
             MemoryStream stream = new MemoryStream();
 
@@ -64,7 +64,7 @@ namespace UnitTestLibrary
         {
             XmlSerializer serializer = new XmlSerializer(typeof(Player));
             var stubPhysicsComponent = MockRepository.GenerateStub<IPhysicsComponent>();
-            Player player = new Player(1, stubPhysicsComponent, null);
+            Player player = new Player(1, null, stubPhysicsComponent, null);
             player.Position = new Vector2(100, 200);
             MemoryStream stream = new MemoryStream();
 
@@ -80,7 +80,7 @@ namespace UnitTestLibrary
         public void JumpAppliesTheJumpVectorAsAnImpulseToThePlayersBodyIfCanJumpIsTrue()
         {
             var stubPhysicsComponent = MockRepository.GenerateStub<IPhysicsComponent>();
-            Player player = new Player(1, stubPhysicsComponent, null);
+            Player player = new Player(1, null, stubPhysicsComponent, null);
 
             player.InContactWithLevel = true;
             player.Jump();
@@ -92,7 +92,7 @@ namespace UnitTestLibrary
         public void JumpAppliesNoImpulseToThePlayersBodyIfNotInContactWithTheLevel()
         {
             var stubPhysicsComponent = MockRepository.GenerateStub<IPhysicsComponent>();
-            Player player = new Player(1, stubPhysicsComponent, null);
+            Player player = new Player(1, null, stubPhysicsComponent, null);
 
             player.InContactWithLevel = false;
             player.Jump();
@@ -104,7 +104,7 @@ namespace UnitTestLibrary
         public void MoveLeftAppliesTheCorrectForceToThePlayersBodyWhenStationary()
         {
             var stubPhysicsComponent = MockRepository.GenerateStub<IPhysicsComponent>();
-            Player player = new Player(1, stubPhysicsComponent, null);
+            Player player = new Player(1, null, stubPhysicsComponent, null);
 
             player.MoveLeft();
 
@@ -115,7 +115,7 @@ namespace UnitTestLibrary
         public void MoveRightAppliesTheCorrectForceToThePlayersBodyWhenStationary()
         {
             var stubPhysicsComponent = MockRepository.GenerateStub<IPhysicsComponent>();
-            Player player = new Player(1, stubPhysicsComponent, null);
+            Player player = new Player(1, null, stubPhysicsComponent, null);
 
             player.MoveRight();
 
@@ -126,7 +126,7 @@ namespace UnitTestLibrary
         public void PlayerVelocityIsCappedToTheLeft()
         {
             var stubPhysicsComponent = MockRepository.GenerateStub<IPhysicsComponent>();
-            Player player = new Player(1, stubPhysicsComponent, null);
+            Player player = new Player(1, null, stubPhysicsComponent, null);
 
             stubPhysicsComponent.Stub(spc => spc.LinearVelocity).Return(new Vector2(-50, 0));
 
@@ -139,7 +139,7 @@ namespace UnitTestLibrary
         public void PlayerVelocityIsCappedToTheRight()
         {
             var stubPhysicsComponent = MockRepository.GenerateStub<IPhysicsComponent>();
-            Player player = new Player(1, stubPhysicsComponent, null);
+            Player player = new Player(1, null, stubPhysicsComponent, null);
 
             stubPhysicsComponent.Stub(spc => spc.LinearVelocity).Return(new Vector2(50, 0));
 

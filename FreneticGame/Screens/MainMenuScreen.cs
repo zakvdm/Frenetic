@@ -53,6 +53,7 @@ namespace Frenetic
         private IGameSessionFactory _gameSessionFactory;
         private IScreenFactory _screenFactory;
         private Game _game;
+        private GameplayScreen _gameplayScreen;
 
         #region Initialization
 
@@ -88,10 +89,16 @@ namespace Frenetic
         {
             State = MainMenuState.Network;
 
-            base.Update(gameTime, otherScreenHasFocus, coveredByOtherScreen);
+            if (_gameplayScreen != null)
+            {
+                if (_gameplayScreen.ScreenState == ScreenState.Dead)
+                {
+                    // NOTE: Currently, this gets called over and over when the gamesession ends... This could burn our fingers at some point...
+                    _gameSessionFactory.Dispose();
+                }
+            }
 
-            if (Microsoft.Xna.Framework.Input.Keyboard.GetState().IsKeyDown(Microsoft.Xna.Framework.Input.Keys.B))
-                GC.Collect();
+            base.Update(gameTime, otherScreenHasFocus, coveredByOtherScreen);
         }
 
         /// <summary>
@@ -148,7 +155,9 @@ namespace Frenetic
             var serverGameSessionCandV = _gameSessionFactory.MakeServerGameSession();
             var clientGameSessionCandV = _gameSessionFactory.MakeClientGameSession();
 
-            _screenFactory.MakeGameplayScreen(clientGameSessionCandV, serverGameSessionCandV);
+            _gameplayScreen = _screenFactory.MakeGameplayScreen(clientGameSessionCandV, serverGameSessionCandV);
+
+
 
             #region Old Network Code
             /*
@@ -246,6 +255,9 @@ namespace Frenetic
             _screenFactory.MakeGameplayScreen(clientGameSessionCandV, null);
         }
 
+        #endregion
+
+        #region Unused old network code
         /// <summary>
         /// Start searching for a session of the given type.
         /// </summary>
@@ -344,6 +356,7 @@ namespace Frenetic
         /// message box.
         /// </summary>
         void FailedMessageBox(object sender, EventArgs e) { }
+
         #endregion
     }
 }

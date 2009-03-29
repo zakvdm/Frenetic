@@ -11,17 +11,16 @@ namespace UnitTestLibrary
     [TestFixture]
     public class XmlMessageSerializerTests
     {
-        [Test]
-        public void CanMake()
+        XmlMessageSerializer serializer;
+        [TestFixtureSetUp]
+        public void SetUpFixture()
         {
-            XmlMessageSerializer serializer = new XmlMessageSerializer();
-            Assert.IsNotNull(serializer);
+            serializer = new XmlMessageSerializer();
         }
 
         [Test]
         public void CanSerializeAndDeserializeAMessage()
         {
-            XmlMessageSerializer serializer = new XmlMessageSerializer();
             Message msg = new Message() { Type = MessageType.NewPlayer, Data = 10 };
 
             byte[] serializedMessage = serializer.Serialize(msg);
@@ -33,14 +32,27 @@ namespace UnitTestLibrary
         [Test]
         public void CanSerializeAndDeserializeAMessageWithPlayerAsData()
         {
-            XmlMessageSerializer serializer = new XmlMessageSerializer();
-            Player player = new Player(10, null, null);
+            Player player = new Player(10, null, null, null);
             Message msg = new Message() { Type = MessageType.PlayerData, Data = player };
 
             byte[] serializedMessage = serializer.Serialize(msg);
 
             Message recoveredMessage = serializer.Deserialize(serializedMessage);
             Assert.AreEqual(10, ((Player)recoveredMessage.Data).ID);
+        }
+
+        [Test]
+        public void SerializesPlayerSettingsAlongWithPlayerData()
+        {
+            PlayerSettings playerSettings = new PlayerSettings();
+            playerSettings.Name = "Jean Pant";
+            Player player = new Player(10, playerSettings, null, null);
+            Message msg = new Message() { Type = MessageType.PlayerData, Data = player };
+
+            byte[] serializedMessage = serializer.Serialize(msg);
+
+            Message recoveredMessage = serializer.Deserialize(serializedMessage);
+            Assert.AreEqual("Jean Pant", ((Player)recoveredMessage.Data).Settings.Name);
         }
     }
 }

@@ -14,7 +14,7 @@ namespace Frenetic
 
         #region IController Members
 
-        public void Process(long ticks)
+        public void Process(float ticks)
         {
             _keyboard.Unlock();
 

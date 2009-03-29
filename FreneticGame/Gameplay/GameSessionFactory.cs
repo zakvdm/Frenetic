@@ -24,15 +24,13 @@ namespace Frenetic
     {
         const int _screenWidth = 800;
         const int _screenHeight = 600;
-        Vector2 _gravity = new Vector2(0, 2);
 
-        public GameSessionFactory(GraphicsDevice graphicsDevice, ContentManager contentManager, IContainer container, PlayerSettings localPlayerSettings)
+        public GameSessionFactory(GraphicsDevice graphicsDevice, ContentManager contentManager, IContainer parentContainer, PlayerSettings localPlayerSettings)
         {
             _graphicsDevice = graphicsDevice;
             _contentManager = contentManager;
 
-            ClientContainer = container.CreateInnerContainer();
-            ServerContainer = container.CreateInnerContainer();
+            _parentContainer = parentContainer;
 
             _localPlayerSettings = localPlayerSettings;
         }
@@ -40,6 +38,8 @@ namespace Frenetic
 
         public GameSessionControllerAndView MakeServerGameSession()
         {
+            ServerContainer = _parentContainer.CreateInnerContainer();
+
             // TODO: Move this somewhere more appropriate
             // Make queues for a SERVER network session:
             // *****************************************
@@ -63,6 +63,8 @@ namespace Frenetic
         
         public GameSessionControllerAndView MakeClientGameSession()
         {
+            ClientContainer = _parentContainer.CreateInnerContainer();
+            
             // TODO: Move this somewhere more appropriate
             // Make queues for a CLIENT network session:
             // *****************************************
@@ -94,7 +96,7 @@ namespace Frenetic
         private IPlayer CreateClientComponents(IGameSession gameSession)
         {
             // Make local player:
-            IPlayer localPlayer = ClientContainer.Resolve<IPlayer>(new TypedParameter(typeof(int), 0));
+            IPlayer localPlayer = ClientContainer.Resolve<IPlayer>(new TypedParameter(typeof(int), 0), new TypedParameter(typeof(PlayerSettings), _localPlayerSettings));
 
             gameSession.Controllers.Add(ClientContainer.Resolve<FarseerPhysicsController>());
             Frenetic.Level.Level level = ClientContainer.Resolve<Frenetic.Level.Level>();
@@ -106,7 +108,7 @@ namespace Frenetic
                                             new TypedParameter(typeof(Vector2), new Vector2(_screenWidth, _screenHeight))
                                             );
 
-            PlayerView localPlayerView = ClientContainer.Resolve<PlayerView>(new TypedParameter(typeof(IPlayer), localPlayer), new TypedParameter(typeof(PlayerSettings), _localPlayerSettings));
+            PlayerView localPlayerView = ClientContainer.Resolve<PlayerView>(new TypedParameter(typeof(IPlayer), localPlayer));
             gameSession.Views.Add(localPlayerView);
 
             gameSession.Controllers.Add(ClientContainer.Resolve<KeyboardPlayerController>(new TypedParameter(typeof(IPlayer), localPlayer)));
@@ -136,14 +138,21 @@ namespace Frenetic
 
         public void Dispose()
         {
-            ClientContainer.Dispose();
-            ServerContainer.Dispose();
+            if (ClientContainer != null)
+            {
+                ClientContainer.Dispose();
+            }
+            if (ServerContainer != null)
+            {
+                ServerContainer.Dispose();
+            }
         }
 
         #endregion
 
         GraphicsDevice _graphicsDevice;
         ContentManager _contentManager;
+        IContainer _parentContainer;
         IContainer ClientContainer { get; set; }
         IContainer ServerContainer { get; set; }
 

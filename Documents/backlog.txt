@@ -40,12 +40,12 @@ DONE Console created as singleton service at top level
 DONE Solve the problem with instances of PlayerSettings, PhysicsSettings, etc.
 DONE Solve the problem with player textures... when do they get loaded?
 
-5 - Player settings are synchronized over the network (eg. I can change my player name/color via the console, and all clients in the current game are notified of this)
-ZAK - Figure out how to serialize PlayerSettings with Player
-  Test to see that the synchronization works properly
+DONE - 5 - Player settings are synchronized over the network (eg. I can change my player name/color via the console, and all clients in the current game "see" it)
+DONE - Figure out how to serialize PlayerSettings with Player
+DONE - Test to see that the synchronization works properly
 
 CARRIED OVER FROM PREVIOUS SPRINT:
-2 - Can recreate a game session once you've exited a running game
+DONE - 2 - Can recreate a game session once you've exited a running game
 
 CARRIED OVER FROM PREVIOUS SPRINT:
 13 - Client types in a message and this message is shown on the screen of all clients connected to the server.

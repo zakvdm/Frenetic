@@ -46,15 +46,6 @@ namespace Frenetic.MyConsole.Components
         }
 
 
-        public override void Update(GameTime gameTime)
-        {
-            
-
-
-            base.Update(gameTime);
-        }
-
-
         public override void Draw(GameTime gameTime)
         {
             elapsedTime += (float)gameTime.ElapsedGameTime.TotalSeconds;
@@ -62,9 +53,9 @@ namespace Frenetic.MyConsole.Components
 
             if (elapsedTime >= 1.0f)
             {
-                fps         = totalFrames;
+                fps = totalFrames;
                 totalFrames = 0;
-                elapsedTime = 0;
+                elapsedTime = elapsedTime - 1.0f;
             }
 
             batch.Begin();

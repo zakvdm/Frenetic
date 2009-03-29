@@ -6,7 +6,7 @@ using System.Xml.Serialization;
 
 namespace Frenetic.Network
 {
-    public interface INetworkSession
+    public interface INetworkSession : IDisposable
     {
         void Shutdown(string reason);
         Message ReadMessage();

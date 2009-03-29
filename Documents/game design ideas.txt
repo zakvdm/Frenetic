@@ -4,7 +4,11 @@ NAME IDEAS:
 			1) the name still hints at speed
 			2) i like the potential for visuals (eg shader effects to obscure what's behind player can be kind of spooky...)
 			3) gives the game some narrative (players start as just "phantoms" and as they level up they can customise their character, who slowly gets more and more definite features)
-
+	Spook
+		It's a little less lame than Phantom I think
+			1) I have some idea for the art--the main thing being characters that are deformable and become more "blurry" when you move faster (this will help with the sensation of speed hopefully)
+			2) It can be cute and HD retro
+			3) It suggests a theme
 
 
 
@@ -45,3 +49,7 @@ ACHIEVEMENT SYSTEM:
 	Challenges provide various visual improvements, certain decisions are final (for specific character)
 		e.g. different colours, clothing, dog tags, hairstyles, tatoos, etc. (how big does player have to be for this to be visible?)
 	Weapon challenges also provide strictly aesthetic weapon improvements (to both actual gun and what it shoots)
+
+DEATHS:
+	Random idea, but when a player dies, we could slow time down (this is for the dead player only) and then reverse it and replay the death scene backwards in slow motion... This would probably look *really* cool.) Think of it like the killcam in COD. The player would be able to opt out by hitting fire and they'll respawn immediately.
+	NOTE: This is just one of a few reasons why it'll be cool to have a nice replay system. Another is a main menu simialar to N where you see continuous loops of cool gameplay, and then we can even have live replays of each stage when you get to the level selection stage. Too cool.

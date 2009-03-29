@@ -12,6 +12,8 @@ namespace Frenetic.Physics
             _body = body;
             _geom = geom;
 
+            _geom.FrictionCoefficient = 0.5f;
+
             _geom.OnCollision += new Geom.CollisionEventHandler((geom1, geom2, contactList) =>
                 {
                     CollidedWithWorld();
@@ -49,6 +51,7 @@ namespace Frenetic.Physics
             }
             set
             {
+                // We set all of the vertices individually (not having the factory at our disposal...)
                 for (int i = 0; i < _geom.LocalVertices.Count; i++)
                 {
                     Vector2 vertex = _geom.LocalVertices[i];

@@ -286,7 +286,7 @@ namespace Frenetic
 
             foreach (GameScreen screen in screensToDraw)
             {
-                if (screen.ScreenState == ScreenState.Hidden)
+                if (screen.ScreenState == ScreenState.Hidden || screen.ScreenState == ScreenState.Dead)
                     continue;
 
                 screen.Draw(gameTime);
@@ -348,6 +348,7 @@ namespace Frenetic
 
             screens.Remove(screen);
             screensToUpdate.Remove(screen);
+            screensToDraw.Remove(screen);
         }
 
 

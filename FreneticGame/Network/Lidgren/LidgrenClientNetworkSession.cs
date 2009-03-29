@@ -11,6 +11,11 @@ namespace Frenetic.Network.Lidgren
             _messageSerializer = messageSerializer;
         }
 
+        public void Dispose()
+        {
+            Shutdown("Cleaning up connection.");
+        }
+
         #region IClientNetworkSession Members
 
         public void Join(string IP, int port)

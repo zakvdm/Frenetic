@@ -39,6 +39,10 @@ namespace Frenetic
             graphics.MinimumVertexShaderProfile = ShaderProfile.VS_1_1;
             graphics.MinimumPixelShaderProfile = ShaderProfile.PS_2_0;
 
+            // Disable fixed timestep
+            this.IsFixedTimeStep = false;
+            graphics.SynchronizeWithVerticalRetrace = false;
+
             Content.RootDirectory = "Content";
 
             // initialize the gamer-services component
@@ -52,8 +56,6 @@ namespace Frenetic
 
             // TODO: REMOVE:
             Components.Add(new Frenetic.MyConsole.Components.FPS(this));
-
-            this.IsFixedTimeStep = false;
         }
 
         /// <summary>
@@ -81,7 +83,7 @@ namespace Frenetic
 
         protected override void Update(GameTime gameTime)
         {
-            _consoleController.Process(gameTime.ElapsedGameTime.Ticks);
+            _consoleController.Process((float)gameTime.ElapsedGameTime.TotalMilliseconds);
 
             base.Update(gameTime);
         }
@@ -251,6 +253,6 @@ namespace Frenetic
         IContainer Container { get; set; }
         const int _screenWidth = 800;
         const int _screenHeight = 600;
-        Vector2 _gravity = new Vector2(0, 2);
+        Vector2 _gravity = new Vector2(0, 0.0002f);
     }
 }

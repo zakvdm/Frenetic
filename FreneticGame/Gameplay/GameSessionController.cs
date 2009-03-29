@@ -27,7 +27,7 @@ namespace Frenetic
             _gameSession.Controllers.Add(_networkPlayerController);
         }
         #region IController Members
-        public void Process(long ticks)
+        public void Process(float ticks)
         {
             // Handle GameSession level messages:
             if (_isServer)
@@ -90,8 +90,7 @@ namespace Frenetic
                 if (data == null)
                     break;
                 int ID = (int)data;
-                _localPlayer.ID = ID;
-                //_gameSession.Views.Add(_playerViewFactory(_localPlayer));
+                _localPlayer.ID = ID;   // View already created when _localPlayer was initialized...
             }
 
         }

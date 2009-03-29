@@ -58,7 +58,7 @@ namespace UnitTestLibrary
         public void HandlesNewPlayerMessageCorrectlyAsClient()
         {
             //var stubNS = MockRepository.GenerateStub<INetworkSession>();
-            PlayerView pv = new PlayerView(null, null, null, null, null);
+            PlayerView pv = new PlayerView(null, null, null, null);
             var stubPlayer = MockRepository.GenerateStub<IPlayer>();
             bool playerFactoryWasUsedCorrectly = false;
             bool playerViewFactoryWasUsedCorrectly = false;
@@ -151,19 +151,15 @@ namespace UnitTestLibrary
         public void HandlesSuccessfulJoinMessageCorrectly()
         {
             IPlayer localPlayer = MockRepository.GenerateStub<IPlayer>();
-            Camera camera = new Camera(localPlayer, new Vector2(1, 2));
-            PlayerView pv = new PlayerView(null, null, null, null, null);
-            PlayerView.Factory playerViewFactory = x => { if (x == localPlayer) return pv; else return null; };
             var stubIncomingMessageQueue = MockRepository.GenerateStub<IIncomingMessageQueue>();
             var gameSession = new GameSession();
-            GameSessionController gsc = new GameSessionController(gameSession, stubIncomingMessageQueue, null, null, playerViewFactory, localPlayer, camera, false);
+            GameSessionController gsc = new GameSessionController(gameSession, stubIncomingMessageQueue, null, null, null, localPlayer, null, false);
             queueMH.QueuedMessages.Enqueue(100);
             stubIncomingMessageQueue.Stub(x => x.ReadMessage(Arg<MessageType>.Is.Equal(MessageType.SuccessfulJoin))).Do(queueMH.GetNextQueuedMessage);
 
             gsc.Process(1);
 
-            Assert.AreEqual(1, gameSession.Views.FindAll(x => x.GetType() == typeof(PlayerView)).Count);
-            Assert.IsTrue(gameSession.Views.Contains(pv));
+            Assert.AreEqual(100, localPlayer.ID);
         }
     }
 }

@@ -14,9 +14,9 @@ namespace Frenetic.Physics
 
         #region IController Members
 
-        public void Process(long ticks)
+        public void Process(float ticks)
         {
-            _physicsSimulator.Update(ticks * 0.000001f);
+            _physicsSimulator.Update(ticks);
         }
 
         #endregion

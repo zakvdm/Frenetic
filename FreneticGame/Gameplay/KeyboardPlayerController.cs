@@ -19,12 +19,12 @@ namespace Frenetic
             Mouse = mouse;
             Crosshair = crosshair;
 
-            LastShootTime = long.MinValue;
-            LastJumpTime = long.MinValue;
+            LastShootTime = float.MinValue;
+            LastJumpTime = float.MinValue;
         }
         #region IController Members
         
-        public void Process(long ticks)
+        public void Process(float ticks)
         {
             TotalTicksElapsed += ticks;
 
@@ -56,13 +56,13 @@ namespace Frenetic
             Player.Update();
         }
 
-        internal bool CanShoot(long time)
+        internal bool CanShoot(float time)
         {
             var diff = time - LastShootTime;
             return diff > ShootTimer || diff < 0;
         }
 
-        internal bool CanJump(long time)
+        internal bool CanJump(float time)
         {
             var diff = time - LastJumpTime;
             return diff > JumpTimer || diff < 0;
@@ -70,12 +70,12 @@ namespace Frenetic
 
         #endregion
 
-        private long TotalTicksElapsed { get; set; }
+        private float TotalTicksElapsed { get; set; }
 
-        private long LastShootTime { get; set; }
-        private long LastJumpTime { get; set; }
+        private float LastShootTime { get; set; }
+        private float LastJumpTime { get; set; }
 
-        static long ShootTimer = 2000000;
-        static long JumpTimer = 8000000;
+        static float ShootTimer = 1000;
+        static float JumpTimer = 200;
     }
 }

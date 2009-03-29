@@ -10,10 +10,9 @@ namespace Frenetic
     {
         public delegate PlayerView Factory(IPlayer player);
         
-        public PlayerView(IPlayer player, PlayerSettings playerSettings, ITextureBank<PlayerTextures> playerTextureBank, ISpriteBatch spriteBatch, ICamera camera)
+        public PlayerView(IPlayer player, ITextureBank<PlayerTextures> playerTextureBank, ISpriteBatch spriteBatch, ICamera camera)
         {
             _player = player;
-            _playerSettings = playerSettings;
             _playerTextureBank = playerTextureBank;
             _spriteBatch = spriteBatch;
             _camera = camera;
@@ -23,11 +22,11 @@ namespace Frenetic
         int count = 0;
         public void Generate()
         {
-            ITexture texture = _playerTextureBank[_playerSettings.Texture];
+            ITexture texture = _playerTextureBank[_player.Settings.Texture];
             if (_spriteBatch != null)
             {
                 _spriteBatch.Begin(_camera.TranslationMatrix);
-                _spriteBatch.Draw(texture, _player.Position, null, _playerSettings.Color, 0f,
+                _spriteBatch.Draw(texture, _player.Position, null, _player.Settings.Color, 0f,
                     new Vector2(texture.Width / 2f, texture.Height / 2f),
                     new Vector2(1, 1),
                     SpriteEffects.None, 1f);
@@ -45,7 +44,6 @@ namespace Frenetic
         #endregion
 
         private IPlayer _player;
-        private PlayerSettings _playerSettings;
         private ITextureBank<PlayerTextures> _playerTextureBank;
         private ISpriteBatch _spriteBatch;
         private ICamera _camera;

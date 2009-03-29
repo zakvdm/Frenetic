@@ -14,9 +14,12 @@ namespace Frenetic.Network.Lidgren
             _netClient = netClient;
 
             _netClient.SetMessageTypeEnabled(NetMessageType.ConnectionRejected, true);
+            _netClient.SetMessageTypeEnabled(NetMessageType.BadMessageReceived, true);
+
+#if DEBUG
             _netClient.SetMessageTypeEnabled(NetMessageType.DebugMessage, true);
             _netClient.SetMessageTypeEnabled(NetMessageType.VerboseDebugMessage, true);
-            _netClient.SetMessageTypeEnabled(NetMessageType.BadMessageReceived, true);
+#endif
         }
 
         #region Properties

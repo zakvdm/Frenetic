@@ -21,7 +21,7 @@ namespace Frenetic.Physics
         DumbRayCaster _dumbRayCaster;
         #region IController Members
 
-        public void Process(long ticks)
+        public void Process(float ticks)
         {
             KeyboardState kbState = Microsoft.Xna.Framework.Input.Keyboard.GetState();
 

@@ -10,9 +10,14 @@ namespace Frenetic.Network.Lidgren
         {
             _netServer = netServer;
             _messageSerializer = messageSerializer;
+
+            ActiveConnections = new Dictionary<int, INetConnection>();
         }
 
-
+        public void Dispose()
+        {
+            Shutdown("Cleaning up connection");
+        }
 
         #region IServerNetworkSession Members
 
@@ -81,9 +86,9 @@ namespace Frenetic.Network.Lidgren
                         break;
                     case NetMessageType.StatusChanged:
                         Console.WriteLine("Status for " + sender.ConnectionID.ToString() + " is: " + sender.Status);
-                        if ((sender.Status == NetConnectionStatus.Connected) && (!_connections.ContainsKey(sender.ConnectionID)))
+                        if ((sender.Status == NetConnectionStatus.Connected) && (!ActiveConnections.ContainsKey(sender.ConnectionID)))
                         {
-                            _connections.Add(sender.ConnectionID, sender);
+                            ActiveConnections.Add(sender.ConnectionID, sender);
                             return new Message() { Type = MessageType.NewPlayer, Data = sender.ConnectionID };
                         }
                         break;
@@ -97,14 +102,7 @@ namespace Frenetic.Network.Lidgren
             return null;
         }
 
-        Dictionary<int, INetConnection> _connections = new Dictionary<int, INetConnection>();
-        public Dictionary<int, INetConnection> ActiveConnections
-        {
-            get
-            {
-                return _connections;
-            }
-        }
+        public Dictionary<int, INetConnection> ActiveConnections { get; private set; }
 
         #endregion
 

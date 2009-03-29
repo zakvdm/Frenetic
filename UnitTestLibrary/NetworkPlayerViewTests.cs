@@ -19,7 +19,7 @@ namespace UnitTestLibrary
         public void CanCreate()
         {
             var stubOutgoingMessageQueue = MockRepository.GenerateStub<IOutgoingMessageQueue>();
-            NetworkPlayerView npView = new NetworkPlayerView(new Player(1, null, null), stubOutgoingMessageQueue);
+            NetworkPlayerView npView = new NetworkPlayerView(new Player(1, null, null, null), stubOutgoingMessageQueue);
 
             Assert.IsNotNull(npView);
         }
@@ -28,7 +28,7 @@ namespace UnitTestLibrary
         public void GenerateCallsNetworkSessionSendNetChannelUnreliable()
         {
             var stubOutgoingMessageQueue = MockRepository.GenerateStub<IOutgoingMessageQueue>();
-            NetworkPlayerView npView = new NetworkPlayerView(new Player(1, null, null), stubOutgoingMessageQueue);
+            NetworkPlayerView npView = new NetworkPlayerView(new Player(1, null, null, null), stubOutgoingMessageQueue);
             
             npView.Generate();
 
@@ -39,7 +39,7 @@ namespace UnitTestLibrary
         public void GenerateSendsPlayer()
         {
             var stubOutgoingMessageQueue = MockRepository.GenerateStub<IOutgoingMessageQueue>();
-            Player player = new Player(1, null, null);
+            Player player = new Player(1, null, null, null);
             player.Position = new Vector2(100, 200);
             NetworkPlayerView npView = new NetworkPlayerView(player, stubOutgoingMessageQueue);
 
@@ -52,7 +52,7 @@ namespace UnitTestLibrary
         public void GenerateDoesNothingIfPlayerNotYetConnectedToNetworkSession()
         {
             var stubOutgoingMessageQueue = MockRepository.GenerateStub<IOutgoingMessageQueue>();
-            Player player = new Player(1, null, null);
+            Player player = new Player(1, null, null, null);
             player.ID = 0;
             NetworkPlayerView npView = new NetworkPlayerView(player, stubOutgoingMessageQueue);
 

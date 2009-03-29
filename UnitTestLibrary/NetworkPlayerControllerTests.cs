@@ -16,14 +16,14 @@ namespace UnitTestLibrary
     public class NetworkPlayerControllerTests
     {
         IIncomingMessageQueue stubIncomingMessageQueue;
-        NetworkPlayerController npController;
+        NetworkPlayerController networkPlayerController;
         QueuedMessageHelper<object, MessageType> queueMessageHelper;
         [SetUp]
         public void SetUp()
         {
             stubIncomingMessageQueue = MockRepository.GenerateStub<IIncomingMessageQueue>();
-            npController = new NetworkPlayerController(stubIncomingMessageQueue);
-            npController.Players.Add(1, new Player(1, null, null));
+            networkPlayerController = new NetworkPlayerController(stubIncomingMessageQueue);
+            networkPlayerController.Players.Add(1, new Player(1, new PlayerSettings(), null, null));
 
             queueMessageHelper = new QueuedMessageHelper<object, MessageType>();
         }
@@ -33,7 +33,7 @@ namespace UnitTestLibrary
         {
             stubIncomingMessageQueue.Stub(x => x.ReadMessage(Arg<MessageType>.Is.Anything)).Return(null);
 
-            npController.Process(1);
+            networkPlayerController.Process(1);
 
             stubIncomingMessageQueue.AssertWasCalled(x => x.ReadMessage(MessageType.PlayerData));
         }
@@ -41,52 +41,66 @@ namespace UnitTestLibrary
         [Test]
         public void UpdatesPositionBasedOnMessage()
         {
-            Player receivedPlayer = new Player(1, null, null);
+            Player receivedPlayer = new Player(1, null, null, null);
             receivedPlayer.Position = new Vector2(100, 200);
             queueMessageHelper.QueuedMessages.Enqueue(receivedPlayer);
             stubIncomingMessageQueue.Stub(x => x.ReadMessage(Arg<MessageType>.Is.Equal(MessageType.PlayerData))).Do(queueMessageHelper.GetNextQueuedMessage);
-            npController.Players[1].Position = Vector2.Zero;
+            networkPlayerController.Players[1].Position = Vector2.Zero;
 
-            npController.Process(1);
+            networkPlayerController.Process(1);
 
-            Assert.AreEqual(new Vector2(100, 200), npController.Players[1].Position);
+            Assert.AreEqual(new Vector2(100, 200), networkPlayerController.Players[1].Position);
+        }
+
+        [Test]
+        public void UpdatesPlayerSettingsBasedOnMessage()
+        {
+            PlayerSettings playerSettings = new PlayerSettings() { Name = "Test Name" };
+            Player receivedPlayer = new Player(1, playerSettings, null, null);
+            queueMessageHelper.QueuedMessages.Enqueue(receivedPlayer);
+            stubIncomingMessageQueue.Stub(x => x.ReadMessage(Arg<MessageType>.Is.Equal(MessageType.PlayerData))).Do(queueMessageHelper.GetNextQueuedMessage);
+            networkPlayerController.Players[1].Settings.Name = "Nom de Plume";
+
+            networkPlayerController.Process(1);
+
+            Assert.AreEqual("Test Name", networkPlayerController.Players[1].Settings.Name);
         }
 
         [Test]
         public void UpdatesAllPlayersFromQueue()
         {
-            Player receivedPlayer1 = new Player(1, null, null);
-            Player receivedPlayer2 = new Player(2, null, null);
+            Player receivedPlayer1 = new Player(1, null, null, null);
+            Player receivedPlayer2 = new Player(2, null, null, null);
             receivedPlayer1.Position = new Vector2(100, 100);
             receivedPlayer2.Position = new Vector2(-100, -100);
             queueMessageHelper.QueuedMessages.Enqueue(receivedPlayer1);
             queueMessageHelper.QueuedMessages.Enqueue(receivedPlayer2);
             stubIncomingMessageQueue.Stub(x => x.ReadMessage(Arg<MessageType>.Is.Anything)).Do(queueMessageHelper.GetNextQueuedMessage);
-            npController.Players.Add(2, new Player(2, null, null));
-            npController.Players[1].Position = Vector2.Zero;
-            npController.Players[2].Position = Vector2.Zero;
+            networkPlayerController.Players.Add(2, new Player(2, null, null, null));
+            networkPlayerController.Players[1].Position = Vector2.Zero;
+            networkPlayerController.Players[2].Position = Vector2.Zero;
 
-            npController.Process(1);
+            networkPlayerController.Process(1);
 
-            Assert.AreEqual(new Vector2(100, 100), npController.Players[1].Position);
-            Assert.AreEqual(new Vector2(-100, -100), npController.Players[2].Position);
+            Assert.AreEqual(new Vector2(100, 100), networkPlayerController.Players[1].Position);
+            Assert.AreEqual(new Vector2(-100, -100), networkPlayerController.Players[2].Position);
         }
 
         [Test]
         public void DoesntCrashOnUnknownPlayer()
         {
-            Player receivedPlayer1 = new Player(1, null, null);
-            Player receivedPlayer2 = new Player(2, null, null);
+            Player receivedPlayer1 = new Player(1, null, null, null);
+            Player receivedPlayer2 = new Player(2, null, null, null);
             receivedPlayer1.Position = new Vector2(100, 100);
             receivedPlayer2.Position = new Vector2(-100, -100);
             queueMessageHelper.QueuedMessages.Enqueue(receivedPlayer1);
             queueMessageHelper.QueuedMessages.Enqueue(receivedPlayer2);
             stubIncomingMessageQueue.Stub(x => x.ReadMessage(Arg<MessageType>.Is.Anything)).Do(queueMessageHelper.GetNextQueuedMessage);
-            npController.Players[1].Position = Vector2.Zero;
+            networkPlayerController.Players[1].Position = Vector2.Zero;
 
-            npController.Process(1);
+            networkPlayerController.Process(1);
 
-            Assert.AreEqual(new Vector2(100, 100), npController.Players[1].Position);
+            Assert.AreEqual(new Vector2(100, 100), networkPlayerController.Players[1].Position);
         }
     }
 }

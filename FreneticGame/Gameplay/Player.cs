@@ -10,7 +10,7 @@ namespace Frenetic
     {
         public delegate IPlayer Factory(int ID);
 
-        public Player(int ID, IPhysicsComponent physicsComponent, IBoundaryCollider boundaryCollider)
+        public Player(int ID, PlayerSettings playerSettings, IPhysicsComponent physicsComponent, IBoundaryCollider boundaryCollider)
         {
             if (physicsComponent == null)
                 _physicsComponent = new DummyPhysicsComponent();
@@ -20,6 +20,7 @@ namespace Frenetic
             _physicsComponent.CollidedWithWorld += () => InContactWithLevel = true;
 
             this.ID = ID;
+            Settings = playerSettings;
             _boundaryCollider = boundaryCollider;
 
             Position = new Vector2(400, 100);
@@ -28,6 +29,8 @@ namespace Frenetic
         {
             _physicsComponent = new DummyPhysicsComponent();
         } // For XmlSerializer
+
+        public PlayerSettings Settings { get; set; }
 
         public Vector2 Position
         {
@@ -83,10 +86,9 @@ namespace Frenetic
         IPhysicsComponent _physicsComponent;
         IBoundaryCollider _boundaryCollider;
 
-        public static Vector2 JumpImpulse = new Vector2(0, -300000);
-        public static Vector2 MoveForce = new Vector2(-2000, 0);
-        static float MaxSpeed = 30;
-        static long JumpTimer = 8000000;
+        public static Vector2 JumpImpulse = new Vector2(0, -3000);
+        public static Vector2 MoveForce = new Vector2(-0.2f, 0);
+        static float MaxSpeed = 10;
 
         public int ID { get; set; }
         
