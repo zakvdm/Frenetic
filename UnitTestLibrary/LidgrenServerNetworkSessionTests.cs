@@ -4,12 +4,33 @@ using Rhino.Mocks;
 using Frenetic.Network.Lidgren;
 using Lidgren.Network;
 using Frenetic.Network;
+using Autofac.Builder;
 
 namespace UnitTestLibrary
 {
     [TestFixture]
     public class LidgrenServerNetworkSessionTests
     {
+        [Test]
+        public void CanBuildNetworkSessionsWithAutofac()
+        {
+            var builder = new ContainerBuilder();
+            builder.Register(MockRepository.GenerateStub<INetServer>()).SingletonScoped();
+            builder.Register(MockRepository.GenerateStub<INetClient>()).SingletonScoped();
+            builder.Register(x => new NetConfiguration("Frenetic")).FactoryScoped();
+            builder.Register<LidgrenServerNetworkSession>();
+            builder.Register<LidgrenClientNetworkSession>();
+            builder.Register(MockRepository.GenerateStub<IMessageSerializer>()).SingletonScoped();
+
+            var container = builder.Build();
+
+            var serverNetworkSession = container.Resolve<LidgrenServerNetworkSession>();
+            Assert.IsNotNull(serverNetworkSession);
+
+            var clientNetworkSession = container.Resolve<LidgrenClientNetworkSession>();
+            Assert.IsNotNull(clientNetworkSession);
+        }
+
         XmlMessageSerializer _serializer = new XmlMessageSerializer();
 
         [Test]

@@ -10,7 +10,7 @@ namespace Frenetic.Level
         }
         #region IController Members
 
-        public void Process(float ticks)
+        public void Process(float elapsedTime)
         {
             if (!_level.Loaded)
                 _level.Load();

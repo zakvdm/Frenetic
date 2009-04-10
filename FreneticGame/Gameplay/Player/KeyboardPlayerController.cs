@@ -23,17 +23,17 @@ namespace Frenetic
             LastJumpTime = float.MinValue;
         }
         #region IController Members
-        
-        public void Process(float ticks)
-        {
-            TotalTicksElapsed += ticks;
 
-            if (Keyboard.IsKeyDown(Keys.Space) && CanJump(TotalTicksElapsed))
+        public void Process(float elapsedTime)
+        {
+            TotalElapsedTime += elapsedTime;
+
+            if (Keyboard.IsKeyDown(Keys.Space) && CanJump(TotalElapsedTime))
             {
                 var jumped = Player.Jump();
                 if (jumped)
                 {
-                    LastJumpTime = TotalTicksElapsed;
+                    LastJumpTime = TotalElapsedTime;
                 }
             }
 
@@ -47,10 +47,10 @@ namespace Frenetic
                 Player.MoveRight();
             }
 
-            if (Mouse.LeftButtonIsDown() && CanShoot(TotalTicksElapsed))
+            if (Mouse.LeftButtonIsDown() && CanShoot(TotalElapsedTime))
             {
                 Player.Shoot(Crosshair.WorldPosition);
-                LastShootTime = TotalTicksElapsed;
+                LastShootTime = TotalElapsedTime;
             }
 
             Player.Update();
@@ -70,12 +70,12 @@ namespace Frenetic
 
         #endregion
 
-        private float TotalTicksElapsed { get; set; }
+        private float TotalElapsedTime { get; set; }
 
         private float LastShootTime { get; set; }
         private float LastJumpTime { get; set; }
 
-        static float ShootTimer = 1000;
+        static float ShootTimer = 250;
         static float JumpTimer = 200;
     }
 }

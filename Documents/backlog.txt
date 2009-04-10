@@ -49,9 +49,12 @@ DONE - 2 - Can recreate a game session once you've exited a running game
 
 CARRIED OVER FROM PREVIOUS SPRINT:
 13 - Client types in a message and this message is shown on the screen of all clients connected to the server.
-  Messages on console (i.e. not commands) are sent reliably to the server
+  Message on console (i.e. whatever's not a command) is sent reliably to the server
   Server sends messages reliably to all clients
-  Messages are written to the console
+  Messages are written to the console with the client name
+
+TODO: Change the client authentication model to be more like the q3 model (everything done unreliably).
+TODO: Add some kind of logging framework (so we can start doing debug output, etc.)
 
 8 - Player settings are saved over multiple game sessions
 

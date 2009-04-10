@@ -1,27 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Frenetic.UserInput;
 
 namespace Frenetic
 {
-    public class GameConsole : IGameConsole
+    public class CommandConsole : ICommandConsole
     {
-        public GameConsole(IMediator mediator)
+        public CommandConsole(IMediator mediator, MessageLog commandLog)
         {
             _mediator = mediator;
 
             Active = false;
-            CommandLog = new List<string>();
-            MessageLog = new List<string>();
-            CurrentInput = "";
+            Log = commandLog;
         }
 
-        public void ProcessInput()
+        public void ProcessInput(string input)
         {
-            if ((CurrentInput.Length > 0) && CurrentInput.StartsWith("/"))
+            if ((input.Length > 0) && input.StartsWith("/"))
             {
-                string commandLine = CurrentInput.Substring(1); // Remove the "/"
-                string[] pieces = commandLine.Split(new char[]{' '}, StringSplitOptions.RemoveEmptyEntries);
+                string commandLine = input.Substring(1); // Remove the "/"
+                string[] pieces = commandLine.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
                 if (pieces.Length > 1)
                 {
                     _mediator.Do(pieces[0], String.Join(" ", pieces, 1, pieces.Length - 1));
@@ -30,63 +29,59 @@ namespace Frenetic
                 {
                     _mediator.Get(pieces[0]);
                 }
-                CommandLog.Add(commandLine);
+                Log.AddMessage(commandLine);
             }
-            else
-                MessageLog.Add(CurrentInput);
-
-            CurrentInput = "";
         }
 
-        public List<string> FindPossibleInputCompletions()
+        public MessageLog FindPossibleInputCompletions(string input)
         {
             // Early outs:
-            if (CurrentInput.Length == 0 || _mediator.AvailableCommands.Count == 0)
+            if (input.Length == 0 || _mediator.AvailableCommands.Count == 0)
                 return null;
 
-            string searchString = CurrentInput.ToLower();
+            string searchString = input.ToLower();
 
             if (searchString.StartsWith("/"))
                 searchString = searchString.Substring(1);
             
-            return (from command in _mediator.AvailableCommands
+            return new MessageLog((from command in _mediator.AvailableCommands
                         where (command.ToString().Length >= searchString.Length)
                         where (command.ToString().Substring(0, searchString.Length).ToLower() == searchString)
-                        select command).ToList<string>();
+                        select command).ToList<string>());
         }
 
-        public void TryToCompleteCurrentInput()
+        public string TryToCompleteInput(string input)
         {
-            List<string> possibleCommands = FindPossibleInputCompletions();
+            var possibleCommands = FindPossibleInputCompletions(input);
 
             if (possibleCommands == null)
-                return;
+                return input;
 
             if (possibleCommands.Count == 1)
             {
-                CurrentInput = possibleCommands[0].ToString() + " ";
+                input = possibleCommands[0].ToString() + " ";
             }
             else if (possibleCommands.Count > 1)
             {
                 string possibleCompletion = possibleCommands[0].ToString();
-                int index = CurrentInput.Length;
+                int index = input.Length;
                 while (possibleCommands.TrueForAll(command => command.ToString()[index] == possibleCompletion[index]))
                 {
                     index++;
                 }
-                CurrentInput = possibleCompletion.Substring(0, index);
+                input = possibleCompletion.Substring(0, index);
                 
             }
             
             // Once we try to complete, we can safely prepend "/" since this is intended to be a command
-            if (!CurrentInput.StartsWith("/"))
-                CurrentInput = "/" + CurrentInput;
+            if (!input.StartsWith("/"))
+                input = "/" + input;
+
+            return input;
         }
 
-        public string CurrentInput { get; set; }
         public bool Active { get; set; }
-        public List<string> CommandLog { get; set; }
-        public List<string> MessageLog { get; set; }
+        public MessageLog Log { get; set; }
 
         IMediator _mediator;
     }

@@ -72,7 +72,7 @@ namespace Frenetic
 
             // Console:
             _consoleView = CreateConsoleView();
-            _consoleController = Container.Resolve<GameConsoleController>();
+            _consoleController = Container.Resolve<ConsoleController>();
 
             CreateMediatorControllers();
 
@@ -110,13 +110,13 @@ namespace Frenetic
             base.Dispose(disposing);
         }
 
-        GameConsoleView CreateConsoleView()
+        ConsoleView CreateConsoleView()
         {
             ITexture consoleTexture = Container.Resolve<ITexture>(new TypedParameter(typeof(Texture2D), Content.Load<Texture2D>("Textures/blank")));
             IFont consoleFont = Container.Resolve<IFont>(new TypedParameter(typeof(SpriteFont), Content.Load<SpriteFont>("Fonts/detailsFont")));
             int edgeGap = 4;
             int inputWindowHeight = 24;
-            return Container.Resolve<GameConsoleView>(
+            return Container.Resolve<ConsoleView>(
                             new NamedParameter("inputWindow", new Rectangle(edgeGap, _screenHeight - edgeGap - inputWindowHeight, _screenWidth - 2 * edgeGap, inputWindowHeight)),
                             new NamedParameter("commandWindow", new Rectangle(edgeGap, edgeGap, (_screenWidth / 2) - 30 - edgeGap, _screenHeight - inputWindowHeight - 3 * edgeGap)),
                             new NamedParameter("messageWindow", new Rectangle((_screenWidth / 2) + 30 + edgeGap, edgeGap, (_screenWidth / 2) - 30 - 2 * edgeGap, (_screenHeight / 2) - 2 * edgeGap)),
@@ -169,6 +169,16 @@ namespace Frenetic
             builder.Register<IncomingMessageQueue>().As<IIncomingMessageQueue>().ContainerScoped();
             builder.Register<OutgoingMessageQueue>().As<IOutgoingMessageQueue>().ContainerScoped();
             builder.Register<XmlMessageSerializer>().As<IMessageSerializer>().ContainerScoped();
+
+            builder.Register<Client>().ContainerScoped();
+
+            builder.Register<ClientInputSender>().ContainerScoped();
+            builder.Register<ClientInputProcessor>().ContainerScoped();
+
+            builder.Register<ClientStateTracker>().As<IClientStateTracker>().ContainerScoped();
+            builder.Register<SnapCounter>().As<ISnapCounter>().ContainerScoped();
+            builder.Register<ChatLogDiffer>().As<IChatLogDiffer>().ContainerScoped();
+            builder.Register<ChatLogArchive>().As<IChatLogArchive>().ContainerScoped();
             #endregion
 
             #region Graphics
@@ -215,9 +225,13 @@ namespace Frenetic
 
             #region Console
             builder.Register<Mediator>().As<IMediator>().SingletonScoped();
-            builder.Register<GameConsole>().As<IGameConsole>().SingletonScoped();
-            builder.Register<GameConsoleView>().SingletonScoped();
-            builder.Register<GameConsoleController>().SingletonScoped();
+            builder.Register<CommandConsole>().As<ICommandConsole>().SingletonScoped();
+            builder.Register<MessageConsole>().As<IMessageConsole>().SingletonScoped();
+            builder.Register<ConsoleView>().SingletonScoped();
+            builder.Register<ConsoleController>().SingletonScoped();
+            builder.Register<MessageLog>().FactoryScoped();
+            builder.Register<ServerChatLogView>().ContainerScoped();
+            builder.Register<ClientChatLogController>().ContainerScoped();
             #endregion
 
             #region Mediator Controllers
@@ -243,13 +257,17 @@ namespace Frenetic
             // MOUSE:
             builder.Register<FreneticMouse>().As<IMouse>().SingletonScoped();
 
+            // TEMP:
+            #region Network Views
+            #endregion
+
 
             return builder.Build();
         }
 
         MainMenuScreen MainMenuScreen { get; set; }
-        GameConsoleView _consoleView;
-        GameConsoleController _consoleController;
+        ConsoleView _consoleView;
+        ConsoleController _consoleController;
         IContainer Container { get; set; }
         const int _screenWidth = 800;
         const int _screenHeight = 600;

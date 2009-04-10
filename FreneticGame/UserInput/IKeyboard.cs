@@ -75,18 +75,8 @@ namespace Frenetic.UserInput
 
         public IEnumerator GetEnumerator()
         {
-            //return new AlphaNumericKeysEnumerator();
             for (int i = 0; i < _keys.Length; i++)
                 yield return _keys[i];
-        }
-
-        #endregion
-
-        #region IEnumerable Members
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
         }
 
         #endregion

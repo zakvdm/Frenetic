@@ -6,7 +6,7 @@ namespace Frenetic.Level
 {
     public class DumbLevelLoader : ILevelLoader
     {
-        private const int BOUNDARY = 50;
+        public const int BOUNDARY = 50;
         public DumbLevelLoader(LevelPiece.Factory levelPieceFactory)
         {
             _levelPieceFactory = levelPieceFactory;

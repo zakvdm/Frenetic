@@ -15,7 +15,7 @@ namespace Frenetic
             _incomingMessageQueue = incomingMessageQueue;
         }
 
-        public void Process(float ticks)
+        public void Process(float elapsedTime)
         {
             while (true)
             {

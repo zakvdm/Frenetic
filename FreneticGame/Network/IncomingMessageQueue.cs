@@ -13,11 +13,22 @@ namespace Frenetic.Network
             InitializeQueues();
         }
 
+        public Message ReadWholeMessage(MessageType type)
+        {
+            ProcessMessages();
+
+            if (_data[type].Count == 0)
+                return null;
+
+            return _data[type].Dequeue();
+        }
+
         private void InitializeQueues()
         {
+            // Make a queue for every possible message type
             foreach (MessageType type in Enum.GetValues(typeof(MessageType)))
             {
-                _data.Add(type, new Queue<object>());
+                _data.Add(type, new Queue<Message>());
             }
         }
 
@@ -28,24 +39,25 @@ namespace Frenetic.Network
             if (_data[type].Count == 0)
                 return null;
 
-            return _data[type].Dequeue();
+            return _data[type].Dequeue().Data;
         }
 
         private void ProcessMessages()
         {
+            // Read all incoming messages and sort them by MessageType
             Message msg;
             do
             {
                 msg = _networkSession.ReadMessage();
                 if (msg != null)
                 {
-                    _data[msg.Type].Enqueue(msg.Data);
+                    _data[msg.Type].Enqueue(msg);
                 }
             }
             while (msg != null);
         }
 
-        Dictionary<MessageType, Queue<object>> _data = new Dictionary<MessageType,Queue<object>>();
+        Dictionary<MessageType, Queue<Message>> _data = new Dictionary<MessageType,Queue<Message>>();
         INetworkSession _networkSession;
     }
 }

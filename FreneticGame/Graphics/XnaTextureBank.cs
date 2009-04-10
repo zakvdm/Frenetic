@@ -34,6 +34,5 @@ namespace Frenetic.Graphics
         }
 
         IContentManager _contentManager;
-        Type _textureEnum;
     }
 }

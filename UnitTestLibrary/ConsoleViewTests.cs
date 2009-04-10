@@ -10,14 +10,27 @@ using System.Collections.Generic;
 namespace UnitTestLibrary
 {
     [TestFixture]
-    public class GameConsoleViewTests
+    public class ConsoleViewTests
     {
         [Test]
-        public void OnlyDrawsConsoleWhenItsActive()
+        public void OnlyDrawsCommandConsoleWhenItsActive()
         {
-            GameConsole console = new GameConsole(null);
+            CommandConsole console = new CommandConsole(null, null);
             var stubSpriteBatch = MockRepository.GenerateStub<ISpriteBatch>();
-            GameConsoleView consoleView = new GameConsoleView(console, new Rectangle(), new Rectangle(), new Rectangle(), stubSpriteBatch, null, null);
+            ConsoleView consoleView = new ConsoleView(console, MockRepository.GenerateStub<IMessageConsole>(), null, new Rectangle(), new Rectangle(), new Rectangle(), stubSpriteBatch, null, null);
+
+            console.Active = false;
+            consoleView.Generate();
+
+            stubSpriteBatch.AssertWasNotCalled(x => x.Draw(Arg<ITexture>.Is.Anything, Arg<Rectangle>.Is.Anything, Arg<Color>.Is.Anything, Arg<float>.Is.Anything));
+        }
+
+        [Test]
+        public void OnlyDrawsMessageConsoleWhenItsActive()
+        {
+            MessageConsole console = new MessageConsole(null, null);
+            var stubSpriteBatch = MockRepository.GenerateStub<ISpriteBatch>();
+            ConsoleView consoleView = new ConsoleView(MockRepository.GenerateStub<ICommandConsole>(), console, null, new Rectangle(), new Rectangle(), new Rectangle(), stubSpriteBatch, null, null);
 
             console.Active = false;
             consoleView.Generate();
@@ -28,12 +41,12 @@ namespace UnitTestLibrary
         [Test]
         public void DrawsCommandLogWindow()
         {
-            GameConsole console = new GameConsole(null);
+            var stubCommandConsole = MockRepository.GenerateStub<ICommandConsole>();
             var stubSpriteBatch = MockRepository.GenerateStub<ISpriteBatch>();
             var stubTexture = MockRepository.GenerateStub<ITexture>();
-            GameConsoleView consoleView = new GameConsoleView(console, new Rectangle(), new Rectangle(0, 0, 1, 1), new Rectangle(), stubSpriteBatch, stubTexture, null);
+            ConsoleView consoleView = new ConsoleView(stubCommandConsole, MockRepository.GenerateStub<IMessageConsole>(), new ConsoleController(null, null, null), new Rectangle(), new Rectangle(0, 0, 1, 1), new Rectangle(), stubSpriteBatch, stubTexture, null);
 
-            console.Active = true;
+            stubCommandConsole.Active = true;
             consoleView.Generate();
 
             stubSpriteBatch.AssertWasCalled(x => x.Begin());
@@ -45,12 +58,12 @@ namespace UnitTestLibrary
         [Test]
         public void DrawsMessageLogWindow()
         {
-            GameConsole console = new GameConsole(null);
+            MessageConsole console = new MessageConsole(new MessageLog(), null);
             var stubSpriteBatch = MockRepository.GenerateStub<ISpriteBatch>();
             var stubTexture = MockRepository.GenerateStub<ITexture>();
-            GameConsoleView consoleView = new GameConsoleView(console, new Rectangle(), new Rectangle(), new Rectangle(0, 0, 100, 200), stubSpriteBatch, stubTexture, null);
+            ConsoleView consoleView = new ConsoleView(MockRepository.GenerateStub<ICommandConsole>(), console, new ConsoleController(null, null, null), new Rectangle(), new Rectangle(), new Rectangle(0, 0, 100, 200), stubSpriteBatch, stubTexture, null);
             console.Active = true;
-            console.MessageLog.Add("message1"); // Won't draw an empty window...
+            console.Log.AddMessage("message1"); // Won't draw an empty window...
 
             consoleView.Generate();
 
@@ -59,14 +72,29 @@ namespace UnitTestLibrary
         }
 
         [Test]
+        public void CallsBeginAndEndWhenDrawingMessageLogWindow()
+        {
+            MessageConsole console = new MessageConsole(new MessageLog(), null);
+            var stubSpriteBatch = MockRepository.GenerateStub<ISpriteBatch>();
+            ConsoleView consoleView = new ConsoleView(MockRepository.GenerateStub<ICommandConsole>(), console, new ConsoleController(null, null, null), new Rectangle(), new Rectangle(), new Rectangle(), stubSpriteBatch, null, null);
+            console.Active = true;
+            console.Log.AddMessage("message 1");
+
+            consoleView.Generate();
+
+            stubSpriteBatch.AssertWasCalled(x => x.Begin());
+            stubSpriteBatch.AssertWasCalled(x => x.End());
+        }
+
+        [Test]
         public void OnlyDrawsMessageWindowWhenThereAreMessages()
         {
-            GameConsole console = new GameConsole(null);
+            MessageConsole console = new MessageConsole(new MessageLog(), null);
             var stubSpriteBatch = MockRepository.GenerateStub<ISpriteBatch>();
             var stubTexture = MockRepository.GenerateStub<ITexture>();
-            GameConsoleView consoleView = new GameConsoleView(console, new Rectangle(), new Rectangle(), new Rectangle(0, 0, 100, 200), stubSpriteBatch, stubTexture, null);
-
+            ConsoleView consoleView = new ConsoleView(MockRepository.GenerateStub<ICommandConsole>(), console, new ConsoleController(null, null, null), new Rectangle(), new Rectangle(), new Rectangle(0, 0, 100, 200), stubSpriteBatch, stubTexture, null);
             console.Active = true;
+
             consoleView.Generate();
 
             stubSpriteBatch.AssertWasNotCalled(x => x.Draw(Arg<ITexture>.Is.Equal(stubTexture),
@@ -76,11 +104,11 @@ namespace UnitTestLibrary
         [Test]
         public void DrawsInputWindow()
         {
-            GameConsole console = new GameConsole(null);
+            var stubCommandConsole = MockRepository.GenerateStub<ICommandConsole>();
             var stubSpriteBatch = MockRepository.GenerateStub<ISpriteBatch>();
             var stubTexture = MockRepository.GenerateStub<ITexture>();
-            GameConsoleView consoleView = new GameConsoleView(console, new Rectangle(10, 20, 100, 200), new Rectangle(), new Rectangle(), stubSpriteBatch, stubTexture, null);
-            console.Active = true;
+            ConsoleView consoleView = new ConsoleView(stubCommandConsole, MockRepository.GenerateStub<IMessageConsole>(), new ConsoleController(null, null, null), new Rectangle(10, 20, 100, 200), new Rectangle(), new Rectangle(), stubSpriteBatch, stubTexture, null);
+            stubCommandConsole.Active = true;
 
             consoleView.Generate();
 
@@ -91,16 +119,15 @@ namespace UnitTestLibrary
         [Test]
         public void DrawsCurrentInput()
         {
-            var stubMediator = MockRepository.GenerateStub<IMediator>();
-            stubMediator.Stub(x => x.AvailableCommands).Return(new List<string>());
-            IGameConsole stubConsole = new GameConsole(stubMediator);
+            ConsoleController consoleController = new ConsoleController(null, null, null);
+            var stubConsole = MockRepository.GenerateStub<ICommandConsole>();
             var stubSpriteBatch = MockRepository.GenerateStub<ISpriteBatch>();
             var stubFont = MockRepository.GenerateStub<IFont>();
-            GameConsoleView consoleView = new GameConsoleView(stubConsole, new Rectangle(10, 20, 100, 200), new Rectangle(), new Rectangle(), stubSpriteBatch, null, stubFont);
+            ConsoleView consoleView = new ConsoleView(stubConsole, MockRepository.GenerateStub<IMessageConsole>(), consoleController, new Rectangle(10, 20, 100, 200), new Rectangle(), new Rectangle(), stubSpriteBatch, null, stubFont);
 
             stubConsole.Active = true;
             consoleView.CursorText = "> ";
-            stubConsole.CurrentInput = "Hey there";
+            consoleController.CurrentInput = "Hey there";
             consoleView.Generate();
 
             stubSpriteBatch.AssertWasCalled(x => x.DrawText(Arg<IFont>.Is.Equal(stubFont), Arg<string>.Is.Equal("> Hey there"), Arg<Vector2>.Is.Equal(new Vector2(10 + 20, 220 - 20)), Arg<Color>.Is.Anything));
@@ -110,15 +137,15 @@ namespace UnitTestLibrary
         [Test]
         public void DrawsCommandLog()
         {
-            IGameConsole stubConsole = MockRepository.GenerateStub<IGameConsole>();
+            ICommandConsole stubConsole = MockRepository.GenerateStub<ICommandConsole>();
             var stubSpriteBatch = MockRepository.GenerateStub<ISpriteBatch>();
             var stubFont = MockRepository.GenerateStub<IFont>();
-            GameConsoleView consoleView = new GameConsoleView(stubConsole, new Rectangle(), new Rectangle(0, 0, 100, 100), new Rectangle(), stubSpriteBatch, null, stubFont);
+            ConsoleView consoleView = new ConsoleView(stubConsole, MockRepository.GenerateStub<IMessageConsole>(), new ConsoleController(null, null, null), new Rectangle(), new Rectangle(0, 0, 100, 100), new Rectangle(), stubSpriteBatch, null, stubFont);
             stubFont.LineSpacing = 10;
             stubConsole.Active = true;
-            stubConsole.CommandLog = new List<string>();
-            stubConsole.CommandLog.Add("You suck.");
-            stubConsole.CommandLog.Add("I suck? Screw you!");
+            stubConsole.Log = new MessageLog();
+            stubConsole.Log.AddMessage("You suck.");
+            stubConsole.Log.AddMessage("I suck? Screw you!");
             
             consoleView.Generate();
 
@@ -129,15 +156,18 @@ namespace UnitTestLibrary
         [Test]
         public void DrawsMessageLog()
         {
-            GameConsole console = new GameConsole(null);
+            var stubMessageConsole = MockRepository.GenerateStub<IMessageConsole>();
+            MessageLog chatLog = new MessageLog();
+            stubMessageConsole.Log = chatLog;
             var stubSpriteBatch = MockRepository.GenerateStub<ISpriteBatch>();
             var stubFont = MockRepository.GenerateStub<IFont>();
-            GameConsoleView consoleView = new GameConsoleView(console, new Rectangle(), new Rectangle(), new Rectangle(100, 200, 100, 100), stubSpriteBatch, null, stubFont);
+            ConsoleView consoleView = new ConsoleView(MockRepository.GenerateStub<ICommandConsole>(), stubMessageConsole, null, new Rectangle(), new Rectangle(), new Rectangle(100, 200, 100, 100), stubSpriteBatch, null, stubFont);
             stubFont.LineSpacing = 10;
 
-            console.Active = true;
-            console.MessageLog.Add("You suck.");
-            console.MessageLog.Add("I suck? Screw you!");
+            stubMessageConsole.Active = true;
+            stubMessageConsole.Log.AddMessage("You suck.");
+            stubMessageConsole.Log.AddMessage("I suck? Screw you!");
+
             consoleView.Generate();
 
             stubSpriteBatch.AssertWasCalled(x => x.DrawText(Arg<IFont>.Is.Equal(stubFont), Arg<string>.Is.Equal("You suck."), Arg<Vector2>.Is.Equal(new Vector2(100 + 20, 300 - 20 - (2 * stubFont.LineSpacing))), Arg<Color>.Is.Anything));
@@ -147,15 +177,15 @@ namespace UnitTestLibrary
         [Test]
         public void DoesntDrawPossibleCompletionWindowWhenNoneAvailable()
         {
-            var stubConsole = MockRepository.GenerateStub<IGameConsole>();
+            var stubConsole = MockRepository.GenerateStub<ICommandConsole>();
             var stubSpriteBatch = MockRepository.GenerateStub<ISpriteBatch>();
             var stubFont = MockRepository.GenerateStub<IFont>();
             Rectangle commandWindow = new Rectangle(10, 20, 100, 200);
             Rectangle messageWindow = new Rectangle(30, 40, 300, 400);
-            GameConsoleView consoleView = new GameConsoleView(stubConsole, new Rectangle(), commandWindow, messageWindow, stubSpriteBatch, null, stubFont);
+            ConsoleView consoleView = new ConsoleView(stubConsole, MockRepository.GenerateStub<IMessageConsole>(), new ConsoleController(null, null, null), new Rectangle(), commandWindow, messageWindow, stubSpriteBatch, null, stubFont);
             stubConsole.Active = true;
-            List<string> possibleCommands = new List<string>();
-            stubConsole.Stub(x => x.FindPossibleInputCompletions()).Return(possibleCommands);
+            MessageLog possibleCommands = new MessageLog();
+            stubConsole.Stub(x => x.FindPossibleInputCompletions(Arg<string>.Is.Anything)).Return(possibleCommands);
 
             consoleView.Generate();
 
@@ -171,18 +201,17 @@ namespace UnitTestLibrary
         {
             var stubSpriteBatch = MockRepository.GenerateStub<ISpriteBatch>();
             var stubFont = MockRepository.GenerateStub<IFont>();
-            var stubConsole = MockRepository.GenerateStub<IGameConsole>();
-            stubConsole.MessageLog = new List<string>();
-            stubConsole.CommandLog = new List<string>();
+            var stubConsole = MockRepository.GenerateStub<ICommandConsole>();
+            stubConsole.Log = new MessageLog();
             Rectangle commandWindow = new Rectangle(10, 20, 100, 200);
             Rectangle messageWindow = new Rectangle(30, 40, 300, 400);
-            GameConsoleView consoleView = new GameConsoleView(stubConsole, new Rectangle(), commandWindow, messageWindow, stubSpriteBatch, null, stubFont);
+            ConsoleView consoleView = new ConsoleView(stubConsole, MockRepository.GenerateStub<IMessageConsole>(), new ConsoleController(null, null, null), new Rectangle(), commandWindow, messageWindow, stubSpriteBatch, null, stubFont);
             stubFont.LineSpacing = 10;
             stubConsole.Active = true;
-            List<string> possibleCommands = new List<string>();
-            possibleCommands.Add("Hey");
-            possibleCommands.Add("Yo");
-            stubConsole.Stub(x => x.FindPossibleInputCompletions()).Return(possibleCommands);
+            MessageLog possibleCommands = new MessageLog();
+            possibleCommands.AddMessage("Hey");
+            possibleCommands.AddMessage("Yo");
+            stubConsole.Stub(x => x.FindPossibleInputCompletions(Arg<string>.Is.Anything)).Return(possibleCommands);
 
             consoleView.Generate();
 

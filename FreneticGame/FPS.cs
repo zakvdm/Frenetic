@@ -33,7 +33,7 @@ namespace Frenetic.MyConsole.Components
             base.Initialize();
         }
 
-
+        [Obsolete]
         protected override void LoadGraphicsContent(bool loadAllContent)
         {
             if (loadAllContent)

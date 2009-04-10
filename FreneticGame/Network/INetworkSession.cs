@@ -14,16 +14,19 @@ namespace Frenetic.Network
     
     public enum MessageType
     {
+        ServerSnap,
         PlayerData,
         Event,
         SuccessfulJoin,
-        NewPlayer
+        NewPlayer,
+        ChatLog
     }
 
     
     [XmlInclude(typeof(Player))]
     public class Message
     {
+        public int ClientID { get; set; }
         public MessageType Type { get; set; }
         public object Data { get; set; }
     }

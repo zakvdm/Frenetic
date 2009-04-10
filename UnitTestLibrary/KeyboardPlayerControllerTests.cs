@@ -53,20 +53,20 @@ namespace UnitTestLibrary
         [Test]
         public void PlayerCannotDoubleJump()
         {
-            var fourHundredMilliseconds = new TimeSpan(0, 0, 0, 0, 400).Ticks;
-            var eightHundredMilliseconds = 2 * fourHundredMilliseconds;
+            var fortyMilliseconds = new TimeSpan(0, 0, 0, 0, 40).Milliseconds;
+            var twoHundredMilliseconds = 5 * fortyMilliseconds;
             int callCount = 0;
             stubKeyboard.Stub(k => k.IsKeyDown(Arg<Keys>.Is.Equal(Keys.Space))).Return(true);
             stubPlayer.Stub(p => p.Jump()).Do(new Func<bool>(() => { callCount++; return true; }));
             kpc.Process(1);
             Assert.AreEqual(1, callCount);
-            kpc.Process(fourHundredMilliseconds);
+            kpc.Process(fortyMilliseconds);
             Assert.AreEqual(1, callCount);
-            kpc.Process(eightHundredMilliseconds);
+            kpc.Process(twoHundredMilliseconds);
             Assert.AreEqual(2, callCount);
-            kpc.Process(fourHundredMilliseconds);
+            kpc.Process(fortyMilliseconds);
             Assert.AreEqual(2, callCount);
-            kpc.Process(eightHundredMilliseconds);
+            kpc.Process(twoHundredMilliseconds);
             Assert.AreEqual(3, callCount);
         }
 
@@ -102,7 +102,7 @@ namespace UnitTestLibrary
         [Test]
         public void PressingTheLeftMouseButtonASecondTimeTooSoonDoesNotRetriggerTheShot()
         {
-            var oneHundredMilliseconds = new TimeSpan(0, 0, 0, 0, 100).Ticks;
+            var oneHundredMilliseconds = new TimeSpan(0, 0, 0, 0, 100).Milliseconds;
             var twoHundredMilliseconds = 2 * oneHundredMilliseconds;
             int callCount = 0;
             stubMouse.Stub(m => m.LeftButtonIsDown()).Return(true);

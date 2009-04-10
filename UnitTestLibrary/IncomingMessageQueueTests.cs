@@ -52,6 +52,18 @@ namespace UnitTestLibrary
         }
 
         [Test]
+        public void ReadWholeMessageReturnsMessageObject()
+        {
+            var stubNetworkSession = MockRepository.GenerateStub<INetworkSession>();
+            IncomingMessageQueue incomingMessageQueue = new IncomingMessageQueue(stubNetworkSession);
+            Message msg = new Message() { Type = MessageType.SuccessfulJoin, ClientID = 11, Data = 1 };
+            queueMH.QueuedMessages.Enqueue(msg);
+            stubNetworkSession.Stub(x => x.ReadMessage()).Do(queueMH.GetNextQueuedMessage);
+
+            Assert.AreEqual(msg, incomingMessageQueue.ReadWholeMessage(MessageType.SuccessfulJoin));
+        }
+
+        [Test]
         public void CanQueueMoreThanOneMessage()
         {
             var stubNS = MockRepository.GenerateStub<INetworkSession>();
@@ -65,7 +77,7 @@ namespace UnitTestLibrary
         }
 
         [Test]
-        public void StoresSeperateQueuesForDifferentIDs()
+        public void StoresSeperateQueuesForDifferentMessageTypes()
         {
             var stubNS = MockRepository.GenerateStub<INetworkSession>();
             var mq = new IncomingMessageQueue(stubNS);

@@ -21,7 +21,6 @@ namespace UnitTestLibrary
         }
         Mediator _mediator;
         PhysicsSettings _physicsSettings;
-        MediatorPhysicsSettingsController _controller;
 
         [Test]
         public void GravityPropertyRegisteredAndWorks()

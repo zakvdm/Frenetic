@@ -3,6 +3,6 @@ namespace Frenetic
 {
     public interface IController
     {
-        void Process(float ticks);
+        void Process(float elapsedTime);
     }
 }

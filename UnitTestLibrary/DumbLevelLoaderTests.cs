@@ -34,18 +34,21 @@ namespace UnitTestLibrary
 
             dumbLevelLoader.LoadEmptyLevel(levelPieces, 400, 600);
 
+            int halfwidth = DumbLevelLoader.BOUNDARY / 2;
+            int width = DumbLevelLoader.BOUNDARY;
+
             // level built clockwise starting on left
-            Assert.AreEqual(new Vector2(10, 300), levelPieces[0].Position);
-            Assert.AreEqual(new Vector2(20, 600), levelPieces[0].Size);
+            Assert.AreEqual(new Vector2(-halfwidth, 300), levelPieces[0].Position);
+            Assert.AreEqual(new Vector2(width, 600), levelPieces[0].Size);
 
-            Assert.AreEqual(new Vector2(200, 10), levelPieces[1].Position);
-            Assert.AreEqual(new Vector2(400, 20), levelPieces[1].Size);
+            Assert.AreEqual(new Vector2(200, -halfwidth), levelPieces[1].Position);
+            Assert.AreEqual(new Vector2(400, width), levelPieces[1].Size);
 
-            Assert.AreEqual(new Vector2(390, 300), levelPieces[2].Position);
-            Assert.AreEqual(new Vector2(20, 600), levelPieces[2].Size);
+            Assert.AreEqual(new Vector2(400 + halfwidth, 300), levelPieces[2].Position);
+            Assert.AreEqual(new Vector2(width, 600), levelPieces[2].Size);
 
-            Assert.AreEqual(new Vector2(200, 590), levelPieces[3].Position);
-            Assert.AreEqual(new Vector2(400, 20), levelPieces[3].Size);
+            Assert.AreEqual(new Vector2(200, 600 + halfwidth), levelPieces[3].Position);
+            Assert.AreEqual(new Vector2(400, width), levelPieces[3].Size);
         }
     }
 }

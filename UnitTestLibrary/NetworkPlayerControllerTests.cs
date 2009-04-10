@@ -18,6 +18,7 @@ namespace UnitTestLibrary
         IIncomingMessageQueue stubIncomingMessageQueue;
         NetworkPlayerController networkPlayerController;
         QueuedMessageHelper<object, MessageType> queueMessageHelper;
+        
         [SetUp]
         public void SetUp()
         {

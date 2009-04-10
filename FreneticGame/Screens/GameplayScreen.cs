@@ -55,7 +55,8 @@ namespace Frenetic
                     // If they pressed pause, bring up the pause menu screen.
                     const string message = "Exit the game?";
                     MessageBoxScreen messageBox = _screenFactory.MakeMessageBoxScreen(message);
-                    messageBox.Accepted += (sender, e) => base.ExitScreen();
+                    //messageBox.Accepted += (sender, e) => base.ExitScreen();
+                    messageBox.Accepted += ExitScreen;
                 }
             }
             base.HandleInput(input);
@@ -68,6 +69,13 @@ namespace Frenetic
                 _serverGameSessionView.Generate();
 
             _clientGameSessionView.Generate();
+        }
+        #endregion
+
+        #region Event Handlers
+        public void ExitScreen(object sender, EventArgs e)
+        {
+            base.ExitScreen();
         }
         #endregion
 
