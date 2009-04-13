@@ -5,10 +5,11 @@ namespace Frenetic.Network
 {
     public class ClientInputSender : IView
     {
-        public ClientInputSender(Client localClient, IMessageConsole messageConsole, IOutgoingMessageQueue outgoingMessageQueue)
+        public ClientInputSender(Client localClient, IMessageConsole messageConsole, ISnapCounter snapCounter, IOutgoingMessageQueue outgoingMessageQueue)
         {
             _localClient = localClient;
             _messageConsole = messageConsole;
+            _snapCounter = snapCounter;
             _outgoingMessageQueue = outgoingMessageQueue;
         }
 
@@ -20,22 +21,47 @@ namespace Frenetic.Network
             if (_localClient.ID == 0)
                 return;
 
-            // Send the last received server snap
-            _outgoingMessageQueue.Write(new Message() { ClientID = _localClient.ID, Type = MessageType.ServerSnap, Data = _localClient.LastServerSnap });
-
-            while (_messageConsole.HasNewMessages)
+            if (_snapCounter.CurrentSnap > _lastSentSnap)
             {
-                string message = _messageConsole.GetNewMessage();
-                _outgoingMessageQueue.Write(new Message() { ClientID = _localClient.ID, Type = MessageType.ChatLog, Data = message });
+                _lastSentSnap = _snapCounter.CurrentSnap;
+
+                SendLastReceivedServerSnapAndCurrentClientSnap();
+
+                SendAllPendingChatMessages();
             }
         }
 
-        int tmpcount = 0;
-
         #endregion
+
+        void SendLastReceivedServerSnapAndCurrentClientSnap()
+        {
+            // the last received server snap:
+            _outgoingMessageQueue.Write(new Message() { ClientID = _localClient.ID, Type = MessageType.ServerSnap, Data = _localClient.LastServerSnap });
+
+            // the current client snap:
+            _outgoingMessageQueue.Write(new Message() { ClientID = _localClient.ID, Type = MessageType.ClientSnap, Data = _snapCounter.CurrentSnap });
+        }
+
+        void SendAllPendingChatMessages()
+        {
+            // First. If there are new messages, we need to set the current client snap on them so we can keep sending them until this snap is acknowledged.
+            foreach (ChatMessage newMsg in _messageConsole.UnsortedMessages)
+            {
+                newMsg.Snap = _snapCounter.CurrentSnap;
+            }
+
+            // NOTE: We use the LastClientSnap on the local client as the last client snap acknowledged by the server
+            foreach (ChatMessage unAckedMsg in _messageConsole.GetPendingMessagesFromAfter(_localClient.LastClientSnap))
+            {
+                _outgoingMessageQueue.Write(new Message() { ClientID = _localClient.ID, Type = MessageType.ChatLog, Data = unAckedMsg });
+            }
+        }
 
         IMessageConsole _messageConsole;
         IOutgoingMessageQueue _outgoingMessageQueue;
         Client _localClient;
+        ISnapCounter _snapCounter;
+
+        int _lastSentSnap = 0;
     }
 }

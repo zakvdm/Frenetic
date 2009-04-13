@@ -58,12 +58,12 @@ namespace UnitTestLibrary
         [Test]
         public void DrawsMessageLogWindow()
         {
-            MessageConsole console = new MessageConsole(new MessageLog(), null);
+            MessageConsole console = new MessageConsole(new Log<ChatMessage>(), null);
             var stubSpriteBatch = MockRepository.GenerateStub<ISpriteBatch>();
             var stubTexture = MockRepository.GenerateStub<ITexture>();
             ConsoleView consoleView = new ConsoleView(MockRepository.GenerateStub<ICommandConsole>(), console, new ConsoleController(null, null, null), new Rectangle(), new Rectangle(), new Rectangle(0, 0, 100, 200), stubSpriteBatch, stubTexture, null);
             console.Active = true;
-            console.Log.AddMessage("message1"); // Won't draw an empty window...
+            console.Log.AddMessage(new ChatMessage() { Message = "message1" }); // Won't draw an empty window...
 
             consoleView.Generate();
 
@@ -74,11 +74,11 @@ namespace UnitTestLibrary
         [Test]
         public void CallsBeginAndEndWhenDrawingMessageLogWindow()
         {
-            MessageConsole console = new MessageConsole(new MessageLog(), null);
+            MessageConsole console = new MessageConsole(new Log<ChatMessage>(), null);
             var stubSpriteBatch = MockRepository.GenerateStub<ISpriteBatch>();
             ConsoleView consoleView = new ConsoleView(MockRepository.GenerateStub<ICommandConsole>(), console, new ConsoleController(null, null, null), new Rectangle(), new Rectangle(), new Rectangle(), stubSpriteBatch, null, null);
             console.Active = true;
-            console.Log.AddMessage("message 1");
+            console.Log.AddMessage(new ChatMessage() { Message = "message 1" });
 
             consoleView.Generate();
 
@@ -89,7 +89,7 @@ namespace UnitTestLibrary
         [Test]
         public void OnlyDrawsMessageWindowWhenThereAreMessages()
         {
-            MessageConsole console = new MessageConsole(new MessageLog(), null);
+            MessageConsole console = new MessageConsole(new Log<ChatMessage>(), null);
             var stubSpriteBatch = MockRepository.GenerateStub<ISpriteBatch>();
             var stubTexture = MockRepository.GenerateStub<ITexture>();
             ConsoleView consoleView = new ConsoleView(MockRepository.GenerateStub<ICommandConsole>(), console, new ConsoleController(null, null, null), new Rectangle(), new Rectangle(), new Rectangle(0, 0, 100, 200), stubSpriteBatch, stubTexture, null);
@@ -143,7 +143,7 @@ namespace UnitTestLibrary
             ConsoleView consoleView = new ConsoleView(stubConsole, MockRepository.GenerateStub<IMessageConsole>(), new ConsoleController(null, null, null), new Rectangle(), new Rectangle(0, 0, 100, 100), new Rectangle(), stubSpriteBatch, null, stubFont);
             stubFont.LineSpacing = 10;
             stubConsole.Active = true;
-            stubConsole.Log = new MessageLog();
+            stubConsole.Log = new Log<string>();
             stubConsole.Log.AddMessage("You suck.");
             stubConsole.Log.AddMessage("I suck? Screw you!");
             
@@ -157,7 +157,7 @@ namespace UnitTestLibrary
         public void DrawsMessageLog()
         {
             var stubMessageConsole = MockRepository.GenerateStub<IMessageConsole>();
-            MessageLog chatLog = new MessageLog();
+            Log<ChatMessage> chatLog = new Log<ChatMessage>();
             stubMessageConsole.Log = chatLog;
             var stubSpriteBatch = MockRepository.GenerateStub<ISpriteBatch>();
             var stubFont = MockRepository.GenerateStub<IFont>();
@@ -165,13 +165,13 @@ namespace UnitTestLibrary
             stubFont.LineSpacing = 10;
 
             stubMessageConsole.Active = true;
-            stubMessageConsole.Log.AddMessage("You suck.");
-            stubMessageConsole.Log.AddMessage("I suck? Screw you!");
+            stubMessageConsole.Log.AddMessage(new ChatMessage() { ClientName = "zak", Message = "You suck." });
+            stubMessageConsole.Log.AddMessage(new ChatMessage() { ClientName = "terence", Message = "I suck? Screw you!" });
 
             consoleView.Generate();
 
-            stubSpriteBatch.AssertWasCalled(x => x.DrawText(Arg<IFont>.Is.Equal(stubFont), Arg<string>.Is.Equal("You suck."), Arg<Vector2>.Is.Equal(new Vector2(100 + 20, 300 - 20 - (2 * stubFont.LineSpacing))), Arg<Color>.Is.Anything));
-            stubSpriteBatch.AssertWasCalled(x => x.DrawText(Arg<IFont>.Is.Equal(stubFont), Arg<string>.Is.Equal("I suck? Screw you!"), Arg<Vector2>.Is.Equal(new Vector2(100 + 20, 300 - 20 - stubFont.LineSpacing)), Arg<Color>.Is.Anything));
+            stubSpriteBatch.AssertWasCalled(x => x.DrawText(Arg<IFont>.Is.Equal(stubFont), Arg<string>.Is.Equal("[zak] You suck."), Arg<Vector2>.Is.Equal(new Vector2(100 + 20, 300 - 20 - (2 * stubFont.LineSpacing))), Arg<Color>.Is.Anything));
+            stubSpriteBatch.AssertWasCalled(x => x.DrawText(Arg<IFont>.Is.Equal(stubFont), Arg<string>.Is.Equal("[terence] I suck? Screw you!"), Arg<Vector2>.Is.Equal(new Vector2(100 + 20, 300 - 20 - stubFont.LineSpacing)), Arg<Color>.Is.Anything));
         }
 
         [Test]
@@ -184,7 +184,7 @@ namespace UnitTestLibrary
             Rectangle messageWindow = new Rectangle(30, 40, 300, 400);
             ConsoleView consoleView = new ConsoleView(stubConsole, MockRepository.GenerateStub<IMessageConsole>(), new ConsoleController(null, null, null), new Rectangle(), commandWindow, messageWindow, stubSpriteBatch, null, stubFont);
             stubConsole.Active = true;
-            MessageLog possibleCommands = new MessageLog();
+            Log<string> possibleCommands = new Log<string>();
             stubConsole.Stub(x => x.FindPossibleInputCompletions(Arg<string>.Is.Anything)).Return(possibleCommands);
 
             consoleView.Generate();
@@ -202,13 +202,13 @@ namespace UnitTestLibrary
             var stubSpriteBatch = MockRepository.GenerateStub<ISpriteBatch>();
             var stubFont = MockRepository.GenerateStub<IFont>();
             var stubConsole = MockRepository.GenerateStub<ICommandConsole>();
-            stubConsole.Log = new MessageLog();
+            stubConsole.Log = new Log<string>();
             Rectangle commandWindow = new Rectangle(10, 20, 100, 200);
             Rectangle messageWindow = new Rectangle(30, 40, 300, 400);
             ConsoleView consoleView = new ConsoleView(stubConsole, MockRepository.GenerateStub<IMessageConsole>(), new ConsoleController(null, null, null), new Rectangle(), commandWindow, messageWindow, stubSpriteBatch, null, stubFont);
             stubFont.LineSpacing = 10;
             stubConsole.Active = true;
-            MessageLog possibleCommands = new MessageLog();
+            Log<string> possibleCommands = new Log<string>();
             possibleCommands.AddMessage("Hey");
             possibleCommands.AddMessage("Yo");
             stubConsole.Stub(x => x.FindPossibleInputCompletions(Arg<string>.Is.Anything)).Return(possibleCommands);
@@ -217,10 +217,14 @@ namespace UnitTestLibrary
 
             // Assuming the text offset is 20
             
+            // Gets possible commands:
+            stubConsole.AssertWasCalled(x => x.FindPossibleInputCompletions(Arg<string>.Is.Equal("")));
+
             // Draw the background:
             Rectangle possibleCommandsWindow = new Rectangle(commandWindow.Right + consoleView.EdgeGap, commandWindow.Bottom - 2*20 - (2 * stubFont.LineSpacing), messageWindow.Width, 2*20 + (2 * stubFont.LineSpacing));
             stubSpriteBatch.AssertWasCalled(x => x.Draw(Arg<ITexture>.Is.Anything, Arg<Rectangle>.Is.Equal(possibleCommandsWindow), Arg<Color>.Is.Anything, Arg<float>.Is.Equal(0f)));
 
+            // Draws the commands:
             stubSpriteBatch.AssertWasCalled(x => x.DrawText(Arg<IFont>.Is.Equal(stubFont), Arg<string>.Is.Equal("Hey"), Arg<Vector2>.Is.Equal(new Vector2(possibleCommandsWindow.Left + 20, possibleCommandsWindow.Bottom - 20 - (2 * stubFont.LineSpacing))), Arg<Color>.Is.Anything));
             stubSpriteBatch.AssertWasCalled(x => x.DrawText(Arg<IFont>.Is.Equal(stubFont), Arg<string>.Is.Equal("Yo"), Arg<Vector2>.Is.Equal(new Vector2(possibleCommandsWindow.Left + 20, possibleCommandsWindow.Bottom - 20 - stubFont.LineSpacing)), Arg<Color>.Is.Anything));
         }

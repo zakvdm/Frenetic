@@ -177,8 +177,7 @@ namespace Frenetic
 
             builder.Register<ClientStateTracker>().As<IClientStateTracker>().ContainerScoped();
             builder.Register<SnapCounter>().As<ISnapCounter>().ContainerScoped();
-            builder.Register<ChatLogDiffer>().As<IChatLogDiffer>().ContainerScoped();
-            builder.Register<ChatLogArchive>().As<IChatLogArchive>().ContainerScoped();
+            builder.Register<ChatLogDifferByReference>().As<IChatLogDiffer>().ContainerScoped();
             #endregion
 
             #region Graphics
@@ -229,9 +228,10 @@ namespace Frenetic
             builder.Register<MessageConsole>().As<IMessageConsole>().SingletonScoped();
             builder.Register<ConsoleView>().SingletonScoped();
             builder.Register<ConsoleController>().SingletonScoped();
-            builder.Register<MessageLog>().FactoryScoped();
-            builder.Register<ServerChatLogView>().ContainerScoped();
-            builder.Register<ClientChatLogController>().ContainerScoped();
+            builder.Register<Log<string>>().FactoryScoped();
+            builder.Register<Log<ChatMessage>>().FactoryScoped();
+            builder.Register<ChatLogSender>().ContainerScoped();
+            builder.Register<ChatLogProcessor>().ContainerScoped();
             #endregion
 
             #region Mediator Controllers

@@ -257,5 +257,17 @@ namespace UnitTestLibrary
 
             stubCommandConsole.AssertWasCalled(x => x.TryToCompleteInput(""));
         }
+
+        [Test]
+        public void TabUpdatesCurrentInputWithPartialCompletion()
+        {
+            stubCommandConsole.Active = true;
+            stubKeyboard.Stub(x => x.IsKeyDown(Keys.Tab)).Return(true);
+            stubCommandConsole.Stub(x => x.TryToCompleteInput(Arg<string>.Is.Anything)).Return("/yo");
+
+            consoleController.Process(1);
+
+            Assert.AreEqual("/yo", consoleController.CurrentInput);
+        }
     }
 }

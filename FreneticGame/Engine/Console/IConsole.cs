@@ -2,9 +2,9 @@
 
 namespace Frenetic
 {
-    public interface IConsole
+    public interface IConsole<T>
     {
-        MessageLog Log { get; set; }
+        Log<T> Log { get; set; }
 
         bool Active { get; set; }
         void ProcessInput(string input);

@@ -1,11 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Frenetic
 {
-    public interface IMessageConsole : IConsole 
+    public interface IMessageConsole : IConsole<ChatMessage> 
     {
-        bool HasNewMessages { get; }
+        IEnumerable<ChatMessage> UnsortedMessages { get; }
 
-        string GetNewMessage();
+        IEnumerable<ChatMessage> GetPendingMessagesFromAfter(int snap);
     }
 }

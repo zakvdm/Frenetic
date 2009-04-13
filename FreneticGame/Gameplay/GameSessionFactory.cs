@@ -58,16 +58,13 @@ namespace Frenetic
 
             SnapCounter snapCounter = (SnapCounter)ServerContainer.Resolve<ISnapCounter>();
             gameSession.Controllers.Add(snapCounter);
-            
-            MessageLog serverLog = ServerContainer.Resolve<MessageLog>();
-            serverLog.AddMessage("test msg");
-            IChatLogArchive chatLogArchive = ServerContainer.Resolve<IChatLogArchive>(new TypedParameter(typeof(MessageLog), serverLog));
-            IChatLogDiffer chatLogDiffer = ServerContainer.Resolve<IChatLogDiffer>(new TypedParameter(typeof(MessageLog), serverLog));
-            gameSession.Controllers.Add(chatLogArchive);
+
+            Log<ChatMessage> serverLog = ServerContainer.Resolve<Log<ChatMessage>>();
+            IChatLogDiffer chatLogDiffer = ServerContainer.Resolve<IChatLogDiffer>(new TypedParameter(typeof(Log<ChatMessage>), serverLog));
 
             // THINGS TO SYNC OVER NETWORK:
-            gameSession.Views.Add(ServerContainer.Resolve<ServerChatLogView>(new TypedParameter(typeof(MessageLog), serverLog)));
-            gameSession.Controllers.Add(ServerContainer.Resolve<ClientInputProcessor>(new TypedParameter(typeof(MessageLog), serverLog)));
+            gameSession.Views.Add(ServerContainer.Resolve<ChatLogSender>(new TypedParameter(typeof(Log<ChatMessage>), serverLog)));
+            gameSession.Controllers.Add(ServerContainer.Resolve<ClientInputProcessor>(new TypedParameter(typeof(Log<ChatMessage>), serverLog)));
             // ****************************
 
 
@@ -91,9 +88,12 @@ namespace Frenetic
             // *****************************************
 
             IGameSession gameSession = ClientContainer.Resolve<IGameSession>();
-            
-            IPlayer localPlayer = CreateClientComponents(gameSession);
 
+            SnapCounter snapCounter = (SnapCounter)ClientContainer.Resolve<ISnapCounter>();
+            gameSession.Controllers.Add(snapCounter);
+
+            IPlayer localPlayer = CreateClientComponents(gameSession);
+            
             gameSession.Controllers.Add(ClientContainer.Resolve<FarseerPhysicsController>());
             Frenetic.Level.Level level = ClientContainer.Resolve<Frenetic.Level.Level>();
 
@@ -106,9 +106,9 @@ namespace Frenetic
 
 
             // THINGS TO SYNC OVER NETWORK:
-            MessageLog chatLog = _parentContainer.Resolve<IMessageConsole>().Log;
-            gameSession.Controllers.Add(ClientContainer.Resolve<ClientChatLogController>(new TypedParameter(typeof(MessageLog), chatLog), new TypedParameter(typeof(IIncomingMessageQueue), incomingMessageQueue)));
-            gameSession.Views.Add(ClientContainer.Resolve<ClientInputSender>(new TypedParameter(typeof(MessageLog), chatLog)));
+            Log<ChatMessage> chatLog = _parentContainer.Resolve<IMessageConsole>().Log;
+            gameSession.Controllers.Add(ClientContainer.Resolve<ChatLogProcessor>(new TypedParameter(typeof(Log<ChatMessage>), chatLog), new TypedParameter(typeof(IIncomingMessageQueue), incomingMessageQueue)));
+            gameSession.Views.Add(ClientContainer.Resolve<ClientInputSender>(new TypedParameter(typeof(Log<ChatMessage>), chatLog)));
             // ****************************
 
 

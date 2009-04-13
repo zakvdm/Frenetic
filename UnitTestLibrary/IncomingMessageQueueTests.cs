@@ -92,7 +92,7 @@ namespace UnitTestLibrary
         }
     }
 
-    public class QueuedMessageHelper<T> where T:class
+    public class QueuedMessageHelper<T>// where T:class
     {
         public QueuedMessageHelper()
         {
@@ -113,7 +113,8 @@ namespace UnitTestLibrary
             {
                 return QueuedMessages.Dequeue();
             }
-            return null;
+            //return null;
+            return default(T);
         }
     }
 

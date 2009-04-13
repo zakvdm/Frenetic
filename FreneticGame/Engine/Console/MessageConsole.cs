@@ -1,13 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Frenetic
 {
     public class MessageConsole : IMessageConsole
     {
-        public MessageConsole(MessageLog chatLog, MessageLog newMessages)
+        public MessageConsole(Log<ChatMessage> chatLog, Log<ChatMessage> newMessages)
         {
             Log = chatLog;
-            _newMessages = newMessages;
+            _pendingMessages = newMessages;
         }
 
         #region IConsole Members
@@ -16,27 +17,45 @@ namespace Frenetic
         
         public void ProcessInput(string input)
         {
-            _newMessages.AddMessage(input);
+            // We just bundle all new messages in UnsortedMessages until someone comes along later and sets their Snap property...
+            ChatMessage msg = new ChatMessage() { Snap = 0, Message = input };
+            
+            _pendingMessages.AddMessage(msg);
         }
 
         #endregion
 
-        public bool HasNewMessages
+        #region IMessageConsole Members
+
+        public IEnumerable<ChatMessage> UnsortedMessages
         {
             get
             {
-                return _newMessages.Count > 0;
+                foreach (ChatMessage msg in _pendingMessages)
+                {
+                    if (msg.Snap == 0) // ChatMessages with Snap set to 0 have not been "sorted" yet...
+                    {
+                        yield return msg;
+                    }
+                }
             }
         }
-        public string GetNewMessage()
+
+        public IEnumerable<ChatMessage> GetPendingMessagesFromAfter(int snap)
         {
-            // We want to return the oldest new message first:
-            return _newMessages.StripOldestMessage();
-
+            foreach (ChatMessage msg in _pendingMessages)
+            {
+                if (msg.Snap <= snap)
+                {
+                    // We only want messages that are younger than this point -- remember, the lower the snap, the older the message
+                    break;
+                }
+                yield return msg;
+            }
         }
-
-        public MessageLog Log { get; set; }
-        MessageLog _newMessages;
-
+        
+        #endregion
+        public Log<ChatMessage> Log { get; set; }
+        Log<ChatMessage> _pendingMessages;
     }
 }

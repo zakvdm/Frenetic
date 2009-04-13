@@ -6,13 +6,13 @@ using System.Collections.Generic;
 namespace UnitTestLibrary
 {
     [TestFixture]
-    public class MessageLogTests
+    public class LogTests
     {
         
         [Test]
         public void CanIterateThroughLog()
         {
-            MessageLog chatMsgLog = new MessageLog();
+            Log<string> chatMsgLog = new Log<string>();
             chatMsgLog.AddMessage("hello there");
             chatMsgLog.AddMessage("you suck");
             chatMsgLog.AddMessage("i'm just kidding, you're pretty cool.");
@@ -27,9 +27,19 @@ namespace UnitTestLibrary
         }
 
         [Test]
+        public void CanBuildALogOfChatMessages()
+        {
+            Log<ChatMessage> chatMsgLog = new Log<ChatMessage>();
+            
+            chatMsgLog.AddMessage(new ChatMessage() { ClientName = "Zak", Snap = 100, Message = "yo" });
+
+            Assert.AreEqual(1, chatMsgLog.Count);
+        }
+
+        [Test]
         public void LogReturnsMessagesWithNewestFirst()
         {
-            MessageLog chatMsgLog = new MessageLog();
+            Log<string> chatMsgLog = new Log<string>();
             chatMsgLog.AddMessage("1");
             chatMsgLog.AddMessage("2");
             chatMsgLog.AddMessage("3");
@@ -44,7 +54,7 @@ namespace UnitTestLibrary
         [Test]
         public void CanIterateThroughLogFromOldestToNewest()
         {
-            MessageLog chatLog = new MessageLog();
+            Log<string> chatLog = new Log<string>();
             chatLog.AddMessage("old");
             chatLog.AddMessage("new");
 
@@ -62,7 +72,7 @@ namespace UnitTestLibrary
         [Test]
         public void LogIndexesMessagesWithNewestAtZero()
         {
-            MessageLog chatMsgLog = new MessageLog();
+            Log<string> chatMsgLog = new Log<string>();
             chatMsgLog.AddMessage("1");
             chatMsgLog.AddMessage("2");
             chatMsgLog.AddMessage("3");
@@ -74,7 +84,7 @@ namespace UnitTestLibrary
         [Test]
         public void CanAccessElementsMoreThanOnce()
         {
-            MessageLog chatMsgLog = new MessageLog();
+            Log<string> chatMsgLog = new Log<string>();
             chatMsgLog.AddMessage("hey");
 
             foreach (string message in chatMsgLog)
@@ -89,7 +99,7 @@ namespace UnitTestLibrary
         {
             List<string> testList = new List<string>();
             testList.Add("hello");
-            MessageLog msgLog = new MessageLog(testList);
+            Log<string> msgLog = new Log<string>(testList);
 
             foreach (string msg in msgLog)
                 Assert.AreEqual("hello", msg);
@@ -98,18 +108,19 @@ namespace UnitTestLibrary
         [Test]
         public void KeepsCount()
         {
-            MessageLog chatMsgLog = new MessageLog();
+            Log<string> chatMsgLog = new Log<string>();
             chatMsgLog.AddMessage("1");
             chatMsgLog.AddMessage("2");
 
             Assert.AreEqual(2, chatMsgLog.Count);
         }
 
+        /*
         [Test]
         public void BuildFromAnotherMessageLogWorks()
         {
-            MessageLog sourceLog = new MessageLog();
-            MessageLog destinationLog = new MessageLog();
+            Log<string> sourceLog = new Log<string>();
+            Log<string> destinationLog = new Log<string>();
             destinationLog.AddMessage("blah blah");
             sourceLog.AddMessage("profound statement");
             sourceLog.AddMessage("witty rejoinder");
@@ -122,9 +133,26 @@ namespace UnitTestLibrary
         }
 
         [Test]
+        public void BuildFromAnotherMessageLogWorksForChatMessages()
+        {
+            Log<ChatMessage> sourceLog = new Log<ChatMessage>();
+            Log<ChatMessage> destinationLog = new Log<ChatMessage>();
+            ChatMessage tmpMsg = new ChatMessage() { Message = "pft" };
+            destinationLog.AddMessage(new ChatMessage() { Message = "blah blah" });
+            sourceLog.AddMessage(tmpMsg);
+
+            destinationLog.BuildFromAnotherMessageLog(sourceLog);
+            tmpMsg.Message = "tmp";
+
+            Assert.AreEqual(1, destinationLog.Count);
+            Assert.AreEqual("pft", destinationLog[0].Message);
+        }
+        */
+
+        [Test]
         public void CanStripOldestMessage()
         {
-            MessageLog log = new MessageLog();
+            Log<string> log = new Log<string>();
             log.AddMessage("old msg");
             log.AddMessage("newer msg");
 
@@ -132,17 +160,34 @@ namespace UnitTestLibrary
             Assert.AreEqual("newer msg", log.StripOldestMessage());
         }
 
+        /*
         [Test]
         public void CanCopy()
         {
-            MessageLog original = new MessageLog();
+            Log<string> original = new Log<string>();
             original.AddMessage("1");
 
-            MessageLog copy = original.Copy();
+            Log<string> copy = original.Copy();
             original.AddMessage("2");
 
             Assert.AreEqual(1, copy.Count);
             Assert.AreEqual("1", copy[0]);
         }
+
+        [Test]
+        public void CanCopyWithChatMessages()
+        {
+            Log<ChatMessage> original = new Log<ChatMessage>();
+            ChatMessage chatMsg = new ChatMessage() { Message = "1" };
+            original.AddMessage(chatMsg);
+
+            Log<ChatMessage> copy = original.Copy();
+            original.AddMessage(new ChatMessage() { Message = "2" });
+            chatMsg.Message = "7";
+
+            Assert.AreEqual(1, copy.Count);
+            Assert.AreEqual("1", copy[0].Message);
+        }
+        */
     }
 }

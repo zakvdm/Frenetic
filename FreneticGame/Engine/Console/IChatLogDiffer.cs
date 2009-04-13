@@ -5,6 +5,7 @@ namespace Frenetic
 {
     public interface IChatLogDiffer
     {
-        MessageLog Diff(Client client);
+        bool IsNewClientChatMessage(ChatMessage chatMessage);
+        Log<ChatMessage> GetOldestToYoungestDiff(Client client);
     }
 }

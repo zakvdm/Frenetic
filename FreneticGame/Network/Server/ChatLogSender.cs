@@ -3,9 +3,9 @@ using Frenetic.Network;
 
 namespace Frenetic
 {
-    public class ServerChatLogView : IView
+    public class ChatLogSender : IView
     {
-        public ServerChatLogView(IChatLogDiffer chatLogDiffer, IClientStateTracker clientStateTracker, ISnapCounter snapCounter, IOutgoingMessageQueue outgoingMessageQueue)
+        public ChatLogSender(IChatLogDiffer chatLogDiffer, IClientStateTracker clientStateTracker, ISnapCounter snapCounter, IOutgoingMessageQueue outgoingMessageQueue)
         {
             _chatLogDiffer = chatLogDiffer;
             _clientStateTracker = clientStateTracker;
@@ -24,9 +24,9 @@ namespace Frenetic
 
                 foreach (Client client in _clientStateTracker.CurrentClients)
                 {
-                    SendServerSnap(client); // We always send the latest snap
+                    SendServerAndClientSnap(client); // We always send the latest snap
 
-                    MessageLog diffedLog = _chatLogDiffer.Diff(client);
+                    Log<ChatMessage> diffedLog = _chatLogDiffer.GetOldestToYoungestDiff(client);
                     if (diffedLog != null) // Diff returned new messages
                         SendLog(diffedLog, client);
                 }
@@ -35,10 +35,11 @@ namespace Frenetic
 
         #endregion
 
-        void SendLog(MessageLog log, Client client)
+        void SendLog(Log<ChatMessage> log, Client client)
         {
             // We send the messages oldest to newest...
-            foreach (var message in log.OldestToNewest)
+            //foreach (var message in log.OldestToNewest)
+            foreach (var message in log)
             {
                 Message msg = new Message() { Type = MessageType.ChatLog, Data = message };
 
@@ -46,9 +47,13 @@ namespace Frenetic
                 _outgoingMessageQueue.WriteFor(msg, client);
             }
         }
-        void SendServerSnap(Client client)
+        void SendServerAndClientSnap(Client client)
         {
+            // Send the current server snap:
             _outgoingMessageQueue.WriteFor(new Message() { Type = MessageType.ServerSnap, Data = _lastSentSnap }, client);
+
+            // Send the last received client snap:
+            _outgoingMessageQueue.WriteFor(new Message() { Type = MessageType.ClientSnap, Data = client.LastClientSnap }, client);
         }
 
         IChatLogDiffer _chatLogDiffer;

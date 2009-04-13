@@ -47,7 +47,7 @@ namespace Frenetic
                 DrawLog(_commandConsole.Log, _commandWindow, Color.White);
                 
                 // POSSIBLE COMMAND WINDOW:
-                var possibleCommands = _commandConsole.FindPossibleInputCompletions("temp");
+                var possibleCommands = _commandConsole.FindPossibleInputCompletions(_consoleController.CurrentInput);
                 if ((possibleCommands != null) && possibleCommands.Count > 0 && possibleCommands.Count < 10)
                 {
                     Rectangle possibleCommandWindow = new Rectangle(_commandWindow.Right + EdgeGap, (int)(_commandWindow.Bottom - 2 * TEXT_OFFSET.Y - (possibleCommands.Count * _font.LineSpacing)), _messageWindow.Width, (int)(2 * TEXT_OFFSET.Y + (possibleCommands.Count * _font.LineSpacing)));
@@ -83,7 +83,7 @@ namespace Frenetic
         }
 
 
-        private void DrawLog(MessageLog log, Rectangle window, Color color)
+        private void DrawLog<T>(Log<T> log, Rectangle window, Color color)
         {
             if (_font == null)
                 return;
@@ -95,9 +95,9 @@ namespace Frenetic
                 return;
 
             Vector2 currentTextPosition = new Vector2(window.Left + TEXT_OFFSET.X, window.Bottom - TEXT_OFFSET.Y - _font.LineSpacing);
-            foreach (string line in log) // Read the log contents from newest message to oldest
+            foreach (T line in log) // Read the log contents from newest message to oldest
             {
-                _spriteBatch.DrawText(_font, line, currentTextPosition, color);
+                _spriteBatch.DrawText(_font, line.ToString(), currentTextPosition, color);
                 currentTextPosition.Y -= _font.LineSpacing;
             }
         }

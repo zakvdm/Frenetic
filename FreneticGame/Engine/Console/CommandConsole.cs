@@ -7,7 +7,7 @@ namespace Frenetic
 {
     public class CommandConsole : ICommandConsole
     {
-        public CommandConsole(IMediator mediator, MessageLog commandLog)
+        public CommandConsole(IMediator mediator, Log<string> commandLog)
         {
             _mediator = mediator;
 
@@ -33,7 +33,7 @@ namespace Frenetic
             }
         }
 
-        public MessageLog FindPossibleInputCompletions(string input)
+        public Log<string> FindPossibleInputCompletions(string input)
         {
             // Early outs:
             if (input.Length == 0 || _mediator.AvailableCommands.Count == 0)
@@ -44,7 +44,7 @@ namespace Frenetic
             if (searchString.StartsWith("/"))
                 searchString = searchString.Substring(1);
             
-            return new MessageLog((from command in _mediator.AvailableCommands
+            return new Log<string>((from command in _mediator.AvailableCommands
                         where (command.ToString().Length >= searchString.Length)
                         where (command.ToString().Substring(0, searchString.Length).ToLower() == searchString)
                         select command).ToList<string>());
@@ -81,7 +81,7 @@ namespace Frenetic
         }
 
         public bool Active { get; set; }
-        public MessageLog Log { get; set; }
+        public Log<string> Log { get; set; }
 
         IMediator _mediator;
     }

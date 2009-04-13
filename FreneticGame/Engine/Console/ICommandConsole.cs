@@ -3,9 +3,9 @@ using System.Collections.Generic;
 
 namespace Frenetic
 {
-    public interface ICommandConsole : IConsole
+    public interface ICommandConsole : IConsole<string>
     {
-        MessageLog FindPossibleInputCompletions(string input);
+        Log<string> FindPossibleInputCompletions(string input);
         string TryToCompleteInput(string input);
     }
 }

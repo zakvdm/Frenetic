@@ -55,7 +55,7 @@ namespace Frenetic
                 CurrentInput = CurrentInput.Remove(CurrentInput.Length - 1);
 
             if (_keyboard.IsKeyDown(Keys.Tab) && !_keyboard.WasKeyDown(Keys.Tab))
-                _commandConsole.TryToCompleteInput(CurrentInput);
+                CurrentInput = _commandConsole.TryToCompleteInput(CurrentInput);
 
             if (_keyboard.IsKeyDown(Keys.Enter) && !_keyboard.WasKeyDown(Keys.Enter))   // ENTER
             {
@@ -65,6 +65,7 @@ namespace Frenetic
                 }
                 else
                 {
+                    // NOTE: We don't set ClientName or ServerSnap on the ChatMessage because this will have been set by the server when we get the message back...
                     _messageConsole.ProcessInput(CurrentInput);
                 }
                 CurrentInput = "";

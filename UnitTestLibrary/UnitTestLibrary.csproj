@@ -77,11 +77,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CameraTests.cs" />
-    <Compile Include="ChatLogArchiveTests.cs" />
-    <Compile Include="ChatLogDifferTests.cs" />
+    <Compile Include="ChatLogDifferByReferenceTests.cs" />
+    <Compile Include="ChatMessageTests.cs" />
     <Compile Include="ClientStateTrackerTests.cs" />
     <Compile Include="MessageConsoleTests.cs" />
-    <Compile Include="MessageLogTests.cs" />
+    <Compile Include="LogTests.cs" />
     <Compile Include="ConsoleControllerTests.cs" />
     <Compile Include="CommandConsoleTests.cs" />
     <Compile Include="CrosshairTests.cs" />
@@ -97,8 +97,8 @@
     <Compile Include="MediatorPhysicsSettingsControllerTests.cs" />
     <Compile Include="MediatorPlayerSettingsTests.cs" />
     <Compile Include="MediatorTests.cs" />
-    <Compile Include="ClientChatLogControllerTests.cs" />
-    <Compile Include="ServerChatLogViewTests.cs" />
+    <Compile Include="ChatLogProcessorTests.cs" />
+    <Compile Include="ChatLogSenderTests.cs" />
     <Compile Include="ClientInputProcessorTests.cs" />
     <Compile Include="ClientInputSenderTests.cs" />
     <Compile Include="OutgoingMessageQueueTests.cs" />
