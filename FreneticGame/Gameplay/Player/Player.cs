@@ -8,9 +8,7 @@ namespace Frenetic
 {
     public class Player : IPlayer
     {
-        public delegate IPlayer Factory(int ID);
-
-        public Player(int ID, PlayerSettings playerSettings, IPhysicsComponent physicsComponent, IBoundaryCollider boundaryCollider)
+        public Player(IPhysicsComponent physicsComponent, IBoundaryCollider boundaryCollider)
         {
             if (physicsComponent == null)
                 _physicsComponent = new DummyPhysicsComponent();
@@ -19,8 +17,6 @@ namespace Frenetic
 
             _physicsComponent.CollidedWithWorld += () => InContactWithLevel = true;
 
-            this.ID = ID;
-            Settings = playerSettings;
             _boundaryCollider = boundaryCollider;
 
             Position = new Vector2(400, 100);
@@ -29,8 +25,6 @@ namespace Frenetic
         {
             _physicsComponent = new DummyPhysicsComponent();
         } // For XmlSerializer
-
-        public PlayerSettings Settings { get; set; }
 
         public Vector2 Position
         {
@@ -90,8 +84,6 @@ namespace Frenetic
         public static Vector2 MoveForce = new Vector2(-0.2f, 0);
         static float MaxSpeed = 10;
 
-        public int ID { get; set; }
-        
         internal bool InContactWithLevel { get; set; }
     }
 }

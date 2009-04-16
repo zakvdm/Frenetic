@@ -15,7 +15,7 @@ namespace Frenetic.Network
 
         public void Write(Message message)
         {
-            Write(message, NetChannel.Unreliable);
+            Write(message, NetChannel.UnreliableInOrder1);
         }
 
         // TODO: Make private

@@ -26,27 +26,15 @@ namespace Frenetic
                 {
                     SendServerAndClientSnap(client); // We always send the latest snap
 
-                    Log<ChatMessage> diffedLog = _chatLogDiffer.GetOldestToYoungestDiff(client);
-                    if (diffedLog != null) // Diff returned new messages
-                        SendLog(diffedLog, client);
+                    SendChatLog(client);
+
+                    SendPlayerToAllClients(client);
                 }
             }
         }
 
         #endregion
 
-        void SendLog(Log<ChatMessage> log, Client client)
-        {
-            // We send the messages oldest to newest...
-            //foreach (var message in log.OldestToNewest)
-            foreach (var message in log)
-            {
-                Message msg = new Message() { Type = MessageType.ChatLog, Data = message };
-
-                // Send chat msg to clients
-                _outgoingMessageQueue.WriteFor(msg, client);
-            }
-        }
         void SendServerAndClientSnap(Client client)
         {
             // Send the current server snap:
@@ -54,6 +42,29 @@ namespace Frenetic
 
             // Send the last received client snap:
             _outgoingMessageQueue.WriteFor(new Message() { Type = MessageType.ClientSnap, Data = client.LastClientSnap }, client);
+        }
+
+        void SendChatLog(Client client)
+        {
+            Log<ChatMessage> diffedLog = _chatLogDiffer.GetOldestToYoungestDiff(client);
+
+            if (diffedLog == null) // Diff didn't return new messages
+                return;
+
+            // We send the messages oldest to newest...
+            //foreach (var message in log.OldestToNewest)
+            foreach (var message in diffedLog)
+            {
+                Message msg = new Message() { Type = MessageType.ChatLog, Data = message };
+
+                // Send chat msg to clients
+                _outgoingMessageQueue.WriteFor(msg, client);
+            }
+        }
+
+        void SendPlayerToAllClients(Client client)
+        {
+            _outgoingMessageQueue.Write(new Message() { ClientID = client.ID, Type = MessageType.Player, Data = client.Player });
         }
 
         IChatLogDiffer _chatLogDiffer;

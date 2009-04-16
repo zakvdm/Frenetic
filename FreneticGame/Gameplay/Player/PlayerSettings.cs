@@ -8,6 +8,7 @@ namespace Frenetic
     {
         public PlayerSettings()
         {
+            Name = "Player";
             Texture = PlayerTextures.Ball;
 
             Random rnd = new Random();

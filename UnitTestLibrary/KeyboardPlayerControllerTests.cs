@@ -26,13 +26,6 @@ namespace UnitTestLibrary
         }
 
         [Test]
-        public void CanConstruct()
-        {
-            Player player = new Player(1, null, null, null);
-            KeyboardPlayerController kpc = new KeyboardPlayerController(player, stubKeyboard, stubMouse, stubCrosshair);
-        }
-
-        [Test]
         public void ProcessCallsPlayerUpdate()
         {
             kpc.Process(1);

@@ -9,27 +9,37 @@ namespace UnitTestLibrary
     [TestFixture]
     public class ChatLogProcessorTests
     {
-        Client client;
+        LocalClient client;
         Log<ChatMessage> clientLog;
         QueuedMessageHelper<Message, MessageType> chatLogQueueMessageHelper;
         QueuedMessageHelper<Message, MessageType> serverSnapQueueMessageHelper;
         QueuedMessageHelper<Message, MessageType> clientSnapQueueMessageHelper;
+        QueuedMessageHelper<Message, MessageType> playerQueueMessageHelper;
+        QueuedMessageHelper<Message, MessageType> playerSettingsMessageHelper;
+        INetworkPlayerProcessor stubNetworkPlayerProcessor;
+        IClientStateTracker stubClientStateTracker;
         IIncomingMessageQueue stubIncomingMessageQueue;
         ChatLogProcessor chatLogProcessor;
 
         [SetUp]
         public void SetUp()
         {
-            client = new Client();
+            client = new LocalClient(null, null);
             clientLog = new Log<ChatMessage>();
+            stubClientStateTracker = MockRepository.GenerateStub<IClientStateTracker>();
             chatLogQueueMessageHelper = new QueuedMessageHelper<Message, MessageType>();
             serverSnapQueueMessageHelper = new QueuedMessageHelper<Message, MessageType>();
             clientSnapQueueMessageHelper = new QueuedMessageHelper<Message, MessageType>();
+            playerQueueMessageHelper = new QueuedMessageHelper<Message, MessageType>();
+            playerSettingsMessageHelper = new QueuedMessageHelper<Message, MessageType>();
             stubIncomingMessageQueue = MockRepository.GenerateStub<IIncomingMessageQueue>();
             stubIncomingMessageQueue.Stub(x => x.ReadWholeMessage(Arg<MessageType>.Is.Equal(MessageType.ChatLog))).Do(chatLogQueueMessageHelper.GetNextQueuedMessage);
             stubIncomingMessageQueue.Stub(x => x.ReadWholeMessage(Arg<MessageType>.Is.Equal(MessageType.ServerSnap))).Do(serverSnapQueueMessageHelper.GetNextQueuedMessage);
             stubIncomingMessageQueue.Stub(x => x.ReadWholeMessage(Arg<MessageType>.Is.Equal(MessageType.ClientSnap))).Do(clientSnapQueueMessageHelper.GetNextQueuedMessage);
-            chatLogProcessor = new ChatLogProcessor(client, clientLog, stubIncomingMessageQueue);
+            stubIncomingMessageQueue.Stub(x => x.ReadWholeMessage(Arg<MessageType>.Is.Equal(MessageType.Player))).Do(playerQueueMessageHelper.GetNextQueuedMessage);
+            stubIncomingMessageQueue.Stub(x => x.ReadWholeMessage(Arg<MessageType>.Is.Equal(MessageType.PlayerSettings))).Do(playerSettingsMessageHelper.GetNextQueuedMessage);
+            stubNetworkPlayerProcessor = MockRepository.GenerateStub<INetworkPlayerProcessor>();
+            chatLogProcessor = new ChatLogProcessor(client, clientLog, stubNetworkPlayerProcessor, stubClientStateTracker, stubIncomingMessageQueue);
         }
 
         [Test]
@@ -89,5 +99,30 @@ namespace UnitTestLibrary
             Assert.AreEqual(msg2, clientLog[0]);
         }
 
+        [Test]
+        public void UpdatesPlayer()
+        {
+            stubClientStateTracker.Stub(x => x[3]).Return(client);
+            Player receivedPlayer = new Player(null, null);
+            Message msg = new Message() { ClientID = 3, Type = MessageType.Player, Data = receivedPlayer };
+            playerQueueMessageHelper.QueuedMessages.Enqueue(msg);
+
+            chatLogProcessor.Process(1);
+
+            stubNetworkPlayerProcessor.AssertWasCalled(me => me.UpdatePlayerFromNetworkMessage(Arg<Message>.Is.Equal(msg)));
+        }
+
+        [Test]
+        public void UpdatesPlayerSettings()
+        {
+            stubClientStateTracker.Stub(x => x[3]).Return(client);
+            PlayerSettings receivedPlayerSettings = new PlayerSettings();
+            Message msg = new Message() { ClientID = 3, Type = MessageType.Player, Data = receivedPlayerSettings };
+            playerSettingsMessageHelper.QueuedMessages.Enqueue(msg);
+
+            chatLogProcessor.Process(1);
+
+            stubNetworkPlayerProcessor.AssertWasCalled(me => me.UpdatePlayerSettingsFromNetworkMessage(Arg<Message>.Is.Equal(msg)));
+        }
     }
 }

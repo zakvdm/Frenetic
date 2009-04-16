@@ -6,6 +6,7 @@ using NUnit.Framework;
 using System.Xml.Serialization;
 using System.IO;
 using Frenetic.Network;
+using Microsoft.Xna.Framework;
 namespace UnitTestLibrary
 {
     [TestFixture]
@@ -32,27 +33,27 @@ namespace UnitTestLibrary
         [Test]
         public void CanSerializeAndDeserializeAMessageWithPlayerAsData()
         {
-            Player player = new Player(10, null, null, null);
-            Message msg = new Message() { Type = MessageType.PlayerData, Data = player };
+            Player player = new Player(null, null);
+            player.Position = new Vector2(1, 2);
+            Message msg = new Message() { Type = MessageType.Player, Data = player };
 
             byte[] serializedMessage = serializer.Serialize(msg);
 
             Message recoveredMessage = serializer.Deserialize(serializedMessage);
-            Assert.AreEqual(10, ((Player)recoveredMessage.Data).ID);
+            Assert.AreEqual(new Vector2(1, 2), ((Player)recoveredMessage.Data).Position);
         }
 
         [Test]
-        public void SerializesPlayerSettingsAlongWithPlayerData()
+        public void CanSerializeAndDeserializeAMessageWithPlayerSettingsAsData()
         {
             PlayerSettings playerSettings = new PlayerSettings();
             playerSettings.Name = "Jean Pant";
-            Player player = new Player(10, playerSettings, null, null);
-            Message msg = new Message() { Type = MessageType.PlayerData, Data = player };
+            Message msg = new Message() { Type = MessageType.PlayerSettings, Data = playerSettings };
 
             byte[] serializedMessage = serializer.Serialize(msg);
 
             Message recoveredMessage = serializer.Deserialize(serializedMessage);
-            Assert.AreEqual("Jean Pant", ((Player)recoveredMessage.Data).Settings.Name);
+            Assert.AreEqual("Jean Pant", ((PlayerSettings)recoveredMessage.Data).Name);
         }
     }
 }

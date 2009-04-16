@@ -11,11 +11,13 @@ namespace UnitTestLibrary
     [TestFixture]
     public class PlayerViewTests
     {
+        Player player;
         PlayerSettings _settings;
         ITextureBank<PlayerTextures> _stubTextureBank;
         [SetUp]
         public void SetUp()
         {
+            player = new Player(null, null);
             _settings = new PlayerSettings();
             _stubTextureBank = MockRepository.GenerateStub<ITextureBank<PlayerTextures>>();
         }
@@ -29,10 +31,9 @@ namespace UnitTestLibrary
             stubTexture.Stub(x => x.Height).Return(200);
             _stubTextureBank.Stub(x => x[PlayerTextures.Ball]).Return(stubTexture);
             var stubSpriteBatch = MockRepository.GenerateStub<ISpriteBatch>();
-            Player player = new Player(1, _settings, null, null);
             var camera = new Camera(player, new Vector2(1, 2));
             player.Position = new Vector2(1, 1);
-            PlayerView playerView = new PlayerView(player, _stubTextureBank, stubSpriteBatch, camera);
+            PlayerView playerView = new PlayerView(player, _settings, _stubTextureBank, stubSpriteBatch, camera);
 
             playerView.Generate();
 
@@ -46,11 +47,10 @@ namespace UnitTestLibrary
         [Test]
         public void UsesCameraCorrectly()
         {
-            Player player = new Player(0, _settings, null, null);
             Camera camera = new Camera(player, new Vector2(100, 100));
             var stubSpriteBatch = MockRepository.GenerateStub<ISpriteBatch>();
             _stubTextureBank.Stub(x => x[PlayerTextures.Ball]).Return(MockRepository.GenerateStub<ITexture>());
-            PlayerView playerView = new PlayerView(player, _stubTextureBank, stubSpriteBatch, camera);
+            PlayerView playerView = new PlayerView(player, _settings, _stubTextureBank, stubSpriteBatch, camera);
 
             playerView.Generate();
 

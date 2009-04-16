@@ -37,7 +37,7 @@ namespace UnitTestLibrary
             IncomingMessageQueue mq = new IncomingMessageQueue(stubNS);
             stubNS.Stub(x => x.ReadMessage()).Return(null);
 
-            Assert.IsNull(mq.ReadMessage(MessageType.PlayerData));
+            Assert.IsNull(mq.ReadMessage(MessageType.Player));
         }
 
         [Test]
@@ -45,10 +45,10 @@ namespace UnitTestLibrary
         {
             var stubNS = MockRepository.GenerateStub<INetworkSession>();
             IncomingMessageQueue mq = new IncomingMessageQueue(stubNS);
-            queueMH.QueuedMessages.Enqueue(new Message() { Type = MessageType.PlayerData, Data = new byte[3] { 1, 2, 3 } });
+            queueMH.QueuedMessages.Enqueue(new Message() { Type = MessageType.Player, Data = new byte[3] { 1, 2, 3 } });
             stubNS.Stub(x => x.ReadMessage()).Do(queueMH.GetNextQueuedMessage);
 
-            Assert.AreEqual(new byte[3] { 1, 2, 3 }, mq.ReadMessage(MessageType.PlayerData));
+            Assert.AreEqual(new byte[3] { 1, 2, 3 }, mq.ReadMessage(MessageType.Player));
         }
 
         [Test]
@@ -68,12 +68,12 @@ namespace UnitTestLibrary
         {
             var stubNS = MockRepository.GenerateStub<INetworkSession>();
             IncomingMessageQueue mq = new IncomingMessageQueue(stubNS);
-            queueMH.QueuedMessages.Enqueue(new Message() { Type = MessageType.PlayerData, Data = new byte[3] { 1, 2, 3 } });
-            queueMH.QueuedMessages.Enqueue(new Message() { Type = MessageType.PlayerData, Data = new byte[2] { 4, 5 } });
+            queueMH.QueuedMessages.Enqueue(new Message() { Type = MessageType.Player, Data = new byte[3] { 1, 2, 3 } });
+            queueMH.QueuedMessages.Enqueue(new Message() { Type = MessageType.Player, Data = new byte[2] { 4, 5 } });
             stubNS.Stub(x => x.ReadMessage()).Do(queueMH.GetNextQueuedMessage);
 
-            Assert.AreEqual(new byte[3] { 1, 2, 3 }, mq.ReadMessage(MessageType.PlayerData));
-            Assert.AreEqual(new byte[2] { 4, 5 }, mq.ReadMessage(MessageType.PlayerData));
+            Assert.AreEqual(new byte[3] { 1, 2, 3 }, mq.ReadMessage(MessageType.Player));
+            Assert.AreEqual(new byte[2] { 4, 5 }, mq.ReadMessage(MessageType.Player));
         }
 
         [Test]
@@ -81,14 +81,14 @@ namespace UnitTestLibrary
         {
             var stubNS = MockRepository.GenerateStub<INetworkSession>();
             var mq = new IncomingMessageQueue(stubNS);
-            queueMH.QueuedMessages.Enqueue(new Message() { Type = MessageType.PlayerData, Data = new byte[3] { 1, 2, 3 } });
+            queueMH.QueuedMessages.Enqueue(new Message() { Type = MessageType.Player, Data = new byte[3] { 1, 2, 3 } });
             queueMH.QueuedMessages.Enqueue(new Message() { Type = MessageType.Event, Data = new byte[2] { 4, 5 } });
-            queueMH.QueuedMessages.Enqueue(new Message() { Type = MessageType.PlayerData, Data = new byte[3] { 6, 7, 8 } });
+            queueMH.QueuedMessages.Enqueue(new Message() { Type = MessageType.Player, Data = new byte[3] { 6, 7, 8 } });
             stubNS.Stub(x => x.ReadMessage()).Do(queueMH.GetNextQueuedMessage);
 
-            Assert.AreEqual(new byte[3] { 1, 2, 3 }, mq.ReadMessage(MessageType.PlayerData));
-            Assert.AreEqual(new byte[3] { 6, 7, 8 }, mq.ReadMessage(MessageType.PlayerData));
-            Assert.IsNull(mq.ReadMessage(MessageType.PlayerData));
+            Assert.AreEqual(new byte[3] { 1, 2, 3 }, mq.ReadMessage(MessageType.Player));
+            Assert.AreEqual(new byte[3] { 6, 7, 8 }, mq.ReadMessage(MessageType.Player));
+            Assert.IsNull(mq.ReadMessage(MessageType.Player));
         }
     }
 

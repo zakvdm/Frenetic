@@ -21,7 +21,7 @@ namespace UnitTestLibrary
         [Test]
         public void ReturnsCorrectDiff()
         {
-            Client client = new Client();
+            Client client = new Client(null, null);
             client.LastServerSnap = 13;
             serverLog.AddMessage(new ChatMessage() { Snap = 12, Message = "1" });
             serverLog.AddMessage(new ChatMessage() { Snap = 15, Message = "2" });
@@ -37,7 +37,7 @@ namespace UnitTestLibrary
         [Test]
         public void EmptyDiffReturnsNull()
         {
-            Client client = new Client();
+            Client client = new Client(null, null);
             client.LastServerSnap = 4;
             serverLog.AddMessage(new ChatMessage() { Snap = 2, Message = "msg" });
 
@@ -47,7 +47,7 @@ namespace UnitTestLibrary
         [Test]
         public void DiffWithAnEmptyServerChatLogIsNull()
         {
-            Client client = new Client();
+            Client client = new Client(null, null);
             client.LastServerSnap = 4;
 
             Assert.IsNull(chatLogDiffer.GetOldestToYoungestDiff(client));

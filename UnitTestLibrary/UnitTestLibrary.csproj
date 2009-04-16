@@ -80,6 +80,7 @@
     <Compile Include="ChatLogDifferByReferenceTests.cs" />
     <Compile Include="ChatMessageTests.cs" />
     <Compile Include="ClientStateTrackerTests.cs" />
+    <Compile Include="LocalClientTests.cs" />
     <Compile Include="MessageConsoleTests.cs" />
     <Compile Include="LogTests.cs" />
     <Compile Include="ConsoleControllerTests.cs" />
@@ -112,9 +113,7 @@
     <Compile Include="IncomingMessageQueueTests.cs" />
     <Compile Include="GameSessionTests.cs" />
     <Compile Include="MainMenuScreenTests.cs" />
-    <Compile Include="NetworkPlayerControllerTests.cs" />
-    <Compile Include="NetworkPlayerViewTests.cs" />
-    <Compile Include="NetworkWorldViewTests.cs" />
+    <Compile Include="NetworkPlayerProcessorTests.cs" />
     <Compile Include="PlayerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="WorldTests.cs" />

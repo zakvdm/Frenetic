@@ -95,6 +95,7 @@
     <Compile Include="Engine\Console\IConsole.cs" />
     <Compile Include="Engine\Console\IMessageConsole.cs" />
     <Compile Include="Engine\Console\MessageConsole.cs" />
+    <Compile Include="Gameplay\Player\INetworkPlayerProcessor.cs" />
     <Compile Include="Network\Client\ChatLogProcessor.cs" />
     <Compile Include="Network\Server\ChatLogSender.cs" />
     <Compile Include="Engine\Console\Log.cs" />
@@ -126,8 +127,7 @@
     <Compile Include="Network\Client.cs" />
     <Compile Include="Network\ClientStateTracker.cs" />
     <Compile Include="Network\Client\ClientInputSender.cs" />
-    <Compile Include="Gameplay\Player\NetworkPlayerController.cs" />
-    <Compile Include="Gameplay\Player\NetworkPlayerView.cs" />
+    <Compile Include="Gameplay\Player\NetworkPlayerProcessor.cs" />
     <Compile Include="Gameplay\Player\Player.cs" />
     <Compile Include="Gameplay\Player\PlayerSettings.cs" />
     <Compile Include="Gameplay\Player\PlayerView.cs" />

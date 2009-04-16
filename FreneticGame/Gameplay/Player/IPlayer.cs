@@ -5,9 +5,7 @@ namespace Frenetic
 {
     public interface IPlayer
     {
-        int ID { get; set; }
         Vector2 Position { get; set; }
-        PlayerSettings Settings { get; set; }
 
         void Update();
         bool Jump();

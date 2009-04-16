@@ -5,7 +5,7 @@ namespace Frenetic.Network
 {
     public class ClientInputSender : IView
     {
-        public ClientInputSender(Client localClient, IMessageConsole messageConsole, ISnapCounter snapCounter, IOutgoingMessageQueue outgoingMessageQueue)
+        public ClientInputSender(LocalClient localClient, IMessageConsole messageConsole, ISnapCounter snapCounter, IOutgoingMessageQueue outgoingMessageQueue)
         {
             _localClient = localClient;
             _messageConsole = messageConsole;
@@ -28,6 +28,8 @@ namespace Frenetic.Network
                 SendLastReceivedServerSnapAndCurrentClientSnap();
 
                 SendAllPendingChatMessages();
+
+                SendLocalPlayerAndPlayerSettings();
             }
         }
 
@@ -57,9 +59,15 @@ namespace Frenetic.Network
             }
         }
 
+        void SendLocalPlayerAndPlayerSettings()
+        {
+            _outgoingMessageQueue.Write(new Message() { ClientID = _localClient.ID, Type = MessageType.Player, Data = _localClient.Player });
+            _outgoingMessageQueue.Write(new Message() { ClientID = _localClient.ID, Type = MessageType.PlayerSettings, Data = _localClient.PlayerSettings });
+        }
+
         IMessageConsole _messageConsole;
         IOutgoingMessageQueue _outgoingMessageQueue;
-        Client _localClient;
+        LocalClient _localClient;
         ISnapCounter _snapCounter;
 
         int _lastSentSnap = 0;

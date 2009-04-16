@@ -85,7 +85,7 @@ namespace UnitTestLibrary
             var stubNetConnection = MockRepository.GenerateStub<INetConnection>();
             LidgrenServerNetworkSession serverNetworkSession = new LidgrenServerNetworkSession(stubNetServer, _serializer);
             NetBuffer tmpBuffer = new NetBuffer();
-            tmpBuffer.Write(_serializer.Serialize(new Message() { Type = MessageType.PlayerData, Data = 10 }));
+            tmpBuffer.Write(_serializer.Serialize(new Message() { Type = MessageType.Player, Data = 10 }));
 
             stubNetConnection.Stub(x => x.ConnectionID).Return(1);
             stubNetServer.Stub(x => x.CreateBuffer()).Return(tmpBuffer);
@@ -99,7 +99,7 @@ namespace UnitTestLibrary
             stubNetServer.AssertWasCalled(x => x.ReadMessage(Arg<NetBuffer>.Is.Equal(tmpBuffer),
                                         out Arg<NetMessageType>.Out(NetMessageType.Data).Dummy,
                                         out Arg<INetConnection>.Out(stubNetConnection).Dummy));
-            Assert.AreEqual(MessageType.PlayerData, msg.Type);
+            Assert.AreEqual(MessageType.Player, msg.Type);
             Assert.AreEqual(10, msg.Data);
         }
 

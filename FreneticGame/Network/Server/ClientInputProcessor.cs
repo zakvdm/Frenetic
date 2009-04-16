@@ -4,8 +4,9 @@ namespace Frenetic.Network
 {
     public class ClientInputProcessor : IController
     {
-        public ClientInputProcessor(Log<ChatMessage> serverChatLog, IClientStateTracker clientStateTracker, IChatLogDiffer chatLogDiffer, ISnapCounter snapCounter, IIncomingMessageQueue incomingMessageQueue)
+        public ClientInputProcessor(INetworkPlayerProcessor networkPlayerProcessor, Log<ChatMessage> serverChatLog, IClientStateTracker clientStateTracker, IChatLogDiffer chatLogDiffer, ISnapCounter snapCounter, IIncomingMessageQueue incomingMessageQueue)
         {
+            _networkPlayerProcessor = networkPlayerProcessor;
             _serverChatLog = serverChatLog;
             _clientStateTracker = clientStateTracker;
             _chatLogDiffer = chatLogDiffer;
@@ -47,6 +48,26 @@ namespace Frenetic.Network
 
                 AddClientChatMessageToServerLog(netMsg);
             }
+            // Update player:
+            while (true)
+            {
+                Message netMsg = _incomingMessageQueue.ReadWholeMessage(MessageType.Player);
+
+                if (netMsg == null)
+                    break;
+
+                _networkPlayerProcessor.UpdatePlayerFromNetworkMessage(netMsg);
+            }
+            // Update Player Settings:
+            while (true)
+            {
+                Message netMsg = _incomingMessageQueue.ReadWholeMessage(MessageType.PlayerSettings);
+
+                if (netMsg == null)
+                    break;
+
+                _networkPlayerProcessor.UpdatePlayerSettingsFromNetworkMessage(netMsg);
+            }
         }
 
         #endregion
@@ -55,7 +76,7 @@ namespace Frenetic.Network
         {
             ChatMessage chatMsg = (ChatMessage)netMsg.Data;
 
-            chatMsg.ClientName = _clientStateTracker[netMsg.ClientID].Name;
+            chatMsg.ClientName = _clientStateTracker[netMsg.ClientID].PlayerSettings.Name;
 
             // Before we add this message to the server log, let's check that we haven't already added it
             if (_chatLogDiffer.IsNewClientChatMessage(chatMsg))
@@ -67,6 +88,7 @@ namespace Frenetic.Network
             }
         }
 
+        INetworkPlayerProcessor _networkPlayerProcessor;
         Log<ChatMessage> _serverChatLog;
         IClientStateTracker _clientStateTracker;
         IChatLogDiffer _chatLogDiffer;

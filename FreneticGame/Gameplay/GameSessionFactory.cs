@@ -25,14 +25,13 @@ namespace Frenetic
         const int _screenWidth = 800;
         const int _screenHeight = 600;
 
-        public GameSessionFactory(GraphicsDevice graphicsDevice, ContentManager contentManager, IContainer parentContainer, PlayerSettings localPlayerSettings)
+        public GameSessionFactory(GraphicsDevice graphicsDevice, ContentManager contentManager, IContainer parentContainer)
         {
             _graphicsDevice = graphicsDevice;
             _contentManager = contentManager;
 
             _parentContainer = parentContainer;
 
-            _localPlayerSettings = localPlayerSettings;
         }
         #region IGameSessionFactory Members
 
@@ -53,7 +52,7 @@ namespace Frenetic
 
             IGameSession gameSession = ServerContainer.Resolve<IGameSession>();
 
-            GameSessionController gameSessionController = ServerContainer.Resolve<GameSessionController>(new TypedParameter(typeof(IPlayer), null));
+            GameSessionController gameSessionController = ServerContainer.Resolve<GameSessionController>();
             GameSessionView gameSessionView = ServerContainer.Resolve<GameSessionView>();
 
             SnapCounter snapCounter = (SnapCounter)ServerContainer.Resolve<ISnapCounter>();
@@ -93,14 +92,14 @@ namespace Frenetic
             gameSession.Controllers.Add(snapCounter);
 
             IPlayer localPlayer = CreateClientComponents(gameSession);
-            
+            ClientContainer.Resolve<LocalClient>().Player = localPlayer;    // reset Player on the local client so that the physics, etc. will be hooked up for this game session...
+
             gameSession.Controllers.Add(ClientContainer.Resolve<FarseerPhysicsController>());
             Frenetic.Level.Level level = ClientContainer.Resolve<Frenetic.Level.Level>();
 
             gameSession.Controllers.Add(ClientContainer.Resolve<LevelController>(new TypedParameter(typeof(Frenetic.Level.Level), level)));
 
             GameSessionController gameSessionController = ClientContainer.Resolve<GameSessionController>(
-                new TypedParameter(typeof(IPlayer), localPlayer),
                 new TypedParameter(typeof(bool), false));
             GameSessionView gameSessionView = ClientContainer.Resolve<GameSessionView>();
 
@@ -118,7 +117,7 @@ namespace Frenetic
         private IPlayer CreateClientComponents(IGameSession gameSession)
         {
             // Make local player:
-            IPlayer localPlayer = ClientContainer.Resolve<IPlayer>(new TypedParameter(typeof(int), 0), new TypedParameter(typeof(PlayerSettings), _localPlayerSettings));
+            IPlayer localPlayer = ClientContainer.Resolve<IPlayer>();
 
             gameSession.Controllers.Add(ClientContainer.Resolve<FarseerPhysicsController>());
             Frenetic.Level.Level level = ClientContainer.Resolve<Frenetic.Level.Level>();
@@ -130,11 +129,10 @@ namespace Frenetic
                                             new TypedParameter(typeof(Vector2), new Vector2(_screenWidth, _screenHeight))
                                             );
 
-            PlayerView localPlayerView = ClientContainer.Resolve<PlayerView>(new TypedParameter(typeof(IPlayer), localPlayer));
+            PlayerView localPlayerView = ClientContainer.Resolve<PlayerView>(new TypedParameter(typeof(IPlayer), localPlayer), new TypedParameter(typeof(PlayerSettings), ClientContainer.Resolve<LocalClient>().PlayerSettings));
             gameSession.Views.Add(localPlayerView);
 
             gameSession.Controllers.Add(ClientContainer.Resolve<KeyboardPlayerController>(new TypedParameter(typeof(IPlayer), localPlayer)));
-            gameSession.Views.Add(ClientContainer.Resolve<NetworkPlayerView>(new TypedParameter(typeof(IPlayer), localPlayer)));
 
             ITexture levelTexture = ClientContainer.Resolve<ITexture>(new TypedParameter(typeof(Texture2D), _contentManager.Load<Texture2D>("Textures/blank")));
             gameSession.Views.Add(ClientContainer.Resolve<LevelView>(new TypedParameter(typeof(ITexture), levelTexture)));
@@ -177,8 +175,6 @@ namespace Frenetic
         IContainer _parentContainer;
         IContainer ClientContainer { get; set; }
         IContainer ServerContainer { get; set; }
-
-        PlayerSettings _localPlayerSettings;
     }
 
     public class GameSessionControllerAndView

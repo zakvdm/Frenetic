@@ -16,6 +16,8 @@ namespace Frenetic.Network.Lidgren
             _netClient.SetMessageTypeEnabled(NetMessageType.ConnectionRejected, true);
             _netClient.SetMessageTypeEnabled(NetMessageType.BadMessageReceived, true);
 
+            _netClient.Simulate(0.1f, 0.1f, 0.2f, 0.1f);
+
 #if DEBUG
             _netClient.SetMessageTypeEnabled(NetMessageType.DebugMessage, true);
             _netClient.SetMessageTypeEnabled(NetMessageType.VerboseDebugMessage, true);

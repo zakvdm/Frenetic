@@ -125,10 +125,7 @@ namespace Frenetic
 
         void CreateMediatorControllers()
         {
-            PlayerSettings localPlayerSettings = Container.Resolve<PlayerSettings>();
-            // NOTE: I'm creating the GameSessionFactory here with the same PlayerSettings that is passed to the MediatorController... This is a little hacky...
-            //      At some point all of this needs to move out of the FreneticGame class...
-            Container.Resolve<IGameSessionFactory>(new TypedParameter(typeof(PlayerSettings), localPlayerSettings));
+            PlayerSettings localPlayerSettings = Container.Resolve<LocalClient>().PlayerSettings;
 
             // Mediator Controllers:
             Container.Resolve<MediatorPlayerSettingsController>(new TypedParameter(typeof(PlayerSettings), localPlayerSettings));
@@ -170,7 +167,9 @@ namespace Frenetic
             builder.Register<OutgoingMessageQueue>().As<IOutgoingMessageQueue>().ContainerScoped();
             builder.Register<XmlMessageSerializer>().As<IMessageSerializer>().ContainerScoped();
 
-            builder.Register<Client>().ContainerScoped();
+            builder.Register<LocalClient>().SingletonScoped();
+            builder.Register<Client>().FactoryScoped();
+            builder.RegisterGeneratedFactory<Client.Factory>(new TypedService(typeof(Client)));
 
             builder.Register<ClientInputSender>().ContainerScoped();
             builder.Register<ClientInputProcessor>().ContainerScoped();
@@ -178,6 +177,8 @@ namespace Frenetic
             builder.Register<ClientStateTracker>().As<IClientStateTracker>().ContainerScoped();
             builder.Register<SnapCounter>().As<ISnapCounter>().ContainerScoped();
             builder.Register<ChatLogDifferByReference>().As<IChatLogDiffer>().ContainerScoped();
+
+            builder.Register<NetworkPlayerProcessor>().As<INetworkPlayerProcessor>().ContainerScoped();
             #endregion
 
             #region Graphics
@@ -200,11 +201,9 @@ namespace Frenetic
             builder.Register<PlayerSettings>().FactoryScoped();
             builder.Register<Player>().As<IPlayer>().FactoryScoped();
             builder.Register<PlayerView>().FactoryScoped();
-            builder.RegisterGeneratedFactory<Player.Factory>(new TypedService(typeof(IPlayer)));
             builder.RegisterGeneratedFactory<PlayerView.Factory>(new TypedService(typeof(PlayerView)));
             builder.Register((c) => (IBoundaryCollider)new WorldBoundaryCollider(_screenWidth, _screenHeight));
             builder.Register<KeyboardPlayerController>().ContainerScoped();
-            builder.Register<NetworkPlayerView>().FactoryScoped();
 
             builder.Register<XnaTextureBank<PlayerTextures>>().As<ITextureBank<PlayerTextures>>().SingletonScoped();
             #endregion

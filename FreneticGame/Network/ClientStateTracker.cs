@@ -5,9 +5,10 @@ namespace Frenetic.Network
 {
     public class ClientStateTracker : IClientStateTracker
     {
-        public ClientStateTracker(ISnapCounter snapCounter)
+        public ClientStateTracker(ISnapCounter snapCounter, Client.Factory clientFactory)
         {
             _snapCounter = snapCounter;
+            _clientFactory = clientFactory;
 
             CurrentClients = new List<Client>();
         }
@@ -22,10 +23,14 @@ namespace Frenetic.Network
 
         public void AddNewClient(int ID)
         {
-            CurrentClients.Add(new Client() { ID = ID, LastServerSnap = _snapCounter.CurrentSnap });
+            Client newClient = _clientFactory();
+            newClient.ID = ID;
+            newClient.LastServerSnap = _snapCounter.CurrentSnap;
+            CurrentClients.Add(newClient);
         }
 
         public List<Client> CurrentClients { get; private set; }
         ISnapCounter _snapCounter;
+        Client.Factory _clientFactory;
     }
 }

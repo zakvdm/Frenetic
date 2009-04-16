@@ -5,6 +5,7 @@ using Frenetic;
 using Frenetic.Network;
 using Lidgren.Network;
 using System.Collections.Generic;
+using Microsoft.Xna.Framework;
 
 namespace UnitTestLibrary
 {
@@ -33,7 +34,7 @@ namespace UnitTestLibrary
         public void GenerateSendsCurrentServerSnap()
         {
             stubSnapCounter.CurrentSnap = 3;
-            Client client = new Client();
+            Client client = new Client(null, null);
             stubClientStateTracker.CurrentClients.Add(client);
 
             serverChatLogView.Generate();
@@ -45,7 +46,7 @@ namespace UnitTestLibrary
         public void GenerateSendsLastReceivedClientSnap()
         {
             stubSnapCounter.CurrentSnap = 3;
-            Client client = new Client();
+            Client client = new Client(null, null);
             client.LastClientSnap = 78;
             stubClientStateTracker.CurrentClients.Add(client);
 
@@ -60,7 +61,7 @@ namespace UnitTestLibrary
             Log<ChatMessage> chatLog = new Log<ChatMessage>();
             ChatMessage chatMsg = new ChatMessage() { ClientName = "terence", Snap = 32 };
             chatLog.AddMessage(chatMsg);
-            Client client = new Client();
+            Client client = new Client(null, null);
             stubClientStateTracker.CurrentClients.Add(client);
             stubChatLogDiffer.Stub(x => x.GetOldestToYoungestDiff(client)).Return(chatLog);
             stubSnapCounter.CurrentSnap = 3;
@@ -76,7 +77,7 @@ namespace UnitTestLibrary
             Log<ChatMessage> chatLog = new Log<ChatMessage>();
             chatLog.AddMessage(new ChatMessage() { Message = "Woohoo" });
             chatLog.AddMessage(new ChatMessage() { Message = "boohoo" });
-            Client client = new Client();
+            Client client = new Client(null, null);
             stubClientStateTracker.CurrentClients.Add(client);
             stubChatLogDiffer.Stub(x => x.GetOldestToYoungestDiff(client)).Return(chatLog);
             stubSnapCounter.CurrentSnap = 3;
@@ -92,8 +93,8 @@ namespace UnitTestLibrary
         [Test]
         public void GetsADiffedLogForEachClient()
         {
-            Client client1 = new Client() { ID = 1 };
-            Client client2 = new Client() { ID = 2 };
+            Client client1 = new Client(null, null) { ID = 1 };
+            Client client2 = new Client(null, null) { ID = 2 };
             stubClientStateTracker.CurrentClients.Add(client1);
             stubClientStateTracker.CurrentClients.Add(client2);
             stubSnapCounter.CurrentSnap = 3;
@@ -104,5 +105,17 @@ namespace UnitTestLibrary
             stubChatLogDiffer.AssertWasCalled(x => x.GetOldestToYoungestDiff(client2));
         }
 
+        [Test]
+        public void SendsPlayerToAllClients()
+        {
+            Client client = new Client(null, null) { ID = 7 };
+            client.Player = new Player(null, null) { Position = new Vector2(100, 200) };
+            stubClientStateTracker.CurrentClients.Add(client);
+            stubSnapCounter.CurrentSnap = 3;
+
+            serverChatLogView.Generate();
+
+            stubOutgoingMessageQueue.AssertWasCalled(x => x.Write(Arg<Message>.Matches(y => y.Type == MessageType.Player && y.ClientID == 7 && ((Player)y.Data).Position == new Vector2(100, 200))));
+        }
     }
 }

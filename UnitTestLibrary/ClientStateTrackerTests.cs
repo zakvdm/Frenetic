@@ -9,12 +9,34 @@ namespace UnitTestLibrary
     [TestFixture]
     public class ClientStateTrackerTests
     {
+        ISnapCounter stubSnapCounter;
+        ClientStateTracker clientStateTracker;
+        bool clientFactoryWasUsed;
+        Client.Factory clientFactory;
+
+        [SetUp]
+        public void SetUp()
+        {
+            clientFactoryWasUsed = false;
+            clientFactory = () => { clientFactoryWasUsed = true; return new Client(null, null); };
+            stubSnapCounter = MockRepository.GenerateStub<ISnapCounter>();
+            clientStateTracker = new ClientStateTracker(stubSnapCounter, clientFactory);
+        }
+
+
+        [Test]
+        public void AddNewClientUsesClientFactory()
+        {
+            clientStateTracker.AddNewClient(100);
+
+            Assert.IsTrue(clientFactoryWasUsed);
+            Assert.IsNotNull(clientStateTracker[100]);
+        }
+
         [Test]
         public void NewClientsAddedWithLatestServerSnap()
         {
-            ISnapCounter stubSnapCounter = MockRepository.GenerateStub<ISnapCounter>();
             stubSnapCounter.CurrentSnap = 12;
-            ClientStateTracker clientStateTracker = new ClientStateTracker(stubSnapCounter);
             clientStateTracker.AddNewClient(100);
 
             foreach (Client client in clientStateTracker.CurrentClients)
@@ -26,7 +48,6 @@ namespace UnitTestLibrary
         [Test]
         public void CanIndexBasedOnClientID()
         {
-            ClientStateTracker clientStateTracker = new ClientStateTracker(MockRepository.GenerateStub<ISnapCounter>());
             clientStateTracker.AddNewClient(100);
 
             Assert.AreEqual(100, clientStateTracker[100].ID);
@@ -35,7 +56,6 @@ namespace UnitTestLibrary
         [Test]
         public void CanSetLastSnapViaIDIndex()
         {
-            ClientStateTracker clientStateTracker = new ClientStateTracker(MockRepository.GenerateStub<ISnapCounter>());
             clientStateTracker.AddNewClient(12);
 
             clientStateTracker[12].LastServerSnap = 1823;

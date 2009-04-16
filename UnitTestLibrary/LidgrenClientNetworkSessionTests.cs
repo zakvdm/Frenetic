@@ -76,7 +76,7 @@ namespace UnitTestLibrary
             LidgrenClientNetworkSession clientNetworkSession = new LidgrenClientNetworkSession(stubNetClient, new XmlMessageSerializer());
 
             NetBuffer tmpBuffer = new NetBuffer();
-            Message msg = new Message() { Type = MessageType.PlayerData, Data = 10 };
+            Message msg = new Message() { Type = MessageType.Player, Data = 10 };
             stubNetClient.Stub(x => x.CreateBuffer(Arg<int>.Is.Anything)).Return(tmpBuffer);
             stubNetClient.Stub(x => x.Connected).Return(true);
 

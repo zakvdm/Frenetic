@@ -16,7 +16,8 @@ namespace Frenetic.Network
     {
         ServerSnap,
         ClientSnap,
-        PlayerData,
+        Player,
+        PlayerSettings,
         Event,
         SuccessfulJoin,
         NewPlayer,
@@ -25,6 +26,7 @@ namespace Frenetic.Network
 
     
     [XmlInclude(typeof(Player))]
+    [XmlInclude(typeof(PlayerSettings))]
     [XmlInclude(typeof(ChatMessage))]
     public class Message
     {

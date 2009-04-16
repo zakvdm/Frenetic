@@ -9,6 +9,7 @@ using Lidgren.Network;
 using Frenetic.Physics;
 using Microsoft.Xna.Framework;
 using Frenetic.Network;
+using System.Collections.Generic;
 
 namespace UnitTestLibrary
 {
@@ -16,26 +17,22 @@ namespace UnitTestLibrary
     public class GameSessionControllerTests
     {
         QueuedMessageHelper<object, MessageType> queueMH;
+        IIncomingMessageQueue stubIncomingMessageQueue;
+        IOutgoingMessageQueue stubOutgoingMessageQueue;
+
         [SetUp]
         public void SetUp()
         {
             queueMH = new QueuedMessageHelper<object, MessageType>();
-        }
-        [Test]
-        public void ConstructingGameSessionControllerCreatesNetworkPlayerController()
-        {
-            var gameSession = new GameSession();
-            GameSessionController gsc = new GameSessionController(gameSession, null, null, null, null, null);
-
-            Assert.AreEqual(1, gameSession.Controllers.Count);
-            Assert.IsInstanceOfType(typeof(NetworkPlayerController), gameSession.Controllers[0]);
+            stubIncomingMessageQueue = MockRepository.GenerateStub<IIncomingMessageQueue>();
+            stubOutgoingMessageQueue = MockRepository.GenerateStub<IOutgoingMessageQueue>();
         }
         
         [Test]
         public void CallsProcessOnAllGameSessionControllersAndViews()
         {
             var gameSession = new GameSession();
-            GameSessionController gsc = new GameSessionController(gameSession, MockRepository.GenerateStub<IIncomingMessageQueue>(), null, null, null, null);
+            GameSessionController gsc = new GameSessionController(gameSession, stubIncomingMessageQueue, null, null);
 
             var stubController1 = MockRepository.GenerateStub<IController>();
             var stubController2 = MockRepository.GenerateStub<IController>();
@@ -57,24 +54,21 @@ namespace UnitTestLibrary
         [Test]
         public void HandlesNewPlayerMessageCorrectlyAsClient()
         {
-            //var stubNS = MockRepository.GenerateStub<INetworkSession>();
-            PlayerView pv = new PlayerView(null, null, null, null);
+            var stubClientStateTracker = MockRepository.GenerateStub<IClientStateTracker>();
             var stubPlayer = MockRepository.GenerateStub<IPlayer>();
-            bool playerFactoryWasUsedCorrectly = false;
+            stubClientStateTracker.Stub(me => me[100]).Return(new Client(stubPlayer, null));
+            PlayerView pv = new PlayerView(null, null, null, null, null);
             bool playerViewFactoryWasUsedCorrectly = false;
-            Player.Factory playerFactory = x => { if (x == 100) playerFactoryWasUsedCorrectly = true; return stubPlayer; };
             PlayerView.Factory playerViewFactory = x => { if (x == stubPlayer) playerViewFactoryWasUsedCorrectly = true; return pv; };
-            var stubIncomingMessageQueue = MockRepository.GenerateStub<IIncomingMessageQueue>();
             var gameSession = new GameSession();
-            GameSessionController gsc = new GameSessionController(gameSession, stubIncomingMessageQueue, null, playerFactory, playerViewFactory, null, null, null, false);
+            GameSessionController gsc = new GameSessionController(gameSession, stubIncomingMessageQueue, null, stubClientStateTracker, playerViewFactory, null, false);
             queueMH.QueuedMessages.Enqueue(100);
             stubIncomingMessageQueue.Stub(x => x.ReadMessage(Arg<MessageType>.Is.Equal(MessageType.NewPlayer))).Do(queueMH.GetNextQueuedMessage);
 
             gsc.Process(1);
 
-            Assert.IsTrue(playerFactoryWasUsedCorrectly);
+            stubClientStateTracker.AssertWasCalled(me => me.AddNewClient(Arg<int>.Is.Equal(100)));
             Assert.IsTrue(playerViewFactoryWasUsedCorrectly);
-            Assert.IsTrue(((NetworkPlayerController)gameSession.Controllers[0]).Players.ContainsKey(100));
             Assert.AreEqual(1, gameSession.Views.FindAll(x => x.GetType() == typeof(PlayerView)).Count);
             Assert.IsTrue(gameSession.Views.Contains(pv));
         }
@@ -82,24 +76,15 @@ namespace UnitTestLibrary
         [Test]
         public void HandlesNewPlayerMessageCorrectlyAsServer()
         {
-            bool playerFactoryWasUsedCorrectly = false;
-            Player.Factory playerFactory = x => { if (x == 100) playerFactoryWasUsedCorrectly = true; return null; };
-            var stubIncomingMessageQueue = MockRepository.GenerateStub<IIncomingMessageQueue>();
-            var stubOutgoingMessageQueue = MockRepository.GenerateStub<IOutgoingMessageQueue>();
-            var stubClientStateTracker = MockRepository.GenerateStub<IClientStateTracker>();
+            ClientStateTracker clientStateTracker = new ClientStateTracker(MockRepository.GenerateStub<ISnapCounter>(), () => new Client(new Player(null, null), null));
             var gameSession = new GameSession();
-            GameSessionController gsc = new GameSessionController(gameSession, stubIncomingMessageQueue, stubOutgoingMessageQueue, stubClientStateTracker, playerFactory, null);
+            GameSessionController gsc = new GameSessionController(gameSession, stubIncomingMessageQueue, stubOutgoingMessageQueue, clientStateTracker);
             queueMH.QueuedMessages.Enqueue(100);
             stubIncomingMessageQueue.Stub(x => x.ReadMessage(Arg<MessageType>.Is.Equal(MessageType.NewPlayer))).Do(queueMH.GetNextQueuedMessage);
 
             gsc.Process(1);
 
-            Assert.IsTrue(playerFactoryWasUsedCorrectly);
-            Assert.IsTrue(((NetworkPlayerController)gameSession.Controllers[0]).Players.ContainsKey(100));
-            Assert.IsInstanceOfType(typeof(NetworkPlayerView), gameSession.Views[0]);
-
-            stubClientStateTracker.AssertWasCalled(x => x.AddNewClient(Arg<int>.Is.Equal(100)));
-
+            Assert.IsNotNull(clientStateTracker[100]);
             stubOutgoingMessageQueue.AssertWasCalled(x => x.WriteFor(Arg<Message>.Matches(y => y.Type == MessageType.SuccessfulJoin && (int)y.Data == 100),
                 Arg<NetChannel>.Is.Equal(NetChannel.ReliableInOrder1),
                 Arg<int>.Is.Equal(100)));
@@ -112,10 +97,9 @@ namespace UnitTestLibrary
         [Test]
         public void NotifiesNewClientsOfAllExistentPlayers()
         {
-            var stubIncomingMessageQueue = MockRepository.GenerateStub<IIncomingMessageQueue>();
-            var stubOutgoingMessageQueue = MockRepository.GenerateStub<IOutgoingMessageQueue>();
+            var clientStateTracker = new ClientStateTracker(MockRepository.GenerateStub<ISnapCounter>(), () => new Client(new Player(null, null), null));
             var gameSession = new GameSession();
-            GameSessionController gsc = new GameSessionController(gameSession, stubIncomingMessageQueue, stubOutgoingMessageQueue, MockRepository.GenerateStub<IClientStateTracker>(), delegate { return null; }, null);
+            GameSessionController gsc = new GameSessionController(gameSession, stubIncomingMessageQueue, stubOutgoingMessageQueue, clientStateTracker);
             queueMH.QueuedMessages.Enqueue(100);
             queueMH.QueuedMessages.Enqueue(200);
             queueMH.QueuedMessages.Enqueue(300);
@@ -134,10 +118,9 @@ namespace UnitTestLibrary
         [Test]
         public void DoesNOTsendNewPlayerMessageToJoiningClient()
         {
-            var stubIncomingMessageQueue = MockRepository.GenerateStub<IIncomingMessageQueue>();
-            var stubOutgoingMessageQueue = MockRepository.GenerateStub<IOutgoingMessageQueue>();
+            ClientStateTracker clientStateTracker = new ClientStateTracker(MockRepository.GenerateStub<ISnapCounter>(), () => new Client(new Player(null, null), new PlayerSettings()));
             var gameSession = new GameSession();
-            GameSessionController gsc = new GameSessionController(gameSession, stubIncomingMessageQueue, stubOutgoingMessageQueue, MockRepository.GenerateStub<IClientStateTracker>(), delegate { return null; }, null);
+            GameSessionController gsc = new GameSessionController(gameSession, stubIncomingMessageQueue, stubOutgoingMessageQueue, clientStateTracker);
             queueMH.QueuedMessages.Enqueue(100);
             queueMH.QueuedMessages.Enqueue(200);
             queueMH.QueuedMessages.Enqueue(300);
@@ -154,16 +137,15 @@ namespace UnitTestLibrary
         public void HandlesSuccessfulJoinMessageCorrectly()
         {
             IPlayer localPlayer = MockRepository.GenerateStub<IPlayer>();
-            Client localClient = new Client();
+            LocalClient localClient = new LocalClient(null, null);
             var stubIncomingMessageQueue = MockRepository.GenerateStub<IIncomingMessageQueue>();
             var gameSession = new GameSession();
-            GameSessionController gsc = new GameSessionController(gameSession, stubIncomingMessageQueue, null, null, null, localPlayer, localClient, null, false);
+            GameSessionController gsc = new GameSessionController(gameSession, stubIncomingMessageQueue, null, null, null, localClient, false);
             queueMH.QueuedMessages.Enqueue(100);
             stubIncomingMessageQueue.Stub(x => x.ReadMessage(Arg<MessageType>.Is.Equal(MessageType.SuccessfulJoin))).Do(queueMH.GetNextQueuedMessage);
 
             gsc.Process(1);
 
-            Assert.AreEqual(100, localPlayer.ID);
             Assert.AreEqual(100, localClient.ID);
         }
     }

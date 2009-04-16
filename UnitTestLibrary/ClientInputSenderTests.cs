@@ -4,6 +4,7 @@ using Frenetic;
 using Frenetic.Network;
 using Rhino.Mocks;
 using Lidgren.Network;
+using Microsoft.Xna.Framework;
 
 namespace UnitTestLibrary
 {
@@ -11,7 +12,7 @@ namespace UnitTestLibrary
     public class ClientInputSenderTests
     {
         IOutgoingMessageQueue mockOutgoingMessageQueue;
-        Client client;
+        LocalClient client;
         ISnapCounter stubSnapCounter;
         MessageConsole console;
         ClientInputSender clientInputSender;
@@ -23,7 +24,7 @@ namespace UnitTestLibrary
             stubSnapCounter = MockRepository.GenerateStub<ISnapCounter>();
             stubSnapCounter.CurrentSnap = 3;
             console = new MessageConsole(null, new Log<ChatMessage>());
-            client = new Client() { ID = 9 };
+            client = new LocalClient(new Player(null, null), new PlayerSettings()) { ID = 9 };
             clientInputSender = new ClientInputSender(client, console, stubSnapCounter, mockOutgoingMessageQueue); 
         }
 
@@ -114,6 +115,32 @@ namespace UnitTestLibrary
             clientInputSender.Generate();
 
             // Assert:
+            mockOutgoingMessageQueue.VerifyAllExpectations();
+        }
+
+        [Test]
+        public void SendsLocalPlayer()
+        {
+            Player player = new Player(null, null);
+            player.Position = new Vector2(100, 200);
+            client.Player = player;
+            mockOutgoingMessageQueue.Expect(x => x.Write(Arg<Message>.Matches(y => y.Type == MessageType.Player && ((Player)y.Data).Position == new Vector2(100, 200)))).Repeat.Once();
+
+            clientInputSender.Generate();
+
+            mockOutgoingMessageQueue.VerifyAllExpectations();
+        }
+
+        [Test]
+        public void SendsLocalPlayerSettings()
+        {
+            PlayerSettings playerSettings = new PlayerSettings();
+            playerSettings.Name = "zak";
+            client.PlayerSettings = playerSettings;
+            mockOutgoingMessageQueue.Expect(x => x.Write(Arg<Message>.Matches(y => y.Type == MessageType.PlayerSettings && ((PlayerSettings)y.Data).Name == "zak"))).Repeat.Once();
+
+            clientInputSender.Generate();
+
             mockOutgoingMessageQueue.VerifyAllExpectations();
         }
     }

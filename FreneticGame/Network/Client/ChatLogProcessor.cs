@@ -5,11 +5,13 @@ namespace Frenetic
 {
     public class ChatLogProcessor : IController
     {
-        public ChatLogProcessor(Client localClient, Log<ChatMessage> chatLog, IIncomingMessageQueue incomingMessageQueue)
+        public ChatLogProcessor(LocalClient localClient, Log<ChatMessage> chatLog, INetworkPlayerProcessor networkPlayerProcessor, IClientStateTracker clientStateTracker, IIncomingMessageQueue incomingMessageQueue)
         {
             _localClient = localClient;
             _chatLog = chatLog;
+            _clientStateTracker = clientStateTracker;
             _incomingMessageQueue = incomingMessageQueue;
+            _networkPlayerProcessor = networkPlayerProcessor;
         }
 
         #region IController Members
@@ -48,6 +50,26 @@ namespace Frenetic
 
                 AddChatMessage((ChatMessage)message.Data);
             }
+            // update the players:
+            while (true)
+            {
+                Message netMsg = _incomingMessageQueue.ReadWholeMessage(MessageType.Player);
+
+                if (netMsg == null)
+                    break;
+
+                _networkPlayerProcessor.UpdatePlayerFromNetworkMessage(netMsg);
+            }
+            // update the player settings:
+            while (true)
+            {
+                Message netMsg = _incomingMessageQueue.ReadWholeMessage(MessageType.PlayerSettings);
+
+                if (netMsg == null)
+                    break;
+
+                _networkPlayerProcessor.UpdatePlayerSettingsFromNetworkMessage(netMsg);
+            }
         }
 
         #endregion
@@ -61,8 +83,10 @@ namespace Frenetic
             _chatLog.AddMessage(newMsg);
         }
 
-        Client _localClient;
+        LocalClient _localClient;
         Log<ChatMessage> _chatLog;
+        IClientStateTracker _clientStateTracker;
         IIncomingMessageQueue _incomingMessageQueue;
+        INetworkPlayerProcessor _networkPlayerProcessor;
     }
 }
