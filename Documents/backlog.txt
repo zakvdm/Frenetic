@@ -53,8 +53,10 @@ CARRIED OVER FROM PREVIOUS SPRINT:
   Server sends messages reliably to all clients
   Messages are written to the console with the client name
 
+TODO: When joining a network session and then exiting, the resources are properly disposed (why?)
 TODO: Change the client authentication model to be more like the q3 model (everything done unreliably).
 TODO: Add some kind of logging framework (so we can start doing debug output, etc.)
+
 
 8 - Player settings are saved over multiple game sessions
 

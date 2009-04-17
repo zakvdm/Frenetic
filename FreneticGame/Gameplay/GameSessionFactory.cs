@@ -50,6 +50,9 @@ namespace Frenetic
             serverNetworkSession.Create(14242);
             // *****************************************
 
+            // Server needs a new PhysicsSimulator (can't use the client's... -- NOTE: the parameter value is irrelevant, all that matters is that it exists...)
+            ServerContainer.Resolve<IPhysicsSimulator>(new NamedParameter("isServer", true));
+
             IGameSession gameSession = ServerContainer.Resolve<IGameSession>();
 
             GameSessionController gameSessionController = ServerContainer.Resolve<GameSessionController>();
@@ -92,9 +95,8 @@ namespace Frenetic
             gameSession.Controllers.Add(snapCounter);
 
             IPlayer localPlayer = CreateClientComponents(gameSession);
-            ClientContainer.Resolve<LocalClient>().Player = localPlayer;    // reset Player on the local client so that the physics, etc. will be hooked up for this game session...
 
-            gameSession.Controllers.Add(ClientContainer.Resolve<FarseerPhysicsController>());
+            gameSession.Controllers.Add(ClientContainer.Resolve<PhysicsController>());
             Frenetic.Level.Level level = ClientContainer.Resolve<Frenetic.Level.Level>();
 
             gameSession.Controllers.Add(ClientContainer.Resolve<LevelController>(new TypedParameter(typeof(Frenetic.Level.Level), level)));
@@ -117,9 +119,9 @@ namespace Frenetic
         private IPlayer CreateClientComponents(IGameSession gameSession)
         {
             // Make local player:
-            IPlayer localPlayer = ClientContainer.Resolve<IPlayer>();
+            IPlayer localPlayer = ClientContainer.Resolve<LocalClient>().Player;
 
-            gameSession.Controllers.Add(ClientContainer.Resolve<FarseerPhysicsController>());
+            gameSession.Controllers.Add(ClientContainer.Resolve<PhysicsController>());
             Frenetic.Level.Level level = ClientContainer.Resolve<Frenetic.Level.Level>();
             gameSession.Controllers.Add(ClientContainer.Resolve<LevelController>(new TypedParameter(typeof(Frenetic.Level.Level), level)));
 
@@ -146,9 +148,9 @@ namespace Frenetic
 
             // DEBUG VIEW:  // TODO: Write a controller for this...
             // TODO: Instantiate with Autofac
-            PhysicsSimulator physicsSimulator = ClientContainer.Resolve<PhysicsSimulator>();
-            var debugView = new PhysicsSimulatorView(physicsSimulator, new SpriteBatch(_graphicsDevice), camera);
-            physicsSimulator.EnableDiagnostics = true;
+            IPhysicsSimulator physicsSimulator = ClientContainer.Resolve<IPhysicsSimulator>();
+            var debugView = new PhysicsSimulatorView(physicsSimulator.PhysicsSimulator, new SpriteBatch(_graphicsDevice), camera);
+            physicsSimulator.PhysicsSimulator.EnableDiagnostics = true;
             debugView.LoadContent(_graphicsDevice, _contentManager);
             gameSession.Views.Add(debugView);
             // *********************************************************************************

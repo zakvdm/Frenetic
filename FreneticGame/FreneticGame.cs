@@ -70,6 +70,8 @@ namespace Frenetic
 
             Container = BuildContainer();
 
+            CreatePhysicsSystem();
+            
             // Console:
             _consoleView = CreateConsoleView();
             _consoleController = Container.Resolve<ConsoleController>();
@@ -108,6 +110,11 @@ namespace Frenetic
                 Container.Dispose();
             }
             base.Dispose(disposing);
+        }
+
+        void CreatePhysicsSystem()
+        {
+            IPhysicsSimulator simulator = Container.Resolve<IPhysicsSimulator>();
         }
 
         ConsoleView CreateConsoleView()

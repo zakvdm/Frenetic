@@ -45,7 +45,7 @@ namespace UnitTestLibrary
 
             outgoingMessageQueue.Write(msg);
 
-            stubClientNetworkSession.AssertWasCalled(x => x.SendToServer(Arg<Message>.Is.Equal(msg), Arg<NetChannel>.Is.Equal(NetChannel.Unreliable)));
+            stubClientNetworkSession.AssertWasCalled(x => x.SendToServer(Arg<Message>.Is.Equal(msg), Arg<NetChannel>.Is.Equal(NetChannel.UnreliableInOrder1)));
         }
 
         [Test]

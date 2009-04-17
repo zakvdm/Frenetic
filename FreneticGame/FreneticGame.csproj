@@ -172,7 +172,7 @@
     <Compile Include="Physics\DumbRayCaster.cs" />
     <Compile Include="Physics\DummyPhysicsComponent.cs" />
     <Compile Include="Physics\FarseerPhysicsComponent.cs" />
-    <Compile Include="Physics\FarseerPhysicsController.cs" />
+    <Compile Include="Physics\PhysicsController.cs" />
     <Compile Include="Physics\FarseerPhysicsSimulator.cs" />
     <Compile Include="Physics\Farseer\DrawingSystem\CircleBrush.cs" />
     <Compile Include="Physics\Farseer\DrawingSystem\DrawingHelper.cs" />
@@ -252,7 +252,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Engine\Level\" />
     <Folder Include="Gameplay\Weapons\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

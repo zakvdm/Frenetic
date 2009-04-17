@@ -5,9 +5,9 @@ using FarseerGames.FarseerPhysics;
 
 namespace Frenetic.Physics
 {
-    public class FarseerPhysicsController : IController
+    public class PhysicsController : IController
     {
-        public FarseerPhysicsController(PhysicsSimulator physicsSimulator)
+        public PhysicsController(IPhysicsSimulator physicsSimulator)
         {
             _physicsSimulator = physicsSimulator;
         }
@@ -21,6 +21,6 @@ namespace Frenetic.Physics
 
         #endregion
 
-        PhysicsSimulator _physicsSimulator;
+        IPhysicsSimulator _physicsSimulator;
     }
 }

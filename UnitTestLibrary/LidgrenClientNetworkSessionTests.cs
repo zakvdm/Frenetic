@@ -11,14 +11,20 @@ namespace UnitTestLibrary
     [TestFixture]
     public class LidgrenClientNetworkSessionTests
     {
+        INetClient stubNetClient;
+        LidgrenClientNetworkSession clientNetworkSession;
+        [SetUp]
+        public void SetUp()
+        {
+            stubNetClient = MockRepository.GenerateStub<INetClient>();
+            clientNetworkSession = new LidgrenClientNetworkSession(stubNetClient, null);
+        }
+
         [Test]
         public void ClientCanJoinSessionCorrectlyWithIP()
         {
-            var stubNetClient = MockRepository.GenerateStub<INetClient>();
             string ip = "ip";
             int port = 1;
-
-            LidgrenClientNetworkSession clientNetworkSession = new LidgrenClientNetworkSession(stubNetClient, null);
 
             clientNetworkSession.Join(ip, port);
 
@@ -29,10 +35,7 @@ namespace UnitTestLibrary
         [Test]
         public void ClientCanSearchForLocalSessions()
         {
-            var stubNetClient = MockRepository.GenerateStub<INetClient>();
             int port = 1;
-
-            LidgrenClientNetworkSession clientNetworkSession = new LidgrenClientNetworkSession(stubNetClient, null);
 
             clientNetworkSession.Join(port);
 
@@ -43,8 +46,6 @@ namespace UnitTestLibrary
         [Test]
         public void ClientConnectsToFoundServer()
         {
-            var stubNetClient = MockRepository.GenerateStub<INetClient>();
-            LidgrenClientNetworkSession clientNetworkSession = new LidgrenClientNetworkSession(stubNetClient, null);
             NetBuffer tmp = new NetBuffer();
 
             stubNetClient.Stub(x => x.CreateBuffer()).Return(tmp);
@@ -63,17 +64,13 @@ namespace UnitTestLibrary
                             ExpectedMessage = "Client not connected to server")]
         public void ClientCantSendToServerWhenNotConnected()
         {
-            var stubNetClient = MockRepository.GenerateStub<INetClient>();
-            LidgrenClientNetworkSession clientNS = new LidgrenClientNetworkSession(stubNetClient, null);
-
-            clientNS.SendToServer(new Message(), NetChannel.Unreliable);
+            clientNetworkSession.SendToServer(new Message(), NetChannel.Unreliable);
         }
 
         [Test]
         public void ClientProcessesAndSendsToServer()
         {
-            var stubNetClient = MockRepository.GenerateStub<INetClient>();
-            LidgrenClientNetworkSession clientNetworkSession = new LidgrenClientNetworkSession(stubNetClient, new XmlMessageSerializer());
+            clientNetworkSession = new LidgrenClientNetworkSession(stubNetClient, new XmlMessageSerializer());
 
             NetBuffer tmpBuffer = new NetBuffer();
             Message msg = new Message() { Type = MessageType.Player, Data = 10 };
@@ -88,6 +85,5 @@ namespace UnitTestLibrary
             byte[] data = (new XmlMessageSerializer()).Serialize(msg);
             Assert.AreEqual(data, tmpBuffer.ReadBytes(data.Length));
         }
-
     }
 }

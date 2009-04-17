@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Net;
 using Microsoft.Xna.Framework.GamerServices;
+using Frenetic.Network;
 
 namespace Frenetic
 {
@@ -52,6 +53,7 @@ namespace Frenetic
 
         private IGameSessionFactory _gameSessionFactory;
         private IScreenFactory _screenFactory;
+        private LocalClient _localClient;
         private Game _game;
         private GameplayScreen _gameplayScreen;
 
@@ -60,13 +62,14 @@ namespace Frenetic
         /// <summary>
         /// Constructs a new MainMenu object.
         /// </summary>
-        public MainMenuScreen(Viewport viewport, SpriteBatch spriteBatch, SpriteFont font, IGameSessionFactory gameSessionFactory, IScreenFactory screenFactory, Game game)
+        public MainMenuScreen(Viewport viewport, SpriteBatch spriteBatch, SpriteFont font, IGameSessionFactory gameSessionFactory, IScreenFactory screenFactory, Game game, LocalClient localClient)    // These last 2 parameters are hacky...
             : base(viewport, spriteBatch, font)
         {
             // TODO: There must be a way to reduce the number of parameters here???
             _gameSessionFactory = gameSessionFactory;
             _screenFactory = screenFactory;
             _game = game;
+            _localClient = localClient;
 
             // set the transition times
             TransitionOnTime = TimeSpan.FromSeconds(1.0);
@@ -94,6 +97,7 @@ namespace Frenetic
                 if (_gameplayScreen.ScreenState == ScreenState.Dead)
                 {
                     // NOTE: Currently, this gets called over and over when the gamesession ends... This could burn our fingers at some point...
+                    _localClient.ID = 0;  // Client is no longer connected... what a hack...
                     _gameSessionFactory.Dispose();
                 }
             }

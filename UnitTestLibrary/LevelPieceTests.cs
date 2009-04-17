@@ -42,7 +42,7 @@ namespace UnitTestLibrary
                 var geom = c.Resolve<Geom>(body, width, height, mass);
                 return (IPhysicsComponent)new FarseerPhysicsComponent(bod, geom);
             }).FactoryScoped();
-            builder.Register<FarseerPhysicsController>().SingletonScoped();
+            builder.Register<PhysicsController>().SingletonScoped();
 
             var container = builder.Build();
             var levelPieceFactory = container.Resolve<LevelPiece.Factory>();

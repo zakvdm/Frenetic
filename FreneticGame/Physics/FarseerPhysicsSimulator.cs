@@ -8,21 +8,26 @@ namespace Frenetic.Physics
     {
         public FarseerPhysicsSimulator(PhysicsSimulator physicsSimulator)
         {
-            _physicsSimulator = physicsSimulator;
+            PhysicsSimulator = physicsSimulator;
+        }
+
+        public PhysicsSimulator PhysicsSimulator { get; private set; }
+
+        public void Update(float elapsedTime)
+        {
+            PhysicsSimulator.Update(elapsedTime);
         }
 
         public float Gravity
         {
             get
             {
-                return _physicsSimulator.Gravity.Y;
+                return PhysicsSimulator.Gravity.Y;
             }
             set
             {
-                _physicsSimulator.Gravity = new Vector2(0f, value);
+                PhysicsSimulator.Gravity = new Vector2(0f, value);
             }
         }
-
-        PhysicsSimulator _physicsSimulator;
     }
 }

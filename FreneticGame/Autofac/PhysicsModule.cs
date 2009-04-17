@@ -7,6 +7,7 @@ using Frenetic.Physics;
 using FarseerGames.FarseerPhysics.Dynamics;
 using FarseerGames.FarseerPhysics.Collisions;
 using Microsoft.Xna.Framework;
+using System.Linq;
 
 namespace Frenetic.Autofac
 {
@@ -16,12 +17,21 @@ namespace Frenetic.Autofac
 
         protected override void Load(ContainerBuilder builder)
         {
+            _clientPhysicsSimulator = new FarseerPhysicsSimulator(new PhysicsSimulator(Gravity));
+            builder.Register(
+                    (c, p) =>
+                    {
+                        if (p.ToList<Parameter>().Count == 0)
+                            return _clientPhysicsSimulator;
+                        else
+                            return new FarseerPhysicsSimulator(new PhysicsSimulator(Gravity));
+                    }).As<IPhysicsSimulator>().ContainerScoped();
+
             builder.Register<PhysicsSettings>().SingletonScoped();
-            builder.Register((c) => new PhysicsSimulator(Gravity)).As<PhysicsSimulator>().ContainerScoped();
             // Body:
-            builder.Register((c, p) => BodyFactory.Instance.CreateRectangleBody(c.Resolve<PhysicsSimulator>(), p.Named<float>("width"), p.Named<float>("height"), p.Named<float>("mass"))).FactoryScoped();
+            builder.Register((c, p) => BodyFactory.Instance.CreateRectangleBody(c.Resolve<IPhysicsSimulator>().PhysicsSimulator, p.Named<float>("width"), p.Named<float>("height"), p.Named<float>("mass"))).FactoryScoped();
             // Geom:
-            builder.Register((c, p) => GeomFactory.Instance.CreateRectangleGeom(c.Resolve<PhysicsSimulator>(), p.Named<Body>("body"), p.Named<float>("width"), p.Named<float>("height"))).FactoryScoped();
+            builder.Register((c, p) => GeomFactory.Instance.CreateRectangleGeom(c.Resolve<IPhysicsSimulator>().PhysicsSimulator, p.Named<Body>("body"), p.Named<float>("width"), p.Named<float>("height"))).FactoryScoped();
             // IPhysicsComponent:
             builder.Register((c, p) =>
             {
@@ -31,9 +41,11 @@ namespace Frenetic.Autofac
                 var bod = c.Resolve<Body>(width, height, mass);
                 var body = new NamedParameter("body", bod);
                 var geom = c.Resolve<Geom>(body, width, height, mass);
-                return (IPhysicsComponent)new FarseerPhysicsComponent(bod, geom);
-            }).FactoryScoped();
-            builder.Register<FarseerPhysicsController>().ContainerScoped();
+                return new FarseerPhysicsComponent(bod, geom);
+            }).As<IPhysicsComponent>().FactoryScoped();
+            builder.Register<PhysicsController>().ContainerScoped();
         }
+
+        IPhysicsSimulator _clientPhysicsSimulator;
     }
 }
