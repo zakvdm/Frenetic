@@ -91,6 +91,10 @@ namespace Frenetic
 
             IGameSession gameSession = ClientContainer.Resolve<IGameSession>();
 
+
+            
+
+
             SnapCounter snapCounter = (SnapCounter)ClientContainer.Resolve<ISnapCounter>();
             gameSession.Controllers.Add(snapCounter);
 
@@ -105,6 +109,12 @@ namespace Frenetic
                 new TypedParameter(typeof(bool), false));
             GameSessionView gameSessionView = ClientContainer.Resolve<GameSessionView>();
 
+            
+            // TEMP:
+            TestVisibilityView tmp = new TestVisibilityView(_graphicsDevice, _contentManager, level, localPlayer, ClientContainer.Resolve<ICamera>());
+            gameSession.Views.Insert(0, tmp);
+            gameSession.Controllers.Add(tmp);
+
 
             // THINGS TO SYNC OVER NETWORK:
             Log<ChatMessage> chatLog = _parentContainer.Resolve<IMessageConsole>().Log;
@@ -115,6 +125,7 @@ namespace Frenetic
 
             return new GameSessionControllerAndView(gameSession, gameSessionController, gameSessionView);
         }
+
 
         private IPlayer CreateClientComponents(IGameSession gameSession)
         {

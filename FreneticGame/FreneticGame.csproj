@@ -96,6 +96,7 @@
     <Compile Include="Engine\Console\IMessageConsole.cs" />
     <Compile Include="Engine\Console\MessageConsole.cs" />
     <Compile Include="Gameplay\Player\INetworkPlayerProcessor.cs" />
+    <Compile Include="Graphics\TestVisibilityView.cs" />
     <Compile Include="Network\Client\ChatLogProcessor.cs" />
     <Compile Include="Network\Server\ChatLogSender.cs" />
     <Compile Include="Engine\Console\Log.cs" />
