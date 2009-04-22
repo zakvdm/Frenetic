@@ -106,6 +106,7 @@
     <Compile Include="PlayerTextureBankTests.cs" />
     <Compile Include="PlayerViewTests.cs" />
     <Compile Include="SnapCounterTests.cs" />
+    <Compile Include="VisibilityViewTests.cs" />
     <Compile Include="WorldBoundaryColliderTests.cs" />
     <Compile Include="GameplayScreenTests.cs" />
     <Compile Include="GameSessionControllerTests.cs" />

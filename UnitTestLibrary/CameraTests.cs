@@ -12,6 +12,14 @@ namespace UnitTestLibrary
     public class CameraTests
     {
         [Test]
+        public void CameraHasScreenWidthAndHeight()
+        {
+            Camera camera = new Camera(null, new Vector2(100, 200));
+
+            Assert.AreEqual(100, camera.ScreenWidth);
+            Assert.AreEqual(200, camera.ScreenHeight);
+        }
+        [Test]
         public void CameraPositionBasedOnPlayerPosition()
         {
             var player = MockRepository.GenerateStub<IPlayer>();

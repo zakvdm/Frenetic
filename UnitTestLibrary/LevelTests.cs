@@ -31,7 +31,7 @@ namespace UnitTestLibrary
             builder.Register<LevelPiece>().FactoryScoped();
             builder.RegisterGeneratedFactory<LevelPiece.Factory>(new TypedService(typeof(LevelPiece)));
             builder.Register<DumbLevelLoader>().As<ILevelLoader>().SingletonScoped();
-            builder.Register<Level>();
+            builder.Register<Level>().As<ILevel>().SingletonScoped();
             
             builder.Register<LevelView>();
             ISpriteBatch spriteBatch = MockRepository.GenerateStub<ISpriteBatch>();
@@ -41,10 +41,8 @@ namespace UnitTestLibrary
 
             var container = builder.Build();
 
-            Level level = container.Resolve<Level>();
-            LevelView levelView = container.Resolve<LevelView>(new TypedParameter(typeof(Level), level), new TypedParameter(typeof(ICamera), null));
+            LevelView levelView = container.Resolve<LevelView>(new TypedParameter(typeof(ICamera), null));
 
-            Assert.IsNotNull(level);
             Assert.IsNotNull(levelView);
         }
 

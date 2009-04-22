@@ -44,10 +44,10 @@ namespace Frenetic
         {
             while (true)
             {
-                object data = _incomingMessageQueue.ReadMessage(MessageType.NewPlayer);
-                if (data == null)
+                Message msg = _incomingMessageQueue.ReadWholeMessage(MessageType.NewPlayer);
+                if (msg == null)
                     break;
-                int newID = (int)data;
+                int newID = (int)msg.Data;
 
                 // TODO: Consider moving these sends into the GameSessionView?
 
@@ -72,20 +72,20 @@ namespace Frenetic
         {
             while (true)
             {
-                object data = _incomingMessageQueue.ReadMessage(MessageType.NewPlayer);
-                if (data == null)
+                Message msg = _incomingMessageQueue.ReadWholeMessage(MessageType.NewPlayer);
+                if (msg == null)
                     break;
-                int ID = (int)data;
+                int ID = (int)msg.Data;
 
                 _clientStateTracker.AddNewClient(ID);
                 _gameSession.Views.Add(_playerViewFactory(_clientStateTracker[ID].Player));
             }
             while (true)
             {
-                object data = _incomingMessageQueue.ReadMessage(MessageType.SuccessfulJoin);
-                if (data == null)
+                Message msg = _incomingMessageQueue.ReadWholeMessage(MessageType.SuccessfulJoin);
+                if (msg == null)
                     break;
-                int ID = (int)data;
+                int ID = (int)msg.Data;
                 _localClient.ID = ID;   // PlayerView & NetworkPlayerView already created when _localClient was initialized in GameSessionFactory...
             }
         }
@@ -97,6 +97,5 @@ namespace Frenetic
         bool _isServer = false;
         PlayerView.Factory _playerViewFactory;
         LocalClient _localClient;
-        NetworkPlayerProcessor _networkPlayerController;
     }
 }

@@ -6,21 +6,16 @@ using Frenetic.Level;
 
 namespace Frenetic.Graphics
 {
-    class TestVisibilityView : IView, IController
+    class TestVisibilityView : IView
     {
 
-        public TestVisibilityView(GraphicsDevice device, ContentManager contentManager, Frenetic.Level.Level level, IPlayer player, ICamera camera)
+        public TestVisibilityView(GraphicsDevice device, ILevel level, IPlayer player, ICamera camera)
         {
             _device = device;
 
-            _renderTarget = new RenderTarget2D(device, 800, 600, 1, device.DisplayMode.Format);
-            _spriteBatch = new SpriteBatch(device);
-            _contentManager = contentManager;
             _level = level;
             _player = player;
             _camera = camera;
-
-            _contentManager.Load<Texture2D>("Textures/ball");
 
             _drawingEffect = new BasicEffect(_device, null);
             _drawingEffect.TextureEnabled = false;
@@ -29,61 +24,20 @@ namespace Frenetic.Graphics
         }
 
         GraphicsDevice _device;
-        RenderTarget2D _renderTarget;
-        SpriteBatch _spriteBatch;
-        ContentManager _contentManager;
-        Frenetic.Level.Level _level;
+        ILevel _level;
         IPlayer _player;
         ICamera _camera;
 
-        Texture2D _texture;
         BasicEffect _drawingEffect;
-
-        #region IController Members
-
-        public void Process(float elapsedTime)
-        {
-            Setup();
-        }
-
-        #endregion
-
-        void Setup()
-        {
-            _device.SetRenderTarget(0, _renderTarget);
-            _device.Clear(ClearOptions.Target, Color.Gray, 0, 0);
-
-
-            //_spriteBatch.Begin();
-            //_spriteBatch.Draw(_contentManager.Load<Texture2D>("Textures/ball"), new Rectangle(200, 100, 400, 400), Color.DarkGray);
-            //_spriteBatch.End();
-
-            DrawShadows();
-
-            _device.SetRenderTarget(0, null);
-            _texture = _renderTarget.GetTexture();
-        }
 
         #region IView Members
 
         public void Generate()
         {
-            DrawRenderTarget();
+            DrawShadows();
         }
 
         #endregion
-
-        void DrawRenderTarget()
-        {
-            if (_texture == null)
-                return;
-            _spriteBatch.Begin(SpriteBlendMode.AlphaBlend, SpriteSortMode.Immediate, SaveStateMode.None);
-            // sourcecolor * sourceblend + destcolor * destblend => sourcecolor * destcolor + destcolor * sourcecolor => 2 * sourcecolor * destcolor
-            _device.RenderState.SourceBlend = Blend.DestinationColor;
-            _device.RenderState.DestinationBlend = Blend.SourceColor;
-            _spriteBatch.Draw(_texture, Vector2.Zero, Color.White);
-            _spriteBatch.End();
-        }
 
         void DrawShadows()
         {
@@ -137,7 +91,7 @@ namespace Frenetic.Graphics
                     bigX = new Vector2(piece.Position.X + (piece.Size.X / 2), piece.Position.Y + (piece.Size.Y / 2));
                 }
 
-                Vector3 pos = new Vector3(_player.Position, 0);
+                Vector2 pos = new Vector2(_player.Position.X, _player.Position.Y);
 
                 if (smallX.X > pos.X)
                 {
@@ -166,7 +120,7 @@ namespace Frenetic.Graphics
                     shadowVertices[2] = new VertexPositionColor(new Vector3(smallX.X, smallX.Y, 0), shadowColor);
                 }
 
-                DrawLine(shadowVertices);
+                DrawShadowForLine(shadowVertices);
             }
         }
 
@@ -195,7 +149,7 @@ namespace Frenetic.Graphics
                     bigX = new Vector2(piece.Position.X + (piece.Size.X / 2), piece.Position.Y - (piece.Size.Y / 2));
                 }
 
-                Vector3 pos = new Vector3(_player.Position, 0);
+                Vector2 pos = new Vector2(_player.Position.X, _player.Position.Y);
 
                 if (smallX.Y > pos.Y)
                 {
@@ -222,13 +176,13 @@ namespace Frenetic.Graphics
                     shadowVertices[2] = new VertexPositionColor(new Vector3(bigX.X, bigX.Y, 0), shadowColor);
                 }
 
-                DrawLine(shadowVertices);
+                DrawShadowForLine(shadowVertices);
             }
         }
 
-        void DrawLine(VertexPositionColor[] shadowVertices)
+        void DrawShadowForLine(VertexPositionColor[] shadowVertices)
         {
-            Vector3 pos = new Vector3(_player.Position, 0);
+            Vector3 pos = new Vector3(_player.Position.X, _player.Position.Y, 0);
             Color shadowColor = Color.Black;
 
             Vector3 angleLeft, angleRight;
@@ -238,17 +192,16 @@ namespace Frenetic.Graphics
             shadowVertices[1] = new VertexPositionColor(shadowVertices[0].Position + angleLeft * 1000, shadowColor);
             shadowVertices[3] = new VertexPositionColor(shadowVertices[2].Position + angleRight * 1000, shadowColor);
 
-            _device.DrawUserPrimitives<VertexPositionColor>(PrimitiveType.TriangleStrip, shadowVertices, 0, 2);
+            VertexPositionColor[] tmp = new VertexPositionColor[4];
+            tmp[0] = shadowVertices[0];
+            tmp[1] = shadowVertices[1];
+            tmp[2] = shadowVertices[3];
+            tmp[3] = shadowVertices[2];
+
+
+            _device.DrawUserPrimitives<VertexPositionColor>(PrimitiveType.TriangleFan, tmp, 0, 2);
         }
 
         
-    }
-
-    struct Shadow
-    {
-        public VertexPositionColor NearLeft;
-        public VertexPositionColor NearRight;
-        public VertexPositionColor FarLeft;
-        public VertexPositionColor FarRight;
     }
 }

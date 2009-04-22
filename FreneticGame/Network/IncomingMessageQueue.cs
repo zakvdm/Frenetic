@@ -32,16 +32,6 @@ namespace Frenetic.Network
             }
         }
 
-        public object ReadMessage(MessageType type)
-        {
-            ProcessMessages();
-
-            if (_data[type].Count == 0)
-                return null;
-
-            return _data[type].Dequeue().Data;
-        }
-
         private void ProcessMessages()
         {
             // Read all incoming messages and sort them by MessageType

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Frenetic.Level
 {
-    public class Level
+    public class Level : ILevel
     {
         public Level(ILevelLoader levelLoader)
         {

@@ -55,5 +55,16 @@ namespace UnitTestLibrary
             Assert.AreEqual(new Vector2(300, 400), levelPiece2.Position);
             Assert.AreEqual(new Vector2(3, 4), levelPiece2.Size);
         }
+
+        [Test]
+        public void ReturnsCorrectEdgeInformation()
+        {
+            LevelPiece piece = new LevelPiece(new Vector2(100, 200), new Vector2(100, 50), new DummyPhysicsComponent());
+
+            Assert.AreEqual(50, piece.LeftEdge);
+            Assert.AreEqual(150, piece.RightEdge);
+            Assert.AreEqual(175, piece.TopEdge);
+            Assert.AreEqual(225, piece.BottomEdge);
+        }
     }
 }

@@ -153,8 +153,8 @@ namespace Frenetic
             // Needs to be fixed somehow...
             builder.Register<ContentManager>(Content).SingletonScoped();
             builder.Register<XnaContentManager>(new XnaContentManager(Content)).As<IContentManager>().SingletonScoped();
-            builder.Register<Game>(this);
-            builder.Register<GraphicsDevice>(graphics.GraphicsDevice);
+            builder.Register<Game>(this).SingletonScoped();
+            builder.Register<GraphicsDevice>(graphics.GraphicsDevice).SingletonScoped();
             #endregion
 
             #region Menus
@@ -195,6 +195,7 @@ namespace Frenetic
             builder.Register<XnaSpriteBatch>().As<ISpriteBatch>().FactoryScoped();
             builder.Register<XnaTexture>().As<ITexture>().FactoryScoped();
             builder.Register<XnaFont>().As<IFont>().FactoryScoped();
+            builder.Register<XnaPrimitiveDrawer>().As<IPrimitiveDrawer>().ContainerScoped();
             #endregion
 
             #region GameSession
@@ -223,9 +224,10 @@ namespace Frenetic
             builder.Register<LevelPiece>().FactoryScoped();
             builder.RegisterGeneratedFactory<LevelPiece.Factory>(new TypedService(typeof(LevelPiece)));
             builder.Register<DumbLevelLoader>().As<ILevelLoader>().ContainerScoped();
-            builder.Register<Frenetic.Level.Level>().ContainerScoped();
+            builder.Register<Frenetic.Level.Level>().As<ILevel>().ContainerScoped();
             builder.Register<LevelController>().ContainerScoped();
             builder.Register<LevelView>().ContainerScoped();
+            builder.Register<VisibilityView>().ContainerScoped();
             #endregion
 
             #region Console

@@ -4,7 +4,7 @@ namespace Frenetic.Level
 {
     public class LevelController : IController
     {
-        public LevelController(Level level)
+        public LevelController(ILevel level)
         {
             _level = level;
         }
@@ -18,6 +18,6 @@ namespace Frenetic.Level
 
         #endregion
 
-        Level _level;
+        ILevel _level;
     }
 }

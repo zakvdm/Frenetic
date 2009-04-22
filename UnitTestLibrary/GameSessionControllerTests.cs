@@ -16,14 +16,14 @@ namespace UnitTestLibrary
     [TestFixture]
     public class GameSessionControllerTests
     {
-        QueuedMessageHelper<object, MessageType> queueMH;
+        QueuedMessageHelper<Message, MessageType> queueMH;
         IIncomingMessageQueue stubIncomingMessageQueue;
         IOutgoingMessageQueue stubOutgoingMessageQueue;
 
         [SetUp]
         public void SetUp()
         {
-            queueMH = new QueuedMessageHelper<object, MessageType>();
+            queueMH = new QueuedMessageHelper<Message, MessageType>();
             stubIncomingMessageQueue = MockRepository.GenerateStub<IIncomingMessageQueue>();
             stubOutgoingMessageQueue = MockRepository.GenerateStub<IOutgoingMessageQueue>();
         }
@@ -62,8 +62,8 @@ namespace UnitTestLibrary
             PlayerView.Factory playerViewFactory = x => { if (x == stubPlayer) playerViewFactoryWasUsedCorrectly = true; return pv; };
             var gameSession = new GameSession();
             GameSessionController gsc = new GameSessionController(gameSession, stubIncomingMessageQueue, null, stubClientStateTracker, playerViewFactory, null, false);
-            queueMH.QueuedMessages.Enqueue(100);
-            stubIncomingMessageQueue.Stub(x => x.ReadMessage(Arg<MessageType>.Is.Equal(MessageType.NewPlayer))).Do(queueMH.GetNextQueuedMessage);
+            queueMH.QueuedMessages.Enqueue(new Message() { Data=100 });
+            stubIncomingMessageQueue.Stub(x => x.ReadWholeMessage(Arg<MessageType>.Is.Equal(MessageType.NewPlayer))).Do(queueMH.GetNextQueuedMessage);
 
             gsc.Process(1);
 
@@ -79,8 +79,8 @@ namespace UnitTestLibrary
             ClientStateTracker clientStateTracker = new ClientStateTracker(MockRepository.GenerateStub<ISnapCounter>(), () => new Client(new Player(null, null), null));
             var gameSession = new GameSession();
             GameSessionController gsc = new GameSessionController(gameSession, stubIncomingMessageQueue, stubOutgoingMessageQueue, clientStateTracker);
-            queueMH.QueuedMessages.Enqueue(100);
-            stubIncomingMessageQueue.Stub(x => x.ReadMessage(Arg<MessageType>.Is.Equal(MessageType.NewPlayer))).Do(queueMH.GetNextQueuedMessage);
+            queueMH.QueuedMessages.Enqueue(new Message() { Data=100 });
+            stubIncomingMessageQueue.Stub(x => x.ReadWholeMessage(Arg<MessageType>.Is.Equal(MessageType.NewPlayer))).Do(queueMH.GetNextQueuedMessage);
 
             gsc.Process(1);
 
@@ -100,10 +100,10 @@ namespace UnitTestLibrary
             var clientStateTracker = new ClientStateTracker(MockRepository.GenerateStub<ISnapCounter>(), () => new Client(new Player(null, null), null));
             var gameSession = new GameSession();
             GameSessionController gsc = new GameSessionController(gameSession, stubIncomingMessageQueue, stubOutgoingMessageQueue, clientStateTracker);
-            queueMH.QueuedMessages.Enqueue(100);
-            queueMH.QueuedMessages.Enqueue(200);
-            queueMH.QueuedMessages.Enqueue(300);
-            stubIncomingMessageQueue.Stub(x => x.ReadMessage(Arg<MessageType>.Is.Equal(MessageType.NewPlayer))).Do(queueMH.GetNextQueuedMessage);
+            queueMH.QueuedMessages.Enqueue(new Message() { Data=100 });
+            queueMH.QueuedMessages.Enqueue(new Message() { Data=200 });
+            queueMH.QueuedMessages.Enqueue(new Message() { Data=300 });
+            stubIncomingMessageQueue.Stub(x => x.ReadWholeMessage(Arg<MessageType>.Is.Equal(MessageType.NewPlayer))).Do(queueMH.GetNextQueuedMessage);
 
             gsc.Process(1);
 
@@ -121,10 +121,10 @@ namespace UnitTestLibrary
             ClientStateTracker clientStateTracker = new ClientStateTracker(MockRepository.GenerateStub<ISnapCounter>(), () => new Client(new Player(null, null), new PlayerSettings()));
             var gameSession = new GameSession();
             GameSessionController gsc = new GameSessionController(gameSession, stubIncomingMessageQueue, stubOutgoingMessageQueue, clientStateTracker);
-            queueMH.QueuedMessages.Enqueue(100);
-            queueMH.QueuedMessages.Enqueue(200);
-            queueMH.QueuedMessages.Enqueue(300);
-            stubIncomingMessageQueue.Stub(x => x.ReadMessage(Arg<MessageType>.Is.Equal(MessageType.NewPlayer))).Do(queueMH.GetNextQueuedMessage);
+            queueMH.QueuedMessages.Enqueue(new Message() { Data = 100 });
+            queueMH.QueuedMessages.Enqueue(new Message() { Data = 200 });
+            queueMH.QueuedMessages.Enqueue(new Message() { Data = 300 });
+            stubIncomingMessageQueue.Stub(x => x.ReadWholeMessage(Arg<MessageType>.Is.Equal(MessageType.NewPlayer))).Do(queueMH.GetNextQueuedMessage);
 
             gsc.Process(1);
 
@@ -141,8 +141,8 @@ namespace UnitTestLibrary
             var stubIncomingMessageQueue = MockRepository.GenerateStub<IIncomingMessageQueue>();
             var gameSession = new GameSession();
             GameSessionController gsc = new GameSessionController(gameSession, stubIncomingMessageQueue, null, null, null, localClient, false);
-            queueMH.QueuedMessages.Enqueue(100);
-            stubIncomingMessageQueue.Stub(x => x.ReadMessage(Arg<MessageType>.Is.Equal(MessageType.SuccessfulJoin))).Do(queueMH.GetNextQueuedMessage);
+            queueMH.QueuedMessages.Enqueue(new Message() { Data=100 });
+            stubIncomingMessageQueue.Stub(x => x.ReadWholeMessage(Arg<MessageType>.Is.Equal(MessageType.SuccessfulJoin))).Do(queueMH.GetNextQueuedMessage);
 
             gsc.Process(1);
 

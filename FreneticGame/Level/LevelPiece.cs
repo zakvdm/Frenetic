@@ -38,6 +38,36 @@ namespace Frenetic.Level
                 return _physicsComponent.Size;
             }
         }
+
+        public float TopEdge
+        {
+            get
+            {
+                return Position.Y - (Size.Y / 2);
+            }
+        }
+        public float BottomEdge
+        {
+            get
+            {
+                return Position.Y + (Size.Y / 2);
+            }
+        }
+        public float LeftEdge
+        {
+            get
+            {
+                return Position.X - (Size.X / 2);
+            }
+        }
+        public float RightEdge
+        {
+            get
+            {
+                return Position.X + (Size.X / 2);
+            }
+        }
+
         public Color Color { get; private set; }    // TODO: This should rather be a property on the View...
 
         IPhysicsComponent _physicsComponent;

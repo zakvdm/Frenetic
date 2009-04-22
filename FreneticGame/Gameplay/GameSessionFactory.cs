@@ -101,9 +101,9 @@ namespace Frenetic
             IPlayer localPlayer = CreateClientComponents(gameSession);
 
             gameSession.Controllers.Add(ClientContainer.Resolve<PhysicsController>());
-            Frenetic.Level.Level level = ClientContainer.Resolve<Frenetic.Level.Level>();
-
-            gameSession.Controllers.Add(ClientContainer.Resolve<LevelController>(new TypedParameter(typeof(Frenetic.Level.Level), level)));
+            
+            ILevel level = ClientContainer.Resolve<ILevel>();
+            gameSession.Controllers.Add(ClientContainer.Resolve<LevelController>(new TypedParameter(typeof(ILevel), level)));
 
             GameSessionController gameSessionController = ClientContainer.Resolve<GameSessionController>(
                 new TypedParameter(typeof(bool), false));
@@ -111,9 +111,8 @@ namespace Frenetic
 
             
             // TEMP:
-            TestVisibilityView tmp = new TestVisibilityView(_graphicsDevice, _contentManager, level, localPlayer, ClientContainer.Resolve<ICamera>());
-            gameSession.Views.Insert(0, tmp);
-            gameSession.Controllers.Add(tmp);
+            //TestVisibilityView tmp = new TestVisibilityView(_graphicsDevice, level, localPlayer, ClientContainer.Resolve<ICamera>());
+            //gameSession.Views.Insert(0, tmp);
 
 
             // THINGS TO SYNC OVER NETWORK:
@@ -133,8 +132,8 @@ namespace Frenetic
             IPlayer localPlayer = ClientContainer.Resolve<LocalClient>().Player;
 
             gameSession.Controllers.Add(ClientContainer.Resolve<PhysicsController>());
-            Frenetic.Level.Level level = ClientContainer.Resolve<Frenetic.Level.Level>();
-            gameSession.Controllers.Add(ClientContainer.Resolve<LevelController>(new TypedParameter(typeof(Frenetic.Level.Level), level)));
+            ILevel level = ClientContainer.Resolve<ILevel>();
+            gameSession.Controllers.Add(ClientContainer.Resolve<LevelController>(new TypedParameter(typeof(ILevel), level)));
 
             ICamera camera = ClientContainer.Resolve<ICamera>
                                             (
@@ -146,6 +145,8 @@ namespace Frenetic
             gameSession.Views.Add(localPlayerView);
 
             gameSession.Controllers.Add(ClientContainer.Resolve<KeyboardPlayerController>(new TypedParameter(typeof(IPlayer), localPlayer)));
+
+            gameSession.Views.Add(ClientContainer.Resolve<VisibilityView>(new TypedParameter(typeof(IPlayer), localPlayer)));
 
             ITexture levelTexture = ClientContainer.Resolve<ITexture>(new TypedParameter(typeof(Texture2D), _contentManager.Load<Texture2D>("Textures/blank")));
             gameSession.Views.Add(ClientContainer.Resolve<LevelView>(new TypedParameter(typeof(ITexture), levelTexture)));

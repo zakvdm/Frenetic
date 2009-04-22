@@ -37,7 +37,7 @@ namespace UnitTestLibrary
             IncomingMessageQueue mq = new IncomingMessageQueue(stubNS);
             stubNS.Stub(x => x.ReadMessage()).Return(null);
 
-            Assert.IsNull(mq.ReadMessage(MessageType.Player));
+            Assert.IsNull(mq.ReadWholeMessage(MessageType.Player));
         }
 
         [Test]
@@ -48,7 +48,7 @@ namespace UnitTestLibrary
             queueMH.QueuedMessages.Enqueue(new Message() { Type = MessageType.Player, Data = new byte[3] { 1, 2, 3 } });
             stubNS.Stub(x => x.ReadMessage()).Do(queueMH.GetNextQueuedMessage);
 
-            Assert.AreEqual(new byte[3] { 1, 2, 3 }, mq.ReadMessage(MessageType.Player));
+            Assert.AreEqual(new byte[3] { 1, 2, 3 }, mq.ReadWholeMessage(MessageType.Player).Data);
         }
 
         [Test]
@@ -72,8 +72,8 @@ namespace UnitTestLibrary
             queueMH.QueuedMessages.Enqueue(new Message() { Type = MessageType.Player, Data = new byte[2] { 4, 5 } });
             stubNS.Stub(x => x.ReadMessage()).Do(queueMH.GetNextQueuedMessage);
 
-            Assert.AreEqual(new byte[3] { 1, 2, 3 }, mq.ReadMessage(MessageType.Player));
-            Assert.AreEqual(new byte[2] { 4, 5 }, mq.ReadMessage(MessageType.Player));
+            Assert.AreEqual(new byte[3] { 1, 2, 3 }, mq.ReadWholeMessage(MessageType.Player).Data);
+            Assert.AreEqual(new byte[2] { 4, 5 }, mq.ReadWholeMessage(MessageType.Player).Data);
         }
 
         [Test]
@@ -86,9 +86,9 @@ namespace UnitTestLibrary
             queueMH.QueuedMessages.Enqueue(new Message() { Type = MessageType.Player, Data = new byte[3] { 6, 7, 8 } });
             stubNS.Stub(x => x.ReadMessage()).Do(queueMH.GetNextQueuedMessage);
 
-            Assert.AreEqual(new byte[3] { 1, 2, 3 }, mq.ReadMessage(MessageType.Player));
-            Assert.AreEqual(new byte[3] { 6, 7, 8 }, mq.ReadMessage(MessageType.Player));
-            Assert.IsNull(mq.ReadMessage(MessageType.Player));
+            Assert.AreEqual(new byte[3] { 1, 2, 3 }, mq.ReadWholeMessage(MessageType.Player).Data);
+            Assert.AreEqual(new byte[3] { 6, 7, 8 }, mq.ReadWholeMessage(MessageType.Player).Data);
+            Assert.IsNull(mq.ReadWholeMessage(MessageType.Player));
         }
     }
 
