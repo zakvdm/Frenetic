@@ -6,6 +6,7 @@ using Frenetic.Network;
 using Lidgren.Network;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
+using Frenetic.Player;
 
 namespace UnitTestLibrary
 {

@@ -7,6 +7,7 @@ using System.Xml.Serialization;
 using System.IO;
 using Frenetic.Network;
 using Microsoft.Xna.Framework;
+using Frenetic.Player;
 namespace UnitTestLibrary
 {
     [TestFixture]
@@ -44,16 +45,29 @@ namespace UnitTestLibrary
         }
 
         [Test]
-        public void CanSerializeAndDeserializeAMessageWithPlayerSettingsAsData()
+        public void CanSerializeAndDeserializeAMessageWithNetworkPlayerSettingsAsData()
         {
-            PlayerSettings playerSettings = new PlayerSettings();
+            NetworkPlayerSettings playerSettings = new NetworkPlayerSettings();
             playerSettings.Name = "Jean Pant";
             Message msg = new Message() { Type = MessageType.PlayerSettings, Data = playerSettings };
 
             byte[] serializedMessage = serializer.Serialize(msg);
 
             Message recoveredMessage = serializer.Deserialize(serializedMessage);
-            Assert.AreEqual("Jean Pant", ((PlayerSettings)recoveredMessage.Data).Name);
+            Assert.AreEqual("Jean Pant", ((NetworkPlayerSettings)recoveredMessage.Data).Name);
+        }
+
+        [Test]
+        public void CanSerializeAndDeserializeAMessageWithLocalPlayerSettingsAsData()
+        {
+            LocalPlayerSettings playerSettings = new LocalPlayerSettings();
+            playerSettings.Name = "Jean Pant";
+            Message msg = new Message() { Type = MessageType.PlayerSettings, Data = playerSettings };
+
+            byte[] serializedMessage = serializer.Serialize(msg);
+
+            Message recoveredMessage = serializer.Deserialize(serializedMessage);
+            Assert.AreEqual("Jean Pant", ((IPlayerSettings)recoveredMessage.Data).Name);
         }
     }
 }

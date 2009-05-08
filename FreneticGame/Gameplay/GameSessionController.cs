@@ -2,6 +2,7 @@
 using Lidgren.Network;
 using Frenetic.Network;
 using Frenetic.Network.Lidgren;
+using Frenetic.Player;
 
 namespace Frenetic
 {

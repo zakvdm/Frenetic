@@ -5,6 +5,7 @@ using Frenetic.Network;
 using Rhino.Mocks;
 using Lidgren.Network;
 using Microsoft.Xna.Framework;
+using Frenetic.Player;
 
 namespace UnitTestLibrary
 {
@@ -24,7 +25,7 @@ namespace UnitTestLibrary
             stubSnapCounter = MockRepository.GenerateStub<ISnapCounter>();
             stubSnapCounter.CurrentSnap = 3;
             console = new MessageConsole(null, new Log<ChatMessage>());
-            client = new LocalClient(new Player(null, null), new PlayerSettings()) { ID = 9 };
+            client = new LocalClient(new Player(null, null), new LocalPlayerSettings()) { ID = 9 };
             clientInputSender = new ClientInputSender(client, console, stubSnapCounter, mockOutgoingMessageQueue); 
         }
 
@@ -134,10 +135,10 @@ namespace UnitTestLibrary
         [Test]
         public void SendsLocalPlayerSettings()
         {
-            PlayerSettings playerSettings = new PlayerSettings();
+            LocalPlayerSettings playerSettings = new LocalPlayerSettings();
             playerSettings.Name = "zak";
             client.PlayerSettings = playerSettings;
-            mockOutgoingMessageQueue.Expect(x => x.Write(Arg<Message>.Matches(y => y.Type == MessageType.PlayerSettings && ((PlayerSettings)y.Data).Name == "zak"))).Repeat.Once();
+            mockOutgoingMessageQueue.Expect(x => x.Write(Arg<Message>.Matches(y => y.Type == MessageType.PlayerSettings && ((LocalPlayerSettings)y.Data).Name == "zak"))).Repeat.Once();
 
             clientInputSender.Generate();
 

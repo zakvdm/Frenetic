@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.Xna.Framework;
 using FarseerGames.FarseerPhysics.Dynamics;
-namespace Frenetic
+namespace Frenetic.Player
 {
     public interface IPlayer
     {

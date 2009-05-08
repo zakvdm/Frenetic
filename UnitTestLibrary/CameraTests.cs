@@ -5,6 +5,7 @@ using Frenetic;
 using NUnit.Framework;
 using Rhino.Mocks;
 using Microsoft.Xna.Framework;
+using Frenetic.Player;
 
 namespace UnitTestLibrary
 {

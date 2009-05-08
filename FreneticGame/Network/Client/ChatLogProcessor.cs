@@ -1,5 +1,6 @@
 ﻿using System;
 using Frenetic.Network;
+using Frenetic.Player;
 
 namespace Frenetic
 {

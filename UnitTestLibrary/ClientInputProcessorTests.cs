@@ -4,6 +4,7 @@ using Rhino.Mocks;
 using Frenetic.Network;
 using Frenetic;
 using Microsoft.Xna.Framework;
+using Frenetic.Player;
 
 namespace UnitTestLibrary
 {
@@ -43,7 +44,7 @@ namespace UnitTestLibrary
             stubSnapCounter = MockRepository.GenerateStub<ISnapCounter>();
             stubNetworkPlayerProcessor = MockRepository.GenerateStub<INetworkPlayerProcessor>();
             serverLog = new Log<ChatMessage>();
-            client = new Client(new Player(null, null), new PlayerSettings());
+            client = new Client(new Player(null, null), new NetworkPlayerSettings());
             clientInputProcessor = new ClientInputProcessor(stubNetworkPlayerProcessor, serverLog, stubClientStateTracker, stubChatLogDiffer, stubSnapCounter, stubIncomingMessageQueue);
         }
 
@@ -138,7 +139,7 @@ namespace UnitTestLibrary
         public void UpdatesPlayerSettings()
         {
             stubClientStateTracker.Stub(x => x[3]).Return(client);
-            PlayerSettings receivedPlayerSettings = new PlayerSettings();
+            NetworkPlayerSettings receivedPlayerSettings = new NetworkPlayerSettings();
             Message msg = new Message() { ClientID = 3, Type = MessageType.Player, Data = receivedPlayerSettings };
             playerSettingsQueueMessageHelper.QueuedMessages.Enqueue(msg);
 

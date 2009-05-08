@@ -9,6 +9,7 @@ using System.IO;
 using Microsoft.Xna.Framework;
 using System.Collections.Generic;
 using Frenetic.Network;
+using Frenetic.Player;
 
 namespace UnitTestLibrary
 {
@@ -21,7 +22,7 @@ namespace UnitTestLibrary
         [SetUp]
         public void SetUp()
         {
-            clientStateTracker = new ClientStateTracker(MockRepository.GenerateStub<ISnapCounter>(), () => new Client(new Player(null, null), new PlayerSettings()));
+            clientStateTracker = new ClientStateTracker(MockRepository.GenerateStub<ISnapCounter>(), () => new Client(new Player(null, null), new NetworkPlayerSettings()));
             networkPlayerController = new NetworkPlayerProcessor(clientStateTracker);
             clientStateTracker.AddNewClient(10);
         }
@@ -48,7 +49,7 @@ namespace UnitTestLibrary
         [Test]
         public void UpdatesPlayerSettingsBasedOnMessage()
         {
-            PlayerSettings receivedPlayerSettings = new PlayerSettings() { Name = "Test Name" };
+            NetworkPlayerSettings receivedPlayerSettings = new NetworkPlayerSettings() { Name = "Test Name" };
             clientStateTracker[10].PlayerSettings.Name = "Nom de Plume";
 
             networkPlayerController.UpdatePlayerSettingsFromNetworkMessage(new Message() { ClientID = 10, Type = MessageType.PlayerSettings, Data = receivedPlayerSettings });

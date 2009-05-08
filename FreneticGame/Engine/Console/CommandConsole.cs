@@ -23,7 +23,7 @@ namespace Frenetic
                 string[] pieces = commandLine.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
                 if (pieces.Length > 1)
                 {
-                    _mediator.Do(pieces[0], String.Join(" ", pieces, 1, pieces.Length - 1));
+                    _mediator.Set(pieces[0], String.Join(" ", pieces, 1, pieces.Length - 1));
                 }
                 else
                 {
@@ -36,7 +36,7 @@ namespace Frenetic
         public Log<string> FindPossibleInputCompletions(string input)
         {
             // Early outs:
-            if (input.Length == 0 || _mediator.AvailableCommands.Count == 0)
+            if (input.Length == 0 || _mediator.AvailableProperties.Count == 0)
                 return null;
 
             string searchString = input.ToLower();
@@ -44,7 +44,7 @@ namespace Frenetic
             if (searchString.StartsWith("/"))
                 searchString = searchString.Substring(1);
             
-            return new Log<string>((from command in _mediator.AvailableCommands
+            return new Log<string>((from command in _mediator.AvailableProperties
                         where (command.ToString().Length >= searchString.Length)
                         where (command.ToString().Substring(0, searchString.Length).ToLower() == searchString)
                         select command).ToList<string>());

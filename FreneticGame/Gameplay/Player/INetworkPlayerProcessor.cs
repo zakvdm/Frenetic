@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Frenetic
+namespace Frenetic.Player
 {
     public interface INetworkPlayerProcessor
     {

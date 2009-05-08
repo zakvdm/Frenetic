@@ -8,6 +8,7 @@ using System.Text;
 using Frenetic.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Frenetic.Player;
 
 namespace Frenetic.Level
 {

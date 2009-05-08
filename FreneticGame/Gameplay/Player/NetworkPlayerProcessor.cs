@@ -4,7 +4,7 @@ using System.IO;
 using System.Collections.Generic;
 using Frenetic.Network;
 
-namespace Frenetic
+namespace Frenetic.Player
 {
     // Used by both the server and client to update network players
     public class NetworkPlayerProcessor : INetworkPlayerProcessor
@@ -29,9 +29,9 @@ namespace Frenetic
 
         public void UpdatePlayerSettingsFromNetworkMessage(Message netMsg)
         {
-            PlayerSettings settings = _clientStateTracker[netMsg.ClientID].PlayerSettings;
+            IPlayerSettings settings = _clientStateTracker[netMsg.ClientID].PlayerSettings;
 
-            settings.Name = ((PlayerSettings)netMsg.Data).Name;
+            settings.Name = ((IPlayerSettings)netMsg.Data).Name;
         }
 
         IClientStateTracker _clientStateTracker;

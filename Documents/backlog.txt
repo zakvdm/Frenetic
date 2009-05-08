@@ -58,10 +58,10 @@ TODO: Change the client authentication model to be more like the q3 model (every
 TODO: Add some kind of logging framework (so we can start doing debug output, etc.)
 
 (OUT OF SPRINT) 8 - Basic visibility
-  All areas not directly visible from the current player position are black
+DONE - All areas not directly visible from the current player position are black
   Players/objects are not visible if they are in the "black" areas
 
-8 - Player settings are saved over multiple game sessions
+ZAK - 8 - Player settings are saved over multiple game sessions
 
 ******************************COMMITED UP TO HERE FOR SPRINT 3 (31 sp commited to -- x sp completed in about x weeks)
 

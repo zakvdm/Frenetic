@@ -39,11 +39,11 @@ namespace Frenetic
                 _spriteBatch.Begin();
 
                 // CURRENT INPUT:
-                DrawWindow(_inputWindow, Color.Black);
+                DrawWindow(_inputWindow, Color.DarkGray);
                 _spriteBatch.DrawText(_font, CursorText + _consoleController.CurrentInput, new Vector2(_inputWindow.Left + TEXT_OFFSET.X, _inputWindow.Bottom - TEXT_OFFSET.Y), Color.Yellow);
 
                 // COMMAND WINDOW:
-                DrawWindow(_commandWindow, Color.Black);
+                DrawWindow(_commandWindow, Color.DarkGray);
                 DrawLog(_commandConsole.Log, _commandWindow, Color.White);
                 
                 // POSSIBLE COMMAND WINDOW:

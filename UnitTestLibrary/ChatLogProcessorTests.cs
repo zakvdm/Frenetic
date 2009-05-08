@@ -3,6 +3,7 @@ using NUnit.Framework;
 using Frenetic.Network;
 using Rhino.Mocks;
 using Frenetic;
+using Frenetic.Player;
 
 namespace UnitTestLibrary
 {
@@ -116,7 +117,7 @@ namespace UnitTestLibrary
         public void UpdatesPlayerSettings()
         {
             stubClientStateTracker.Stub(x => x[3]).Return(client);
-            PlayerSettings receivedPlayerSettings = new PlayerSettings();
+            NetworkPlayerSettings receivedPlayerSettings = new NetworkPlayerSettings();
             Message msg = new Message() { ClientID = 3, Type = MessageType.Player, Data = receivedPlayerSettings };
             playerSettingsMessageHelper.QueuedMessages.Enqueue(msg);
 

@@ -10,6 +10,7 @@ using Frenetic.Physics;
 using Microsoft.Xna.Framework;
 using Frenetic.Network;
 using System.Collections.Generic;
+using Frenetic.Player;
 
 namespace UnitTestLibrary
 {
@@ -118,7 +119,7 @@ namespace UnitTestLibrary
         [Test]
         public void DoesNOTsendNewPlayerMessageToJoiningClient()
         {
-            ClientStateTracker clientStateTracker = new ClientStateTracker(MockRepository.GenerateStub<ISnapCounter>(), () => new Client(new Player(null, null), new PlayerSettings()));
+            ClientStateTracker clientStateTracker = new ClientStateTracker(MockRepository.GenerateStub<ISnapCounter>(), () => new Client(new Player(null, null), new NetworkPlayerSettings()));
             var gameSession = new GameSession();
             GameSessionController gsc = new GameSessionController(gameSession, stubIncomingMessageQueue, stubOutgoingMessageQueue, clientStateTracker);
             queueMH.QueuedMessages.Enqueue(new Message() { Data = 100 });

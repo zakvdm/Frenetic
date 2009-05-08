@@ -95,9 +95,10 @@
     <Compile Include="Engine\Console\IConsole.cs" />
     <Compile Include="Engine\Console\IMessageConsole.cs" />
     <Compile Include="Engine\Console\MessageConsole.cs" />
+    <Compile Include="Engine\TweakablePropertiesLoader.cs" />
     <Compile Include="Gameplay\Player\INetworkPlayerProcessor.cs" />
+    <Compile Include="Gameplay\Player\IPlayerSettings.cs" />
     <Compile Include="Graphics\IPrimitiveDrawer.cs" />
-    <Compile Include="Graphics\TestVisibilityView.cs" />
     <Compile Include="Graphics\XnaPrimitiveDrawer.cs" />
     <Compile Include="Level\ILevel.cs" />
     <Compile Include="Level\VisibilityView.cs" />
@@ -128,7 +129,6 @@
     <Compile Include="Gameplay\Player\IPlayer.cs" />
     <Compile Include="Engine\IView.cs" />
     <Compile Include="Gameplay\Player\KeyboardPlayerController.cs" />
-    <Compile Include="Gameplay\Player\MediatorPlayerSettingsController.cs" />
     <Compile Include="Network\Client.cs" />
     <Compile Include="Network\ClientStateTracker.cs" />
     <Compile Include="Network\Client\ClientInputSender.cs" />
@@ -136,7 +136,6 @@
     <Compile Include="Gameplay\Player\Player.cs" />
     <Compile Include="Gameplay\Player\PlayerSettings.cs" />
     <Compile Include="Gameplay\Player\PlayerView.cs" />
-    <Compile Include="Gameplay\World.cs" />
     <Compile Include="Graphics\IContentManager.cs" />
     <Compile Include="Graphics\IFont.cs" />
     <Compile Include="Graphics\ISpriteBatch.cs" />
@@ -187,7 +186,6 @@
     <Compile Include="Physics\IBoundaryCollider.cs" />
     <Compile Include="Physics\IPhysicsComponent.cs" />
     <Compile Include="Physics\IPhysicsSimulator.cs" />
-    <Compile Include="Physics\MediatorPhysicsSettingsController.cs" />
     <Compile Include="Physics\PhysicsSettings.cs" />
     <Compile Include="Physics\WorldBoundaryCollider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

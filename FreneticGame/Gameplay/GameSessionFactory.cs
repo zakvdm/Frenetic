@@ -17,6 +17,7 @@ using Frenetic.Network.Lidgren;
 using Frenetic.Network;
 using Frenetic.Autofac;
 using Frenetic.UserInput;
+using Frenetic.Player;
 
 namespace Frenetic
 {
@@ -91,10 +92,6 @@ namespace Frenetic
 
             IGameSession gameSession = ClientContainer.Resolve<IGameSession>();
 
-
-            
-
-
             SnapCounter snapCounter = (SnapCounter)ClientContainer.Resolve<ISnapCounter>();
             gameSession.Controllers.Add(snapCounter);
 
@@ -141,7 +138,7 @@ namespace Frenetic
                                             new TypedParameter(typeof(Vector2), new Vector2(_screenWidth, _screenHeight))
                                             );
 
-            PlayerView localPlayerView = ClientContainer.Resolve<PlayerView>(new TypedParameter(typeof(IPlayer), localPlayer), new TypedParameter(typeof(PlayerSettings), ClientContainer.Resolve<LocalClient>().PlayerSettings));
+            PlayerView localPlayerView = ClientContainer.Resolve<PlayerView>(new TypedParameter(typeof(IPlayer), localPlayer), new TypedParameter(typeof(IPlayerSettings), ClientContainer.Resolve<LocalPlayerSettings>()));
             gameSession.Views.Add(localPlayerView);
 
             gameSession.Controllers.Add(ClientContainer.Resolve<KeyboardPlayerController>(new TypedParameter(typeof(IPlayer), localPlayer)));

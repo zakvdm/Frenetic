@@ -4,7 +4,7 @@ using Microsoft.Xna.Framework;
 using Frenetic.Physics;
 using FarseerGames.FarseerPhysics.Dynamics;
 
-namespace Frenetic
+namespace Frenetic.Player
 {
     public class Player : IPlayer
     {

@@ -24,6 +24,7 @@ namespace Frenetic.UserInput
         {
             switch (key)
             {
+                // NUMERIC:
                 case Keys.D0:
                 case Keys.NumPad0:
                     return "0";
@@ -54,6 +55,9 @@ namespace Frenetic.UserInput
                 case Keys.D9:
                 case Keys.NumPad9:
                     return "9";
+                // OTHER:
+                case Keys.OemPeriod:
+                    return ".";
                 default:
                     return key.ToString();
             }
@@ -68,7 +72,9 @@ namespace Frenetic.UserInput
                 Keys.A, Keys.B, Keys.C, Keys.D, Keys.E, Keys.F, Keys.G, Keys.H, Keys.I, Keys.J, Keys.K, Keys.L, Keys.M, Keys.N, Keys.O, Keys.P, Keys.Q, Keys.R, Keys.S, Keys.T, Keys.U, Keys.V, Keys.W, Keys.X, Keys.Y, Keys.Z, 
                 // NUMERIC:
                 Keys.D1, Keys.D2, Keys.D3, Keys.D4, Keys.D5, Keys.D6, Keys.D7, Keys.D8, Keys.D9, Keys.D0,
-                Keys.NumPad1, Keys.NumPad2, Keys.NumPad3, Keys.NumPad4, Keys.NumPad5, Keys.NumPad6, Keys.NumPad7, Keys.NumPad8, Keys.NumPad9, Keys.NumPad0
+                Keys.NumPad1, Keys.NumPad2, Keys.NumPad3, Keys.NumPad4, Keys.NumPad5, Keys.NumPad6, Keys.NumPad7, Keys.NumPad8, Keys.NumPad9, Keys.NumPad0,
+                // OTHER:
+                Keys.OemPeriod
             };
 
         #region IEnumerable Members

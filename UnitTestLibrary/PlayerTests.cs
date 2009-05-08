@@ -9,13 +9,14 @@ using Frenetic.Physics;
 using NUnit.Framework;
 using Rhino.Mocks;
 using FarseerGames.FarseerPhysics.Dynamics;
+using Frenetic.Player;
 
 namespace UnitTestLibrary
 {
     [TestFixture]
     public class PlayerTests
     {
-        Player player;
+        Frenetic.Player.Player player;
         IPhysicsComponent stubPhysicsComponent;
         IBoundaryCollider stubBoundaryCollider;
 
@@ -24,7 +25,7 @@ namespace UnitTestLibrary
         {
             stubPhysicsComponent = MockRepository.GenerateStub<IPhysicsComponent>();
             stubBoundaryCollider = MockRepository.GenerateStub<IBoundaryCollider>();
-            player = new Player(stubPhysicsComponent, stubBoundaryCollider);
+            player = new Frenetic.Player.Player(stubPhysicsComponent, stubBoundaryCollider);
         }
 
         [Test]
@@ -48,7 +49,7 @@ namespace UnitTestLibrary
         [Test]
         public void CanSerialiseAndDeserialisePlayerPosition()
         {
-            XmlSerializer serializer = new XmlSerializer(typeof(Player));
+            XmlSerializer serializer = new XmlSerializer(typeof(Frenetic.Player.Player));
             player.Position = new Vector2(100, 200);
             MemoryStream stream = new MemoryStream();
 

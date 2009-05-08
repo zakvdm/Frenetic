@@ -9,6 +9,7 @@ using Frenetic.Network;
 using Frenetic;
 using Frenetic.Physics;
 using Microsoft.Xna.Framework.Graphics;
+using Frenetic.Player;
 
 namespace UnitTestLibrary
 {

@@ -9,6 +9,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using FarseerGames.FarseerPhysics.Dynamics;
 using Frenetic.UserInput;
+using Frenetic.Player;
 
 namespace UnitTestLibrary
 {

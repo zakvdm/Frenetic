@@ -18,6 +18,7 @@ using Frenetic.Physics;
 using Frenetic.Autofac;
 using Frenetic.Level;
 using Frenetic.UserInput;
+using Frenetic.Player;
 
 namespace Frenetic
 {
@@ -76,7 +77,7 @@ namespace Frenetic
             _consoleView = CreateConsoleView();
             _consoleController = Container.Resolve<ConsoleController>();
 
-            CreateMediatorControllers();
+            RegisterTweakableProperties();
 
             PreloadTextures();
 
@@ -98,9 +99,10 @@ namespace Frenetic
         {
             graphics.GraphicsDevice.Clear(Color.OldLace);
 
-            _consoleView.Generate();
-
             base.Draw(gameTime);
+
+            // NOTE: The console is drawn over everything else, so it's drawn last...
+            _consoleView.Generate();
         }
 
         protected override void Dispose(bool disposing)
@@ -130,18 +132,17 @@ namespace Frenetic
                             new TypedParameter(typeof(ITexture), consoleTexture), new TypedParameter(typeof(IFont), consoleFont));
         }
 
-        void CreateMediatorControllers()
+        void RegisterTweakableProperties()
         {
-            PlayerSettings localPlayerSettings = Container.Resolve<LocalClient>().PlayerSettings;
+            TweakablePropertiesLoader loader = Container.Resolve<TweakablePropertiesLoader>();
 
-            // Mediator Controllers:
-            Container.Resolve<MediatorPlayerSettingsController>(new TypedParameter(typeof(PlayerSettings), localPlayerSettings));
-            Container.Resolve<MediatorPhysicsSettingsController>();
+            loader.LoadTweakableProperties(Container.Resolve<LocalPlayerSettings>());
+            loader.LoadTweakableProperties(Container.Resolve<PhysicsSettings>());
         }
 
         void PreloadTextures()
         {
-            Container.Resolve<ITextureBank<PlayerTextures>>();
+            Container.Resolve<ITextureBank<PlayerTexture>>();
         }
 
         IContainer BuildContainer()
@@ -206,14 +207,15 @@ namespace Frenetic
             #endregion
 
             #region Player
-            builder.Register<PlayerSettings>().FactoryScoped();
-            builder.Register<Player>().As<IPlayer>().FactoryScoped();
+            builder.Register<NetworkPlayerSettings>().As<IPlayerSettings>().FactoryScoped();
+            builder.Register<LocalPlayerSettings>().SingletonScoped();
+            builder.Register<Frenetic.Player.Player>().As<IPlayer>().FactoryScoped();
             builder.Register<PlayerView>().FactoryScoped();
             builder.RegisterGeneratedFactory<PlayerView.Factory>(new TypedService(typeof(PlayerView)));
             builder.Register((c) => (IBoundaryCollider)new WorldBoundaryCollider(_screenWidth, _screenHeight));
             builder.Register<KeyboardPlayerController>().ContainerScoped();
 
-            builder.Register<XnaTextureBank<PlayerTextures>>().As<ITextureBank<PlayerTextures>>().SingletonScoped();
+            builder.Register<XnaTextureBank<PlayerTexture>>().As<ITextureBank<PlayerTexture>>().SingletonScoped();
             #endregion
 
             #region Physics
@@ -242,18 +244,12 @@ namespace Frenetic
             builder.Register<ChatLogProcessor>().ContainerScoped();
             #endregion
 
-            #region Mediator Controllers
-            builder.Register<MediatorPlayerSettingsController>().SingletonScoped();
-            builder.Register<MediatorPhysicsSettingsController>().SingletonScoped();
-            #endregion
-
             // RAYCASTER:
             builder.Register<DumbRayCaster>().SingletonScoped();
             builder.Register<DumbRayCasterTestController>().ContainerScoped();
 
             // CAMERA:
             builder.Register((c, p) => (ICamera)new Camera(p.TypedAs<IPlayer>(), new Vector2(_screenWidth, _screenHeight))).ContainerScoped();
-            //builder.Register<Camera>().As<ICamera>().FactoryScoped();
 
             // CROSSHAIR:
             builder.Register<Crosshair>().As<ICrosshair>().ContainerScoped();
@@ -265,9 +261,8 @@ namespace Frenetic
             // MOUSE:
             builder.Register<FreneticMouse>().As<IMouse>().SingletonScoped();
 
-            // TEMP:
-            #region Network Views
-            #endregion
+            // Mediator:
+            builder.Register<TweakablePropertiesLoader>().SingletonScoped();
 
 
             return builder.Build();

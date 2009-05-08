@@ -2,9 +2,10 @@
 
 namespace Frenetic.Graphics
 {
-    public enum PlayerTextures
+    public enum PlayerTexture
     {
-        Ball
+        Ball,
+        Blank
     }
     public class XnaTextureBank<textureEnum> : ITextureBank<textureEnum>
     {

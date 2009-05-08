@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Frenetic.UserInput;
 
-namespace Frenetic
+namespace Frenetic.Player
 {
     public class KeyboardPlayerController : IController
     {

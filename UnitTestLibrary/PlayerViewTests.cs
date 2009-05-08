@@ -5,31 +5,32 @@ using Rhino.Mocks;
 using Frenetic.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Frenetic.Player;
 
 namespace UnitTestLibrary
 {
     [TestFixture]
     public class PlayerViewTests
     {
-        Player player;
-        PlayerSettings _settings;
-        ITextureBank<PlayerTextures> _stubTextureBank;
+        Frenetic.Player.Player player;
+        IPlayerSettings _settings;
+        ITextureBank<PlayerTexture> _stubTextureBank;
         [SetUp]
         public void SetUp()
         {
             player = new Player(null, null);
-            _settings = new PlayerSettings();
-            _stubTextureBank = MockRepository.GenerateStub<ITextureBank<PlayerTextures>>();
+            _settings = new NetworkPlayerSettings();
+            _stubTextureBank = MockRepository.GenerateStub<ITextureBank<PlayerTexture>>();
         }
 
         [Test]
         public void CallsDrawWithCorrectParameters()
         {
-            _settings.Texture = PlayerTextures.Ball;
+            _settings.Texture = PlayerTexture.Ball;
             var stubTexture = MockRepository.GenerateStub<ITexture>();
             stubTexture.Stub(x => x.Width).Return(100);
             stubTexture.Stub(x => x.Height).Return(200);
-            _stubTextureBank.Stub(x => x[PlayerTextures.Ball]).Return(stubTexture);
+            _stubTextureBank.Stub(x => x[PlayerTexture.Ball]).Return(stubTexture);
             var stubSpriteBatch = MockRepository.GenerateStub<ISpriteBatch>();
             var camera = new Camera(player, new Vector2(1, 2));
             player.Position = new Vector2(1, 1);
@@ -49,7 +50,7 @@ namespace UnitTestLibrary
         {
             Camera camera = new Camera(player, new Vector2(100, 100));
             var stubSpriteBatch = MockRepository.GenerateStub<ISpriteBatch>();
-            _stubTextureBank.Stub(x => x[PlayerTextures.Ball]).Return(MockRepository.GenerateStub<ITexture>());
+            _stubTextureBank.Stub(x => x[PlayerTexture.Ball]).Return(MockRepository.GenerateStub<ITexture>());
             PlayerView playerView = new PlayerView(player, _settings, _stubTextureBank, stubSpriteBatch, camera);
 
             playerView.Generate();

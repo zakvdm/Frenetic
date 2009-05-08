@@ -4,13 +4,13 @@ using Microsoft.Xna.Framework;
 using Frenetic.Graphics;
 using Microsoft.Xna.Framework.Content;
 
-namespace Frenetic
+namespace Frenetic.Player
 {
     public class PlayerView : IView
     {
         public delegate PlayerView Factory(IPlayer player);
         
-        public PlayerView(IPlayer player, PlayerSettings playerSettings, ITextureBank<PlayerTextures> playerTextureBank, ISpriteBatch spriteBatch, ICamera camera)
+        public PlayerView(IPlayer player, IPlayerSettings playerSettings, ITextureBank<PlayerTexture> playerTextureBank, ISpriteBatch spriteBatch, ICamera camera)
         {
             _player = player;
             _playerSettings = playerSettings;
@@ -45,8 +45,8 @@ namespace Frenetic
         #endregion
 
         private IPlayer _player;
-        PlayerSettings _playerSettings;
-        private ITextureBank<PlayerTextures> _playerTextureBank;
+        IPlayerSettings _playerSettings;
+        private ITextureBank<PlayerTexture> _playerTextureBank;
         private ISpriteBatch _spriteBatch;
         private ICamera _camera;
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using Autofac;
 using Autofac.Builder;
+using Frenetic.Player;
 
 namespace Frenetic.Autofac
 {

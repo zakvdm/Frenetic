@@ -11,17 +11,13 @@ namespace UnitTestLibrary
     public class CommandConsoleTests
     {
         CommandConsole console;
-        CommandConsole consoleWithMediator;
-        IMediator mediator;
         IMediator stubMediator;
 
         [SetUp]
         public void SetUp()
         {
             stubMediator = MockRepository.GenerateStub<IMediator>();
-            mediator = new Mediator();
             console = new CommandConsole(stubMediator, new Log<string>());
-            consoleWithMediator = new CommandConsole(mediator, new Log<string>());
         }
 
         [Test]
@@ -39,7 +35,7 @@ namespace UnitTestLibrary
         {
             console.ProcessInput("/command 1");
 
-            stubMediator.AssertWasCalled(x => x.Do("command", "1"));
+            stubMediator.AssertWasCalled(x => x.Set("command", "1"));
         }
 
         [Test]
@@ -55,7 +51,7 @@ namespace UnitTestLibrary
         {
             console.ProcessInput("/command  arg1   arg2 arg3");
 
-            stubMediator.AssertWasCalled(x => x.Do("command", "arg1 arg2 arg3"));
+            stubMediator.AssertWasCalled(x => x.Set("command", "arg1 arg2 arg3"));
         }
 
         [Test]
@@ -74,10 +70,9 @@ namespace UnitTestLibrary
         [Test]
         public void CompletesCommandWhenUnambiguousCompletionAvailable()
         {
-            mediator.Register("Eat", (input) => "");
-            mediator.Register("Die", (input) => "");
+            stubMediator.Stub(x => x.AvailableProperties).Return(new List<string>() { "Eat", "Die" });
 
-            string completed = consoleWithMediator.TryToCompleteInput("E");
+            string completed = console.TryToCompleteInput("E");
 
             Assert.AreEqual("/Eat ", completed);
         }
@@ -85,37 +80,36 @@ namespace UnitTestLibrary
         [Test]
         public void CompleteHandlesASlashInFront()
         {
-            mediator.Register("Eat", (input) => "");
+            stubMediator.Stub(x => x.AvailableProperties).Return(new List<string>() { "Eat" });
 
-            string completed = consoleWithMediator.TryToCompleteInput("/E");
+            string completed = console.TryToCompleteInput("/E");
 
             Assert.AreEqual("/Eat ", completed);
         }
         [Test]
         public void CompleteIgnoresCaseVariations()
         {
-            mediator.Register("EaT", (x) => "");
+            stubMediator.Stub(x => x.AvailableProperties).Return(new List<string>() { "EaT" });
 
-            string completed = consoleWithMediator.TryToCompleteInput("eAt");
+            string completed = console.TryToCompleteInput("eAt");
 
             Assert.AreEqual("/EaT ", completed);
         }
         [Test]
         public void HandlesCurrentInputLongerThanCommandWithoutFailing()
         {
-            mediator.Register("Eat", (x) => "");
+            stubMediator.Stub(x => x.AvailableProperties).Return(new List<string>() { "Eat" });
 
-            string completed = consoleWithMediator.TryToCompleteInput("Eat shit");
+            string completed = console.TryToCompleteInput("Eat shit");
 
             Assert.AreEqual("/Eat shit", completed);
         }
         [Test]
         public void DoesAPartialCompleteWhenAppropriate()
         {
-            mediator.Register("GiveX", (x) => "");
-            mediator.Register("GiveY", (x) => "");
+            stubMediator.Stub(x => x.AvailableProperties).Return(new List<string>() { "GiveX", "GiveY" });
 
-            string completed = consoleWithMediator.TryToCompleteInput("gi");
+            string completed = console.TryToCompleteInput("gi");
 
             Assert.AreEqual("/Give", completed);
         }
@@ -123,7 +117,9 @@ namespace UnitTestLibrary
         [Test]
         public void HandlesANullListOfPossibleCompletions()
         {
-            string completed = consoleWithMediator.TryToCompleteInput("a");
+            stubMediator.Stub(x => x.AvailableProperties).Return(new List<string>());
+
+            string completed = console.TryToCompleteInput("a");
 
             Assert.AreEqual("a", completed);
         }
@@ -132,11 +128,9 @@ namespace UnitTestLibrary
         [Test]
         public void ReturnsListOfAllPossibleCompletions()
         {
-            mediator.Register("Eat", (x) => "");
-            mediator.Register("Endear", (x) => "");
-            mediator.Register("Die", (x) => "");
+            stubMediator.Stub(x => x.AvailableProperties).Return(new List<string>() { "Eat", "Endear", "Die" });
 
-            Log<string> possibleCommands = consoleWithMediator.FindPossibleInputCompletions("E");
+            Log<string> possibleCommands = console.FindPossibleInputCompletions("E");
 
             Assert.AreEqual(2, possibleCommands.Count);
             Assert.IsTrue(possibleCommands.Exists((x) => x.ToString() == "Eat"));
@@ -146,9 +140,9 @@ namespace UnitTestLibrary
         [Test]
         public void DoesntReturnAnyCompletionsWhenCurrentInputIsEmpty()
         {
-            mediator.Register("Eat", (x) => "");
+            stubMediator.Stub(x => x.AvailableProperties).Return(new List<string>() { "Eat" });
 
-            Log<string> possibleCommands = consoleWithMediator.FindPossibleInputCompletions("");
+            Log<string> possibleCommands = console.FindPossibleInputCompletions("");
 
             Assert.IsNull(possibleCommands);
         }

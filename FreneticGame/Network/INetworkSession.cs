@@ -3,6 +3,7 @@
 using Lidgren.Network;
 using Frenetic.Network.Lidgren;
 using System.Xml.Serialization;
+using Frenetic.Player;
 
 namespace Frenetic.Network
 {
@@ -25,8 +26,9 @@ namespace Frenetic.Network
     }
 
     
-    [XmlInclude(typeof(Player))]
-    [XmlInclude(typeof(PlayerSettings))]
+    [XmlInclude(typeof(Frenetic.Player.Player))]
+    [XmlInclude(typeof(NetworkPlayerSettings))]
+    [XmlInclude(typeof(LocalPlayerSettings))]
     [XmlInclude(typeof(ChatMessage))]
     public class Message
     {
