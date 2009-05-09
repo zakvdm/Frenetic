@@ -95,7 +95,12 @@
     <Compile Include="Engine\Console\IConsole.cs" />
     <Compile Include="Engine\Console\IMessageConsole.cs" />
     <Compile Include="Engine\Console\MessageConsole.cs" />
+    <Compile Include="Engine\IGame.cs" />
+    <Compile Include="Engine\ISettingsPersister.cs" />
+    <Compile Include="Engine\Quitter.cs" />
+    <Compile Include="Engine\SettingsPersister.cs" />
     <Compile Include="Engine\TweakablePropertiesLoader.cs" />
+    <Compile Include="Engine\XnaGame.cs" />
     <Compile Include="Gameplay\Player\INetworkPlayerProcessor.cs" />
     <Compile Include="Gameplay\Player\IPlayerSettings.cs" />
     <Compile Include="Graphics\IPrimitiveDrawer.cs" />

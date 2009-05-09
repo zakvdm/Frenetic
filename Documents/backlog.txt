@@ -97,7 +97,7 @@ ZAK - 8 - Player settings are saved over multiple game sessions
 40 - Can load arbitrarily shaped polygons from textures
 8 - As the client, I can reconfigure my keys
 40 - Player can use various techniques to move better/faster (trick jumping, strafe/circle jumping, wall/double jumping)
-40 - Various other visibility obscuring techniques (everything "behind" the player is not visible, using blurs, fade in/out, soft edges, etc.)
+40 - Various other visibility obscuring techniques (everything "behind" the player is not visible, using motion blurs, fade in/out, soft edges, etc.)
 100 - Player character is animated
 40 - Can search for sessions, see information on each one, and join one
 100 - On the client, player movement, etc. is predicted to make the game seem smoother during online play

@@ -91,17 +91,30 @@ namespace Frenetic
             {
                 return null;
             }
-            Func<string> getter = (Func<string>)_properties[name][1];
+            Func<object> getter = (Func<object>)_properties[name][1];
 
-            return getter();
+            Type type = GetTypeOfProperty(name);
+
+            if (type == typeof(Vector2))
+            {
+                Vector2 tmp = (Vector2)getter();
+                return tmp.X + " " + tmp.Y;
+            }
+            if (type == typeof(Color))
+            {
+                Color tmp = (Color)getter();
+                return tmp.R + " " + tmp.G + " " + tmp.B;
+            }
+
+            return getter().ToString();
         }
         
         private void RegisterSetterAndGetter<PropertyType>(PropertyInfo property, object instance)
         {
             Action<PropertyType> setter = (value) => property.SetValue(instance, value, null);
             _properties[GetNameOfProperty(property)].Add(setter);
-            
-            Func<string> getter = () => property.GetValue(instance, null).ToString();
+
+            Func<object> getter = () => property.GetValue(instance, null);
             _properties[GetNameOfProperty(property)].Add(getter);
         }
 

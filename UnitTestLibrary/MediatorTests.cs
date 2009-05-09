@@ -77,7 +77,7 @@ namespace UnitTestLibrary
 
             mediator.Set("FakeName.Vector2TestProperty", "100 200");
 
-            Assert.AreEqual("{X:100 Y:200}", mediator.Get("FakeName.Vector2TestProperty"));
+            Assert.AreEqual("100 200", mediator.Get("FakeName.Vector2TestProperty"));
         }
 
         [Test]
@@ -88,7 +88,7 @@ namespace UnitTestLibrary
 
             mediator.Set("FakeName.ColorTestProperty", "100 200 10");
 
-            Assert.AreEqual("{R:100 G:200 B:10 A:255}", mediator.Get("FakeName.ColorTestProperty"));
+            Assert.AreEqual("100 200 10", mediator.Get("FakeName.ColorTestProperty"));
         }
 
         [Test]
@@ -137,7 +137,7 @@ namespace UnitTestLibrary
 
             mediator.Set("FakeName.Vector2TestProperty", "300 ARG! BEEF");
 
-            Assert.AreEqual("{X:100 Y:200}", mediator.Get("FakeName.Vector2TestProperty"));
+            Assert.AreEqual("100 200", mediator.Get("FakeName.Vector2TestProperty"));
         }
 
         

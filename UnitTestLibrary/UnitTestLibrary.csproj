@@ -103,6 +103,8 @@
     <Compile Include="OutgoingMessageQueueTests.cs" />
     <Compile Include="PlayerTextureBankTests.cs" />
     <Compile Include="PlayerViewTests.cs" />
+    <Compile Include="QuitterTests.cs" />
+    <Compile Include="SettingsPersisterTests.cs" />
     <Compile Include="SnapCounterTests.cs" />
     <Compile Include="TweakablePropertiesLoaderTests.cs" />
     <Compile Include="VisibilityViewTests.cs" />

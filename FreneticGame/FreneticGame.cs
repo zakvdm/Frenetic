@@ -19,6 +19,7 @@ using Frenetic.Autofac;
 using Frenetic.Level;
 using Frenetic.UserInput;
 using Frenetic.Player;
+using System.Windows.Forms;
 
 namespace Frenetic
 {
@@ -40,6 +41,10 @@ namespace Frenetic
             graphics.MinimumVertexShaderProfile = ShaderProfile.VS_1_1;
             graphics.MinimumPixelShaderProfile = ShaderProfile.PS_2_0;
 
+            // Disable the title bar and border:
+            Form frm = (Form)Form.FromHandle(this.Window.Handle);
+            frm.FormBorderStyle = FormBorderStyle.None;
+            
             // Disable fixed timestep
             this.IsFixedTimeStep = false;
             graphics.SynchronizeWithVerticalRetrace = false;
@@ -77,7 +82,9 @@ namespace Frenetic
             _consoleView = CreateConsoleView();
             _consoleController = Container.Resolve<ConsoleController>();
 
+            // NOTE: order is important here, first register, then set!
             RegisterTweakableProperties();
+            LoadSettings();
 
             PreloadTextures();
 
@@ -97,7 +104,7 @@ namespace Frenetic
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            graphics.GraphicsDevice.Clear(Color.OldLace);
+            graphics.GraphicsDevice.Clear(Color.LightSlateGray);
 
             base.Draw(gameTime);
 
@@ -112,6 +119,12 @@ namespace Frenetic
                 Container.Dispose();
             }
             base.Dispose(disposing);
+        }
+
+        void LoadSettings()
+        {
+            ISettingsPersister settingsSaver = Container.Resolve<ISettingsPersister>();
+            settingsSaver.LoadSettings();
         }
 
         void CreatePhysicsSystem()
@@ -154,8 +167,13 @@ namespace Frenetic
             // Needs to be fixed somehow...
             builder.Register<ContentManager>(Content).SingletonScoped();
             builder.Register<XnaContentManager>(new XnaContentManager(Content)).As<IContentManager>().SingletonScoped();
-            builder.Register<Game>(this).SingletonScoped();
+            builder.Register<XnaGame>(new XnaGame(this)).As<IGame>().SingletonScoped();
             builder.Register<GraphicsDevice>(graphics.GraphicsDevice).SingletonScoped();
+            #endregion
+
+            #region Engine
+            builder.Register<Quitter>().SingletonScoped();
+            builder.Register<SettingsPersister>().As<ISettingsPersister>().SingletonScoped();
             #endregion
 
             #region Menus

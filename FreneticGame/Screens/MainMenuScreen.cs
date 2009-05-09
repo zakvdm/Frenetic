@@ -54,7 +54,7 @@ namespace Frenetic
         private IGameSessionFactory _gameSessionFactory;
         private IScreenFactory _screenFactory;
         private LocalClient _localClient;
-        private Game _game;
+        private Quitter _quitter;
         private GameplayScreen _gameplayScreen;
 
         #region Initialization
@@ -62,13 +62,13 @@ namespace Frenetic
         /// <summary>
         /// Constructs a new MainMenu object.
         /// </summary>
-        public MainMenuScreen(Viewport viewport, SpriteBatch spriteBatch, SpriteFont font, IGameSessionFactory gameSessionFactory, IScreenFactory screenFactory, Game game, LocalClient localClient)    // These last 2 parameters are hacky...
+        public MainMenuScreen(Viewport viewport, SpriteBatch spriteBatch, SpriteFont font, IGameSessionFactory gameSessionFactory, IScreenFactory screenFactory, Quitter quitter, LocalClient localClient)    // These last 2 parameters are hacky...
             : base(viewport, spriteBatch, font)
         {
             // TODO: There must be a way to reduce the number of parameters here???
             _gameSessionFactory = gameSessionFactory;
             _screenFactory = screenFactory;
-            _game = game;
+            _quitter = quitter;
             _localClient = localClient;
 
             // set the transition times
@@ -143,7 +143,7 @@ namespace Frenetic
             const string message = "Exit Frenetic?";
             MessageBoxScreen messageBox = _screenFactory.MakeMessageBoxScreen(message);
             // TODO: Only using the reference to Game in this one method... this needs refactoring...
-            messageBox.Accepted += (sender, e) => _game.Exit();
+            messageBox.Accepted += (sender, e) => _quitter.Quit();
         }
 
         #endregion
