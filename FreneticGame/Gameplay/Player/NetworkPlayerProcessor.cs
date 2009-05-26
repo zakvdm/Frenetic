@@ -16,10 +16,10 @@ namespace Frenetic.Player
 
         public void UpdatePlayerFromNetworkMessage(Message netMsg)
         {
-            if (!_clientStateTracker.CurrentClients.Exists(client => client.ID == netMsg.ClientID))
+            if (!_clientStateTracker.NetworkClients.Exists(client => client.ID == netMsg.ClientID))
                 return; // Probably this is the local player which hasn't been added to the client state tracker...
 
-            IPlayer player = _clientStateTracker[netMsg.ClientID].Player;
+            IPlayer player = _clientStateTracker.FindNetworkClient(netMsg.ClientID).Player;
                 
             // We can't just do a direct assignment (Player[player.ID] = player) here because we need the service objects (physics components, etc.) to remain in tact
             //      Unfortunately, this means that every time another property gets added to Player that needs to be network synced, it needs to be assigned here.
@@ -29,7 +29,7 @@ namespace Frenetic.Player
 
         public void UpdatePlayerSettingsFromNetworkMessage(Message netMsg)
         {
-            IPlayerSettings settings = _clientStateTracker[netMsg.ClientID].PlayerSettings;
+            IPlayerSettings settings = _clientStateTracker.FindNetworkClient(netMsg.ClientID).PlayerSettings;
 
             settings.Name = ((IPlayerSettings)netMsg.Data).Name;
         }

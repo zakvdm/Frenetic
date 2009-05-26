@@ -13,9 +13,19 @@ namespace Frenetic.Network
             InitializeQueues();
         }
 
+        public bool HasAvailable(MessageType type)
+        {
+            EnqueueAllWaitingMessagesFromNetworkSession();
+
+            if (_data[type].Count == 0)
+                return false;
+
+            return true;
+        }
+
         public Message ReadWholeMessage(MessageType type)
         {
-            ProcessMessages();
+            EnqueueAllWaitingMessagesFromNetworkSession();
 
             if (_data[type].Count == 0)
                 return null;
@@ -32,7 +42,7 @@ namespace Frenetic.Network
             }
         }
 
-        private void ProcessMessages()
+        private void EnqueueAllWaitingMessagesFromNetworkSession()
         {
             // Read all incoming messages and sort them by MessageType
             Message msg;

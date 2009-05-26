@@ -34,7 +34,7 @@ namespace UnitTestLibrary
         }
 
         [Test]
-        [ExpectedException(typeof(InvalidOperationException), "Tweakable property {UnitTestLibrary.IncorrectStaticTweakableClass.NonStaticProperty} is of the wrong type (should be public static read/write)")]
+        [ExpectedException(typeof(InvalidOperationException), ExpectedMessage="Tweakable property {UnitTestLibrary.IncorrectStaticTweakableClass.NonStaticProperty} is of the wrong type (should be public static read/write)")]
         public void ChecksThatPropertyIsStatic()
         {
             object x = new IncorrectStaticTweakableClass();
@@ -55,7 +55,7 @@ namespace UnitTestLibrary
         }
 
         [Test]
-        [ExpectedException(typeof(InvalidOperationException), "Tweakable property {UnitTestLibrary.IncorrectTweakableClass.NonWritableProperty} is of the wrong type (should be public read/write)")]
+        [ExpectedException(typeof(InvalidOperationException), ExpectedMessage="Tweakable property {UnitTestLibrary.IncorrectTweakableClass.NonWritableProperty} is of the wrong type (should be public read/write)")]
         public void ChecksThatPropertyIsReadWrite()
         {
             IncorrectTweakableClass testClass = new IncorrectTweakableClass();

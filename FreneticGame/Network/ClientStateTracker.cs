@@ -5,32 +5,41 @@ namespace Frenetic.Network
 {
     public class ClientStateTracker : IClientStateTracker
     {
-        public ClientStateTracker(ISnapCounter snapCounter, Client.Factory clientFactory)
+        public ClientStateTracker(ISnapCounter snapCounter, INetworkSession networkSession, IClientFactory clientFactory)
         {
             _snapCounter = snapCounter;
+            _networkSession = networkSession;
             _clientFactory = clientFactory;
 
-            CurrentClients = new List<Client>();
+            networkSession.ClientJoined += HandleNewClientJoined;
+
+            NetworkClients = new List<Client>();
         }
 
-        public Client this[int clientID]
+        public Client FindNetworkClient(int clientID)
         {
-            get
+            return NetworkClients.Find(client => client.ID == clientID);
+        }
+
+        void HandleNewClientJoined(object sender, ClientJoinedEventArgs newClientInfo)
+        {
+            if (newClientInfo.IsLocalClient)
             {
-                return CurrentClients.Find(client => client.ID == clientID);
+                LocalClient = _clientFactory.GetLocalClient();
+                LocalClient.ID = newClientInfo.ID;
+            }
+            else
+            {
+                Client newClient = _clientFactory.MakeNewClient(newClientInfo.ID);
+                newClient.LastServerSnap = _snapCounter.CurrentSnap; // No point in sending info about what happened before they joined...
+                NetworkClients.Add(newClient);
             }
         }
 
-        public void AddNewClient(int ID)
-        {
-            Client newClient = _clientFactory();
-            newClient.ID = ID;
-            newClient.LastServerSnap = _snapCounter.CurrentSnap;
-            CurrentClients.Add(newClient);
-        }
-
-        public List<Client> CurrentClients { get; private set; }
+        public Client LocalClient { get; private set; }
+        public List<Client> NetworkClients { get; private set; }
         ISnapCounter _snapCounter;
-        Client.Factory _clientFactory;
+        INetworkSession _networkSession;
+        IClientFactory _clientFactory;
     }
 }

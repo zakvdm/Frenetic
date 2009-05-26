@@ -107,7 +107,11 @@
     <Compile Include="Graphics\XnaPrimitiveDrawer.cs" />
     <Compile Include="Level\ILevel.cs" />
     <Compile Include="Level\VisibilityView.cs" />
+    <Compile Include="Network\ClientFactory.cs" />
     <Compile Include="Network\Client\ChatLogProcessor.cs" />
+    <Compile Include="Network\IClientFactory.cs" />
+    <Compile Include="Network\IServerMessageSender.cs" />
+    <Compile Include="Network\Lidgren\LidgrenServerMessageSender.cs" />
     <Compile Include="Network\Server\ChatLogSender.cs" />
     <Compile Include="Engine\Console\Log.cs" />
     <Compile Include="Engine\Crosshair.cs" />

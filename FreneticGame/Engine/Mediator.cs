@@ -127,7 +127,7 @@ namespace Frenetic
                 PropertyType convertedValue = ConvertTo<PropertyType>(value);
                 setter(convertedValue);
             }
-            catch (FormatException invalidConversionException)
+            catch (FormatException)
             {
                 // NOTE: If the conversion from string to the property type fails, we just do nothing...
             }

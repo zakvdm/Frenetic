@@ -10,8 +10,8 @@ namespace Frenetic.Network
         void Create(int port);
 
         void SendToAll(Message msg, NetChannel channel);
-        void SendTo(Message msg, NetChannel channel, int destinationPlayerID);
-        void SendToAllExcept(Message msg, NetChannel channel, int excludedPlayerID);
+        void SendTo(Message msg, NetChannel channel, int destinationClientID);
+        void SendToAllExcept(Message msg, NetChannel channel, int excludedClientID);
 
         Dictionary<int, INetConnection> ActiveConnections { get; }
     }

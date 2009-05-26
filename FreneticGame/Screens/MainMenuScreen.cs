@@ -62,7 +62,7 @@ namespace Frenetic
         /// <summary>
         /// Constructs a new MainMenu object.
         /// </summary>
-        public MainMenuScreen(Viewport viewport, SpriteBatch spriteBatch, SpriteFont font, IGameSessionFactory gameSessionFactory, IScreenFactory screenFactory, Quitter quitter, LocalClient localClient)    // These last 2 parameters are hacky...
+        public MainMenuScreen(Viewport viewport, SpriteBatch spriteBatch, SpriteFont font, IGameSessionFactory gameSessionFactory, IScreenFactory screenFactory, Quitter quitter, LocalClient localClient) 
             : base(viewport, spriteBatch, font)
         {
             // TODO: There must be a way to reduce the number of parameters here???

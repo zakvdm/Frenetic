@@ -11,6 +11,8 @@ namespace Frenetic.Network.Lidgren
             _messageSerializer = messageSerializer;
         }
 
+        public event EventHandler<ClientJoinedEventArgs> ClientJoined;
+
         public void Dispose()
         {
             Shutdown("Cleaning up connection.");
@@ -68,20 +70,40 @@ namespace Frenetic.Network.Lidgren
                         NetBuffer buf = _netClient.CreateBuffer();
                         buf.Write("Hail from " + Environment.MachineName);
                         _netClient.Connect(inBuffer.ReadIPEndPoint(), buf.ToArray());
-                        return null;
+                        break;
                     case NetMessageType.DebugMessage:
                         Console.WriteLine(inBuffer.ReadString());
-                        return null;
+                        break;
                     case NetMessageType.VerboseDebugMessage:
-                        return null;
+                        break;
                     case NetMessageType.Data:
-                        return _messageSerializer.Deserialize(inBuffer.ReadBytes(inBuffer.LengthBytes));
+                        Message msg = _messageSerializer.Deserialize(inBuffer.ReadBytes(inBuffer.LengthBytes));
+                
+                        if (HandleMessageFromServer(msg))
+                            break;  // Message is handled in this class
+
+                        return msg; // Message needs to be handled externally
                 }
             }
             return null;
         }
         
         #endregion
+
+        bool HandleMessageFromServer(Message incomingMessage)
+        {
+            switch (incomingMessage.Type)
+            {
+                case MessageType.SuccessfulJoin:
+                    ClientJoined(this, new ClientJoinedEventArgs((int)incomingMessage.Data, true));
+                    return true;
+                case MessageType.NewPlayer:
+                    ClientJoined(this, new ClientJoinedEventArgs((int)incomingMessage.Data, false));
+                    return true;
+                default:
+                    return false;
+            }
+        }
 
         INetClient _netClient;
         IMessageSerializer _messageSerializer;

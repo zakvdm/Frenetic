@@ -11,15 +11,18 @@ namespace UnitTestLibrary
     [TestFixture]
     public class LidgrenClientNetworkSessionTests
     {
+        IMessageSerializer stubSerializer;
         INetClient stubNetClient;
         LidgrenClientNetworkSession clientNetworkSession;
         [SetUp]
         public void SetUp()
         {
             stubNetClient = MockRepository.GenerateStub<INetClient>();
-            clientNetworkSession = new LidgrenClientNetworkSession(stubNetClient, null);
+            stubSerializer = MockRepository.GenerateStub<IMessageSerializer>();
+            clientNetworkSession = new LidgrenClientNetworkSession(stubNetClient, stubSerializer);
         }
 
+        // CONNECTION:
         [Test]
         public void ClientCanJoinSessionCorrectlyWithIP()
         {
@@ -59,6 +62,38 @@ namespace UnitTestLibrary
             stubNetClient.AssertWasCalled(x => x.Connect(Arg<System.Net.IPEndPoint>.Is.Anything, Arg<byte[]>.Is.Anything));
         }
 
+        // RECEIVING DATA:
+        [Test]
+        public void RaisesClientJoinedEventForLocalPlayerWhenNotifiedOfSuccessfulJoin()
+        {
+            NetBuffer buffer = new NetBuffer();
+            stubNetClient.Stub(me => me.CreateBuffer()).Return(buffer);
+            stubNetClient.Stub(me => me.ReadMessage(Arg<NetBuffer>.Is.Equal(buffer), out Arg<NetMessageType>.Out(NetMessageType.Data).Dummy)).Return(true);
+            stubSerializer.Stub(me => me.Deserialize(buffer.ReadBytes(buffer.LengthBytes))).Return(new Message() { Type = MessageType.SuccessfulJoin, Data = 100 });
+            bool raisedEvent = false;
+            clientNetworkSession.ClientJoined += (obj, args) => { if ((args.ID == 100) && (args.IsLocalClient)) raisedEvent = true; };
+
+            clientNetworkSession.ReadMessage();
+
+            Assert.IsTrue(raisedEvent);
+        }
+        [Test]
+        public void RaisesClientJoinedEventForNetworkPlayersWhenNotifiedOfNewPlayers()
+        {
+            NetBuffer buffer = new NetBuffer();
+            stubNetClient.Stub(me => me.CreateBuffer()).Return(buffer);
+            stubNetClient.Stub(me => me.ReadMessage(Arg<NetBuffer>.Is.Equal(buffer), out Arg<NetMessageType>.Out(NetMessageType.Data).Dummy)).Return(true);
+            stubSerializer.Stub(me => me.Deserialize(buffer.ReadBytes(buffer.LengthBytes))).Return(new Message() { Type = MessageType.NewPlayer, Data = 100 });
+            bool raisedEvent = false;
+            clientNetworkSession.ClientJoined += (obj, args) => { if ((args.ID == 100) && (!args.IsLocalClient)) raisedEvent = true; };
+
+            clientNetworkSession.ReadMessage();
+
+            Assert.IsTrue(raisedEvent);
+        }
+
+
+        // SENDING DATA:
         [Test]
         [ExpectedException(ExceptionType = typeof(System.InvalidOperationException),
                             ExpectedMessage = "Client not connected to server")]
@@ -70,19 +105,17 @@ namespace UnitTestLibrary
         [Test]
         public void ClientProcessesAndSendsToServer()
         {
-            clientNetworkSession = new LidgrenClientNetworkSession(stubNetClient, new XmlMessageSerializer());
-
             NetBuffer tmpBuffer = new NetBuffer();
             Message msg = new Message() { Type = MessageType.Player, Data = 10 };
             stubNetClient.Stub(x => x.CreateBuffer(Arg<int>.Is.Anything)).Return(tmpBuffer);
             stubNetClient.Stub(x => x.Connected).Return(true);
+            byte[] data = { 0, 2 };
+            stubSerializer.Stub(x => x.Serialize(msg)).Return(data);
 
             clientNetworkSession.SendToServer(msg, NetChannel.ReliableUnordered);
 
             stubNetClient.AssertWasCalled(x => x.CreateBuffer(Arg<int>.Is.Anything));
             stubNetClient.AssertWasCalled(x => x.SendMessage(tmpBuffer, NetChannel.ReliableUnordered));
-
-            byte[] data = (new XmlMessageSerializer()).Serialize(msg);
             Assert.AreEqual(data, tmpBuffer.ReadBytes(data.Length));
         }
     }

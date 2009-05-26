@@ -188,6 +188,7 @@ namespace Frenetic
             builder.Register<NetServerWrapper>().As<INetServer>().ContainerScoped();
             builder.Register<NetClientWrapper>().As<INetClient>().ContainerScoped();
             builder.Register<LidgrenServerNetworkSession>().As<IServerNetworkSession>().ContainerScoped();
+            builder.Register<LidgrenServerMessageSender>().As<IServerMessageSender>().ContainerScoped();
             builder.Register<LidgrenClientNetworkSession>().As<IClientNetworkSession>().ContainerScoped();
             builder.Register<IncomingMessageQueue>().As<IIncomingMessageQueue>().ContainerScoped();
             builder.Register<OutgoingMessageQueue>().As<IOutgoingMessageQueue>().ContainerScoped();
@@ -196,6 +197,8 @@ namespace Frenetic
             builder.Register<LocalClient>().SingletonScoped();
             builder.Register<Client>().FactoryScoped();
             builder.RegisterGeneratedFactory<Client.Factory>(new TypedService(typeof(Client)));
+            builder.Register<ServerSideClientFactory>().ContainerScoped();
+            builder.Register<ClientSideClientFactory>().ContainerScoped();
 
             builder.Register<ClientInputSender>().ContainerScoped();
             builder.Register<ClientInputProcessor>().ContainerScoped();

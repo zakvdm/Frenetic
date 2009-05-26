@@ -103,7 +103,7 @@ namespace UnitTestLibrary
         }
 
         [Test]
-        [ExpectedException(typeof(ArgumentException), "This implementation of IMediator does not support Properties of type System.Decimal")]
+        [ExpectedException(typeof(ArgumentException), ExpectedMessage="This implementation of IMediator does not support Properties of type System.Decimal")]
         public void ThrowsExceptionWhenRegisteringAnUnknownType()
         {
             var tweakProp = typeof(TestClass).GetProperty("InvalidTypeProperty");

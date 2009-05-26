@@ -79,7 +79,9 @@
     <Compile Include="CameraTests.cs" />
     <Compile Include="ChatLogDifferByReferenceTests.cs" />
     <Compile Include="ChatMessageTests.cs" />
+    <Compile Include="ClientFactoryTests.cs" />
     <Compile Include="ClientStateTrackerTests.cs" />
+    <Compile Include="LidgrenServerMessageSenderTests.cs" />
     <Compile Include="LocalClientTests.cs" />
     <Compile Include="MessageConsoleTests.cs" />
     <Compile Include="LogTests.cs" />

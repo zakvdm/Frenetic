@@ -5,9 +5,9 @@ namespace Frenetic.Network
 {
     public interface IClientStateTracker
     {
-        Client this[int clientID] { get; }
-        List<Client> CurrentClients { get; }
+        Client FindNetworkClient(int clientID);
 
-        void AddNewClient(int ID);
+        Client LocalClient { get; }
+        List<Client> NetworkClients { get; }
     }
 }

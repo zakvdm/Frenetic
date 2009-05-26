@@ -22,7 +22,7 @@ namespace Frenetic
             {
                 _lastSentSnap = _snapCounter.CurrentSnap;
 
-                foreach (Client client in _clientStateTracker.CurrentClients)
+                foreach (Client client in _clientStateTracker.NetworkClients)
                 {
                     SendServerAndClientSnap(client); // We always send the latest snap
 

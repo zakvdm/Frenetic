@@ -20,52 +20,37 @@ namespace Frenetic.Network
         public void Process(float elapsedTime)
         {
             // Update the last server snap received by the client:
-            while (true)
+            while (_incomingMessageQueue.HasAvailable(MessageType.ServerSnap))
             {
                 Message message = _incomingMessageQueue.ReadWholeMessage(MessageType.ServerSnap);
 
-                if (message == null)
-                    break;
-
-                _clientStateTracker[message.ClientID].LastServerSnap = (int)message.Data;
+                _clientStateTracker.FindNetworkClient(message.ClientID).LastServerSnap = (int)message.Data;
             }
             // Update the last client snap received here by the server:
-            while (true)
+            while (_incomingMessageQueue.HasAvailable(MessageType.ClientSnap))
             {
                 Message message = _incomingMessageQueue.ReadWholeMessage(MessageType.ClientSnap);
 
-                if (message == null)
-                    break;
-
-                _clientStateTracker[message.ClientID].LastClientSnap = (int)message.Data;
+                _clientStateTracker.FindNetworkClient(message.ClientID).LastClientSnap = (int)message.Data;
             }
             // Update server chat log:
-            while (true)
+            while (_incomingMessageQueue.HasAvailable(MessageType.ChatLog))
             {
                 Message netMsg = _incomingMessageQueue.ReadWholeMessage(MessageType.ChatLog);
-
-                if (netMsg == null)
-                    break;
 
                 AddClientChatMessageToServerLog(netMsg);
             }
             // Update player:
-            while (true)
+            while (_incomingMessageQueue.HasAvailable(MessageType.Player))
             {
                 Message netMsg = _incomingMessageQueue.ReadWholeMessage(MessageType.Player);
-
-                if (netMsg == null)
-                    break;
 
                 _networkPlayerProcessor.UpdatePlayerFromNetworkMessage(netMsg);
             }
             // Update Player Settings:
-            while (true)
+            while (_incomingMessageQueue.HasAvailable(MessageType.PlayerSettings))
             {
                 Message netMsg = _incomingMessageQueue.ReadWholeMessage(MessageType.PlayerSettings);
-
-                if (netMsg == null)
-                    break;
 
                 _networkPlayerProcessor.UpdatePlayerSettingsFromNetworkMessage(netMsg);
             }
@@ -77,7 +62,7 @@ namespace Frenetic.Network
         {
             ChatMessage chatMsg = (ChatMessage)netMsg.Data;
 
-            chatMsg.ClientName = _clientStateTracker[netMsg.ClientID].PlayerSettings.Name;
+            chatMsg.ClientName = _clientStateTracker.FindNetworkClient(netMsg.ClientID).PlayerSettings.Name;
 
             // Before we add this message to the server log, let's check that we haven't already added it
             if (_chatLogDiffer.IsNewClientChatMessage(chatMsg))

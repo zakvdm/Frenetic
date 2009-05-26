@@ -16,15 +16,18 @@ namespace UnitTestLibrary
     [TestFixture]
     public class NetworkPlayerProcessorTests
     {
-        ClientStateTracker clientStateTracker;
+        IClientStateTracker clientStateTracker;
         NetworkPlayerProcessor networkPlayerController;
+        Client client;
         
         [SetUp]
         public void SetUp()
         {
-            clientStateTracker = new ClientStateTracker(MockRepository.GenerateStub<ISnapCounter>(), () => new Client(new Player(null, null), new NetworkPlayerSettings()));
+            client = new Client(new Player(null, null), new NetworkPlayerSettings()) { ID = 10 };
+            clientStateTracker = MockRepository.GenerateStub<IClientStateTracker>();
+            clientStateTracker.Stub(me => me.FindNetworkClient(10)).Return(client);
+            clientStateTracker.Stub(me => me.NetworkClients).Return(new List<Client>() { client });
             networkPlayerController = new NetworkPlayerProcessor(clientStateTracker);
-            clientStateTracker.AddNewClient(10);
         }
 
         [Test]
@@ -39,22 +42,22 @@ namespace UnitTestLibrary
         {
             Player receivedPlayer = new Player(null, null);
             receivedPlayer.Position = new Vector2(100, 200);
-            clientStateTracker[10].Player.Position = Vector2.Zero;
+            clientStateTracker.FindNetworkClient(10).Player.Position = Vector2.Zero;
 
             networkPlayerController.UpdatePlayerFromNetworkMessage(new Message() { ClientID = 10, Type = MessageType.Player, Data = receivedPlayer });
 
-            Assert.AreEqual(new Vector2(100, 200), clientStateTracker[10].Player.Position);
+            Assert.AreEqual(new Vector2(100, 200), clientStateTracker.FindNetworkClient(10).Player.Position);
         }
 
         [Test]
         public void UpdatesPlayerSettingsBasedOnMessage()
         {
             NetworkPlayerSettings receivedPlayerSettings = new NetworkPlayerSettings() { Name = "Test Name" };
-            clientStateTracker[10].PlayerSettings.Name = "Nom de Plume";
+            client.PlayerSettings.Name = "Nom de Plume";
 
             networkPlayerController.UpdatePlayerSettingsFromNetworkMessage(new Message() { ClientID = 10, Type = MessageType.PlayerSettings, Data = receivedPlayerSettings });
 
-            Assert.AreEqual("Test Name", clientStateTracker[10].PlayerSettings.Name);
+            Assert.AreEqual("Test Name", clientStateTracker.FindNetworkClient(10).PlayerSettings.Name);
         }
     }
 }

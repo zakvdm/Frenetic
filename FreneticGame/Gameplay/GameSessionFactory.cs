@@ -51,6 +51,9 @@ namespace Frenetic
             serverNetworkSession.Create(14242);
             // *****************************************
 
+            ServerContainer.Resolve<IClientStateTracker>(new TypedParameter(typeof(INetworkSession), serverNetworkSession),
+                                                            new TypedParameter(typeof(IClientFactory), ServerContainer.Resolve<ServerSideClientFactory>()));
+
             // Server needs a new PhysicsSimulator (can't use the client's... -- NOTE: the parameter value is irrelevant, all that matters is that it exists...)
             ServerContainer.Resolve<IPhysicsSimulator>(new NamedParameter("isServer", true));
 
@@ -89,6 +92,9 @@ namespace Frenetic
                     new TypedParameter(typeof(IServerNetworkSession), null));
             clientNetworkSession.Join(14242);
             // *****************************************
+
+            ClientContainer.Resolve<IClientStateTracker>(new TypedParameter(typeof(INetworkSession), clientNetworkSession),
+                                                            new TypedParameter(typeof(IClientFactory), ClientContainer.Resolve<ClientSideClientFactory>()));
 
             IGameSession gameSession = ClientContainer.Resolve<IGameSession>();
 

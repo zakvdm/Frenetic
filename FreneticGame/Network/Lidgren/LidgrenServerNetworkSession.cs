@@ -6,13 +6,16 @@ namespace Frenetic.Network.Lidgren
 {
     public class LidgrenServerNetworkSession : IServerNetworkSession
     {
-        public LidgrenServerNetworkSession(INetServer netServer, IMessageSerializer messageSerializer)
+        public LidgrenServerNetworkSession(INetServer netServer, IServerMessageSender serverMessageSender, IMessageSerializer messageSerializer)
         {
             _netServer = netServer;
+            _serverMessageSender = serverMessageSender;
             _messageSerializer = messageSerializer;
 
             ActiveConnections = new Dictionary<int, INetConnection>();
         }
+
+        public event EventHandler<ClientJoinedEventArgs> ClientJoined;
 
         public void Dispose()
         {
@@ -30,36 +33,26 @@ namespace Frenetic.Network.Lidgren
             _netServer.Start();
         }
 
-        public void SendTo(Message msg, NetChannel channel, int destinationPlayerID)
+        #region Sending
+        public void SendTo(Message msg, NetChannel channel, int destinationClientID)
         {
-            if ((!ActiveConnections.ContainsKey(destinationPlayerID)) || (ActiveConnections[destinationPlayerID].Status != NetConnectionStatus.Connected))
+            if ((!ActiveConnections.ContainsKey(destinationClientID)) || (ActiveConnections[destinationClientID].Status != NetConnectionStatus.Connected))
                 throw new System.InvalidOperationException("Not a valid player");
 
-            byte[] data = _messageSerializer.Serialize(msg);
-            NetBuffer buffer = _netServer.CreateBuffer(data.Length);
-            buffer.Write(data);
-
-            _netServer.SendMessage(buffer, channel, ActiveConnections[destinationPlayerID]);
+            _serverMessageSender.SendTo(msg, channel, ActiveConnections[destinationClientID]);
         }
         public void SendToAll(Message msg, NetChannel channel)
         {
-            byte[] data = _messageSerializer.Serialize(msg);
-            NetBuffer buffer = _netServer.CreateBuffer(data.Length);
-            buffer.Write(data);
-
-            _netServer.SendToAll(buffer, channel);
+            _serverMessageSender.SendToAll(msg, channel);
         }
-        public void SendToAllExcept(Message msg, NetChannel channel, int excludedPlayerID)
+        public void SendToAllExcept(Message msg, NetChannel channel, int excludedClientID)
         {
-            if (!ActiveConnections.ContainsKey(excludedPlayerID))
+            if (!ActiveConnections.ContainsKey(excludedClientID))
                 throw new System.InvalidOperationException("Excluded player not connected to network session");
 
-            byte[] data = _messageSerializer.Serialize(msg);
-            NetBuffer buffer = _netServer.CreateBuffer(data.Length);
-            buffer.Write(data);
-
-            _netServer.SendToAll(buffer, channel, ActiveConnections[excludedPlayerID]);
+            _serverMessageSender.SendToAllExcept(msg, channel, ActiveConnections[excludedClientID]);
         }
+        #endregion
 
         #endregion
 
@@ -82,15 +75,10 @@ namespace Frenetic.Network.Lidgren
                 switch (type)
                 {
                     case NetMessageType.ConnectionApproval:
-                        sender.Approve();
+                        ApproveNewClient(sender);
                         break;
                     case NetMessageType.StatusChanged:
-                        Console.WriteLine("Status for " + sender.ConnectionID.ToString() + " is: " + sender.Status);
-                        if ((sender.Status == NetConnectionStatus.Connected) && (!ActiveConnections.ContainsKey(sender.ConnectionID)))
-                        {
-                            ActiveConnections.Add(sender.ConnectionID, sender);
-                            return new Message() { Type = MessageType.NewPlayer, Data = sender.ConnectionID };
-                        }
+                        HandleClientStatusChanged(sender);
                         break;
                     case NetMessageType.DebugMessage:
                         Console.WriteLine(inBuffer.ReadString());
@@ -106,7 +94,45 @@ namespace Frenetic.Network.Lidgren
 
         #endregion
 
+        void ApproveNewClient(INetConnection client)
+        {
+            client.Approve();
+        }
+
+        void HandleClientStatusChanged(INetConnection clientConnection)
+        {
+            Console.WriteLine("Status for " + clientConnection.ConnectionID.ToString() + " is: " + clientConnection.Status);
+            if ((clientConnection.Status == NetConnectionStatus.Connected) && (!ActiveConnections.ContainsKey(clientConnection.ConnectionID)))
+            {
+                ActiveConnections.Add(clientConnection.ConnectionID, clientConnection);
+
+                ProcessNewClient(clientConnection.ConnectionID);
+            }
+        }
+
+        void ProcessNewClient(int newClientID)
+        {
+            if (ClientJoined != null)
+                ClientJoined(this, new ClientJoinedEventArgs(newClientID, false));
+
+            // send ack to new client:
+            SendTo(new Message() { Type = MessageType.SuccessfulJoin, Data = newClientID }, NetChannel.ReliableInOrder1, newClientID);
+
+            // send existent clients' info to new client:
+            foreach (INetConnection connection in ActiveConnections.Values)
+            {
+                if (connection.ConnectionID == newClientID)
+                    continue;   // We don't want to send the client to itself...
+
+                SendTo(new Message() { Type = MessageType.NewPlayer, Data = connection.ConnectionID }, NetChannel.ReliableUnordered, newClientID);
+            }
+                
+            // tell existent clients about new client:
+            SendToAllExcept(new Message() { Type = MessageType.NewPlayer, Data = newClientID }, NetChannel.ReliableUnordered, newClientID);
+        }
+
         INetServer _netServer;
+        IServerMessageSender _serverMessageSender;
         IMessageSerializer _messageSerializer;
     }
 }

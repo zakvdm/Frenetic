@@ -9,9 +9,35 @@ NAME IDEAS:
 			1) I have some idea for the art--the main thing being characters that are deformable and become more "blurry" when you move faster (this will help with the sensation of speed hopefully)
 			2) It can be cute and HD retro
 			3) It suggests a theme
+	
+	SpooQ
+		I like this a little more than plain "Spook" (probably)
+			1) The "Q" can be a persistent symbol that's always in the bottom right, and can tie into the gameplay (for example, you click on the Q to see a list of "masks" you've unlocked to use with your spooq - see character section)
+			2) It's also a reference to Quake (of course), and in fact, has the same number of letters as "quake", only starting backwards (which appeals to me)
+			3) the "poo" bit in the middle of SpooQ can (in the intro sequence) start out as "boo" and then the vertical line on the "b" drops down to form the "p"
+			4) So the theme now is becoming something like a "scary meets cute" theme: The characters are ghosts, spooks, but they're kind of cute, but the graphics are done in a kind of Japanese horror style, lots of sketchy fonts, extensive use of black and white (with maybe a little red thrown in to approximate blood). Maybe some screeches and scary sounds, but also cutesy character masks that you unlock/collect (from the corpses of dead enemies).
+		ALSO: spooqs has a lovely kind of symmetry to it, and the domain is AVAILABLE
+
+PLAYER CHARACTER:
+	If we go with the spook theme, then the characters have to be little phantoms/ghosts. The bodies can be globulous and fuzzy--procedurally generated, probably just with a clever particle system, and deforming to indicate movement (we want the sensation of speed!). Each character has a body and a head region. The head is the same (black?) amorphous substance of the body, but it wears a mask too.
+	Masks:
+		The masks the characters wear are unlocked in a kind of mini-game-inside-the-game system similar to Call of Duty 4. They don't serve any purpose other than aesthetics and bragging rights. The whole unlocking masks system is used to teach game dynamics in a as-you-play tutorial (eg. Kill a character while doing a wall jump; kill 5 people with your "scare"; rocket jumps; whatever--it can all be introduced through the mask system)
+		It would be cool if you could pick up masks of people you kill. So even if I'm a complete newbie, if i kill an advanced player wearing an advanced mask, i can pick up the mask he drops, and it's available for me to wear... This will make it riskier to wear the harder to unlock masks frivolously, and will allow for a good deal of cheaky play. (We could even do a system of make your own mask; collect a mask for every person you've killed; etc. There are interesting options!)
+	Deaths:
+		The masks will allow for cool death animations. When someone dies normally, the amorphous blob part of them disappears in a puff of smoke and particle magic, then the mask falls to the ground like a normal physics object. For more spectacular deaths (the equivalents of gibs in quake) the mask can shoot across the room, or even shatter.
 
 
-
+MOVEMENT:
+	The whole premise of the movement is this: The game is about moving FAST. There are lots of visual cues to give a sensation of speed. Weapons do more damage when you go fast. You're harder to hit when you go fast. You unlock certain masks when you do certain speed related challenges. In short, good things happen when you go fast. Of course, for all of this to work, there needs to be some SKILL involved in going fast. This is where N comes in. I want what they have and more! Wall jumps, jump pads, teleporters, but also rocket/plasma jumping, double jumping, (circle jumping?).
+	The theme of spooks makes me think that it would be really cool to have some kind of "ghost-like" movement system. What I'm picturing will be a little bit like the special moves in the unreal tournament system, except it needs to be less gimmicky (uggg... I have the double-tap dodging, it's so clunky). Instead of double tap dodging (or something like that), i want to experiment with having a single "special" command button that does different things depending on context. What exactly those things are needs prototyping and lots of experimenting to decide, but as a for example:
+		* When character is in the air and you push the special button with no other buttons -> the character become momentarily semi-transparent and projectiles pass right through him (so useful for dodging, has a timer similar to Soldat so it can't be over used)
+		* combining special key with direction keys while in the air -> character "darts" a short distance in the direction of the key press
+		* special key with jump can be combined to do better (higher/further) from the ground
+		* and then, most theme specifically, you have a kind of almost melee attack where you can "spook" someone. (I picture it as a shockwave that emanates from the player in all directions for a short distance, and anyone hit by this shockwave gets "stunned", and takes some damage).
+			-> what's cool about the spook attack is that you have to get very close to your opponent to use it, and it takes--for a short time--a lot of your opponent's momentum away. So there will be cool kills where you stun someone with your spook attack, and then finish them off with one of the other higher damage guns.
+	VARIATIONS: 
+		I had the idea that using the semi-transparent mode of the special key, you could even pass through walls (so you could suddenly "teleport" into a chamber and then "spook" your opponent), but this might be hard to balance/impractical)
+		It might be cool to have some kind of "mouse gesture" system where you can do certain moves by hovering the mouse on your character (at which point the cursor changes) and then click dragging it in certain patterns/shapes. But i'm not really sure what this would look like in reality, it's just an idea.
 
 
 WEAPONS:

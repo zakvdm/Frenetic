@@ -24,7 +24,7 @@ namespace UnitTestLibrary
         {
             stubClientStateTracker = MockRepository.GenerateStub<IClientStateTracker>();
             List<Client> clientList = new List<Client>();
-            stubClientStateTracker.Stub(x => x.CurrentClients).Return(clientList);
+            stubClientStateTracker.Stub(x => x.NetworkClients).Return(clientList);
             stubChatLogDiffer = MockRepository.GenerateStub<IChatLogDiffer>();
             stubSnapCounter = MockRepository.GenerateStub<ISnapCounter>();
             stubOutgoingMessageQueue = MockRepository.GenerateStub<IOutgoingMessageQueue>();
@@ -36,7 +36,7 @@ namespace UnitTestLibrary
         {
             stubSnapCounter.CurrentSnap = 3;
             Client client = new Client(null, null);
-            stubClientStateTracker.CurrentClients.Add(client);
+            stubClientStateTracker.NetworkClients.Add(client);
 
             serverChatLogView.Generate();
 
@@ -49,7 +49,7 @@ namespace UnitTestLibrary
             stubSnapCounter.CurrentSnap = 3;
             Client client = new Client(null, null);
             client.LastClientSnap = 78;
-            stubClientStateTracker.CurrentClients.Add(client);
+            stubClientStateTracker.NetworkClients.Add(client);
 
             serverChatLogView.Generate();
 
@@ -63,7 +63,7 @@ namespace UnitTestLibrary
             ChatMessage chatMsg = new ChatMessage() { ClientName = "terence", Snap = 32 };
             chatLog.AddMessage(chatMsg);
             Client client = new Client(null, null);
-            stubClientStateTracker.CurrentClients.Add(client);
+            stubClientStateTracker.NetworkClients.Add(client);
             stubChatLogDiffer.Stub(x => x.GetOldestToYoungestDiff(client)).Return(chatLog);
             stubSnapCounter.CurrentSnap = 3;
 
@@ -79,7 +79,7 @@ namespace UnitTestLibrary
             chatLog.AddMessage(new ChatMessage() { Message = "Woohoo" });
             chatLog.AddMessage(new ChatMessage() { Message = "boohoo" });
             Client client = new Client(null, null);
-            stubClientStateTracker.CurrentClients.Add(client);
+            stubClientStateTracker.NetworkClients.Add(client);
             stubChatLogDiffer.Stub(x => x.GetOldestToYoungestDiff(client)).Return(chatLog);
             stubSnapCounter.CurrentSnap = 3;
 
@@ -96,8 +96,8 @@ namespace UnitTestLibrary
         {
             Client client1 = new Client(null, null) { ID = 1 };
             Client client2 = new Client(null, null) { ID = 2 };
-            stubClientStateTracker.CurrentClients.Add(client1);
-            stubClientStateTracker.CurrentClients.Add(client2);
+            stubClientStateTracker.NetworkClients.Add(client1);
+            stubClientStateTracker.NetworkClients.Add(client2);
             stubSnapCounter.CurrentSnap = 3;
 
             serverChatLogView.Generate();
@@ -111,7 +111,7 @@ namespace UnitTestLibrary
         {
             Client client = new Client(null, null) { ID = 7 };
             client.Player = new Player(null, null) { Position = new Vector2(100, 200) };
-            stubClientStateTracker.CurrentClients.Add(client);
+            stubClientStateTracker.NetworkClients.Add(client);
             stubSnapCounter.CurrentSnap = 3;
 
             serverChatLogView.Generate();

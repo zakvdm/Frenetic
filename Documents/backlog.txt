@@ -53,17 +53,21 @@ DONE - Message on console (i.e. whatever's not a command) is sent reliably to th
 DONE - Server sends messages reliably to all clients
 DONE - Messages are written to the console with the client name
 
-TODO: When joining a network session and then exiting, the resources are properly disposed (why?)
+BUGS:
+TODO: Players/objects are not visible if they are in the "black" areas
+	This needs some kind of unified drawing order. Not sure if this should be handled yet (haven't even decided HOW the visibility stuff will finally be implemented...).
 TODO: Change the client authentication model to be more like the q3 model (everything done unreliably).
+	TODO: When joining a network session and then exiting, the resources are properly disposed (why?)
+		This can be fixed when changing the authentication model... it needs to handle client disconnects better.
 TODO: Add some kind of logging framework (so we can start doing debug output, etc.)
 
-(OUT OF SPRINT) 8 - Basic visibility
-DONE - All areas not directly visible from the current player position are black
-  Players/objects are not visible if they are in the "black" areas
+DONE - (OUT OF SPRINT) 8 - Basic visibility (All areas not directly visible from the current player position are black)
 
-ZAK - 8 - Player settings are saved over multiple game sessions
+DONE - 8 - Player settings are saved over multiple game sessions
 
 ******************************COMMITED UP TO HERE FOR SPRINT 3 (31 sp commited to -- x sp completed in about x weeks)
+
+3 - Create a system of console-executable commands (probably with an attribute similar to [Tweakable] -- [Runnable]?)
 
 2 - Change menu system to use same keyboard structure as game (this will allow the console to lock keyboard input during the menu stages)
 
@@ -82,8 +86,6 @@ ZAK - 8 - Player settings are saved over multiple game sessions
 	Implementation: Records all input (what? network incoming messages and local input? (if client)). Records a periodic 'summary' of the game state.
 	STEP 3:
 	Run game simulation from recorded files (instead of live input). Confirm that the game state reaches the expected 'summary' states.
-
-13 - As the client I can enter an IP address and port number to join a specific game.
 
 3 - Write chat messages to the screen (not just in console)
 

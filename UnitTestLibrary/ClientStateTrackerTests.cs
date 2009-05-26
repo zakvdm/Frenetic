@@ -11,56 +11,76 @@ namespace UnitTestLibrary
     {
         ISnapCounter stubSnapCounter;
         ClientStateTracker clientStateTracker;
-        bool clientFactoryWasUsed;
-        Client.Factory clientFactory;
+        IClientFactory clientFactory;
+        INetworkSession stubNetworkSession;
 
         [SetUp]
         public void SetUp()
         {
-            clientFactoryWasUsed = false;
-            clientFactory = () => { clientFactoryWasUsed = true; return new Client(null, null); };
+            clientFactory = MockRepository.GenerateStub<IClientFactory>();
+            clientFactory.Stub(x => x.MakeNewClient(Arg<int>.Is.Anything)).Return(new Client(null, null) { ID = 100 });
             stubSnapCounter = MockRepository.GenerateStub<ISnapCounter>();
-            clientStateTracker = new ClientStateTracker(stubSnapCounter, clientFactory);
+            stubNetworkSession = MockRepository.GenerateStub<INetworkSession>();
+            clientStateTracker = new ClientStateTracker(stubSnapCounter, stubNetworkSession, clientFactory);
         }
 
+        [Test]
+        public void RegistersWithNetworkSessionForClientJoinedEvent()
+        {
+            stubNetworkSession.AssertWasCalled(me => me.ClientJoined += Arg<EventHandler<ClientJoinedEventArgs>>.Is.Anything);
+        }
 
         [Test]
-        public void AddNewClientUsesClientFactory()
+        public void GetsLocalClientFromFactoryAndSetsID()
         {
-            clientStateTracker.AddNewClient(100);
+            clientFactory.Stub(x => x.GetLocalClient()).Return(new LocalClient(null, null));
 
-            Assert.IsTrue(clientFactoryWasUsed);
-            Assert.IsNotNull(clientStateTracker[100]);
+            stubNetworkSession.Raise(me => me.ClientJoined += null, this, new ClientJoinedEventArgs(200, true));
+
+            clientFactory.AssertWasNotCalled(x => x.MakeNewClient(Arg<int>.Is.Anything));
+            clientFactory.AssertWasCalled(x => x.GetLocalClient());
+            Assert.AreEqual(200, clientStateTracker.LocalClient.ID);
+        }
+
+        [Test]
+        public void AddNewNetworkClientUsesClientFactory()
+        {
+            stubNetworkSession.Raise(me => me.ClientJoined += null, this, new ClientJoinedEventArgs(100, false));
+
+            clientFactory.AssertWasNotCalled(x => x.GetLocalClient());
+            clientFactory.AssertWasCalled(x => x.MakeNewClient(100));
+            Assert.IsNotNull(clientStateTracker.FindNetworkClient(100));
         }
 
         [Test]
         public void NewClientsAddedWithLatestServerSnap()
         {
             stubSnapCounter.CurrentSnap = 12;
-            clientStateTracker.AddNewClient(100);
+            stubNetworkSession.Raise(me => me.ClientJoined += null, this, new ClientJoinedEventArgs(100, false));
 
-            foreach (Client client in clientStateTracker.CurrentClients)
+            foreach (Client client in clientStateTracker.NetworkClients)
             {
                 Assert.AreEqual(12, client.LastServerSnap);
             }
         }
 
         [Test]
-        public void CanIndexBasedOnClientID()
+        public void CanFindAddedNetworkClients()
         {
-            clientStateTracker.AddNewClient(100);
+            stubNetworkSession.Raise(me => me.ClientJoined += null, this, new ClientJoinedEventArgs(100, false));
 
-            Assert.AreEqual(100, clientStateTracker[100].ID);
+            Assert.AreEqual(100, clientStateTracker.FindNetworkClient(100).ID);
         }
 
         [Test]
         public void CanSetLastSnapViaIDIndex()
         {
-            clientStateTracker.AddNewClient(12);
+            stubNetworkSession.Raise(me => me.ClientJoined += null, this, new ClientJoinedEventArgs(100, false));
 
-            clientStateTracker[12].LastServerSnap = 1823;
+            clientStateTracker.FindNetworkClient(100).LastServerSnap = 1823;
 
-            Assert.AreEqual(1823, clientStateTracker[12].LastServerSnap);
+            Assert.AreEqual(1823, clientStateTracker.FindNetworkClient(100).LastServerSnap);
         }
+
     }
 }

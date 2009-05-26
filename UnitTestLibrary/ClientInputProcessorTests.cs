@@ -35,10 +35,15 @@ namespace UnitTestLibrary
             playerQueueMessageHelper = new QueuedMessageHelper<Message, MessageType>();
             playerSettingsQueueMessageHelper = new QueuedMessageHelper<Message, MessageType>();
             stubIncomingMessageQueue.Stub(x => x.ReadWholeMessage(Arg<MessageType>.Is.Equal(MessageType.ServerSnap))).Do(serverSnapQueueMessageHelper.GetNextQueuedMessage);
+            stubIncomingMessageQueue.Stub(x => x.HasAvailable(MessageType.ServerSnap)).Do(serverSnapQueueMessageHelper.HasMessageAvailable);
             stubIncomingMessageQueue.Stub(x => x.ReadWholeMessage(Arg<MessageType>.Is.Equal(MessageType.ClientSnap))).Do(clientSnapQueueMessageHelper.GetNextQueuedMessage);
+            stubIncomingMessageQueue.Stub(x => x.HasAvailable(MessageType.ClientSnap)).Do(clientSnapQueueMessageHelper.HasMessageAvailable);
             stubIncomingMessageQueue.Stub(x => x.ReadWholeMessage(Arg<MessageType>.Is.Equal(MessageType.ChatLog))).Do(chatLogQueueMessageHelper.GetNextQueuedMessage);
+            stubIncomingMessageQueue.Stub(x => x.HasAvailable(MessageType.ChatLog)).Do(chatLogQueueMessageHelper.HasMessageAvailable);
             stubIncomingMessageQueue.Stub(x => x.ReadWholeMessage(Arg<MessageType>.Is.Equal(MessageType.Player))).Do(playerQueueMessageHelper.GetNextQueuedMessage);
+            stubIncomingMessageQueue.Stub(x => x.HasAvailable(MessageType.Player)).Do(playerQueueMessageHelper.HasMessageAvailable);
             stubIncomingMessageQueue.Stub(x => x.ReadWholeMessage(Arg<MessageType>.Is.Equal(MessageType.PlayerSettings))).Do(playerSettingsQueueMessageHelper.GetNextQueuedMessage);
+            stubIncomingMessageQueue.Stub(x => x.HasAvailable(MessageType.PlayerSettings)).Do(playerSettingsQueueMessageHelper.HasMessageAvailable);
             stubClientStateTracker = MockRepository.GenerateStub<IClientStateTracker>();
             stubChatLogDiffer = MockRepository.GenerateStub<IChatLogDiffer>();
             stubSnapCounter = MockRepository.GenerateStub<ISnapCounter>();
@@ -52,7 +57,7 @@ namespace UnitTestLibrary
         public void ChecksThatClientInputChatMessageIsNewBeforeAddingToServerLog()
         {
             ChatMessage chatMsg = new ChatMessage();
-            stubClientStateTracker.Stub(x => x[Arg<int>.Is.Anything]).Return(client);
+            stubClientStateTracker.Stub(x => x.FindNetworkClient(Arg<int>.Is.Anything)).Return(client);
             chatLogQueueMessageHelper.QueuedMessages.Enqueue(new Message() { Data = chatMsg });
 
             clientInputProcessor.Process(1);
@@ -64,7 +69,7 @@ namespace UnitTestLibrary
         public void UpdatesChatLogFromClientInput()
         {
             chatLogQueueMessageHelper.QueuedMessages.Enqueue(new Message() { Data = new ChatMessage() { Message = "client message" } });
-            stubClientStateTracker.Stub(x => x[Arg<int>.Is.Anything]).Return(client);
+            stubClientStateTracker.Stub(x => x.FindNetworkClient(Arg<int>.Is.Anything)).Return(client);
             stubChatLogDiffer.Stub(x => x.IsNewClientChatMessage(Arg<ChatMessage>.Is.Anything)).Return(true);
 
             clientInputProcessor.Process(1);
@@ -75,7 +80,7 @@ namespace UnitTestLibrary
         [Test]
         public void UpdatesAcknowledgedServerSnapNumbersPerClient()
         {
-            stubClientStateTracker.Stub(x => x[3]).Return(client);
+            stubClientStateTracker.Stub(x => x.FindNetworkClient(3)).Return(client);
             serverSnapQueueMessageHelper.QueuedMessages.Enqueue(new Message() { ClientID = 3, Type = MessageType.ServerSnap, Data = 12 });
 
             clientInputProcessor.Process(1);
@@ -86,7 +91,7 @@ namespace UnitTestLibrary
         [Test]
         public void UpdatesCurrentClientSnapPerClient()
         {
-            stubClientStateTracker.Stub(x => x[3]).Return(client);
+            stubClientStateTracker.Stub(x => x.FindNetworkClient(3)).Return(client);
             stubChatLogDiffer.Stub(x => x.IsNewClientChatMessage(Arg<ChatMessage>.Is.Anything)).Return(true);
             clientSnapQueueMessageHelper.QueuedMessages.Enqueue(new Message() { ClientID = 3, Type = MessageType.ClientSnap, Data = 32 });
 
@@ -99,7 +104,7 @@ namespace UnitTestLibrary
         public void AddsClientNameToNewChatMessages()
         {
             client.PlayerSettings.Name = "terence";
-            stubClientStateTracker.Stub(x => x[1]).Return(client);
+            stubClientStateTracker.Stub(x => x.FindNetworkClient(1)).Return(client);
             stubChatLogDiffer.Stub(x => x.IsNewClientChatMessage(Arg<ChatMessage>.Is.Anything)).Return(true);
             chatLogQueueMessageHelper.QueuedMessages.Enqueue(new Message() { ClientID = 1, Type = MessageType.ChatLog, Data = new ChatMessage() { Message = "I am AWESOME" } });
 
@@ -111,7 +116,7 @@ namespace UnitTestLibrary
         [Test]
         public void AddsNewChatMessagesWithCurrentServerSnap()
         {
-            stubClientStateTracker.Stub(x => x[1]).Return(client);
+            stubClientStateTracker.Stub(x => x.FindNetworkClient(1)).Return(client);
             stubChatLogDiffer.Stub(x => x.IsNewClientChatMessage(Arg<ChatMessage>.Is.Anything)).Return(true);
             chatLogQueueMessageHelper.QueuedMessages.Enqueue(new Message() { ClientID = 1, Type = MessageType.ChatLog, Data = new ChatMessage() { Message = "I am AWESOME" } });
             stubSnapCounter.CurrentSnap = 331;
@@ -124,7 +129,7 @@ namespace UnitTestLibrary
         [Test]
         public void UpdatesPlayer()
         {
-            stubClientStateTracker.Stub(x => x[3]).Return(client);
+            stubClientStateTracker.Stub(x => x.FindNetworkClient(3)).Return(client);
             Player receivedPlayer = new Player(null, null);
             receivedPlayer.Position = new Vector2(-31, -92);
             Message msg = new Message() { ClientID = 3, Type = MessageType.Player, Data = receivedPlayer };
@@ -138,7 +143,7 @@ namespace UnitTestLibrary
         [Test]
         public void UpdatesPlayerSettings()
         {
-            stubClientStateTracker.Stub(x => x[3]).Return(client);
+            stubClientStateTracker.Stub(x => x.FindNetworkClient(3)).Return(client);
             NetworkPlayerSettings receivedPlayerSettings = new NetworkPlayerSettings();
             Message msg = new Message() { ClientID = 3, Type = MessageType.Player, Data = receivedPlayerSettings };
             playerSettingsQueueMessageHelper.QueuedMessages.Enqueue(msg);
