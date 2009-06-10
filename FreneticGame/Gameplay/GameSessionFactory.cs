@@ -144,9 +144,6 @@ namespace Frenetic
                                             new TypedParameter(typeof(Vector2), new Vector2(_screenWidth, _screenHeight))
                                             );
 
-            PlayerView localPlayerView = ClientContainer.Resolve<PlayerView>(new TypedParameter(typeof(IPlayer), localPlayer), new TypedParameter(typeof(IPlayerSettings), ClientContainer.Resolve<LocalPlayerSettings>()));
-            gameSession.Views.Add(localPlayerView);
-
             gameSession.Controllers.Add(ClientContainer.Resolve<KeyboardPlayerController>(new TypedParameter(typeof(IPlayer), localPlayer)));
 
             gameSession.Views.Add(ClientContainer.Resolve<VisibilityView>(new TypedParameter(typeof(IPlayer), localPlayer)));

@@ -19,7 +19,7 @@ SPRINT 2: Started on 2/02/2009
 DONE - 2 - As the player, when I move the camera follows me so I'm always at the centre of the screen
 	Just calculates a simple transformation matrix (code already implemented). Needs to be given to every IView?
 
-DONE - 5 -Move crosshair and click to print position
+DONE - 5 - Move crosshair and click to print position
 
 DONE - 3 - Can properly exit game
 
@@ -54,12 +54,10 @@ DONE - Server sends messages reliably to all clients
 DONE - Messages are written to the console with the client name
 
 BUGS:
-TODO: Players/objects are not visible if they are in the "black" areas
-	This needs some kind of unified drawing order. Not sure if this should be handled yet (haven't even decided HOW the visibility stuff will finally be implemented...).
-TODO: Change the client authentication model to be more like the q3 model (everything done unreliably).
-	TODO: When joining a network session and then exiting, the resources are properly disposed (why?)
+TODO: When joining a network session and then exiting, the resources are properly disposed (why?)
 		This can be fixed when changing the authentication model... it needs to handle client disconnects better.
-TODO: Add some kind of logging framework (so we can start doing debug output, etc.)
+
+5 - Add some kind of logging framework (so we can start doing debug output, etc.)
 
 DONE - (OUT OF SPRINT) 8 - Basic visibility (All areas not directly visible from the current player position are black)
 
@@ -67,9 +65,10 @@ DONE - 8 - Player settings are saved over multiple game sessions
 
 ******************************COMMITED UP TO HERE FOR SPRINT 3 (31 sp commited to -- x sp completed in about x weeks)
 
+
 3 - Create a system of console-executable commands (probably with an attribute similar to [Tweakable] -- [Runnable]?)
 
-2 - Change menu system to use same keyboard structure as game (this will allow the console to lock keyboard input during the menu stages)
+2 - Refactor Menu System: Change menu system to use same keyboard structure as game (this will allow the console to lock keyboard input during the menu stages)
 
 20 - As the player, I can click on the screen and fire a railgun at the point where I click.
 	Player clicks somewhere on screen and client sends fire event to Server - 5 - 
@@ -79,6 +78,9 @@ DONE - 8 - Player settings are saved over multiple game sessions
 
 13 - I can bring down the console and type "connect 196.21.23.4" and connect to a game hosted somewhere on the internet.
 	
+13 - Players/objects are not visible if they are in the "black" areas
+	This needs some kind of unified drawing order. Not sure if this should be handled yet (haven't even decided HOW the visibility stuff will finally be implemented...).
+
 40 - Games can be recorded and played back 
 	STEP 1:
 	We need to investigate what effect Farseer has on this... Apparently it's not deterministic. Way around this? Do player physics manually?
@@ -91,11 +93,11 @@ DONE - 8 - Player settings are saved over multiple game sessions
 
 5 - Game can be run in fullscreen and windowed mode
 13 - The game is resolution independent
+20 - Particle system (Mercury)
 40 - Item pickups
 40 - Can load a level format
 20 - Can load levels from menu
 40 - Various level items (jump pads, teleporters, etc.)
-100 - Particle system
 40 - Can load arbitrarily shaped polygons from textures
 8 - As the client, I can reconfigure my keys
 40 - Player can use various techniques to move better/faster (trick jumping, strafe/circle jumping, wall/double jumping)

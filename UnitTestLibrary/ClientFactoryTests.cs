@@ -24,8 +24,8 @@ namespace UnitTestLibrary
         public void SetUp()
         {
             gameSession = new GameSession();
-            localClient = new LocalClient(MockRepository.GenerateStub<IPlayer>(), null);
-            playerViewFactory = player => { if (player == localClient.Player) return createdLocalPlayerView; else return createdPlayerView; };
+            localClient = new LocalClient(MockRepository.GenerateStub<IPlayer>(), MockRepository.GenerateStub<LocalPlayerSettings>());
+            playerViewFactory = (player, playerSettings) => { if ((player == localClient.Player) && (playerSettings == localClient.PlayerSettings)) return createdLocalPlayerView; else return createdPlayerView; };
             clientFactoryDelegate = () => createdClient;
             clientFactory = new ClientSideClientFactory(clientFactoryDelegate, gameSession, playerViewFactory, localClient);
         }

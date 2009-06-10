@@ -8,7 +8,7 @@ namespace Frenetic.Player
 {
     public class PlayerView : IView
     {
-        public delegate PlayerView Factory(IPlayer player);
+        public delegate PlayerView Factory(IPlayer player, IPlayerSettings playerSettings);
         
         public PlayerView(IPlayer player, IPlayerSettings playerSettings, ITextureBank<PlayerTexture> playerTextureBank, ISpriteBatch spriteBatch, ICamera camera)
         {

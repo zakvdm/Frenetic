@@ -45,7 +45,7 @@ namespace Frenetic.Network
         {
             Client client = base.MakeNewClient(ID);
 
-            _gameSession.Views.Add(_playerViewFactory(client.Player));
+            _gameSession.Views.Add(_playerViewFactory(client.Player, client.PlayerSettings));
 
             return client;
         }
@@ -54,7 +54,7 @@ namespace Frenetic.Network
         {
             if (_localPlayerView == null)
             {
-                _localPlayerView = _playerViewFactory(_localClient.Player);
+                _localPlayerView = _playerViewFactory(_localClient.Player, _localClient.PlayerSettings);
                 _gameSession.Views.Add(_localPlayerView);
             }
 
