@@ -1,4 +1,5 @@
 ﻿using System;
+
 using Frenetic.Player;
 
 namespace Frenetic.Network
@@ -24,6 +25,11 @@ namespace Frenetic.Network
         public virtual LocalClient GetLocalClient()
         {
             throw new NotImplementedException("Server should not be trying to create local clients!");
+        }
+
+        public virtual void DeleteClient(Client client)
+        {
+            return;
         }
 
         #endregion
@@ -59,6 +65,15 @@ namespace Frenetic.Network
             }
 
             return _localClient;
+        }
+
+        public override void DeleteClient(Client client)
+        {
+            base.DeleteClient(client);
+
+            // Remove this Client's PlayerView:
+            _gameSession.Views.RemoveAll(view => view.Model == client.Player);
+            throw new NotImplementedException();
         }
 
         PlayerView.Factory _playerViewFactory;

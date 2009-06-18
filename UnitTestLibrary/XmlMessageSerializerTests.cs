@@ -23,11 +23,11 @@ namespace UnitTestLibrary
         [Test]
         public void CanSerializeAndDeserializeAMessage()
         {
-            Message msg = new Message() { Type = MessageType.NewPlayer, Data = 10 };
+            Message msg = new Message() { Type = MessageType.NewClient, Data = 10 };
 
             byte[] serializedMessage = serializer.Serialize(msg);
 
-            Assert.AreEqual(MessageType.NewPlayer, (serializer.Deserialize(serializedMessage)).Type);
+            Assert.AreEqual(MessageType.NewClient, (serializer.Deserialize(serializedMessage)).Type);
             Assert.AreEqual(10, (serializer.Deserialize(serializedMessage)).Data);
         }
 

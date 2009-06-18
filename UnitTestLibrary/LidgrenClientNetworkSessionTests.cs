@@ -22,7 +22,7 @@ namespace UnitTestLibrary
             clientNetworkSession = new LidgrenClientNetworkSession(stubNetClient, stubSerializer);
         }
 
-        // CONNECTION:
+        // CONNECTING:
         [Test]
         public void ClientCanJoinSessionCorrectlyWithIP()
         {
@@ -83,7 +83,7 @@ namespace UnitTestLibrary
             NetBuffer buffer = new NetBuffer();
             stubNetClient.Stub(me => me.CreateBuffer()).Return(buffer);
             stubNetClient.Stub(me => me.ReadMessage(Arg<NetBuffer>.Is.Equal(buffer), out Arg<NetMessageType>.Out(NetMessageType.Data).Dummy)).Return(true);
-            stubSerializer.Stub(me => me.Deserialize(buffer.ReadBytes(buffer.LengthBytes))).Return(new Message() { Type = MessageType.NewPlayer, Data = 100 });
+            stubSerializer.Stub(me => me.Deserialize(buffer.ReadBytes(buffer.LengthBytes))).Return(new Message() { Type = MessageType.NewClient, Data = 100 });
             bool raisedEvent = false;
             clientNetworkSession.ClientJoined += (obj, args) => { if ((args.ID == 100) && (!args.IsLocalClient)) raisedEvent = true; };
 
@@ -91,7 +91,19 @@ namespace UnitTestLibrary
 
             Assert.IsTrue(raisedEvent);
         }
+        [Test]
+        public void RaisesClientDisconnectedEventCorrectlyForDisconnectingClients()
+        {
+            stubNetClient.Stub(me => me.CreateBuffer()).Return(new NetBuffer());
+            stubNetClient.Stub(me => me.ReadMessage(Arg<NetBuffer>.Is.Anything, out Arg<NetMessageType>.Out(NetMessageType.Data).Dummy)).Return(true);
+            stubSerializer.Stub(me => me.Deserialize(Arg<byte[]>.Is.Anything)).Return(new Message() { Type = MessageType.DisconnectingClient, Data = 100 });
+            bool raisedEvent = false;
+            clientNetworkSession.ClientDisconnected += (obj, args) => { if ((args.ID == 100) && (!args.IsLocalClient)) raisedEvent = true; };
 
+            clientNetworkSession.ReadMessage();
+
+            Assert.IsTrue(raisedEvent);
+        }
 
         // SENDING DATA:
         [Test]
@@ -108,7 +120,7 @@ namespace UnitTestLibrary
             NetBuffer tmpBuffer = new NetBuffer();
             Message msg = new Message() { Type = MessageType.Player, Data = 10 };
             stubNetClient.Stub(x => x.CreateBuffer(Arg<int>.Is.Anything)).Return(tmpBuffer);
-            stubNetClient.Stub(x => x.Connected).Return(true);
+            stubNetClient.Stub(x => x.Status).Return(NetConnectionStatus.Connected);
             byte[] data = { 0, 2 };
             stubSerializer.Stub(x => x.Serialize(msg)).Return(data);
 

@@ -57,5 +57,17 @@ namespace UnitTestLibrary
             factory.GetLocalClient();
         }
 
+        [Test]
+        public void RemovesViewWhenDeletingClient()
+        {
+            var stubPlayer = MockRepository.GenerateStub<IPlayer>();
+            var client = new Client(stubPlayer, null);
+            gameSession.Views.Add(new PlayerView(stubPlayer, null, null, null, null));
+
+            clientFactory.DeleteClient(client);
+
+            Assert.AreEqual(0, gameSession.Views.Count);
+        }
     }
+
 }

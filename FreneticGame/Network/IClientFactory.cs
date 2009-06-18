@@ -9,5 +9,7 @@ namespace Frenetic.Network
     {
         Client MakeNewClient(int ID);
         LocalClient GetLocalClient();
+
+        void DeleteClient(Client client);
     }
 }

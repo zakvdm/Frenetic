@@ -97,7 +97,7 @@ namespace Frenetic
                 if (_gameplayScreen.ScreenState == ScreenState.Dead)
                 {
                     // NOTE: Currently, this gets called over and over when the gamesession ends... This could burn our fingers at some point...
-                    _localClient.ID = 0;  // Client is no longer connected... what a hack...
+                    _localClient.ID = 0;  // Client is no longer connected... what a hack... TODO: Fix this!
                     _gameSessionFactory.Dispose();
                 }
             }

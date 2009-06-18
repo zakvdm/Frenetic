@@ -7,7 +7,7 @@ namespace Frenetic.Network.Lidgren
 {
     public interface INetClient
     {
-        bool Connected { get; }
+        NetConnectionStatus Status { get; }
 
         void Start();
         void Connect(string IP, int port);

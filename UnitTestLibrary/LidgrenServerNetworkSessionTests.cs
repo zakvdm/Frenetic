@@ -16,6 +16,7 @@ namespace UnitTestLibrary
         INetServer stubNetServer;
         IServerMessageSender stubMessageSender;
         INetConnection stubNetConnection;
+        INetConnection stubDisconnectingConnection;
         LidgrenServerNetworkSession serverNetworkSession;
         [SetUp]
         public void SetUp()
@@ -23,10 +24,15 @@ namespace UnitTestLibrary
             stubNetServer = MockRepository.GenerateStub<INetServer>();
             stubMessageSender = MockRepository.GenerateStub<IServerMessageSender>();
             stubNetConnection = MockRepository.GenerateStub<INetConnection>();
+            stubDisconnectingConnection = MockRepository.GenerateStub<INetConnection>();
             serverNetworkSession = new LidgrenServerNetworkSession(stubNetServer, stubMessageSender, _serializer);
 
             stubNetConnection.Stub(x => x.Status).Return(NetConnectionStatus.Connected);
             stubNetConnection.Stub(x => x.ConnectionID).Return(100);
+            stubDisconnectingConnection.Stub(x => x.Status).Return(NetConnectionStatus.Disconnecting);
+            stubDisconnectingConnection.Stub(x => x.ConnectionID).Return(200);
+
+            serverNetworkSession.ActiveConnections.Add(200, stubDisconnectingConnection);
         }
 
         [Test]
@@ -163,7 +169,7 @@ namespace UnitTestLibrary
 
             serverNetworkSession.ReadMessage();
 
-            stubMessageSender.AssertWasCalled(me => me.SendToAllExcept(Arg<Message>.Matches((msg) => (msg.Type == MessageType.NewPlayer) && ((int)msg.Data == 100)), Arg<NetChannel>.Is.Equal(NetChannel.ReliableUnordered), Arg<INetConnection>.Is.Equal(stubNetConnection)));
+            stubMessageSender.AssertWasCalled(me => me.SendToAllExcept(Arg<Message>.Matches((msg) => (msg.Type == MessageType.NewClient) && ((int)msg.Data == 100)), Arg<NetChannel>.Is.Equal(NetChannel.ReliableUnordered), Arg<INetConnection>.Is.Equal(stubNetConnection)));
         }
         [Test]
         public void SendsExistingClientsInfoToNewClient()
@@ -180,10 +186,62 @@ namespace UnitTestLibrary
 
             serverNetworkSession.ReadMessage();
 
-            stubMessageSender.AssertWasNotCalled(me => me.SendTo(Arg<Message>.Matches((msg) => (msg.Type == MessageType.NewPlayer) && ((int)msg.Data == 100)), Arg<NetChannel>.Is.Anything, Arg<INetConnection>.Is.Equal(stubNetConnection)));
+            stubMessageSender.AssertWasNotCalled(me => me.SendTo(Arg<Message>.Matches((msg) => (msg.Type == MessageType.NewClient) && ((int)msg.Data == 100)), Arg<NetChannel>.Is.Anything, Arg<INetConnection>.Is.Equal(stubNetConnection)));
 
-            stubMessageSender.AssertWasCalled(me => me.SendTo(Arg<Message>.Matches((msg) => (msg.Type == MessageType.NewPlayer) && ((int)msg.Data == 20)), Arg<NetChannel>.Is.Equal(NetChannel.ReliableUnordered), Arg<INetConnection>.Is.Equal(stubNetConnection)));
-            stubMessageSender.AssertWasCalled(me => me.SendTo(Arg<Message>.Matches((msg) => (msg.Type == MessageType.NewPlayer) && ((int)msg.Data == 40)), Arg<NetChannel>.Is.Equal(NetChannel.ReliableUnordered), Arg<INetConnection>.Is.Equal(stubNetConnection)));
+            stubMessageSender.AssertWasCalled(me => me.SendTo(Arg<Message>.Matches((msg) => (msg.Type == MessageType.NewClient) && ((int)msg.Data == 20)), Arg<NetChannel>.Is.Equal(NetChannel.ReliableUnordered), Arg<INetConnection>.Is.Equal(stubNetConnection)));
+            stubMessageSender.AssertWasCalled(me => me.SendTo(Arg<Message>.Matches((msg) => (msg.Type == MessageType.NewClient) && ((int)msg.Data == 40)), Arg<NetChannel>.Is.Equal(NetChannel.ReliableUnordered), Arg<INetConnection>.Is.Equal(stubNetConnection)));
+        }
+
+        // DISCONNECTING CLIENT:
+        [Test]
+        public void ServerFiresClientDisconnectedEventWhenConnectionStatusBecomesDisconnected()
+        {
+            stubNetServer.Stub(x => x.ReadMessage(Arg<NetBuffer>.Is.Anything,
+                    out Arg<NetMessageType>.Out(NetMessageType.StatusChanged).Dummy,
+                    out Arg<INetConnection>.Out(stubDisconnectingConnection).Dummy)).Return(true);
+            bool eventRaised = false;
+            serverNetworkSession.ClientDisconnected += (obj, event_args) => { if (event_args.ID == 200) eventRaised = true; };
+
+            Message msg = serverNetworkSession.ReadMessage();
+
+            Assert.IsNull(msg);
+            Assert.IsTrue(eventRaised);
+        }
+        [Test]
+        public void RemovesConnectionFromListOfActiveConnections()
+        {
+            stubNetServer.Stub(x => x.ReadMessage(Arg<NetBuffer>.Is.Anything,
+                    out Arg<NetMessageType>.Out(NetMessageType.StatusChanged).Dummy,
+                    out Arg<INetConnection>.Out(stubDisconnectingConnection).Dummy)).Return(true);
+
+            serverNetworkSession.ReadMessage();
+
+            Assert.IsFalse(serverNetworkSession.ActiveConnections.ContainsValue(stubDisconnectingConnection));
+        }
+        [Test]
+        public void ServerFiresClientDisconnectedEventONLYoncePerDisconnectingConnection()
+        {
+            stubNetServer.Stub(x => x.ReadMessage(Arg<NetBuffer>.Is.Anything,
+                    out Arg<NetMessageType>.Out(NetMessageType.StatusChanged).Dummy,
+                    out Arg<INetConnection>.Out(stubDisconnectingConnection).Dummy)).Return(true);
+            int eventRaiseCount = 0;
+            serverNetworkSession.ClientDisconnected += (obj, event_args) => eventRaiseCount++;
+
+            serverNetworkSession.ReadMessage();
+            serverNetworkSession.ReadMessage();
+
+            Assert.AreEqual(1, eventRaiseCount);
+        }
+        [Test]
+        public void SendsDisconnectingClientInfoToAllExistingClients()
+        {
+            stubNetServer.Stub(x => x.ReadMessage(Arg<NetBuffer>.Is.Anything,
+                    out Arg<NetMessageType>.Out(NetMessageType.StatusChanged).Dummy,
+                    out Arg<INetConnection>.Out(stubDisconnectingConnection).Dummy)).Return(true);
+
+            serverNetworkSession.ReadMessage();
+
+            stubMessageSender.AssertWasCalled(me => me.SendToAll(Arg<Message>.Matches((msg) => (msg.Type == MessageType.DisconnectingClient) && ((int)msg.Data == 200)), Arg<NetChannel>.Is.Equal(NetChannel.ReliableUnordered))); 
         }
 
         // **************

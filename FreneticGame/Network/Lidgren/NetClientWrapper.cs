@@ -24,20 +24,8 @@ namespace Frenetic.Network.Lidgren
 #endif
         }
 
-        #region Properties
-        public bool Connected
-        {
-            get
-            {
-                if (_netClient.ServerConnection == null)
-                    return false;
-
-                return (_netClient.ServerConnection.Status == NetConnectionStatus.Connected);
-            }
-        }
-        #endregion
-
         #region INetClient Members
+        public NetConnectionStatus Status { get { return _netClient.Status; } }
 
         public void Start()
         {

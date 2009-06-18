@@ -9,7 +9,8 @@ namespace Frenetic.Network
 {
     public interface INetworkSession : IDisposable
     {
-        event EventHandler<ClientJoinedEventArgs> ClientJoined;
+        event EventHandler<ClientStatusChangeEventArgs> ClientJoined;
+        event EventHandler<ClientStatusChangeEventArgs> ClientDisconnected;
 
         void Shutdown(string reason);
         Message ReadMessage();
@@ -23,13 +24,14 @@ namespace Frenetic.Network
         PlayerSettings,
         Event,
         SuccessfulJoin,
-        NewPlayer,
+        NewClient,
+        DisconnectingClient,
         ChatLog
     }
 
-    public class ClientJoinedEventArgs : EventArgs
+    public class ClientStatusChangeEventArgs : EventArgs
     {
-        public ClientJoinedEventArgs(int ID, bool isLocalClient)
+        public ClientStatusChangeEventArgs(int ID, bool isLocalClient)
         {
             this.ID = ID;
             IsLocalClient = isLocalClient;

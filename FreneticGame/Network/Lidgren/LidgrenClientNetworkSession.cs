@@ -9,9 +9,12 @@ namespace Frenetic.Network.Lidgren
         {
             _netClient = netClient;
             _messageSerializer = messageSerializer;
+
+            ClientDisconnected += (obj, args) => Console.WriteLine("ZAK HERE: Client disconnected!");
         }
 
-        public event EventHandler<ClientJoinedEventArgs> ClientJoined;
+        public event EventHandler<ClientStatusChangeEventArgs> ClientJoined;
+        public event EventHandler<ClientStatusChangeEventArgs> ClientDisconnected;
 
         public void Dispose()
         {
@@ -33,7 +36,7 @@ namespace Frenetic.Network.Lidgren
 
         public void SendToServer(Message msg, NetChannel channel)
         {
-            if (!_netClient.Connected)
+            if (_netClient.Status != NetConnectionStatus.Connected)
                 throw new System.InvalidOperationException("Client not connected to server");
 
             byte[] data = _messageSerializer.Serialize(msg);
@@ -95,10 +98,13 @@ namespace Frenetic.Network.Lidgren
             switch (incomingMessage.Type)
             {
                 case MessageType.SuccessfulJoin:
-                    ClientJoined(this, new ClientJoinedEventArgs((int)incomingMessage.Data, true));
+                    ClientJoined(this, new ClientStatusChangeEventArgs((int)incomingMessage.Data, true));
                     return true;
-                case MessageType.NewPlayer:
-                    ClientJoined(this, new ClientJoinedEventArgs((int)incomingMessage.Data, false));
+                case MessageType.NewClient:
+                    ClientJoined(this, new ClientStatusChangeEventArgs((int)incomingMessage.Data, false));
+                    return true;
+                case MessageType.DisconnectingClient:
+                    ClientDisconnected(this, new ClientStatusChangeEventArgs((int)incomingMessage.Data, false));
                     return true;
                 default:
                     return false;

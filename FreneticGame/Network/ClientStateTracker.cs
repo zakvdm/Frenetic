@@ -12,6 +12,7 @@ namespace Frenetic.Network
             _clientFactory = clientFactory;
 
             networkSession.ClientJoined += HandleNewClientJoined;
+            networkSession.ClientDisconnected += HandleClientDisconnect;
 
             NetworkClients = new List<Client>();
         }
@@ -21,7 +22,7 @@ namespace Frenetic.Network
             return NetworkClients.Find(client => client.ID == clientID);
         }
 
-        void HandleNewClientJoined(object sender, ClientJoinedEventArgs newClientInfo)
+        void HandleNewClientJoined(object sender, ClientStatusChangeEventArgs newClientInfo)
         {
             if (newClientInfo.IsLocalClient)
             {
@@ -34,6 +35,16 @@ namespace Frenetic.Network
                 newClient.LastServerSnap = _snapCounter.CurrentSnap; // No point in sending info about what happened before they joined...
                 NetworkClients.Add(newClient);
             }
+        }
+
+        void HandleClientDisconnect(object sender, ClientStatusChangeEventArgs disconnectingClientInfo)
+        {
+            Client disconnectingClient = FindNetworkClient(disconnectingClientInfo.ID);
+
+            NetworkClients.Remove(disconnectingClient);
+
+            // We call this to allow for any other cleanup that needs to be done per client (such as removing PlayerViews, etc.)
+            _clientFactory.DeleteClient(disconnectingClient);
         }
 
         public Client LocalClient { get; private set; }

@@ -15,7 +15,8 @@ namespace Frenetic.Network.Lidgren
             ActiveConnections = new Dictionary<int, INetConnection>();
         }
 
-        public event EventHandler<ClientJoinedEventArgs> ClientJoined;
+        public event EventHandler<ClientStatusChangeEventArgs> ClientJoined;
+        public event EventHandler<ClientStatusChangeEventArgs> ClientDisconnected;
 
         public void Dispose()
         {
@@ -108,12 +109,18 @@ namespace Frenetic.Network.Lidgren
 
                 ProcessNewClient(clientConnection.ConnectionID);
             }
+            else if ((clientConnection.Status == NetConnectionStatus.Disconnecting) && (ActiveConnections.ContainsKey(clientConnection.ConnectionID)))
+            {
+                ActiveConnections.Remove(clientConnection.ConnectionID);
+
+                ProcessDisconnectingClient(clientConnection.ConnectionID);
+            }
         }
 
         void ProcessNewClient(int newClientID)
         {
             if (ClientJoined != null)
-                ClientJoined(this, new ClientJoinedEventArgs(newClientID, false));
+                ClientJoined(this, new ClientStatusChangeEventArgs(newClientID, false));
 
             // send ack to new client:
             SendTo(new Message() { Type = MessageType.SuccessfulJoin, Data = newClientID }, NetChannel.ReliableInOrder1, newClientID);
@@ -124,11 +131,19 @@ namespace Frenetic.Network.Lidgren
                 if (connection.ConnectionID == newClientID)
                     continue;   // We don't want to send the client to itself...
 
-                SendTo(new Message() { Type = MessageType.NewPlayer, Data = connection.ConnectionID }, NetChannel.ReliableUnordered, newClientID);
+                SendTo(new Message() { Type = MessageType.NewClient, Data = connection.ConnectionID }, NetChannel.ReliableUnordered, newClientID);
             }
                 
             // tell existent clients about new client:
-            SendToAllExcept(new Message() { Type = MessageType.NewPlayer, Data = newClientID }, NetChannel.ReliableUnordered, newClientID);
+            SendToAllExcept(new Message() { Type = MessageType.NewClient, Data = newClientID }, NetChannel.ReliableUnordered, newClientID);
+        }
+        void ProcessDisconnectingClient(int disconnectingClientID)
+        {
+            if (ClientDisconnected != null)
+                ClientDisconnected(this, new ClientStatusChangeEventArgs(disconnectingClientID, false));
+
+            // tell all remaining clients about the disconnecting client
+            SendToAll(new Message() { Type = MessageType.DisconnectingClient, Data = disconnectingClientID }, NetChannel.ReliableUnordered);
         }
 
         INetServer _netServer;

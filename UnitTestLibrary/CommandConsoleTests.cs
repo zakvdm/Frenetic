@@ -55,6 +55,17 @@ namespace UnitTestLibrary
         }
 
         [Test]
+        public void IgnoresInvalidInput()
+        {
+            string badinput = "/";
+
+            console.ProcessInput(badinput);
+
+            stubMediator.AssertWasNotCalled(x => x.Set(Arg<string>.Is.Anything, Arg<string>.Is.Anything));
+            stubMediator.AssertWasNotCalled(x => x.Get(Arg<string>.Is.Anything));
+        }
+
+        [Test]
         public void KeepsCommandsInCommandLog()
         {
             // COMMANDS need a prefixing "/"

@@ -132,7 +132,8 @@ namespace Frenetic
         private IPlayer CreateClientComponents(IGameSession gameSession)
         {
             // Make local player:
-            IPlayer localPlayer = ClientContainer.Resolve<LocalClient>().Player;
+            LocalClient localClient = ClientContainer.Resolve<LocalClient>();
+            IPlayer localPlayer = localClient.Player;
 
             gameSession.Controllers.Add(ClientContainer.Resolve<PhysicsController>());
             ILevel level = ClientContainer.Resolve<ILevel>();

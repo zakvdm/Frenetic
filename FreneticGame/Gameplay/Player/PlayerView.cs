@@ -33,13 +33,6 @@ namespace Frenetic.Player
                     SpriteEffects.None, 1f);
                 _spriteBatch.End();
             }
-            
-            if (count > 100)
-            {
-                Console.WriteLine("CLIENT: Player " + _playerSettings.Name + " position is: " + _player.Position.ToString());
-                count = 0;
-            }
-            count++;
         }
 
         #endregion

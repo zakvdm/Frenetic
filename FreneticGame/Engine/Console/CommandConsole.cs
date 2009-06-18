@@ -17,7 +17,7 @@ namespace Frenetic
 
         public void ProcessInput(string input)
         {
-            if ((input.Length > 0) && input.StartsWith("/"))
+            if ((input.Length > 1) && input.StartsWith("/"))
             {
                 string commandLine = input.Substring(1); // Remove the "/"
                 string[] pieces = commandLine.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
