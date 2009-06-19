@@ -40,10 +40,10 @@ namespace Frenetic.Network
 
     public class ClientSideClientFactory : ServerSideClientFactory
     {
-        public ClientSideClientFactory(Client.Factory clientFactory, IGameSession gameSession, PlayerView.Factory playerViewFactory, LocalClient localClient)
+        public ClientSideClientFactory(Client.Factory clientFactory, IGameSession gameSession, PlayerView playerView, LocalClient localClient)
             : base(clientFactory, gameSession)
         {
-            _playerViewFactory = playerViewFactory;
+            _playerView = playerView;
             _localClient = localClient;
         }
 
@@ -51,17 +51,16 @@ namespace Frenetic.Network
         {
             Client client = base.MakeNewClient(ID);
 
-            _gameSession.Views.Add(_playerViewFactory(client.Player, client.PlayerSettings));
+            _playerView.AddPlayer(client.Player, client.PlayerSettings);
 
             return client;
         }
 
         public override LocalClient GetLocalClient()
         {
-            if (_localPlayerView == null)
+            if (!_playerView.Players.Contains(_localClient.Player))
             {
-                _localPlayerView = _playerViewFactory(_localClient.Player, _localClient.PlayerSettings);
-                _gameSession.Views.Add(_localPlayerView);
+                _playerView.AddPlayer(_localClient.Player, _localClient.PlayerSettings);
             }
 
             return _localClient;
@@ -71,14 +70,10 @@ namespace Frenetic.Network
         {
             base.DeleteClient(client);
 
-            // Remove this Client's PlayerView:
-            _gameSession.Views.RemoveAll(view => view.Model == client.Player);
-            throw new NotImplementedException();
+            _playerView.RemovePlayer(client.Player);
         }
 
-        PlayerView.Factory _playerViewFactory;
         LocalClient _localClient;
-        
-        PlayerView _localPlayerView;
+        PlayerView _playerView;
     }
 }

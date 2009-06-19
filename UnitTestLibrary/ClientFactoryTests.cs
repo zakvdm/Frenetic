@@ -14,27 +14,24 @@ namespace UnitTestLibrary
         ClientSideClientFactory clientFactory;
         LocalClient localClient;
         Client.Factory clientFactoryDelegate;
-        PlayerView.Factory playerViewFactory;
-
-        PlayerView createdPlayerView = new PlayerView(null, null, null, null, null);
-        PlayerView createdLocalPlayerView = new PlayerView(null, null, null, null, null);
-        Client createdClient = new Client(null, null);
+        PlayerView playerView;
+        Client createdClient = new Client(MockRepository.GenerateStub<IPlayer>(), MockRepository.GenerateStub<IPlayerSettings>());
         
         [SetUp]
         public void SetUp()
         {
             gameSession = new GameSession();
             localClient = new LocalClient(MockRepository.GenerateStub<IPlayer>(), MockRepository.GenerateStub<LocalPlayerSettings>());
-            playerViewFactory = (player, playerSettings) => { if ((player == localClient.Player) && (playerSettings == localClient.PlayerSettings)) return createdLocalPlayerView; else return createdPlayerView; };
+            playerView = new PlayerView(null, null, null);
             clientFactoryDelegate = () => createdClient;
-            clientFactory = new ClientSideClientFactory(clientFactoryDelegate, gameSession, playerViewFactory, localClient);
+            clientFactory = new ClientSideClientFactory(clientFactoryDelegate, gameSession, playerView, localClient);
         }
         [Test]
-        public void AddsAPlayerViewToGameSessionViewAndSetsID()
+        public void AddsAPlayerToThePlayerViewAndSetsID()
         {
             Client newClient = clientFactory.MakeNewClient(100);
 
-            Assert.IsTrue(gameSession.Views.Contains(createdPlayerView));
+            Assert.IsTrue(playerView.Players.Contains(newClient.Player));
             Assert.AreEqual(100, newClient.ID);
         }
 
@@ -44,8 +41,17 @@ namespace UnitTestLibrary
             clientFactory.GetLocalClient();
 
             Assert.AreEqual(localClient, clientFactory.GetLocalClient());
-            Assert.AreEqual(1, gameSession.Views.Count);
-            Assert.IsTrue(gameSession.Views.Contains(createdLocalPlayerView));
+            Assert.AreEqual(1, playerView.Players.Count);
+            Assert.IsTrue(playerView.Players.Contains(localClient.Player));
+        }
+
+        [Test]
+        public void OnlyAddsViewForLocalClientOnce()
+        {
+            clientFactory.GetLocalClient();
+            clientFactory.GetLocalClient();
+
+            Assert.AreEqual(1, playerView.Players.Count);
         }
 
         [Test]
@@ -60,13 +66,11 @@ namespace UnitTestLibrary
         [Test]
         public void RemovesViewWhenDeletingClient()
         {
-            var stubPlayer = MockRepository.GenerateStub<IPlayer>();
-            var client = new Client(stubPlayer, null);
-            gameSession.Views.Add(new PlayerView(stubPlayer, null, null, null, null));
+            Client client = clientFactory.MakeNewClient(200);
 
             clientFactory.DeleteClient(client);
 
-            Assert.AreEqual(0, gameSession.Views.Count);
+            Assert.AreEqual(0, playerView.Players.Count);
         }
     }
 

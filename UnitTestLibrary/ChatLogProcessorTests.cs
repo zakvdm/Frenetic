@@ -34,15 +34,15 @@ namespace UnitTestLibrary
             playerQueueMessageHelper = new QueuedMessageHelper<Message, MessageType>();
             playerSettingsMessageHelper = new QueuedMessageHelper<Message, MessageType>();
             stubIncomingMessageQueue = MockRepository.GenerateStub<IIncomingMessageQueue>();
-            stubIncomingMessageQueue.Stub(x => x.ReadWholeMessage(Arg<MessageType>.Is.Equal(MessageType.ChatLog))).Do(chatLogQueueMessageHelper.GetNextQueuedMessage);
+            stubIncomingMessageQueue.Stub(x => x.ReadMessage(Arg<MessageType>.Is.Equal(MessageType.ChatLog))).Do(chatLogQueueMessageHelper.GetNextQueuedMessage);
             stubIncomingMessageQueue.Stub(x => x.HasAvailable(MessageType.ChatLog)).Do(chatLogQueueMessageHelper.HasMessageAvailable);
-            stubIncomingMessageQueue.Stub(x => x.ReadWholeMessage(Arg<MessageType>.Is.Equal(MessageType.ServerSnap))).Do(serverSnapQueueMessageHelper.GetNextQueuedMessage);
+            stubIncomingMessageQueue.Stub(x => x.ReadMessage(Arg<MessageType>.Is.Equal(MessageType.ServerSnap))).Do(serverSnapQueueMessageHelper.GetNextQueuedMessage);
             stubIncomingMessageQueue.Stub(x => x.HasAvailable(MessageType.ServerSnap)).Do(serverSnapQueueMessageHelper.HasMessageAvailable);
-            stubIncomingMessageQueue.Stub(x => x.ReadWholeMessage(Arg<MessageType>.Is.Equal(MessageType.ClientSnap))).Do(clientSnapQueueMessageHelper.GetNextQueuedMessage);
+            stubIncomingMessageQueue.Stub(x => x.ReadMessage(Arg<MessageType>.Is.Equal(MessageType.ClientSnap))).Do(clientSnapQueueMessageHelper.GetNextQueuedMessage);
             stubIncomingMessageQueue.Stub(x => x.HasAvailable(MessageType.ClientSnap)).Do(clientSnapQueueMessageHelper.HasMessageAvailable);
-            stubIncomingMessageQueue.Stub(x => x.ReadWholeMessage(Arg<MessageType>.Is.Equal(MessageType.Player))).Do(playerQueueMessageHelper.GetNextQueuedMessage);
+            stubIncomingMessageQueue.Stub(x => x.ReadMessage(Arg<MessageType>.Is.Equal(MessageType.Player))).Do(playerQueueMessageHelper.GetNextQueuedMessage);
             stubIncomingMessageQueue.Stub(x => x.HasAvailable(MessageType.Player)).Do(playerQueueMessageHelper.HasMessageAvailable);
-            stubIncomingMessageQueue.Stub(x => x.ReadWholeMessage(Arg<MessageType>.Is.Equal(MessageType.PlayerSettings))).Do(playerSettingsMessageHelper.GetNextQueuedMessage);
+            stubIncomingMessageQueue.Stub(x => x.ReadMessage(Arg<MessageType>.Is.Equal(MessageType.PlayerSettings))).Do(playerSettingsMessageHelper.GetNextQueuedMessage);
             stubIncomingMessageQueue.Stub(x => x.HasAvailable(MessageType.PlayerSettings)).Do(playerSettingsMessageHelper.HasMessageAvailable);
             stubNetworkPlayerProcessor = MockRepository.GenerateStub<INetworkPlayerProcessor>();
             chatLogProcessor = new ChatLogProcessor(client, clientLog, stubNetworkPlayerProcessor, stubClientStateTracker, stubIncomingMessageQueue);
@@ -53,7 +53,7 @@ namespace UnitTestLibrary
         {
             chatLogProcessor.Process(1);
 
-            stubIncomingMessageQueue.AssertWasNotCalled(x => x.ReadWholeMessage(MessageType.ChatLog));
+            stubIncomingMessageQueue.AssertWasNotCalled(x => x.ReadMessage(MessageType.ChatLog));
         }
 
         [Test]

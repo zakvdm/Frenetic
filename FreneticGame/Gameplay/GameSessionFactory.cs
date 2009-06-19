@@ -44,6 +44,9 @@ namespace Frenetic
             // Make queues for a SERVER network session:
             // *****************************************
             IServerNetworkSession serverNetworkSession = ServerContainer.Resolve<IServerNetworkSession>();
+            ServerContainer.Resolve<IClientStateTracker>(new TypedParameter(typeof(INetworkSession), serverNetworkSession),
+                                                         new TypedParameter(typeof(IClientFactory), ServerContainer.Resolve<ServerSideClientFactory>()));
+
             IIncomingMessageQueue incomingMessageQueue = ServerContainer.Resolve<IIncomingMessageQueue>(
                     new TypedParameter(typeof(INetworkSession), serverNetworkSession));
             IOutgoingMessageQueue outgoingMessageQueue = ServerContainer.Resolve<IOutgoingMessageQueue>(
@@ -51,8 +54,6 @@ namespace Frenetic
             serverNetworkSession.Create(14242);
             // *****************************************
 
-            ServerContainer.Resolve<IClientStateTracker>(new TypedParameter(typeof(INetworkSession), serverNetworkSession),
-                                                            new TypedParameter(typeof(IClientFactory), ServerContainer.Resolve<ServerSideClientFactory>()));
 
             // Server needs a new PhysicsSimulator (can't use the client's... -- NOTE: the parameter value is irrelevant, all that matters is that it exists...)
             ServerContainer.Resolve<IPhysicsSimulator>(new NamedParameter("isServer", true));
@@ -86,15 +87,7 @@ namespace Frenetic
             // Make queues for a CLIENT network session:
             // *****************************************
             IClientNetworkSession clientNetworkSession = ClientContainer.Resolve<IClientNetworkSession>();
-            IIncomingMessageQueue incomingMessageQueue = ClientContainer.Resolve<IIncomingMessageQueue>(
-                    new TypedParameter(typeof(INetworkSession), clientNetworkSession));
-            IOutgoingMessageQueue outgoingMessageQueue = ClientContainer.Resolve<IOutgoingMessageQueue>(
-                    new TypedParameter(typeof(IServerNetworkSession), null));
-            clientNetworkSession.Join(14242);
             // *****************************************
-
-            ClientContainer.Resolve<IClientStateTracker>(new TypedParameter(typeof(INetworkSession), clientNetworkSession),
-                                                            new TypedParameter(typeof(IClientFactory), ClientContainer.Resolve<ClientSideClientFactory>()));
 
             IGameSession gameSession = ClientContainer.Resolve<IGameSession>();
 
@@ -102,6 +95,16 @@ namespace Frenetic
             gameSession.Controllers.Add(snapCounter);
 
             IPlayer localPlayer = CreateClientComponents(gameSession);
+
+
+            ClientContainer.Resolve<IClientStateTracker>(new TypedParameter(typeof(INetworkSession), clientNetworkSession),
+                                                         new TypedParameter(typeof(IClientFactory), ClientContainer.Resolve<ClientSideClientFactory>()));
+            IIncomingMessageQueue incomingMessageQueue = ClientContainer.Resolve<IIncomingMessageQueue>(
+                    new TypedParameter(typeof(INetworkSession), clientNetworkSession));
+            IOutgoingMessageQueue outgoingMessageQueue = ClientContainer.Resolve<IOutgoingMessageQueue>(
+                    new TypedParameter(typeof(IServerNetworkSession), null));
+            clientNetworkSession.Join(14242);
+
 
             gameSession.Controllers.Add(ClientContainer.Resolve<PhysicsController>());
             
@@ -112,10 +115,8 @@ namespace Frenetic
                 new TypedParameter(typeof(bool), false));
             GameSessionView gameSessionView = ClientContainer.Resolve<GameSessionView>();
 
+
             
-            // TEMP:
-            //TestVisibilityView tmp = new TestVisibilityView(_graphicsDevice, level, localPlayer, ClientContainer.Resolve<ICamera>());
-            //gameSession.Views.Insert(0, tmp);
 
 
             // THINGS TO SYNC OVER NETWORK:
@@ -147,6 +148,7 @@ namespace Frenetic
 
             gameSession.Controllers.Add(ClientContainer.Resolve<KeyboardPlayerController>(new TypedParameter(typeof(IPlayer), localPlayer)));
 
+            gameSession.Views.Add(ClientContainer.Resolve<PlayerView>()); // PlayerView must draw before VisibilityView (so players are underneath blackness!)
             gameSession.Views.Add(ClientContainer.Resolve<VisibilityView>(new TypedParameter(typeof(IPlayer), localPlayer)));
 
             ITexture levelTexture = ClientContainer.Resolve<ITexture>(new TypedParameter(typeof(Texture2D), _contentManager.Load<Texture2D>("Textures/blank")));
@@ -154,6 +156,7 @@ namespace Frenetic
 
             ITexture crosshairTexture = ClientContainer.Resolve<ITexture>(new TypedParameter(typeof(Texture2D), _contentManager.Load<Texture2D>("Textures/cursor")));
             gameSession.Views.Add(ClientContainer.Resolve<CrosshairView>(new TypedParameter(typeof(ITexture), crosshairTexture)));
+
 
             // TEMP CODE:
             // *********************************************************************************

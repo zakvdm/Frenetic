@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Xml.Serialization;
 using System.IO;
 
@@ -7,9 +8,10 @@ namespace Frenetic.Network
 {
     public class IncomingMessageQueue : IIncomingMessageQueue
     {
-        public IncomingMessageQueue(INetworkSession networkSession)
+        public IncomingMessageQueue(INetworkSession networkSession, IClientStateTracker clientStateTracker)
         {
             _networkSession = networkSession;
+            _clientStateTracker = clientStateTracker;
             InitializeQueues();
         }
 
@@ -23,7 +25,7 @@ namespace Frenetic.Network
             return true;
         }
 
-        public Message ReadWholeMessage(MessageType type)
+        public Message ReadMessage(MessageType type)
         {
             EnqueueAllWaitingMessagesFromNetworkSession();
 
@@ -55,9 +57,24 @@ namespace Frenetic.Network
                 }
             }
             while (msg != null);
+
+            RemoveInvalidMessagesFromTheFrontOfEachQueue();
+        }
+
+        void RemoveInvalidMessagesFromTheFrontOfEachQueue()
+        {
+            // A message is invalid if we find no corresponding client in the ClientStateTracker (probably because the client who sent this message has since disconnected...)
+            foreach (MessageType type in Enum.GetValues(typeof(MessageType)))
+            {
+                while((_data[type].Count > 0) && (_clientStateTracker.FindNetworkClient(_data[type].Peek().ClientID) == null))
+                {
+                    _data[type].Dequeue();
+                }
+            }
         }
 
         Dictionary<MessageType, Queue<Message>> _data = new Dictionary<MessageType,Queue<Message>>();
         INetworkSession _networkSession;
+        IClientStateTracker _clientStateTracker;
     }
 }

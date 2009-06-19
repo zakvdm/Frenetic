@@ -6,6 +6,6 @@ namespace Frenetic.Network
     {
         bool HasAvailable(MessageType type);
 
-        Message ReadWholeMessage(MessageType type);
+        Message ReadMessage(MessageType type);
     }
 }

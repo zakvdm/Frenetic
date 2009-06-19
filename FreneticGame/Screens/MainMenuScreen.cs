@@ -162,7 +162,6 @@ namespace Frenetic
             _gameplayScreen = _screenFactory.MakeGameplayScreen(clientGameSessionCandV, serverGameSessionCandV);
 
 
-
             #region Old Network Code
             /*
             try
@@ -256,7 +255,7 @@ namespace Frenetic
         {
             var clientGameSessionCandV = _gameSessionFactory.MakeClientGameSession();
 
-            _screenFactory.MakeGameplayScreen(clientGameSessionCandV, null);
+            _gameplayScreen = _screenFactory.MakeGameplayScreen(clientGameSessionCandV, null);
         }
 
         #endregion

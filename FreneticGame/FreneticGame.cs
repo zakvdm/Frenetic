@@ -231,8 +231,7 @@ namespace Frenetic
             builder.Register<NetworkPlayerSettings>().As<IPlayerSettings>().FactoryScoped();
             builder.Register<LocalPlayerSettings>().SingletonScoped();
             builder.Register<Frenetic.Player.Player>().As<IPlayer>().FactoryScoped();
-            builder.Register<PlayerView>().FactoryScoped();
-            builder.RegisterGeneratedFactory<PlayerView.Factory>(new TypedService(typeof(PlayerView)));
+            builder.Register<PlayerView>().ContainerScoped();
             builder.Register((c) => (IBoundaryCollider)new WorldBoundaryCollider(_screenWidth, _screenHeight));
             builder.Register<KeyboardPlayerController>().ContainerScoped();
 

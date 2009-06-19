@@ -22,35 +22,35 @@ namespace Frenetic
             // Set most recently received server snap:
             while (_incomingMessageQueue.HasAvailable(MessageType.ServerSnap))
             {
-                Message message = _incomingMessageQueue.ReadWholeMessage(MessageType.ServerSnap);
+                Message message = _incomingMessageQueue.ReadMessage(MessageType.ServerSnap);
                 _localClient.LastServerSnap = (int)message.Data;
             }
 
             // Set last acknowledged client snap:
             while (_incomingMessageQueue.HasAvailable(MessageType.ClientSnap))
             {
-                Message message = _incomingMessageQueue.ReadWholeMessage(MessageType.ClientSnap);
+                Message message = _incomingMessageQueue.ReadMessage(MessageType.ClientSnap);
                 _localClient.LastClientSnap = (int)message.Data;
             }
 
             // update chat log from server:
             while (_incomingMessageQueue.HasAvailable(MessageType.ChatLog))
             {
-                Message message = _incomingMessageQueue.ReadWholeMessage(MessageType.ChatLog);
+                Message message = _incomingMessageQueue.ReadMessage(MessageType.ChatLog);
 
                 AddChatMessage((ChatMessage)message.Data);
             }
             // update the players:
             while (_incomingMessageQueue.HasAvailable(MessageType.Player))
             {
-                Message netMsg = _incomingMessageQueue.ReadWholeMessage(MessageType.Player);
+                Message netMsg = _incomingMessageQueue.ReadMessage(MessageType.Player);
 
                 _networkPlayerProcessor.UpdatePlayerFromNetworkMessage(netMsg);
             }
             // update the player settings:
             while (_incomingMessageQueue.HasAvailable(MessageType.PlayerSettings))
             {
-                Message netMsg = _incomingMessageQueue.ReadWholeMessage(MessageType.PlayerSettings);
+                Message netMsg = _incomingMessageQueue.ReadMessage(MessageType.PlayerSettings);
 
                 _networkPlayerProcessor.UpdatePlayerSettingsFromNetworkMessage(netMsg);
             }
