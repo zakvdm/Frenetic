@@ -34,6 +34,7 @@ namespace UnitTestLibrary
         public void HandlesNonExistentClientIDWithoutComplaining()
         {
             networkPlayerController.UpdatePlayerFromNetworkMessage(new Message() { ClientID = 11, Type = MessageType.Player, Data = new Player(null, null) });
+            networkPlayerController.UpdatePlayerSettingsFromNetworkMessage(new Message() { ClientID = 11, Type = MessageType.PlayerSettings, Data = MockRepository.GenerateStub<IPlayerSettings>() });
         }
 
 

@@ -16,8 +16,8 @@ namespace Frenetic.Player
 
         public void UpdatePlayerFromNetworkMessage(Message netMsg)
         {
-            if (!_clientStateTracker.NetworkClients.Exists(client => client.ID == netMsg.ClientID))
-                return; // Probably this is the local player which hasn't been added to the client state tracker...
+            if (!IsValidClient(netMsg.ClientID))
+                return;
 
             IPlayer player = _clientStateTracker.FindNetworkClient(netMsg.ClientID).Player;
                 
@@ -29,9 +29,17 @@ namespace Frenetic.Player
 
         public void UpdatePlayerSettingsFromNetworkMessage(Message netMsg)
         {
-            IPlayerSettings settings = _clientStateTracker.FindNetworkClient(netMsg.ClientID).PlayerSettings;
+            if (!IsValidClient(netMsg.ClientID))
+                return;
 
+            IPlayerSettings settings = _clientStateTracker.FindNetworkClient(netMsg.ClientID).PlayerSettings;
             settings.Name = ((IPlayerSettings)netMsg.Data).Name;
+        }
+
+        bool IsValidClient(int clientID)
+        {
+            // We don't care about Clients who aren't currently connected...
+            return (_clientStateTracker.FindNetworkClient(clientID) != null);
         }
 
         IClientStateTracker _clientStateTracker;

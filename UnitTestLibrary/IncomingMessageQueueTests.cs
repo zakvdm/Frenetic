@@ -87,7 +87,15 @@ namespace UnitTestLibrary
             Assert.IsFalse(mq.HasAvailable(MessageType.PlayerSettings));
         }
 
-        // INVALID MESSAGES:
+        [Test]
+        public void DoesntDiscardMessagesAboutTheLocalClient()
+        {
+            queueMH.QueuedMessages.Enqueue(new Message() { Type = MessageType.PlayerSettings, ClientID = 300, Data = 4 });
+            stubNS.Stub(me => me.ReadMessage()).Do(queueMH.GetNextQueuedMessage);
+            stubClientStateTracker.Stub(me => me.LocalClient).Return(new LocalClient(null, null) { ID = 300 });
+
+            Assert.IsTrue(mq.HasAvailable(MessageType.PlayerSettings));
+        }
         [Test]
         public void HasAvailableDiscardsInvalidMessages()
         {
@@ -96,6 +104,14 @@ namespace UnitTestLibrary
             stubClientStateTracker.Stub(me => me.FindNetworkClient(200)).Return(null);
 
             Assert.IsFalse(mq.HasAvailable(MessageType.Player));
+        }
+        [Test]
+        public void DoesntDiscardMessagesThatDontCareAboutHavingAValidClient()
+        {
+            queueMH.QueuedMessages.Enqueue(new Message() { Type = MessageType.ChatLog, Data = 1 }); // No ClientID set, so the ClientID's not relevant
+            stubNS.Stub(me => me.ReadMessage()).Do(queueMH.GetNextQueuedMessage);
+
+            Assert.IsTrue(mq.HasAvailable(MessageType.ChatLog));
         }
     }
 

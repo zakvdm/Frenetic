@@ -66,11 +66,25 @@ namespace Frenetic.Network
             // A message is invalid if we find no corresponding client in the ClientStateTracker (probably because the client who sent this message has since disconnected...)
             foreach (MessageType type in Enum.GetValues(typeof(MessageType)))
             {
-                while((_data[type].Count > 0) && (_clientStateTracker.FindNetworkClient(_data[type].Peek().ClientID) == null))
+                if (RequiresAValidClient(type))
                 {
-                    _data[type].Dequeue();
+                    while (!MessageClientIsValid(type))
+                    {
+                        _data[type].Dequeue();
+                    }
                 }
             }
+        }
+
+        bool RequiresAValidClient(MessageType type)
+        {
+            return ((_data[type].Count > 0) && (_data[type].Peek().ClientID != 0));
+        }
+        bool MessageClientIsValid(MessageType type)
+        {
+            return ((_data[type].Count == 0)
+                || (_clientStateTracker.FindNetworkClient(_data[type].Peek().ClientID) != null)
+                || ((_clientStateTracker.LocalClient != null) && (_clientStateTracker.LocalClient.ID == _data[type].Peek().ClientID)));
         }
 
         Dictionary<MessageType, Queue<Message>> _data = new Dictionary<MessageType,Queue<Message>>();
