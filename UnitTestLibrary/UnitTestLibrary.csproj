@@ -81,6 +81,7 @@
     <Compile Include="ChatMessageTests.cs" />
     <Compile Include="ClientFactoryTests.cs" />
     <Compile Include="ClientStateTrackerTests.cs" />
+    <Compile Include="EffectUpdaterTests.cs" />
     <Compile Include="LidgrenServerMessageSenderTests.cs" />
     <Compile Include="LocalClientTests.cs" />
     <Compile Include="MessageConsoleTests.cs" />
@@ -106,6 +107,7 @@
     <Compile Include="PlayerTextureBankTests.cs" />
     <Compile Include="PlayerViewTests.cs" />
     <Compile Include="QuitterTests.cs" />
+    <Compile Include="RailGunTests.cs" />
     <Compile Include="SettingsPersisterTests.cs" />
     <Compile Include="SnapCounterTests.cs" />
     <Compile Include="TweakablePropertiesLoaderTests.cs" />

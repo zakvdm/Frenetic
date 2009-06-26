@@ -19,23 +19,6 @@ namespace Frenetic
             _mediator = mediator;
         }
 
-        [Obsolete]
-        public void LoadTweakableProperties(Type[] types)
-        {
-            Stopwatch stopwatch = new Stopwatch();
-            stopwatch.Start();
-            foreach (Type type in types)
-            {
-                var properties = type.GetProperties();
-                foreach (PropertyInfo propertyinfo in properties)
-                {
-                    RegisterPropertyWithMediator(propertyinfo, null, IsStaticProperty);
-                }
-            }
-            stopwatch.Stop();
-            Console.WriteLine("Loaded tweakable properties in " + stopwatch.ElapsedMilliseconds + " milliseconds.");
-        }
-
         public void LoadTweakableProperties(object instance)
         {
             Type type = instance.GetType();
@@ -66,13 +49,14 @@ namespace Frenetic
             return true;
         }
 
+        /*
         bool IsStaticProperty(PropertyInfo propertyInfo)
         {
             if (!propertyInfo.GetSetMethod().IsStatic || !propertyInfo.GetGetMethod().IsStatic)
                 throw new InvalidOperationException("Tweakable property {" + propertyInfo.ReflectedType + "." + propertyInfo.Name + "} is of the wrong type (should be public static read/write)");
 
             return true;
-        }
+        }*/
 
         IMediator _mediator;
     }

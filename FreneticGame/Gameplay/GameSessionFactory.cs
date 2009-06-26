@@ -12,12 +12,13 @@ using FarseerGames.FarseerPhysics.Dynamics;
 using FarseerGames.FarseerPhysics.Collisions;
 using Frenetic.Graphics;
 using Microsoft.Xna.Framework;
-using FarseerGames.GettingStarted;
+using FarseerGames.AdvancedSamplesXNA;
 using Frenetic.Network.Lidgren;
 using Frenetic.Network;
 using Frenetic.Autofac;
 using Frenetic.UserInput;
 using Frenetic.Player;
+using Frenetic.Weapons;
 
 namespace Frenetic
 {
@@ -56,7 +57,7 @@ namespace Frenetic
 
 
             // Server needs a new PhysicsSimulator (can't use the client's... -- NOTE: the parameter value is irrelevant, all that matters is that it exists...)
-            ServerContainer.Resolve<IPhysicsSimulator>(new NamedParameter("isServer", true));
+            var simulator = ServerContainer.Resolve<IPhysicsSimulator>(new NamedParameter("isServer", true));
 
             IGameSession gameSession = ServerContainer.Resolve<IGameSession>();
 
@@ -105,7 +106,6 @@ namespace Frenetic
                     new TypedParameter(typeof(IServerNetworkSession), null));
             clientNetworkSession.Join(14242);
 
-
             gameSession.Controllers.Add(ClientContainer.Resolve<PhysicsController>());
             
             ILevel level = ClientContainer.Resolve<ILevel>();
@@ -115,8 +115,6 @@ namespace Frenetic
                 new TypedParameter(typeof(bool), false));
             GameSessionView gameSessionView = ClientContainer.Resolve<GameSessionView>();
 
-
-            
 
 
             // THINGS TO SYNC OVER NETWORK:
@@ -147,6 +145,10 @@ namespace Frenetic
                                             );
 
             gameSession.Controllers.Add(ClientContainer.Resolve<KeyboardPlayerController>(new TypedParameter(typeof(IPlayer), localPlayer)));
+
+            gameSession.Controllers.Add(ClientContainer.Resolve<EffectUpdater>());
+
+            localPlayer.AddWeapon(ClientContainer.Resolve<IRailGun>());
 
             gameSession.Views.Add(ClientContainer.Resolve<PlayerView>()); // PlayerView must draw before VisibilityView (so players are underneath blackness!)
             gameSession.Views.Add(ClientContainer.Resolve<VisibilityView>(new TypedParameter(typeof(IPlayer), localPlayer)));

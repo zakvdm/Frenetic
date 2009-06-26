@@ -11,15 +11,15 @@ namespace UnitTestLibrary
         public void CountsSnaps()
         {
             SnapCounter counter = new SnapCounter();
-            counter.SnapsPerSecond = 20;  // Every 50 ms is a snap...
+            counter.SnapsPerSecond = 20;  // Every 0.05f seconds is a snap...
 
             Assert.AreEqual(1, counter.CurrentSnap);
 
-            counter.Process(45);
+            counter.Process(0.045f);
 
             Assert.AreEqual(1, counter.CurrentSnap);
 
-            counter.Process(10);
+            counter.Process(0.01f);
 
             Assert.AreEqual(2, counter.CurrentSnap);
         }

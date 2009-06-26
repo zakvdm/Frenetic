@@ -20,6 +20,7 @@ using Frenetic.Level;
 using Frenetic.UserInput;
 using Frenetic.Player;
 using System.Windows.Forms;
+using Frenetic.Weapons;
 
 namespace Frenetic
 {
@@ -62,6 +63,7 @@ namespace Frenetic
 
             // TODO: REMOVE:
             Components.Add(new Frenetic.MyConsole.Components.FPS(this));
+            //Components.Add(new Frenetic.MyConsole.Components.EmitterTest(this, graphics));
         }
 
         /// <summary>
@@ -104,7 +106,8 @@ namespace Frenetic
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            graphics.GraphicsDevice.Clear(Color.LightSlateGray);
+            //graphics.GraphicsDevice.Clear(Color.LightSlateGray);
+            graphics.GraphicsDevice.Clear(new Color(20, 20, 20));
 
             base.Draw(gameTime);
 
@@ -242,14 +245,12 @@ namespace Frenetic
             builder.RegisterModule(new PhysicsModule() { Gravity = _gravity });
             #endregion
 
+            #region Weapons
+            builder.RegisterModule(new WeaponsModule() { ContentManager = new ContentManager(this.Services, "Content"), GraphicsDeviceService = this.graphics });
+            #endregion
+
             #region Level
-            builder.Register<LevelPiece>().FactoryScoped();
-            builder.RegisterGeneratedFactory<LevelPiece.Factory>(new TypedService(typeof(LevelPiece)));
-            builder.Register<DumbLevelLoader>().As<ILevelLoader>().ContainerScoped();
-            builder.Register<Frenetic.Level.Level>().As<ILevel>().ContainerScoped();
-            builder.Register<LevelController>().ContainerScoped();
-            builder.Register<LevelView>().ContainerScoped();
-            builder.Register<VisibilityView>().ContainerScoped();
+            builder.RegisterModule(new LevelModule());
             #endregion
 
             #region Console
@@ -265,8 +266,8 @@ namespace Frenetic
             #endregion
 
             // RAYCASTER:
-            builder.Register<DumbRayCaster>().SingletonScoped();
-            builder.Register<DumbRayCasterTestController>().ContainerScoped();
+            //builder.Register<DumbRayCaster>().SingletonScoped();
+            //builder.Register<DumbRayCasterTestController>().ContainerScoped();
 
             // CAMERA:
             builder.Register((c, p) => (ICamera)new Camera(p.TypedAs<IPlayer>(), new Vector2(_screenWidth, _screenHeight))).ContainerScoped();

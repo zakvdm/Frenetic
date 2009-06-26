@@ -13,15 +13,15 @@ namespace Frenetic
 
         #region IController Members
 
-        public void Process(float elapsedTime)
+        public void Process(float elapsedSeconds)
         {
-            _elapsedTime += elapsedTime;
+            _totalElapsedSeconds += elapsedSeconds;
 
-            float msPerSnap = 1000 / SnapsPerSecond;
+            float secondsPerSnap = 1f / SnapsPerSecond;
 
-            if (_elapsedTime  > msPerSnap)
+            if (_totalElapsedSeconds  > secondsPerSnap)
             {
-                _elapsedTime -= msPerSnap;
+                _totalElapsedSeconds -= secondsPerSnap;
                 CurrentSnap++;
             }
 
@@ -30,6 +30,6 @@ namespace Frenetic
         #endregion
 
         public int CurrentSnap { get; set; }
-        float _elapsedTime = 0f;
+        float _totalElapsedSeconds = 0f;
     }
 }

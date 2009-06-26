@@ -23,27 +23,6 @@ namespace UnitTestLibrary
         }
 
         [Test]
-        public void RegistersTweakableProperties()
-        {
-            PropertyInfo propinfo = typeof(TestStaticTweakableClass).GetProperty("TestProperty");
-            Type[] types = new Type[] { new TestStaticTweakableClass().GetType() };
-
-            loader.LoadTweakableProperties(types);
-
-            stubMediator.AssertWasCalled(me => me.Register(propinfo, null));
-        }
-
-        [Test]
-        [ExpectedException(typeof(InvalidOperationException), ExpectedMessage="Tweakable property {UnitTestLibrary.IncorrectStaticTweakableClass.NonStaticProperty} is of the wrong type (should be public static read/write)")]
-        public void ChecksThatPropertyIsStatic()
-        {
-            object x = new IncorrectStaticTweakableClass();
-            Type[] types = new Type[] { x.GetType() };
-
-            loader.LoadTweakableProperties(types);
-        }
-
-        [Test]
         public void RegistersTweakablePropertiesForASpecificClassInstance()
         {
             TestTweakableClass testClass = new TestTweakableClass();

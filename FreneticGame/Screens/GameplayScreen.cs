@@ -33,10 +33,10 @@ namespace Frenetic
             base.Update(pGameTime, otherScreenHasFocus, coveredByOtherScreen);
 
             if (_serverGameSessionController != null)
-                _serverGameSessionController.Process((float)pGameTime.ElapsedGameTime.TotalMilliseconds);
+                _serverGameSessionController.Process((float)pGameTime.ElapsedGameTime.TotalSeconds);
 
             if (_clientGameSessionController != null)
-                _clientGameSessionController.Process((float)pGameTime.ElapsedGameTime.TotalMilliseconds);
+                _clientGameSessionController.Process((float)pGameTime.ElapsedGameTime.TotalSeconds);
         }
 
         /// <summary>

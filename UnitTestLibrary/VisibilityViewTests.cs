@@ -47,7 +47,7 @@ namespace UnitTestLibrary
         public void DrawsAShadowForTheBottomOfALevelPiece()
         {
             // the block is top left (relative to the player)
-            LevelPiece piece = new LevelPiece(new Vector2(100, 100), new Vector2(40, 20), new DummyPhysicsComponent());
+            LevelPiece piece = LevelPieceHelper.MakeLevelPiece(new Vector2(100, 100), new Vector2(40, 20));
             stubLevel.Pieces.Add(piece);
             stubPlayer.Position = new Vector2(200, 200);
             // The expected vertex positions:
@@ -65,7 +65,7 @@ namespace UnitTestLibrary
         public void DrawsAShadowForTheTopOfALevelPiece()
         {
             // the block is bottom right (relative to the player)
-            LevelPiece piece = new LevelPiece(new Vector2(300, 400), new Vector2(20, 20), new DummyPhysicsComponent());
+            LevelPiece piece = LevelPieceHelper.MakeLevelPiece(new Vector2(300, 400), new Vector2(20, 20));
             stubLevel.Pieces.Add(piece);
             stubPlayer.Position = new Vector2(100, 100);
             // The expected vertex positions:
@@ -83,7 +83,7 @@ namespace UnitTestLibrary
         public void DrawsAShadowForTheLeftOfALevelPiece()
         {
             // the block is bottom right (relative to the player)
-            LevelPiece piece = new LevelPiece(new Vector2(300, 400), new Vector2(20, 20), new DummyPhysicsComponent());
+            LevelPiece piece = LevelPieceHelper.MakeLevelPiece(new Vector2(300, 400), new Vector2(20, 20));
             stubLevel.Pieces.Add(piece);
             stubPlayer.Position = new Vector2(100, 100);
             // The expected vertex positions:
@@ -101,7 +101,7 @@ namespace UnitTestLibrary
         public void DrawsAShadowForTheRightOfALevelPiece()
         {
             // the block is bottom right (relative to the player)
-            LevelPiece piece = new LevelPiece(new Vector2(300, 400), new Vector2(20, 20), new DummyPhysicsComponent());
+            LevelPiece piece = LevelPieceHelper.MakeLevelPiece(new Vector2(300, 400), new Vector2(20, 20));
             stubLevel.Pieces.Add(piece);
             stubPlayer.Position = new Vector2(500, 400);
             // The expected vertex positions:
@@ -119,7 +119,7 @@ namespace UnitTestLibrary
         public void OnlyDrawsShadowsForVisibleEdges()
         {
             // By placing the player inside the level piece, we make sure that none of the edges are "visible" to the player, so no shadows should get drawn...
-            LevelPiece piece = new LevelPiece(new Vector2(300, 400), new Vector2(20, 20), new DummyPhysicsComponent());
+            LevelPiece piece = LevelPieceHelper.MakeLevelPiece(new Vector2(300, 400), new Vector2(20, 20));
             stubLevel.Pieces.Add(piece);
             stubPlayer.Position = new Vector2(305, 397);
 

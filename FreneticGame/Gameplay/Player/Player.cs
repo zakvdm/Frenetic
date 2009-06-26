@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework;
 
 using Frenetic.Physics;
 using FarseerGames.FarseerPhysics.Dynamics;
+using Frenetic.Weapons;
 
 namespace Frenetic.Player
 {
@@ -36,6 +37,16 @@ namespace Frenetic.Player
             {
                 _physicsComponent.Position = value;
             }
+        }
+
+        public IRailGun CurrentWeapon
+        {
+            get { return _weapon; }
+        }
+
+        public void AddWeapon(IRailGun railGun)
+        {
+            _weapon = railGun;
         }
 
         public void Update()
@@ -74,14 +85,16 @@ namespace Frenetic.Player
 
         public void Shoot(Vector2 targetPosition)
         {
-            Console.WriteLine("Shot fired at {0}", targetPosition);
+            _weapon.Shoot(this.Position, targetPosition);
         }
 
         IPhysicsComponent _physicsComponent;
         IBoundaryCollider _boundaryCollider;
 
-        public static Vector2 JumpImpulse = new Vector2(0, -3000);
-        public static Vector2 MoveForce = new Vector2(-0.2f, 0);
+        IRailGun _weapon;
+
+        public static Vector2 JumpImpulse = new Vector2(0, -250);
+        public static Vector2 MoveForce = new Vector2(-0.8f, 0);
         static float MaxSpeed = 10;
 
         internal bool InContactWithLevel { get; set; }

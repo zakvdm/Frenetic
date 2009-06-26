@@ -17,7 +17,7 @@ namespace Frenetic
 
         #region IController Members
 
-        public void Process(float elapsedTime)
+        public void Process(float elapsedSeconds)
         {
             // Set most recently received server snap:
             while (_incomingMessageQueue.HasAvailable(MessageType.ServerSnap))

@@ -17,7 +17,7 @@ namespace Frenetic
 
         #region IController Members
 
-        public void Process(float elapsedTime)
+        public void Process(float elapsedSeconds)
         {
             _keyboard.Unlock();
 

@@ -38,7 +38,6 @@ namespace UnitTestLibrary
         public void PressingTheSpacebarExertsJumpImpulseOnPlayer()
         {
             stubKeyboard.Stub(k => k.IsKeyDown(Arg<Keys>.Is.Equal(Keys.Space))).Return(true);
-            var stubBody = MockRepository.GenerateStub<Body>();
 
             kpc.Process(1);
             stubPlayer.AssertWasCalled(p => p.Jump());
@@ -47,28 +46,24 @@ namespace UnitTestLibrary
         [Test]
         public void PlayerCannotDoubleJump()
         {
-            var fortyMilliseconds = new TimeSpan(0, 0, 0, 0, 40).Milliseconds;
-            var twoHundredMilliseconds = 5 * fortyMilliseconds;
+            var lessThanJumpDelay = KeyboardPlayerController.JumpTimer / 3;
+            var moreThanJumpDelay = KeyboardPlayerController.JumpTimer - (lessThanJumpDelay / 2);
+
             int callCount = 0;
             stubKeyboard.Stub(k => k.IsKeyDown(Arg<Keys>.Is.Equal(Keys.Space))).Return(true);
             stubPlayer.Stub(p => p.Jump()).Do(new Func<bool>(() => { callCount++; return true; }));
-            kpc.Process(1);
+            kpc.Process(KeyboardPlayerController.JumpTimer);
             Assert.AreEqual(1, callCount);
-            kpc.Process(fortyMilliseconds);
+            kpc.Process(lessThanJumpDelay);
             Assert.AreEqual(1, callCount);
-            kpc.Process(twoHundredMilliseconds);
+            kpc.Process(moreThanJumpDelay);
             Assert.AreEqual(2, callCount);
-            kpc.Process(fortyMilliseconds);
-            Assert.AreEqual(2, callCount);
-            kpc.Process(twoHundredMilliseconds);
-            Assert.AreEqual(3, callCount);
         }
 
         [Test]
         public void PressingTheLeftArrowExertsMovementForceOnPlayer()
         {
             stubKeyboard.Stub(k => k.IsKeyDown(Arg<Keys>.Is.Equal(Keys.Left))).Return(true);
-            var stubBody = MockRepository.GenerateStub<Body>();
 
             kpc.Process(1);
             stubPlayer.AssertWasCalled(p => p.MoveLeft());
@@ -78,7 +73,6 @@ namespace UnitTestLibrary
         public void PressingTheRightArrowExertsMovementForceOnPlayer()
         {
             stubKeyboard.Stub(k => k.IsKeyDown(Arg<Keys>.Is.Equal(Keys.Right))).Return(true);
-            var stubBody = MockRepository.GenerateStub<Body>();
 
             kpc.Process(1);
             stubPlayer.AssertWasCalled(p => p.MoveRight());
@@ -96,22 +90,19 @@ namespace UnitTestLibrary
         [Test]
         public void PressingTheLeftMouseButtonASecondTimeTooSoonDoesNotRetriggerTheShot()
         {
-            var oneHundredMilliseconds = new TimeSpan(0, 0, 0, 0, 100).Milliseconds;
-            var twoHundredMilliseconds = 2 * oneHundredMilliseconds;
+            var lessThanShootDelay = KeyboardPlayerController.ShootTimer / 2;
+            var moreThanShootDelay = KeyboardPlayerController.ShootTimer - (lessThanShootDelay / 3);
             int callCount = 0;
             stubMouse.Stub(m => m.LeftButtonIsDown()).Return(true);
             stubCrosshair.Stub(c => c.WorldPosition).Return(Vector2.UnitX);
             stubPlayer.Stub(p => p.Shoot(Vector2.UnitX)).Do(new Action<Vector2>((pos) => callCount++));
-            kpc.Process(1);
+
+            kpc.Process(KeyboardPlayerController.ShootTimer);
             Assert.AreEqual(1, callCount);
-            kpc.Process(oneHundredMilliseconds);
+            kpc.Process(lessThanShootDelay);
             Assert.AreEqual(1, callCount);
-            kpc.Process(twoHundredMilliseconds);
+            kpc.Process(moreThanShootDelay);
             Assert.AreEqual(2, callCount);
-            kpc.Process(oneHundredMilliseconds);
-            Assert.AreEqual(2, callCount);
-            kpc.Process(twoHundredMilliseconds);
-            Assert.AreEqual(3, callCount);
         }
 
         IPlayer stubPlayer;

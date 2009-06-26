@@ -22,7 +22,7 @@ namespace UnitTestLibrary
         {
             gameSession = new GameSession();
             localClient = new LocalClient(MockRepository.GenerateStub<IPlayer>(), MockRepository.GenerateStub<LocalPlayerSettings>());
-            playerView = new PlayerView(null, null, null);
+            playerView = new PlayerView(null, null, null, null);
             clientFactoryDelegate = () => createdClient;
             clientFactory = new ClientSideClientFactory(clientFactoryDelegate, gameSession, playerView, localClient);
         }

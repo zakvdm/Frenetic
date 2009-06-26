@@ -28,7 +28,7 @@ namespace Frenetic.Player
         {
             TotalElapsedTime += elapsedTime;
 
-            if (Keyboard.IsKeyDown(Keys.Space) && CanJump(TotalElapsedTime))
+            if ((Keyboard.IsKeyDown(Keys.Space) || Keyboard.IsKeyDown(Keys.W)) && CanJump(TotalElapsedTime))
             {
                 var jumped = Player.Jump();
                 if (jumped)
@@ -37,18 +37,19 @@ namespace Frenetic.Player
                 }
             }
 
-            if (Keyboard.IsKeyDown(Keys.Left))
+            if (Keyboard.IsKeyDown(Keys.Left) || Keyboard.IsKeyDown(Keys.A))
             {
                 Player.MoveLeft();
             }
 
-            if (Keyboard.IsKeyDown(Keys.Right))
+            if (Keyboard.IsKeyDown(Keys.Right) || Keyboard.IsKeyDown(Keys.D))
             {
                 Player.MoveRight();
             }
 
             if (Mouse.LeftButtonIsDown() && CanShoot(TotalElapsedTime))
             {
+                Console.WriteLine(Crosshair.ViewPosition);
                 Player.Shoot(Crosshair.WorldPosition);
                 LastShootTime = TotalElapsedTime;
             }
@@ -75,7 +76,7 @@ namespace Frenetic.Player
         private float LastShootTime { get; set; }
         private float LastJumpTime { get; set; }
 
-        static float ShootTimer = 250;
-        static float JumpTimer = 200;
+        public static float ShootTimer = 1;
+        public static float JumpTimer = 0.5f;
     }
 }

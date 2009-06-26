@@ -5,16 +5,18 @@ using Frenetic.Graphics;
 using Microsoft.Xna.Framework.Content;
 using System.Collections.Generic;
 using System.Linq;
+using Frenetic.Weapons;
 
 namespace Frenetic.Player
 {
     public class PlayerView : IView
     {
-        public PlayerView(ITextureBank<PlayerTexture> playerTextureBank, ISpriteBatch spriteBatch, ICamera camera)
+        public PlayerView(ITextureBank<PlayerTexture> playerTextureBank, ISpriteBatch spriteBatch, ICamera camera, IRailGunView railGunView)
         {
             _playerTextureBank = playerTextureBank;
             _spriteBatch = spriteBatch;
             _camera = camera;
+            _railGunView = railGunView;
         }
         #region IView Members
 
@@ -35,6 +37,8 @@ namespace Frenetic.Player
                         SpriteEffects.None, 1f);
                     _spriteBatch.End();
                 }
+
+                _railGunView.Draw(player.CurrentWeapon, _camera.TranslationMatrix);
             }
         }
 
@@ -61,9 +65,9 @@ namespace Frenetic.Player
 
         Dictionary<IPlayer, IPlayerSettings> _players = new Dictionary<IPlayer,IPlayerSettings>();
 
-        private ITextureBank<PlayerTexture> _playerTextureBank;
-        private ISpriteBatch _spriteBatch;
-        private ICamera _camera;
-
+        ITextureBank<PlayerTexture> _playerTextureBank;
+        ISpriteBatch _spriteBatch;
+        ICamera _camera;
+        IRailGunView _railGunView;
     }
 }

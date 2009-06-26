@@ -10,6 +10,7 @@ using NUnit.Framework;
 using Rhino.Mocks;
 using FarseerGames.FarseerPhysics.Dynamics;
 using Frenetic.Player;
+using Frenetic.Weapons;
 
 namespace UnitTestLibrary
 {
@@ -130,5 +131,27 @@ namespace UnitTestLibrary
 
             stubPhysicsComponent.AssertWasNotCalled(pc => pc.ApplyForce(Player.MoveForce * -1));
         }
+
+        [Test]
+        public void CanGiveThePlayerAWeapon()
+        {
+            RailGun railGun = new RailGun(null);
+            player.AddWeapon(railGun);
+
+            Assert.AreEqual(railGun, player.CurrentWeapon);
+        }
+
+        [Test]
+        public void ShootCallsShootOnCurrentWeapon()
+        {
+            var stubRailGun = MockRepository.GenerateStub<IRailGun>();
+            player.AddWeapon(stubRailGun);
+            player.Position = new Vector2(10, 20);
+
+            player.Shoot(new Vector2(30, 40));
+
+            stubRailGun.AssertWasCalled(me => me.Shoot(new Vector2(10, 20), new Vector2(30, 40)));
+        }
+
     }
 }
