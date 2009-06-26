@@ -73,6 +73,8 @@ ZAK - 20 - As the player, I can click on the screen and fire a railgun at the po
 BUGS:
 1) When server dies, connected client has to shutdown gracefully
 2) When a client disconnects, we have to remove its associated physics objects (currently only removing it from PlayerView)
+3) PlayerSettings must be syncronized over network (currently they're not even sent by ChatLogSender (which also needs to be renamed))
+4) NetworkPlayerProcessor will have to also update the LocalClient state (like if the server sends new Health status, etc.)
 *****
 
 5 - Add some kind of logging framework (so we can start doing debug output, etc.)

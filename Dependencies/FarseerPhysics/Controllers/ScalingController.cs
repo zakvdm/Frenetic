@@ -1,25 +1,21 @@
+//Added by Daniel Pramel 08/24/08
+
+using FarseerGames.FarseerPhysics.Controllers;
+
 namespace FarseerGames.FarseerPhysics
 {
-    public class Scaling
+    public class ScalingController : Controller
     {
         private float _elapsedTime; // holds the total time since the last update
-        private bool _enabled;
-
         private float _maximumUpdateInterval;
         private float _scalingPenalty;
 
         private float _updateInterval;
 
-        public Scaling(float preferredUpdateInterval, float maximumUpdateInterval)
+        public ScalingController(float preferredUpdateInterval, float maximumUpdateInterval)
         {
             _updateInterval = preferredUpdateInterval;
             _maximumUpdateInterval = maximumUpdateInterval;
-        }
-
-        public bool Enabled
-        {
-            get { return _enabled; }
-            set { _enabled = value; }
         }
 
         /// <summary>
@@ -52,7 +48,7 @@ namespace FarseerGames.FarseerPhysics
 
         public float GetUpdateInterval(float dt)
         {
-            if (_updateInterval > 0 && _enabled)
+            if (_updateInterval > 0 && Enabled)
             {
                 _elapsedTime += dt;
                 if (_elapsedTime < UpdateInterval)
@@ -71,18 +67,42 @@ namespace FarseerGames.FarseerPhysics
 
         public void IncreaseUpdateInterval()
         {
-            if (_scalingPenalty + _updateInterval/4 <= _maximumUpdateInterval)
+            if (_scalingPenalty + _updateInterval / 4 <= _maximumUpdateInterval)
             {
-                _scalingPenalty += _updateInterval/4;
+                _scalingPenalty += _updateInterval / 4;
             }
         }
 
         public void DecreaseUpdateInterval()
         {
-            _scalingPenalty -= _updateInterval/8;
+            _scalingPenalty -= _updateInterval / 8;
             if (_scalingPenalty < 0)
             {
                 _scalingPenalty = 0;
+            }
+        }
+
+        public override void Validate()
+        {
+            //Do nothing
+        }
+
+        public override void Update(float dt, float dtReal)
+        {
+            dt = GetUpdateInterval(dt);
+
+            if (dt == 0)
+            {
+                return;
+            }
+
+            if (UpdateInterval < dtReal)
+            {
+                IncreaseUpdateInterval();
+            }
+            else
+            {
+                DecreaseUpdateInterval();
             }
         }
     }

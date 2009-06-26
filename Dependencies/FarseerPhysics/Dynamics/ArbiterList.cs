@@ -44,16 +44,20 @@ namespace FarseerGames.FarseerPhysics.Dynamics
         {
             for (int i = 0; i < Count; i++)
             {
-                if (ContactCountEqualsZero(this[i]))
+                //If they don't have any contacts associated with them. Remove them.
+                if (this[i].ContactCount == 0)
                 {
                     _markedForRemovalList.Add(this[i]);
                 }
             }
-            for (int j = 0; j < _markedForRemovalList.Count; j++)
+
+            int count = _markedForRemovalList.Count;
+            for (int j = 0; j < count; j++)
             {
                 Remove(_markedForRemovalList[j]);
                 arbiterPool.Insert(_markedForRemovalList[j]);
 
+                //No contacts exist between the two geometries, fire the OnSeperation event.
                 if (_markedForRemovalList[j].GeometryA.OnSeparation != null)
                 {
                     _markedForRemovalList[j].GeometryA.OnSeparation(_markedForRemovalList[j].GeometryA,
@@ -69,11 +73,11 @@ namespace FarseerGames.FarseerPhysics.Dynamics
             _markedForRemovalList.Clear();
         }
 
-        public void RemoveContainsDisposedBody(Pool<Arbiter> arbiterPool)
+        public void CleanArbiterList(Pool<Arbiter> arbiterPool)
         {
             for (int i = 0; i < Count; i++)
             {
-                if (ContainsDisposedBody(this[i]))
+                if (this[i].ContainsInvalidGeom())
                 {
                     _markedForRemovalList.Add(this[i]);
                 }
@@ -84,16 +88,6 @@ namespace FarseerGames.FarseerPhysics.Dynamics
                 arbiterPool.Insert(_markedForRemovalList[j]);
             }
             _markedForRemovalList.Clear();
-        }
-
-        internal static bool ContactCountEqualsZero(Arbiter a)
-        {
-            return a.ContactCount == 0;
-        }
-
-        internal static bool ContainsDisposedBody(Arbiter a)
-        {
-            return a.ContainsDisposedGeom();
         }
     }
 }

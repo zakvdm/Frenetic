@@ -1,4 +1,9 @@
 using System;
+using System.Xml.Serialization;
+
+#if(XNA)
+using Microsoft.Xna.Framework.Content;
+#endif
 
 namespace FarseerGames.FarseerPhysics.Dynamics.Joints
 {
@@ -7,6 +12,8 @@ namespace FarseerGames.FarseerPhysics.Dynamics.Joints
     /// </summary>
     public class FixedAngleJoint : Joint
     {
+        public event FixedJointDelegate JointUpdated;
+
         private Body _body;
         private float _massFactor;
         private float _maxImpulse = float.MaxValue;
@@ -28,6 +35,10 @@ namespace FarseerGames.FarseerPhysics.Dynamics.Joints
             _targetAngle = targetAngle;
         }
 
+#if(XNA)
+        [ContentSerializerIgnore]
+#endif
+        [XmlIgnore]
         /// <summary>
         /// Gets or sets the body.
         /// </summary>
@@ -68,25 +79,38 @@ namespace FarseerGames.FarseerPhysics.Dynamics.Joints
 
         public override void PreStep(float inverseDt)
         {
-            if (IsDisposed)
+            if (_body.isStatic)
+                return;
+
+            if (!_body.Enabled)
                 return;
 
             JointError = _body.totalRotation - _targetAngle;
 
-            _velocityBias = -BiasFactor*inverseDt*JointError;
-            _massFactor = (1 - Softness)/(_body.inverseMomentOfInertia);
+            _velocityBias = -BiasFactor * inverseDt * JointError;
+            _massFactor = (1 - Softness) / (_body.inverseMomentOfInertia);
         }
 
         public override void Update()
         {
             base.Update();
 
-            if (IsDisposed)
+            if (_body.isStatic)
                 return;
 
-            float angularImpulse = (_velocityBias - _body.AngularVelocity)*_massFactor;
-            _body.AngularVelocity += _body.inverseMomentOfInertia*Math.Sign(angularImpulse)*
-                                     Math.Min(Math.Abs(angularImpulse), _maxImpulse);
+            if (!_body.Enabled)
+                return;
+
+            float angularImpulse = (_velocityBias - _body.AngularVelocity) * _massFactor;
+
+            if (angularImpulse != 0f)
+            {
+                _body.AngularVelocity += _body.inverseMomentOfInertia * Math.Sign(angularImpulse) *
+                         Math.Min(Math.Abs(angularImpulse), _maxImpulse);
+
+                if (JointUpdated != null)
+                    JointUpdated(this, _body);
+            }
         }
     }
 }

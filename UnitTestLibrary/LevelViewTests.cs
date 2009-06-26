@@ -18,7 +18,7 @@ namespace UnitTestLibrary
         public void GenerateDrawsLevelPieceWithCorrectParameters()
         {
             Level level = new Level(null);
-            level.Pieces.Add(new LevelPiece(new Vector2(1, 1), new Vector2(100, 100), MockRepository.GenerateStub<IPhysicsComponent>()));
+            level.Pieces.Add(LevelPieceHelper.MakeLevelPiece(new Vector2(1, 1), new Vector2(100, 100)));
             var stubSpriteBatch = MockRepository.GenerateStub<ISpriteBatch>();
             var stubTexture = MockRepository.GenerateStub<ITexture>();
             LevelView levelView = new LevelView(level, stubSpriteBatch, stubTexture, MockRepository.GenerateStub<ICamera>());
@@ -36,8 +36,8 @@ namespace UnitTestLibrary
         public void GenerateDrawsEachLevelPiece()
         {
             Level level = new Level(null);
-            level.Pieces.Add(new LevelPiece(new Vector2(1, 1), new Vector2(100, 100), MockRepository.GenerateStub<IPhysicsComponent>()));
-            level.Pieces.Add(new LevelPiece(new Vector2(2, 2), new Vector2(50, 50), MockRepository.GenerateStub<IPhysicsComponent>()));
+            level.Pieces.Add(LevelPieceHelper.MakeLevelPiece(new Vector2(1, 1), new Vector2(100, 100)));
+            level.Pieces.Add(LevelPieceHelper.MakeLevelPiece(new Vector2(2, 2), new Vector2(50, 50)));
             var stubSpriteBatch = MockRepository.GenerateStub<ISpriteBatch>();
             var stubTexture = MockRepository.GenerateStub<ITexture>();
             LevelView levelView = new LevelView(level, stubSpriteBatch, stubTexture, MockRepository.GenerateStub<ICamera>());
@@ -57,7 +57,7 @@ namespace UnitTestLibrary
         public void UsesCameraCorrectly()
         {
             Level level = new Level(null);
-            level.Pieces.Add(new LevelPiece(new Vector2(1, 1), new Vector2(100, 100), MockRepository.GenerateStub<IPhysicsComponent>()));
+            level.Pieces.Add(LevelPieceHelper.MakeLevelPiece(new Vector2(1, 1), new Vector2(100, 100)));
             var stubSpriteBatch = MockRepository.GenerateStub<ISpriteBatch>();
             var stubTexture = MockRepository.GenerateStub<ITexture>();
             Camera camera = new Camera(MockRepository.GenerateStub<IPlayer>(), new Vector2(100, 200));

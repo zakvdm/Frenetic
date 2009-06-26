@@ -1,24 +1,37 @@
 using System;
+using System.Xml.Serialization;
+using FarseerGames.FarseerPhysics.Interfaces;
+
+#if(XNA)
+using Microsoft.Xna.Framework.Content;
+#endif
 
 namespace FarseerGames.FarseerPhysics.Dynamics.Joints
 {
     /// <summary>
     /// Provides common functionality for joints.
     /// </summary>
-    public abstract class Joint : IDisposable
+    public abstract class Joint : IIsDisposable
     {
         public float BiasFactor = .2f;
 
         /// <summary>
         /// The Breakpoint simply indicates the maximum Value the JointError can be before it breaks.
+        /// The default value is float.MaxValue
         /// </summary>
         public float Breakpoint = float.MaxValue;
 
         public bool Enabled = true;
-        public bool IsDisposed;
 
         public float Softness;
 
+#if(XNA)
+        [ContentSerializerIgnore]
+#endif
+        [XmlIgnore]
+        /// <summary>
+        /// Tag that can contain a user specified object.
+        /// </summary>
         public Object Tag { get; set; }
 
         /// <summary>
@@ -27,16 +40,6 @@ namespace FarseerGames.FarseerPhysics.Dynamics.Joints
         /// </summary>
         /// <Value>The joint error.</Value>
         public float JointError { get; protected set; }
-
-        #region IDisposable Members
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        #endregion
 
         /// <summary>
         /// Fires when the joint is broken.
@@ -48,7 +51,6 @@ namespace FarseerGames.FarseerPhysics.Dynamics.Joints
 
         public virtual void Update()
         {
-            //TODO: Ehhh, this makes no sense. Please test breakability!
             if (!Enabled || Math.Abs(JointError) <= Breakpoint)
                 return;
 
@@ -60,18 +62,33 @@ namespace FarseerGames.FarseerPhysics.Dynamics.Joints
 
         protected virtual void Dispose(bool disposing)
         {
-            //subclasses can override incase they need to dispose of resources
-            //otherwise do nothing.
-            if (!IsDisposed)
-            {
-                if (disposing)
-                {
-                    //dispose managed resources 
-                }
-
-                //dispose unmanaged resources
-            }
             IsDisposed = true;
         }
+
+        #region IDisposable Members
+
+        private bool _isDisposed;
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        #endregion
+
+        #region IIsDisposable Members
+
+#if(XNA)
+        [ContentSerializerIgnore]
+#endif
+        [XmlIgnore]
+        public bool IsDisposed
+        {
+            get { return _isDisposed; }
+            set { _isDisposed = value; }
+        }
+
+        #endregion
     }
 }

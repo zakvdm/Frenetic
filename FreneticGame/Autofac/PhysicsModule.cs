@@ -24,28 +24,37 @@ namespace Frenetic.Autofac
                         if (p.ToList<Parameter>().Count == 0)
                             return _clientPhysicsSimulator;
                         else
-                            return new FarseerPhysicsSimulator(new PhysicsSimulator(Gravity));
+                            _serverPhysicsSimulator = new FarseerPhysicsSimulator(new PhysicsSimulator(Gravity));
+                            return _serverPhysicsSimulator;
                     }).As<IPhysicsSimulator>().ContainerScoped();
 
             builder.Register<PhysicsSettings>().SingletonScoped();
-            // Body:
-            builder.Register((c, p) => BodyFactory.Instance.CreateRectangleBody(c.Resolve<IPhysicsSimulator>().PhysicsSimulator, p.Named<float>("width"), p.Named<float>("height"), p.Named<float>("mass"))).FactoryScoped();
-            // Geom:
-            builder.Register((c, p) => GeomFactory.Instance.CreateRectangleGeom(c.Resolve<IPhysicsSimulator>().PhysicsSimulator, p.Named<Body>("body"), p.Named<float>("width"), p.Named<float>("height"))).FactoryScoped();
-            // IPhysicsComponent:
+
+            //IPhysicsComponent
             builder.Register((c, p) =>
-            {
-                var width = new NamedParameter("width", 50f);
-                var height = new NamedParameter("height", 50f);
-                var mass = new NamedParameter("mass", 100f);
-                var bod = c.Resolve<Body>(width, height, mass);
-                var body = new NamedParameter("body", bod);
-                var geom = c.Resolve<Geom>(body, width, height, mass);
-                return new FarseerPhysicsComponent(bod, geom);
-            }).As<IPhysicsComponent>().FactoryScoped();
+                {
+                    Vector2 size;
+                    if (p.Count() > 0)
+                        size = p.Named<Vector2>("size");
+                    else
+                        size = new Vector2(20f, 30f);
+
+                    var vertices = Vertices.CreateSimpleRectangle(size.X, size.Y);
+                    var body = BodyFactory.Instance.CreatePolygonBody(c.Resolve<IPhysicsSimulator>().PhysicsSimulator, vertices, 1000f);
+                    var geom = GeomFactory.Instance.CreateSATPolygonGeom(c.Resolve<IPhysicsSimulator>().PhysicsSimulator, body, vertices, 1)[0];
+
+                    body.MomentOfInertia = float.MaxValue;
+
+                    return new FarseerPhysicsComponent(body, geom);
+                }).As<IPhysicsComponent>().FactoryScoped();
+            builder.RegisterGeneratedFactory<FarseerPhysicsComponent.Factory>(new TypedService(typeof(IPhysicsComponent))).ContainerScoped();
+
             builder.Register<PhysicsController>().ContainerScoped();
+
+            builder.Register<FarseerRayCaster>().As<IRayCaster>().ContainerScoped();
         }
 
         IPhysicsSimulator _clientPhysicsSimulator;
+        IPhysicsSimulator _serverPhysicsSimulator;
     }
 }

@@ -1,5 +1,10 @@
-using System;
+﻿using System;
 using System.Diagnostics;
+using System.Collections.Generic;
+using FarseerGames.FarseerPhysics.Factories;
+using FarseerGames.FarseerPhysics.Dynamics;
+using FarseerGames.FarseerPhysics.Dynamics.Joints;
+using FarseerGames.FarseerPhysics.Collisions;
 using FarseerGames.FarseerPhysics.Mathematics;
 
 #if (XNA)
@@ -11,18 +16,22 @@ using FarseerGames.FarseerPhysics.Mathematics;
 namespace FarseerGames.FarseerPhysics.Dynamics.Joints
 {
     /// <summary>
-    /// Creates a revolute joint between 2 bodies.
-    /// Can be used as wheels on a car.
+    /// 
     /// </summary>
-    public class RevoluteJoint : Joint
+    public class WeldJoint : Joint
     {
         public event JointDelegate JointUpdated;
+
+        private Body _body1;
+        private Body _body2;
+        private float _targetAngle;
+        private float _massFactor;
+        private float _maxImpulse = float.MaxValue;
+        private float _velocityBias;
 
         private Vector2 _accumulatedImpulse;
         private Vector2 _anchor;
         private Matrix _b;
-        private Body _body1;
-        private Body _body2;
         private Vector2 _currentAnchor;
         private Vector2 _dv;
         private Vector2 _dvBias;
@@ -32,18 +41,19 @@ namespace FarseerGames.FarseerPhysics.Dynamics.Joints
         private Matrix _matrix;
         private Vector2 _r1;
         private Vector2 _r2;
-        private Vector2 _velocityBias;
+        private Vector2 _velocityBiasRev;
 
-        public RevoluteJoint()
+        public WeldJoint()
         {
         }
 
-        public RevoluteJoint(Body body1, Body body2, Vector2 anchor)
+        public WeldJoint(Body body1, Body body2, Vector2 anchor)
         {
             _body1 = body1;
             _body2 = body2;
 
             _anchor = anchor;
+            _targetAngle = _body2.totalRotation - _body1.totalRotation;
 
             body1.GetLocalPosition(ref anchor, out _localAnchor1);
             body2.GetLocalPosition(ref anchor, out _localAnchor2);
@@ -52,7 +62,7 @@ namespace FarseerGames.FarseerPhysics.Dynamics.Joints
         }
 
         /// <summary>
-        /// Gets or sets the first body.
+        /// Gets or sets the fist body.
         /// </summary>
         /// <Value>The body1.</Value>
         public Body Body1
@@ -69,6 +79,16 @@ namespace FarseerGames.FarseerPhysics.Dynamics.Joints
         {
             get { return _body2; }
             set { _body2 = value; }
+        }
+
+        /// <summary>
+        /// Gets or sets the max impulse.
+        /// </summary>
+        /// <Value>The max impulse.</Value>
+        public float MaxImpulse
+        {
+            get { return _maxImpulse; }
+            set { _maxImpulse = value; }
         }
 
         /// <summary>
@@ -110,15 +130,12 @@ namespace FarseerGames.FarseerPhysics.Dynamics.Joints
             if (_body1 == null)
             {
                 throw new ArgumentNullException("initialAnchor",
-                                                "Body must be set prior to setting the _anchor of the Revolute Joint");
+                                                "Body must be set prior to setting the _anchor of the Weld Joint");
             }
             _body1.GetLocalPosition(ref initialAnchor, out _localAnchor1);
             _body2.GetLocalPosition(ref initialAnchor, out _localAnchor2);
         }
 
-        /// <summary>
-        /// Validates this instance.
-        /// </summary>
         public override void Validate()
         {
             if (_body1.IsDisposed || _body2.IsDisposed)
@@ -127,10 +144,6 @@ namespace FarseerGames.FarseerPhysics.Dynamics.Joints
             }
         }
 
-        /// <summary>
-        /// Calculates all the work needed before updating the joint.
-        /// </summary>
-        /// <param name="inverseDt">The inverse dt.</param>
         public override void PreStep(float inverseDt)
         {
             if (_body1.isStatic && _body2.isStatic)
@@ -138,6 +151,12 @@ namespace FarseerGames.FarseerPhysics.Dynamics.Joints
 
             if (!_body1.Enabled && !_body2.Enabled)
                 return;
+
+            JointError = (_body2.totalRotation - _body1.totalRotation) - _targetAngle;
+
+            _velocityBias = -BiasFactor * inverseDt * JointError;
+
+            _massFactor = (1 - Softness) / (_body1.inverseMomentOfInertia + _body2.inverseMomentOfInertia);
 
             _body1InverseMass = _body1.inverseMass;
             _body1InverseMomentOfInertia = _body1.inverseMomentOfInertia;
@@ -178,7 +197,7 @@ namespace FarseerGames.FarseerPhysics.Dynamics.Joints
             Vector2.Add(ref _body1.position, ref _r1, out _vectorTemp1);
             Vector2.Add(ref _body2.position, ref _r2, out _vectorTemp2);
             Vector2.Subtract(ref _vectorTemp2, ref _vectorTemp1, out _vectorTemp3);
-            Vector2.Multiply(ref _vectorTemp3, -BiasFactor * inverseDt, out _velocityBias);
+            Vector2.Multiply(ref _vectorTemp3, -BiasFactor * inverseDt, out _velocityBiasRev);
 
             JointError = _vectorTemp3.Length();
 
@@ -206,18 +225,25 @@ namespace FarseerGames.FarseerPhysics.Dynamics.Joints
             invertedMatrix = _b;
         }
 
-        /// <summary>
-        /// Updates this instance.
-        /// </summary>
         public override void Update()
         {
             base.Update();
 
             if (_body1.isStatic && _body2.isStatic)
                 return;
-
+          
             if (!_body1.Enabled && !_body2.Enabled)
                 return;
+
+            float angularImpulse = (_velocityBias - _body2.AngularVelocity + _body1.AngularVelocity) * _massFactor;
+
+            if (angularImpulse != 0f)
+            {
+                _body1.AngularVelocity -= _body1.inverseMomentOfInertia * Math.Sign(angularImpulse) *
+                                          Math.Min(Math.Abs(angularImpulse), _maxImpulse);
+                _body2.AngularVelocity += _body2.inverseMomentOfInertia * Math.Sign(angularImpulse) *
+                                          Math.Min(Math.Abs(angularImpulse), _maxImpulse);
+            }
 
             #region INLINE: Calculator.Cross(ref _body2.AngularVelocity, ref _r2, out _vectorTemp1);
 
@@ -256,8 +282,8 @@ namespace FarseerGames.FarseerPhysics.Dynamics.Joints
 
             #region INLINE: Vector2.Subtract(ref _velocityBias, ref _dv, out _vectorTemp1);
 
-            _vectorTemp1.X = _velocityBias.X - _dv.X;
-            _vectorTemp1.Y = _velocityBias.Y - _dv.Y;
+            _vectorTemp1.X = _velocityBiasRev.X - _dv.X;
+            _vectorTemp1.Y = _velocityBiasRev.Y - _dv.Y;
 
             #endregion
 
@@ -344,14 +370,13 @@ namespace FarseerGames.FarseerPhysics.Dynamics.Joints
 
                 #region INLINE: _body1.ApplyAngularImpulse(ref _floatTemp1);
 
-                _body1.AngularVelocity += _floatTemp1 * _body1.inverseMomentOfInertia;
+                //_body1.AngularVelocity += _floatTemp1 * _body1.inverseMomentOfInertia;
 
                 #endregion
 
                 if (JointUpdated != null)
                     JointUpdated(this, _body1, _body2);
             }
-
         }
 
         #region PreStep variables

@@ -7,14 +7,16 @@ namespace Frenetic.Physics
 {
     public class FarseerPhysicsComponent : IPhysicsComponent
     {
+        public delegate IPhysicsComponent Factory(Vector2 size);
+
         public FarseerPhysicsComponent(Body body, Geom geom)
         {
             _body = body;
             _geom = geom;
 
-            _geom.FrictionCoefficient = 0.5f;
+            _geom.FrictionCoefficient = 1.1f;
 
-            _geom.OnCollision += new Geom.CollisionEventHandler((geom1, geom2, contactList) =>
+            _geom.OnCollision += new CollisionEventHandler((geom1, geom2, contactList) =>
                 {
                     CollidedWithWorld();
                     return true;
@@ -51,15 +53,9 @@ namespace Frenetic.Physics
             }
             set
             {
-                // We set all of the vertices individually (not having the factory at our disposal...)
-                for (int i = 0; i < _geom.LocalVertices.Count; i++)
-                {
-                    Vector2 vertex = _geom.LocalVertices[i];
-                    vertex.X = vertex.X / _geom.AABB.Width;
-                    vertex.Y = vertex.Y / _geom.AABB.Height;
-                    _geom.LocalVertices[i] = vertex * value;
-                }
-                _geom.ComputeCollisionGrid();
+                throw new NotImplementedException();
+                //_geom.SetVertices(Vertices.CreateSimpleRectangle(value.X, value.Y));
+                //_geom.SetBody(_body);
             }
         }
         public Vector2 LinearVelocity

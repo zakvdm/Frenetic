@@ -12,15 +12,12 @@ namespace Frenetic.Level
     {
         public delegate LevelPiece Factory(Vector2 position, Vector2 size);
 
-        public LevelPiece(Vector2 position, Vector2 size, IPhysicsComponent physicsComponent)
+        public LevelPiece(IPhysicsComponent physicsComponent)
         {
-            
             _physicsComponent = physicsComponent;
-            _physicsComponent.Position = position;
-            _physicsComponent.Size = size;
             _physicsComponent.IsStatic = true;
 
-            Random rnd = new Random();
+            Random rnd = new Random((int)(physicsComponent.Size.X + physicsComponent.Size.Y));
             Color = new Color((float)rnd.NextDouble(), (float)rnd.NextDouble(), (float)rnd.NextDouble());
         }
 

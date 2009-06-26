@@ -16,19 +16,14 @@ namespace UnitTestLibrary
         [Test]
         public void RequiresALevelPieceFactory()
         {
-            DumbLevelLoader dumbLevelLoader = new DumbLevelLoader(MakeLevelPiece);
+            DumbLevelLoader dumbLevelLoader = new DumbLevelLoader(LevelPieceHelper.MakeLevelPiece);
             Assert.IsNotNull(dumbLevelLoader);
-        }
-
-        private LevelPiece MakeLevelPiece(Vector2 position, Vector2 size)
-        {
-            return new LevelPiece(position, size, MockRepository.GenerateStub<IPhysicsComponent>());
         }
 
         [Test]
         public void LoadEmptyLevelTakesSizeAndFillsInEdges()
         {
-            DumbLevelLoader dumbLevelLoader = new DumbLevelLoader(MakeLevelPiece);
+            DumbLevelLoader dumbLevelLoader = new DumbLevelLoader(LevelPieceHelper.MakeLevelPiece);
             
             List<LevelPiece> levelPieces = new List<LevelPiece>();
 

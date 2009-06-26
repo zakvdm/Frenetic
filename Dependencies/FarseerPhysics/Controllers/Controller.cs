@@ -1,14 +1,17 @@
 using System;
+using FarseerGames.FarseerPhysics.Interfaces;
 
 namespace FarseerGames.FarseerPhysics.Controllers
 {
     /// <summary>
     /// Provides common functionality for controllers.
     /// </summary>
-    public abstract class Controller : IDisposable
+    public abstract class Controller : IIsDisposable
     {
+        /// <summary>
+        /// If false, this controller will not be processed/updated.
+        /// </summary>
         public bool Enabled = true;
-        public bool IsDisposed;
 
         /// <summary>
         /// Gets or sets the tag. The Tag can contain a custom object.
@@ -17,6 +20,19 @@ namespace FarseerGames.FarseerPhysics.Controllers
         public Object Tag { get; set; }
 
         #region IDisposable Members
+
+        private bool _isDisposed;
+
+        public bool IsDisposed
+        {
+            get { return _isDisposed; }
+            set { _isDisposed = value; }
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            IsDisposed = true;
+        }
 
         public void Dispose()
         {
@@ -34,23 +50,8 @@ namespace FarseerGames.FarseerPhysics.Controllers
         /// <summary>
         /// Updates this instance.
         /// </summary>
-        /// <param name="dt">The dt.</param>
-        public abstract void Update(float dt);
-
-        protected virtual void Dispose(bool disposing)
-        {
-            //subclasses can override incase they need to dispose of resources
-            //otherwise do nothing.
-            if (!IsDisposed)
-            {
-                if (disposing)
-                {
-                    //dispose managed resources 
-                }
-
-                //dispose unmanaged resources
-            }
-            IsDisposed = true;
-        }
+        /// <param name="dt">The time since last update.</param>
+        /// <param name="dtReal">The real time since last update.</param>
+        public abstract void Update(float dt, float dtReal);
     }
 }

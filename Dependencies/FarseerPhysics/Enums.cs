@@ -26,6 +26,12 @@ namespace FarseerGames.FarseerPhysics
     }
 #endif
 
+    public enum NarrowPhaseCollider
+    {
+        DistanceGrid,
+        SAT
+    }
+
     /// <summary>
     /// Determine the type of joint or spring used to link bodies, in the path generator.
     /// </summary>
@@ -100,5 +106,20 @@ namespace FarseerGames.FarseerPhysics
         /// Takes the minimum of the friction from the two geometries colliding.
         /// </summary>
         Minimum = 1
+    }
+
+    /// <summary>
+    /// Defines the type of gravity.
+    /// </summary>
+    public enum GravityType
+    {
+        /// <summary>
+        /// Gives the most realistic gravity.
+        /// </summary>
+        DistanceSquared,
+        /// <summary>
+        /// Not as realistic as DistanceSquared, but performs better when controlling a lot of bodies.
+        /// </summary>
+        Linear
     }
 }

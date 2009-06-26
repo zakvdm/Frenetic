@@ -1,18 +1,22 @@
+using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace FarseerGames.GettingStarted.DrawingSystem
+namespace FarseerGames.AdvancedSamplesXNA.DrawingSystem
 {
     public class CircleBrush
     {
         private Color _borderColor;
-        private Texture2D _circleTexture;
-        private Color _color = Color.Black;
+        private Color _color;
         private float _layer;
-        private int _radius = 5;
+        private int _radius;
+        private Texture2D _circleTexture;
+        private Vector2 _circleOrigin;
 
         public CircleBrush()
         {
+            _color = Color.White;
+            _borderColor = Color.Black;
         }
 
         public CircleBrush(int radius, Color color, Color borderColor)
@@ -48,15 +52,17 @@ namespace FarseerGames.GettingStarted.DrawingSystem
 
         public void Load(GraphicsDevice graphicsDevice)
         {
+            if (_radius == 0)
+                throw new ArgumentException("You need to set a radius before you can load the brush.", "radius");
+
             _circleTexture = DrawingHelper.CreateCircleTexture(graphicsDevice, _radius, _color, _borderColor);
+            _circleOrigin = new Vector2(_circleTexture.Width / 2f, _circleTexture.Height / 2f);
         }
 
         public void Draw(SpriteBatch spriteBatch, Vector2 position)
         {
             spriteBatch.Draw(_circleTexture, position, null, Color.White, 0,
-                             new Vector2(1 + _circleTexture.Width/2f, 1 + _circleTexture.Height/2), 1,
-                             SpriteEffects.None,
-                             _layer);
+                             _circleOrigin, 1, SpriteEffects.None, _layer);
         }
     }
 }
