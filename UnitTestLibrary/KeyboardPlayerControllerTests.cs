@@ -79,12 +79,14 @@ namespace UnitTestLibrary
         }   
 
         [Test]
-        public void PressingTheLeftMouseButtonGeneratesShotEvent()
+        public void PressingTheLeftMouseButtonCreatesPendingShotOnPlayer()
         {
             stubMouse.Stub(m => m.LeftButtonIsDown()).Return(true);
             stubCrosshair.Stub(c => c.WorldPosition).Return(Vector2.UnitX);
+
             kpc.Process(1);
-            stubPlayer.AssertWasCalled(p => p.Shoot(Vector2.UnitX));
+
+            Assert.AreEqual(Vector2.UnitX, stubPlayer.PendingShot);           
         }
 
         [Test]
@@ -92,17 +94,16 @@ namespace UnitTestLibrary
         {
             var lessThanShootDelay = KeyboardPlayerController.ShootTimer / 2;
             var moreThanShootDelay = KeyboardPlayerController.ShootTimer - (lessThanShootDelay / 3);
-            int callCount = 0;
             stubMouse.Stub(m => m.LeftButtonIsDown()).Return(true);
             stubCrosshair.Stub(c => c.WorldPosition).Return(Vector2.UnitX);
-            stubPlayer.Stub(p => p.Shoot(Vector2.UnitX)).Do(new Action<Vector2>((pos) => callCount++));
 
             kpc.Process(KeyboardPlayerController.ShootTimer);
-            Assert.AreEqual(1, callCount);
+            stubPlayer.PendingShot = Vector2.Zero;
+
             kpc.Process(lessThanShootDelay);
-            Assert.AreEqual(1, callCount);
+            Assert.AreEqual(Vector2.Zero, stubPlayer.PendingShot);
             kpc.Process(moreThanShootDelay);
-            Assert.AreEqual(2, callCount);
+            Assert.AreEqual(Vector2.UnitX, stubPlayer.PendingShot);
         }
 
         IPlayer stubPlayer;

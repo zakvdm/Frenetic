@@ -3,15 +3,20 @@ using Microsoft.Xna.Framework;
 
 namespace Frenetic.Weapons
 {
-    public class Shot
+    public struct Shot
     {
-        public Shot(Vector2 startPoint, Vector2 endPoint)
+        public Shot(Vector2 startPoint, Vector2 endPoint) : this()
         {
-            this.StartPoint = startPoint;
-            this.EndPoint = endPoint;
+            StartPoint = startPoint;
+            EndPoint = endPoint;
         }
 
-        public Vector2 StartPoint { get; private set; }
-        public Vector2 EndPoint { get; private set; }
+        //public Shot()
+        //{
+            // ONLY FOR XML SERIALIZATION!
+        //}
+
+        public Vector2 StartPoint { get; set; }
+        public Vector2 EndPoint { get; set; }
     }
 }

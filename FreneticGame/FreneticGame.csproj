@@ -99,12 +99,16 @@
     <Compile Include="Engine\EffectUpdater.cs" />
     <Compile Include="Engine\IGame.cs" />
     <Compile Include="Engine\ISettingsPersister.cs" />
+    <Compile Include="Engine\ITimer.cs" />
     <Compile Include="Engine\Quitter.cs" />
     <Compile Include="Engine\SettingsPersister.cs" />
+    <Compile Include="Engine\Timer.cs" />
     <Compile Include="Engine\TweakablePropertiesLoader.cs" />
     <Compile Include="Engine\XnaGame.cs" />
     <Compile Include="Gameplay\Player\INetworkPlayerProcessor.cs" />
     <Compile Include="Gameplay\Player\IPlayerSettings.cs" />
+    <Compile Include="Gameplay\Player\PlayerState.cs" />
+    <Compile Include="Gameplay\Player\PlayerUpdater.cs" />
     <Compile Include="Gameplay\Weapons\IRailGun.cs" />
     <Compile Include="Gameplay\Weapons\IRailGunView.cs" />
     <Compile Include="Gameplay\Weapons\RailGun.cs" />

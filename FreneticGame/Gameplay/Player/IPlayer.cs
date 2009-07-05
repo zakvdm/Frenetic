@@ -6,15 +6,17 @@ namespace Frenetic.Player
 {
     public interface IPlayer
     {
+        bool IsAlive { get; set; }
         Vector2 Position { get; set; }
 
         IRailGun CurrentWeapon { get; }
 
         void Update();
-        void AddWeapon(IRailGun railGun);
         bool Jump();
         void MoveLeft();
         void MoveRight();
         void Shoot(Vector2 targetPosition);
+
+        Vector2? PendingShot { get; set; }
     }
 }

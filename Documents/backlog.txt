@@ -60,21 +60,16 @@ DONE - Players/objects are not visible if they are in the "black" areas
 *****
 
 DONE - 8 - Basic visibility (All areas not directly visible from the current player position are black)
-
 DONE - 8 - Player settings are saved over multiple game sessions
+DONE - 20 - As the player, I can click on the screen and fire a railgun at the point where I click.
 
-ZAK - 20 - As the player, I can click on the screen and fire a railgun at the point where I click.
-	Player clicks somewhere on screen and client sends fire event to Server - 5 - 
-	Server calculates all hits and modifies all players that were hit - 3 -
-	Server sends fire event to ALL clients to draw - 5 - 
-	Server notifies all clients when a player has been "hit"; clients change colour of hit players - 5 -
-
+5 - Player death... DUM DUM DUM DUUUUH
 *****
 BUGS:
 1) When server dies, connected client has to shutdown gracefully
 2) When a client disconnects, we have to remove its associated physics objects (currently only removing it from PlayerView)
 3) PlayerSettings must be syncronized over network (currently they're not even sent by ChatLogSender (which also needs to be renamed))
-4) NetworkPlayerProcessor will have to also update the LocalClient state (like if the server sends new Health status, etc.)
+FIXED NetworkPlayerProcessor will have to also update the LocalClient state (like if the server sends new Health status, etc.)
 *****
 
 5 - Add some kind of logging framework (so we can start doing debug output, etc.)
@@ -83,7 +78,6 @@ BUGS:
 2 - Refactor Menu System: Change menu system to use same keyboard structure as game (this will allow the console to lock keyboard input during the menu stages)
 
 13 - I can bring down the console and type "connect 196.21.23.4" and connect to a game hosted somewhere on the internet.
-	
 
 40 - Games can be recorded and played back 
 	STEP 1:

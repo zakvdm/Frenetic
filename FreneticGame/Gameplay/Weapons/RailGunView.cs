@@ -6,6 +6,8 @@ namespace Frenetic.Weapons
 {
     public class RailGunView : IRailGunView
     {
+        public delegate IRailGunView Factory();
+
         public RailGunView(MercuryParticleEffect mercuryParticleEffect)
         {
             _particleEffect = mercuryParticleEffect;
@@ -23,6 +25,8 @@ namespace Frenetic.Weapons
 
                 Shot shot = railGun.Shots[shot_count - 1];
                 _particleEffect.Trigger(shot.StartPoint, shot.EndPoint);
+
+                Console.WriteLine("Drawing Railgun Shot");
             }
 
             _particleEffect.Draw(ref translationMatrix);

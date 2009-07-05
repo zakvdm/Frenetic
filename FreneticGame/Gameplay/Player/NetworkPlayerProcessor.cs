@@ -24,7 +24,31 @@ namespace Frenetic.Player
             // We can't just do a direct assignment (Player[player.ID] = player) here because we need the service objects (physics components, etc.) to remain in tact
             //      Unfortunately, this means that every time another property gets added to Player that needs to be network synced, it needs to be assigned here.
             //      It may very well be that there is a better solution here... after all, we really shouldn't be sending unnecessary info over the network...
-            player.Position = ((Player)netMsg.Data).Position;
+            var receivedPlayer = (IPlayer)netMsg.Data;
+            player.Position = receivedPlayer.Position;
+            player.PendingShot = receivedPlayer.PendingShot;
+        }
+        public void UpdatePlayerFromPlayerStateMessage(Message stateMessage)
+        {
+            Client client;
+            PlayerType playerType;
+
+            if (_clientStateTracker.LocalClient.ID == stateMessage.ClientID)
+            {
+                client = _clientStateTracker.LocalClient;
+                playerType = PlayerType.Local;
+            }
+            else
+            {
+                if (!IsValidClient(stateMessage.ClientID))
+                    return;
+
+                client = _clientStateTracker.FindNetworkClient(stateMessage.ClientID);
+                playerType = PlayerType.Network;
+            }
+
+            var playerState = (IPlayerState)stateMessage.Data;
+            playerState.RefreshPlayerValuesFromState(client.Player, playerType);
         }
 
         public void UpdatePlayerSettingsFromNetworkMessage(Message netMsg)
@@ -40,6 +64,10 @@ namespace Frenetic.Player
         {
             // We don't care about Clients who aren't currently connected...
             return (_clientStateTracker.FindNetworkClient(clientID) != null);
+        }
+
+        void UpdateLocalPlayer(Message stateMessage)
+        {
         }
 
         IClientStateTracker _clientStateTracker;

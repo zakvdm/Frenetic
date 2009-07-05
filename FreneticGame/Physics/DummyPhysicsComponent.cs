@@ -24,7 +24,10 @@ namespace Frenetic.Physics
         {
         }
 
-        public event CollidedWithWorldDelegate CollidedWithWorld = delegate { };
+        public void HitByWeapon() { }
+
+        public event Action CollidedWithWorld = delegate { };
+        public event Action OnShot = delegate { };
 
         #endregion
     }

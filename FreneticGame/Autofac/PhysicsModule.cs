@@ -39,11 +39,15 @@ namespace Frenetic.Autofac
                     else
                         size = new Vector2(20f, 30f);
 
+                    var simulator = c.Resolve<IPhysicsSimulator>().PhysicsSimulator;
+
                     var vertices = Vertices.CreateSimpleRectangle(size.X, size.Y);
-                    var body = BodyFactory.Instance.CreatePolygonBody(c.Resolve<IPhysicsSimulator>().PhysicsSimulator, vertices, 1000f);
-                    var geom = GeomFactory.Instance.CreateSATPolygonGeom(c.Resolve<IPhysicsSimulator>().PhysicsSimulator, body, vertices, 1)[0];
+                    var body = BodyFactory.Instance.CreatePolygonBody(simulator, vertices, 1000f);
+                    var geom = GeomFactory.Instance.CreateSATPolygonGeom(simulator, body, vertices, 1)[0];
 
                     body.MomentOfInertia = float.MaxValue;
+
+                    simulator.ProcessAddedAndRemoved();
 
                     return new FarseerPhysicsComponent(body, geom);
                 }).As<IPhysicsComponent>().FactoryScoped();

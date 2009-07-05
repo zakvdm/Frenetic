@@ -1,5 +1,6 @@
 ﻿using System;
 using Frenetic.Network;
+using Frenetic.Player;
 
 namespace Frenetic
 {
@@ -64,7 +65,8 @@ namespace Frenetic
 
         void SendPlayerToAllClients(Client client)
         {
-            _outgoingMessageQueue.Write(new Message() { ClientID = client.ID, Type = MessageType.Player, Data = client.Player });
+            IPlayerState state = new PlayerState(client.Player);
+            _outgoingMessageQueue.Write(new Message() { ClientID = client.ID, Type = MessageType.Player, Data = state });
         }
 
         IChatLogDiffer _chatLogDiffer;

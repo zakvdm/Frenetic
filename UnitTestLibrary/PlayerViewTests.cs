@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Frenetic.Player;
 using Frenetic.Weapons;
+using System.Collections.Generic;
 
 namespace UnitTestLibrary
 {
@@ -15,36 +16,42 @@ namespace UnitTestLibrary
     {
         ITexture stubTexture;
         ITextureBank<PlayerTexture> _stubTextureBank;
-        ISpriteBatch mockSpriteBatch;
+        ISpriteBatch stubSpriteBatch;
         ICamera stubCamera;
+        RailGunView.Factory railgunViewFactoryDelegate;
         IRailGunView stubRailGunView;
+        IPlayer player;
         PlayerView playerView;
         [SetUp]
         public void SetUp()
         {
-            
             stubTexture = MockRepository.GenerateStub<ITexture>();
             _stubTextureBank = MockRepository.GenerateStub<ITextureBank<PlayerTexture>>();
             _stubTextureBank.Stub(x => x[PlayerTexture.Ball]).Return(stubTexture);
-            mockSpriteBatch = MockRepository.GenerateMock<ISpriteBatch>();
+            stubSpriteBatch = MockRepository.GenerateStub<ISpriteBatch>();
             stubCamera = MockRepository.GenerateStub<ICamera>();
             stubRailGunView = MockRepository.GenerateStub<IRailGunView>();
-            playerView = new PlayerView(_stubTextureBank, mockSpriteBatch, stubCamera, stubRailGunView);
+            railgunViewFactoryDelegate = () => stubRailGunView;
+            player = MockRepository.GenerateStub<IPlayer>();
+            player.IsAlive = true;
+            playerView = new PlayerView(_stubTextureBank, stubSpriteBatch, stubCamera, railgunViewFactoryDelegate);
         }
 
         [Test]
-        public void CanAddPlayer()
+        public void AddPlayerAlsoAddsWeaponView()
         {
-            IPlayer player = MockRepository.GenerateStub<IPlayer>();
+            bool factoryWasUsed = false;
+            railgunViewFactoryDelegate = () => { factoryWasUsed = true; return stubRailGunView; };
+            playerView = new PlayerView(_stubTextureBank, stubSpriteBatch, stubCamera, railgunViewFactoryDelegate);
             playerView.AddPlayer(player, null);
 
             Assert.AreEqual(player, playerView.Players[0]);
+            Assert.IsTrue(factoryWasUsed);
         }
 
         [Test]
         public void CanRemovePlayer()
         {
-            IPlayer player = MockRepository.GenerateStub<IPlayer>();
             playerView.AddPlayer(player, MockRepository.GenerateStub<IPlayerSettings>());
 
             playerView.RemovePlayer(player);
@@ -55,20 +62,20 @@ namespace UnitTestLibrary
         [Test]
         public void DrawsEachPlayer()
         {
-            playerView.AddPlayer(MockRepository.GenerateStub<IPlayer>(), MockRepository.GenerateStub<IPlayerSettings>());
-            playerView.AddPlayer(MockRepository.GenerateStub<IPlayer>(), MockRepository.GenerateStub<IPlayerSettings>());
-            mockSpriteBatch.Expect(me => me.Draw(Arg<ITexture>.Is.Anything, Arg<Vector2>.Is.Anything, Arg<Rectangle>.Is.Anything, Arg<Color>.Is.Anything, Arg<float>.Is.Anything, Arg<Vector2>.Is.Anything, Arg<Vector2>.Is.Anything, Arg<SpriteEffects>.Is.Anything, Arg<float>.Is.Anything)).
-                                Repeat.Twice();
+            var player2 = MockRepository.GenerateStub<IPlayer>();
+            player2.IsAlive = true;
+            playerView.AddPlayer(player, MockRepository.GenerateStub<IPlayerSettings>());
+            playerView.AddPlayer(player2, MockRepository.GenerateStub<IPlayerSettings>());
 
             playerView.Generate();
 
-            mockSpriteBatch.VerifyAllExpectations();
+            stubSpriteBatch.AssertWasCalled(me => me.Draw(Arg<ITexture>.Is.Anything, Arg<Vector2>.Is.Anything, Arg<Rectangle>.Is.Anything, Arg<Color>.Is.Anything, Arg<float>.Is.Anything, Arg<Vector2>.Is.Anything, Arg<Vector2>.Is.Anything, Arg<SpriteEffects>.Is.Anything, Arg<float>.Is.Anything),
+                o => o.Repeat.Twice());
         }
 
         [Test]
         public void CallsDrawWithCorrectParameters()
         {
-            IPlayer player = new Player(null, null);
             IPlayerSettings settings = new NetworkPlayerSettings();
             settings.Texture = PlayerTexture.Ball;
             stubTexture.Stub(x => x.Width).Return(100);
@@ -78,27 +85,38 @@ namespace UnitTestLibrary
 
             playerView.Generate();
 
-            mockSpriteBatch.AssertWasCalled(x => x.Draw(Arg<ITexture>.Is.Equal(stubTexture), Arg<Vector2>.Is.Equal(new Vector2(1, 1)),
+            stubSpriteBatch.AssertWasCalled(x => x.Draw(Arg<ITexture>.Is.Equal(stubTexture), Arg<Vector2>.Is.Equal(new Vector2(1, 1)),
                 Arg<Rectangle>.Is.Equal(null), Arg<Color>.Is.Anything, Arg<float>.Is.Equal(0f),
                 Arg<Vector2>.Is.Equal(new Vector2(100 / 2f, 200 / 2f)),
                 Arg<Vector2>.Is.Equal(new Vector2(1, 1)), Arg<SpriteEffects>.Is.Equal(SpriteEffects.None), Arg<float>.Is.Equal(1f)));
-            mockSpriteBatch.AssertWasCalled(x => x.End());
+            stubSpriteBatch.AssertWasCalled(x => x.End());
         }
 
         [Test]
         public void UsesCameraCorrectly()
         {
-            IPlayer player = new Player(null, null);
             IPlayerSettings settings = new NetworkPlayerSettings();
             ICamera camera = new Camera(player, new Vector2(100, 100));
-            playerView = new PlayerView(_stubTextureBank, mockSpriteBatch, camera, MockRepository.GenerateStub<IRailGunView>());
+            playerView = new PlayerView(_stubTextureBank, stubSpriteBatch, camera, () => MockRepository.GenerateStub<IRailGunView>());
             playerView.AddPlayer(player, settings);
 
             playerView.Generate();
 
-            mockSpriteBatch.AssertWasCalled(x => x.Begin(Arg<Matrix>.Is.Equal(camera.TranslationMatrix)));
+            stubSpriteBatch.AssertWasCalled(x => x.Begin(Arg<Matrix>.Is.Equal(camera.TranslationMatrix)));
         }
 
+        [Test]
+        public void DoesntDrawDeadPlayer()
+        {
+            player.IsAlive = false;
+            playerView.AddPlayer(player, MockRepository.GenerateStub<IPlayerSettings>());
+
+            playerView.Generate();
+
+            stubSpriteBatch.AssertWasNotCalled(me => me.Draw(Arg<ITexture>.Is.Anything, Arg<Vector2>.Is.Anything, Arg<Rectangle>.Is.Anything, Arg<Color>.Is.Anything, Arg<float>.Is.Anything, Arg<Vector2>.Is.Anything, Arg<Vector2>.Is.Anything, Arg<SpriteEffects>.Is.Anything, Arg<float>.Is.Anything));
+        }
+
+        // WEAPON:
         [Test]
         public void DrawsPlayerWeapon()
         {
@@ -111,6 +129,26 @@ namespace UnitTestLibrary
             playerView.Generate();
 
             stubRailGunView.AssertWasCalled(me => me.Draw(railGun, Matrix.Identity));
+        }
+        [Test]
+        public void DrawsSeparateWeaponViewForEachPlayer()
+        {
+            var stubRailGunView1 = MockRepository.GenerateStub<IRailGunView>();
+            var stubRailGunView2 = MockRepository.GenerateStub<IRailGunView>();
+            Queue<IRailGunView> railgun_views = new Queue<IRailGunView>();
+            railgun_views.Enqueue(stubRailGunView1);
+            railgun_views.Enqueue(stubRailGunView2);
+            railgunViewFactoryDelegate = () => railgun_views.Dequeue();
+            playerView = new PlayerView(_stubTextureBank, stubSpriteBatch, stubCamera, railgunViewFactoryDelegate);
+            var player2 = MockRepository.GenerateStub<IPlayer>();
+            player2.IsAlive = true;
+            playerView.AddPlayer(player, MockRepository.GenerateStub<IPlayerSettings>());
+            playerView.AddPlayer(player2, MockRepository.GenerateStub<IPlayerSettings>());
+
+            playerView.Generate();
+
+            stubRailGunView2.AssertWasCalled(me => me.Draw(Arg<IRailGun>.Is.Anything, Arg<Matrix>.Is.Anything));
+            stubRailGunView1.AssertWasCalled(me => me.Draw(Arg<IRailGun>.Is.Anything, Arg<Matrix>.Is.Anything));
         }
     }
 }

@@ -28,6 +28,12 @@ namespace UnitTestLibrary
         }
 
         [Test]
+        public void AddsPhysicsComponentAsTagOnGeom()
+        {
+            Assert.AreEqual(farseerPComponent, geom.Tag as IPhysicsComponent);
+        }
+
+        [Test]
         public void CanGetAndSetPosition()
         {
             farseerPComponent.Position = new Vector2(100, 200);
@@ -70,6 +76,17 @@ namespace UnitTestLibrary
             farseerPComponent.ApplyForce(Vector2.UnitX);
 
             Assert.AreEqual(Vector2.UnitX, body.Force);
+        }
+
+        [Test]
+        public void RaisesEventWhenHitByWeapon()
+        {
+            bool raisedEvent = false;
+            farseerPComponent.OnShot += () => raisedEvent = true;
+
+            farseerPComponent.HitByWeapon();
+
+            Assert.IsTrue(raisedEvent);
         }
     }
 }

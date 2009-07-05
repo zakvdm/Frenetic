@@ -49,7 +49,7 @@ namespace UnitTestLibrary
             stubSnapCounter = MockRepository.GenerateStub<ISnapCounter>();
             stubNetworkPlayerProcessor = MockRepository.GenerateStub<INetworkPlayerProcessor>();
             serverLog = new Log<ChatMessage>();
-            client = new Client(new Player(null, null), new NetworkPlayerSettings());
+            client = new Client(MockRepository.GenerateStub<IPlayer>(), new NetworkPlayerSettings());
             clientInputProcessor = new ClientInputProcessor(stubNetworkPlayerProcessor, serverLog, stubClientStateTracker, stubChatLogDiffer, stubSnapCounter, stubIncomingMessageQueue);
         }
 
@@ -130,7 +130,7 @@ namespace UnitTestLibrary
         public void UpdatesPlayer()
         {
             stubClientStateTracker.Stub(x => x.FindNetworkClient(3)).Return(client);
-            Player receivedPlayer = new Player(null, null);
+            var receivedPlayer = MockRepository.GenerateStub<IPlayer>();
             receivedPlayer.Position = new Vector2(-31, -92);
             Message msg = new Message() { ClientID = 3, Type = MessageType.Player, Data = receivedPlayer };
             playerQueueMessageHelper.QueuedMessages.Enqueue(msg);

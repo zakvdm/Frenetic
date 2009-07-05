@@ -22,10 +22,35 @@ namespace UnitTestLibrary
         {
             gameSession = new GameSession();
             localClient = new LocalClient(MockRepository.GenerateStub<IPlayer>(), MockRepository.GenerateStub<LocalPlayerSettings>());
-            playerView = new PlayerView(null, null, null, null);
+            playerView = new PlayerView(null, null, null, () => null);
             clientFactoryDelegate = () => createdClient;
             clientFactory = new ClientSideClientFactory(clientFactoryDelegate, gameSession, playerView, localClient);
         }
+
+        [Test]
+        public void ServerSideFactoryAddsPlayersToPlayerUpdater()
+        {
+            PlayerUpdater updater = new PlayerUpdater();
+            ServerSideClientFactory serverClientFactory = new ServerSideClientFactory(clientFactoryDelegate, gameSession, updater);
+
+            Client newClient = serverClientFactory.MakeNewClient(300);
+
+            Assert.IsTrue(updater.Players.Contains(newClient.Player));
+            Assert.AreEqual(300, newClient.ID);
+        }
+        [Test]
+        public void ServerSideFactoryRemovesPlayerFromUpdaterWhenDeletingClient()
+        {
+            PlayerUpdater updater = new PlayerUpdater();
+            ServerSideClientFactory serverClientFactory = new ServerSideClientFactory(clientFactoryDelegate, gameSession, updater);
+
+            Client client = serverClientFactory.MakeNewClient(300);
+
+            serverClientFactory.DeleteClient(client);
+
+            Assert.AreEqual(0, updater.Players.Count);
+        }
+
         [Test]
         public void AddsAPlayerToThePlayerViewAndSetsID()
         {
@@ -58,7 +83,7 @@ namespace UnitTestLibrary
         [ExpectedException(typeof(NotImplementedException))]
         public void ServerSideFactoryCantCreateLocalClient()
         {
-            ServerSideClientFactory factory = new ServerSideClientFactory(null, null);
+            ServerSideClientFactory factory = new ServerSideClientFactory(null, null, null);
 
             factory.GetLocalClient();
         }

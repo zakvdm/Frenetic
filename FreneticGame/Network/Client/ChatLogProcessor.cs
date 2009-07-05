@@ -43,9 +43,9 @@ namespace Frenetic
             // update the players:
             while (_incomingMessageQueue.HasAvailable(MessageType.Player))
             {
-                Message netMsg = _incomingMessageQueue.ReadMessage(MessageType.Player);
+                Message stateMsg = _incomingMessageQueue.ReadMessage(MessageType.Player);
 
-                _networkPlayerProcessor.UpdatePlayerFromNetworkMessage(netMsg);
+                _networkPlayerProcessor.UpdatePlayerFromPlayerStateMessage(stateMsg);
             }
             // update the player settings:
             while (_incomingMessageQueue.HasAvailable(MessageType.PlayerSettings))

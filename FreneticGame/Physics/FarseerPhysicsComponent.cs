@@ -13,6 +13,7 @@ namespace Frenetic.Physics
         {
             _body = body;
             _geom = geom;
+            _geom.Tag = this;
 
             _geom.FrictionCoefficient = 1.1f;
 
@@ -20,9 +21,10 @@ namespace Frenetic.Physics
                 {
                     CollidedWithWorld();
                     return true;
-                }); 
+                });
         }
 
+        #region Properties
         public bool IsStatic
         {
             get
@@ -65,6 +67,7 @@ namespace Frenetic.Physics
                 return new Vector2(_body.LinearVelocity.X, _body.LinearVelocity.Y);
             }
         }
+        #endregion
 
         public void ApplyImpulse(Vector2 impulse)
         {
@@ -76,8 +79,13 @@ namespace Frenetic.Physics
             _body.ApplyForce(force);
         }
 
-        public event CollidedWithWorldDelegate CollidedWithWorld = delegate { };
-        
+        public void HitByWeapon()
+        {
+            OnShot();
+        }
+
+        public event Action OnShot = delegate { };
+        public event Action CollidedWithWorld = delegate { };
 
         Body _body;
         Geom _geom;

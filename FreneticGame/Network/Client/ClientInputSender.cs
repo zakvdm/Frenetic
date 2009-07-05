@@ -62,6 +62,8 @@ namespace Frenetic.Network
         void SendLocalPlayerAndPlayerSettings()
         {
             _outgoingMessageQueue.Write(new Message() { ClientID = _localClient.ID, Type = MessageType.Player, Data = _localClient.Player });
+            _localClient.Player.PendingShot = null; // Only want to send this once...
+
             _outgoingMessageQueue.Write(new Message() { ClientID = _localClient.ID, Type = MessageType.PlayerSettings, Data = _localClient.PlayerSettings });
         }
 

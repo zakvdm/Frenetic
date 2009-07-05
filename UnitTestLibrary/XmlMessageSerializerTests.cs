@@ -8,6 +8,9 @@ using System.IO;
 using Frenetic.Network;
 using Microsoft.Xna.Framework;
 using Frenetic.Player;
+using Rhino.Mocks;
+using Frenetic.Weapons;
+using System.Collections.Generic;
 namespace UnitTestLibrary
 {
     [TestFixture]
@@ -32,16 +35,33 @@ namespace UnitTestLibrary
         }
 
         [Test]
-        public void CanSerializeAndDeserializeAMessageWithPlayerAsData()
+        public void CanSerialiseAndDeserialisePlayerPosition()
         {
-            Player player = new Player(null, null);
-            player.Position = new Vector2(1, 2);
+            Player player = new Player(null, null, null, null);
+            player.Position = new Vector2(100, 200);
             Message msg = new Message() { Type = MessageType.Player, Data = player };
 
-            byte[] serializedMessage = serializer.Serialize(msg);
+            byte[] serializedMsg = serializer.Serialize(msg);
+            Player recoveredPlayer = (Player)(serializer.Deserialize(serializedMsg)).Data;
 
-            Message recoveredMessage = serializer.Deserialize(serializedMessage);
-            Assert.AreEqual(new Vector2(1, 2), ((Player)recoveredMessage.Data).Position);
+            Assert.AreEqual(player.Position, recoveredPlayer.Position);
+        }
+
+        [Test]
+        public void CanSerializeAndDeserializeAMessageWithPlayerState()
+        {
+            PlayerState state = new PlayerState();
+            state.Position = new Vector2(100, 200);
+            state.Shots = new List<Shot>();
+            state.Shots.Add(new Shot(Vector2.UnitY, Vector2.UnitX));
+            Message msg = new Message() { Type = MessageType.Player, Data = state };
+
+            byte[] serializedMessage = serializer.Serialize(msg);
+            PlayerState recoveredState = (PlayerState)(serializer.Deserialize(serializedMessage)).Data;
+
+            Assert.AreEqual(new Vector2(100, 200), recoveredState.Position);
+            Assert.AreEqual(1, recoveredState.Shots.Count);
+            Assert.AreEqual(new Shot(Vector2.UnitY, Vector2.UnitX), recoveredState.Shots[0]);
         }
 
         [Test]

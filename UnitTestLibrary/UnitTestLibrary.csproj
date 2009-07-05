@@ -104,12 +104,15 @@
     <Compile Include="ClientInputProcessorTests.cs" />
     <Compile Include="ClientInputSenderTests.cs" />
     <Compile Include="OutgoingMessageQueueTests.cs" />
+    <Compile Include="PlayerPacketsTests.cs" />
     <Compile Include="PlayerTextureBankTests.cs" />
+    <Compile Include="PlayerUpdaterTests.cs" />
     <Compile Include="PlayerViewTests.cs" />
     <Compile Include="QuitterTests.cs" />
     <Compile Include="RailGunTests.cs" />
     <Compile Include="SettingsPersisterTests.cs" />
     <Compile Include="SnapCounterTests.cs" />
+    <Compile Include="TimerTests.cs" />
     <Compile Include="TweakablePropertiesLoaderTests.cs" />
     <Compile Include="VisibilityViewTests.cs" />
     <Compile Include="WorldBoundaryColliderTests.cs" />

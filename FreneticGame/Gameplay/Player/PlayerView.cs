@@ -11,39 +11,43 @@ namespace Frenetic.Player
 {
     public class PlayerView : IView
     {
-        public PlayerView(ITextureBank<PlayerTexture> playerTextureBank, ISpriteBatch spriteBatch, ICamera camera, IRailGunView railGunView)
+        public PlayerView(ITextureBank<PlayerTexture> playerTextureBank, ISpriteBatch spriteBatch, ICamera camera, RailGunView.Factory railGunViewFactory)
         {
             _playerTextureBank = playerTextureBank;
             _spriteBatch = spriteBatch;
             _camera = camera;
-            _railGunView = railGunView;
+            _railGunViewFactory = railGunViewFactory;
         }
         #region IView Members
 
         public void Generate()
         {
-            foreach (KeyValuePair<IPlayer, IPlayerSettings> playerInfo in _players)
+            foreach (KeyValuePair<IPlayer, PlayerDrawInfo> playerInfo in _players)
             {
                 IPlayer player = playerInfo.Key;
-                IPlayerSettings playerSettings = playerInfo.Value;
+                IPlayerSettings playerSettings = playerInfo.Value.PlayerSettings;
+                IRailGunView weaponView = playerInfo.Value.WeaponView;
+
                 ITexture texture = _playerTextureBank[playerSettings.Texture];
 
                 if (_spriteBatch != null)
                 {
-                    _spriteBatch.Begin(_camera.TranslationMatrix);
-                    _spriteBatch.Draw(texture, player.Position, null, playerSettings.Color, 0f,
-                        new Vector2(texture.Width / 2f, texture.Height / 2f),
-                        new Vector2(1, 1),
-                        SpriteEffects.None, 1f);
-                    _spriteBatch.End();
+                    if (player.IsAlive)
+                    {
+                        _spriteBatch.Begin(_camera.TranslationMatrix);
+                        _spriteBatch.Draw(texture, player.Position, null, playerSettings.Color, 0f,
+                            new Vector2(texture.Width / 2f, texture.Height / 2f),
+                            new Vector2(1, 1),
+                            SpriteEffects.None, 1f);
+                        _spriteBatch.End();
+                    }
                 }
 
-                _railGunView.Draw(player.CurrentWeapon, _camera.TranslationMatrix);
+                weaponView.Draw(player.CurrentWeapon, _camera.TranslationMatrix);
             }
         }
 
         #endregion
-
 
         public List<IPlayer> Players
         {
@@ -55,7 +59,7 @@ namespace Frenetic.Player
 
         public void AddPlayer(IPlayer player, IPlayerSettings settings)
         {
-            _players.Add(player, settings);
+            _players.Add(player, new PlayerDrawInfo(settings, _railGunViewFactory()));
         }
 
         public void RemovePlayer(IPlayer player)
@@ -63,11 +67,23 @@ namespace Frenetic.Player
             _players.Remove(player);
         }
 
-        Dictionary<IPlayer, IPlayerSettings> _players = new Dictionary<IPlayer,IPlayerSettings>();
+        Dictionary<IPlayer, PlayerDrawInfo> _players = new Dictionary<IPlayer,PlayerDrawInfo>();
 
         ITextureBank<PlayerTexture> _playerTextureBank;
         ISpriteBatch _spriteBatch;
         ICamera _camera;
-        IRailGunView _railGunView;
+        RailGunView.Factory _railGunViewFactory;
+
+        class PlayerDrawInfo
+        {
+            public PlayerDrawInfo(IPlayerSettings settings, IRailGunView weaponView)
+            {
+                this.PlayerSettings = settings;
+                this.WeaponView = weaponView;
+            }
+
+            public IPlayerSettings PlayerSettings { get; set; }
+            public IRailGunView WeaponView { get; set; }
+        }
     }
 }

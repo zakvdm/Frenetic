@@ -6,10 +6,11 @@ namespace Frenetic.Network
 {
     public class ServerSideClientFactory : IClientFactory
     {
-        public ServerSideClientFactory(Client.Factory clientFactory, IGameSession gameSession)
+        public ServerSideClientFactory(Client.Factory clientFactory, IGameSession gameSession, PlayerUpdater playerUpdater)
         {
             _clientFactory = clientFactory;
             _gameSession = gameSession;
+            _playerUpdater = playerUpdater;
         }
 
         #region IClientFactory Members
@@ -18,6 +19,11 @@ namespace Frenetic.Network
         {
             Client client = _clientFactory();
             client.ID = ID;
+
+            if (_playerUpdater != null)
+            {
+                _playerUpdater.AddPlayer(client.Player);
+            }
 
             return client;
         }
@@ -29,19 +35,24 @@ namespace Frenetic.Network
 
         public virtual void DeleteClient(Client client)
         {
-            return;
+            if (_playerUpdater != null)
+            {
+                _playerUpdater.RemovePlayer(client.Player);
+            }
         }
 
         #endregion
 
         Client.Factory _clientFactory;
         protected IGameSession _gameSession;
+
+        PlayerUpdater _playerUpdater;
     }
 
     public class ClientSideClientFactory : ServerSideClientFactory
     {
         public ClientSideClientFactory(Client.Factory clientFactory, IGameSession gameSession, PlayerView playerView, LocalClient localClient)
-            : base(clientFactory, gameSession)
+            : base(clientFactory, gameSession, null)
         {
             _playerView = playerView;
             _localClient = localClient;

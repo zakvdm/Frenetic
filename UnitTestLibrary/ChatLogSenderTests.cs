@@ -7,6 +7,7 @@ using Lidgren.Network;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Frenetic.Player;
+using Frenetic.Weapons;
 
 namespace UnitTestLibrary
 {
@@ -107,16 +108,18 @@ namespace UnitTestLibrary
         }
 
         [Test]
-        public void SendsPlayerToAllClients()
+        public void SendsPlayerStateToAllClients()
         {
             Client client = new Client(null, null) { ID = 7 };
-            client.Player = new Player(null, null) { Position = new Vector2(100, 200) };
+            client.Player = MockRepository.GenerateStub<IPlayer>();
+            client.Player.Position = new Vector2(100, 200);
+            client.Player.Stub(me => me.CurrentWeapon).Return(new RailGun(null));
             stubClientStateTracker.NetworkClients.Add(client);
             stubSnapCounter.CurrentSnap = 3;
 
             serverChatLogView.Generate();
 
-            stubOutgoingMessageQueue.AssertWasCalled(x => x.Write(Arg<Message>.Matches(y => y.Type == MessageType.Player && y.ClientID == 7 && ((Player)y.Data).Position == new Vector2(100, 200))));
+            stubOutgoingMessageQueue.AssertWasCalled(x => x.Write(Arg<Message>.Matches(y => y.Type == MessageType.Player && y.ClientID == 7 && ((IPlayerState)y.Data).Position == new Vector2(100, 200))));
         }
     }
 }

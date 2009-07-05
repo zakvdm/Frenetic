@@ -49,8 +49,7 @@ namespace Frenetic.Player
 
             if (Mouse.LeftButtonIsDown() && CanShoot(TotalElapsedTime))
             {
-                Console.WriteLine(Crosshair.ViewPosition);
-                Player.Shoot(Crosshair.WorldPosition);
+                Player.PendingShot = Crosshair.WorldPosition;
                 LastShootTime = TotalElapsedTime;
             }
 

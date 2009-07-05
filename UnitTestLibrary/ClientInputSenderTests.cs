@@ -12,7 +12,7 @@ namespace UnitTestLibrary
     [TestFixture]
     public class ClientInputSenderTests
     {
-        IOutgoingMessageQueue mockOutgoingMessageQueue;
+        IOutgoingMessageQueue stubOutgoingMessageQueue;
         LocalClient client;
         ISnapCounter stubSnapCounter;
         MessageConsole console;
@@ -21,39 +21,36 @@ namespace UnitTestLibrary
         [SetUp]
         public void SetUp()
         {
-            mockOutgoingMessageQueue = MockRepository.GenerateMock<IOutgoingMessageQueue>();
+            stubOutgoingMessageQueue = MockRepository.GenerateStub<IOutgoingMessageQueue>();
             stubSnapCounter = MockRepository.GenerateStub<ISnapCounter>();
             stubSnapCounter.CurrentSnap = 3;
             console = new MessageConsole(null, new Log<ChatMessage>());
-            client = new LocalClient(new Player(null, null), new LocalPlayerSettings()) { ID = 9 };
-            clientInputSender = new ClientInputSender(client, console, stubSnapCounter, mockOutgoingMessageQueue); 
+            client = new LocalClient(MockRepository.GenerateStub<IPlayer>(), new LocalPlayerSettings()) { ID = 9 };
+            clientInputSender = new ClientInputSender(client, console, stubSnapCounter, stubOutgoingMessageQueue); 
         }
 
         [Test]
         public void DoesNothingWhenClientIDIsZero()
         {
             client.ID = 0;
-            mockOutgoingMessageQueue.Expect(x => x.Write(Arg<Message>.Is.Anything)).Repeat.Never();
 
             clientInputSender.Generate();
 
-            mockOutgoingMessageQueue.VerifyAllExpectations();
+            stubOutgoingMessageQueue.AssertWasNotCalled(me => me.Write(Arg<Message>.Is.Anything));
         }
 
         [Test]
-        public void OnlySendsOncePerSnap()
+        public void ChecksForANewSnapBeforeSending()
         {
-            stubSnapCounter.CurrentSnap = 2;
-            clientInputSender.Generate(); // Send at current snap...
+            stubSnapCounter.CurrentSnap = 0;
 
-            // Arrange:
-            mockOutgoingMessageQueue.Expect(x => x.Write(Arg<Message>.Is.Anything)).Repeat.Never(); // Once for ClientSnap and once for ServerSnap, but NO MORE!
+            clientInputSender.Generate();
+            stubOutgoingMessageQueue.AssertWasNotCalled(me => me.Write(Arg<Message>.Is.Anything));
+            stubSnapCounter.CurrentSnap = 2;
             
-            // Action:
             clientInputSender.Generate();
 
-            // Assert:
-            mockOutgoingMessageQueue.VerifyAllExpectations();
+            stubOutgoingMessageQueue.AssertWasCalled(me => me.Write(Arg<Message>.Is.Anything), o => o.Repeat.AtLeastOnce());
         }
 
         [Test]
@@ -63,7 +60,7 @@ namespace UnitTestLibrary
 
             clientInputSender.Generate();
 
-            mockOutgoingMessageQueue.AssertWasCalled(x => x.Write(Arg<Message>.Matches(y => y.ClientID == 9 && y.Type == MessageType.ClientSnap && (int)y.Data == 99)));
+            stubOutgoingMessageQueue.AssertWasCalled(x => x.Write(Arg<Message>.Matches(y => y.ClientID == 9 && y.Type == MessageType.ClientSnap && (int)y.Data == 99)));
         }
 
         [Test]
@@ -73,22 +70,19 @@ namespace UnitTestLibrary
 
             clientInputSender.Generate();
 
-            mockOutgoingMessageQueue.AssertWasCalled(x => x.Write(Arg<Message>.Matches(y => y.ClientID == 9 && y.Type == MessageType.ServerSnap && (int)y.Data == 33)));
+            stubOutgoingMessageQueue.AssertWasCalled(x => x.Write(Arg<Message>.Matches(y => y.ClientID == 9 && y.Type == MessageType.ServerSnap && (int)y.Data == 33)));
         }
 
         [Test]
         public void SendsChatLogMessages()
         {
             // Arrange:
-            mockOutgoingMessageQueue.Expect(x => x.Write(Arg<Message>.Matches(y => y.ClientID == 9 && y.Type == MessageType.ChatLog && ((ChatMessage)y.Data).Message == "new message 2"))).Repeat.Twice();
-            mockOutgoingMessageQueue.Expect(x => x.Write(Arg<Message>.Matches(y => y.ClientID == 9 && y.Type == MessageType.ChatLog && ((ChatMessage)y.Data).Message == "new message 3"))).Repeat.Once();
-
-            // Action:
             client.LastClientSnap = 23; // Set last acknowledged client snap
             stubSnapCounter.CurrentSnap = 20;
             console.ProcessInput("new message 1"); // Won't be sent
             clientInputSender.Generate();
 
+            // Action:
             stubSnapCounter.CurrentSnap = 40;
             console.ProcessInput("new message 2");  // Will be sent (40 > 23)
             clientInputSender.Generate();
@@ -98,7 +92,8 @@ namespace UnitTestLibrary
             clientInputSender.Generate();
 
             // Assert:
-            mockOutgoingMessageQueue.VerifyAllExpectations();
+            stubOutgoingMessageQueue.AssertWasCalled(me => me.Write(Arg<Message>.Matches(y => y.ClientID == 9 && y.Type == MessageType.ChatLog && ((ChatMessage)y.Data).Message == "new message 2")), o => o.Repeat.Twice());
+            stubOutgoingMessageQueue.AssertWasCalled(me => me.Write(Arg<Message>.Matches(y => y.ClientID == 9 && y.Type == MessageType.ChatLog && ((ChatMessage)y.Data).Message == "new message 3")), o => o.Repeat.Once());
         }
 
         [Test]
@@ -110,39 +105,41 @@ namespace UnitTestLibrary
             console.ProcessInput("hello");
             clientInputSender.Generate();
             stubSnapCounter.CurrentSnap = 8;
-            mockOutgoingMessageQueue.Expect(x => x.Write(Arg<Message>.Matches(y => y.Type == MessageType.ChatLog && ((ChatMessage)y.Data).Snap == 7))).Repeat.Once();
 
             // Action:
-            clientInputSender.Generate();
+            clientInputSender.Generate(); // Even though we're at snap 8, the snap on the chat message should still be '7'
 
             // Assert:
-            mockOutgoingMessageQueue.VerifyAllExpectations();
+            stubOutgoingMessageQueue.AssertWasCalled(x => x.Write(Arg<Message>.Matches(y => y.Type == MessageType.ChatLog && ((ChatMessage)y.Data).Snap == 7)), o => o.Repeat.Twice());
         }
 
         [Test]
         public void SendsLocalPlayer()
         {
-            Player player = new Player(null, null);
-            player.Position = new Vector2(100, 200);
-            client.Player = player;
-            mockOutgoingMessageQueue.Expect(x => x.Write(Arg<Message>.Matches(y => y.Type == MessageType.Player && ((Player)y.Data).Position == new Vector2(100, 200)))).Repeat.Once();
+            client.Player.Position = new Vector2(100, 200);
 
             clientInputSender.Generate();
 
-            mockOutgoingMessageQueue.VerifyAllExpectations();
+            stubOutgoingMessageQueue.AssertWasCalled(x => x.Write(Arg<Message>.Matches(y => y.Type == MessageType.Player && ((IPlayer)y.Data).Position == new Vector2(100, 200))));
+        }
+        [Test]
+        public void OnlySendsPendingShotOnce()
+        {
+            client.Player.PendingShot = new Vector2(10, 20);
+
+            clientInputSender.Generate();
+
+            Assert.IsNull(client.Player.PendingShot);
         }
 
         [Test]
         public void SendsLocalPlayerSettings()
         {
-            LocalPlayerSettings playerSettings = new LocalPlayerSettings();
-            playerSettings.Name = "zak";
-            client.PlayerSettings = playerSettings;
-            mockOutgoingMessageQueue.Expect(x => x.Write(Arg<Message>.Matches(y => y.Type == MessageType.PlayerSettings && ((LocalPlayerSettings)y.Data).Name == "zak"))).Repeat.Once();
+            client.PlayerSettings.Name = "zak";
 
             clientInputSender.Generate();
 
-            mockOutgoingMessageQueue.VerifyAllExpectations();
+            stubOutgoingMessageQueue.AssertWasCalled(x => x.Write(Arg<Message>.Matches(y => y.Type == MessageType.PlayerSettings && ((LocalPlayerSettings)y.Data).Name == "zak")));
         }
     }
 }

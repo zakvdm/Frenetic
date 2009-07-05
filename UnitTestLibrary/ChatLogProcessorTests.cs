@@ -109,13 +109,13 @@ namespace UnitTestLibrary
         public void UpdatesPlayer()
         {
             stubClientStateTracker.Stub(x => x.FindNetworkClient(3)).Return(client);
-            Player receivedPlayer = new Player(null, null);
-            Message msg = new Message() { ClientID = 3, Type = MessageType.Player, Data = receivedPlayer };
+            var receivedState = MockRepository.GenerateStub<IPlayerState>();
+            Message msg = new Message() { ClientID = 3, Type = MessageType.Player, Data = receivedState };
             playerQueueMessageHelper.QueuedMessages.Enqueue(msg);
 
             chatLogProcessor.Process(1);
 
-            stubNetworkPlayerProcessor.AssertWasCalled(me => me.UpdatePlayerFromNetworkMessage(Arg<Message>.Is.Equal(msg)));
+            stubNetworkPlayerProcessor.AssertWasCalled(me => me.UpdatePlayerFromPlayerStateMessage(Arg<Message>.Is.Equal(msg)));
         }
 
         [Test]

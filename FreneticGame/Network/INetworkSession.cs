@@ -4,6 +4,7 @@ using Lidgren.Network;
 using Frenetic.Network.Lidgren;
 using System.Xml.Serialization;
 using Frenetic.Player;
+using Frenetic.Weapons;
 
 namespace Frenetic.Network
 {
@@ -41,8 +42,9 @@ namespace Frenetic.Network
         public bool IsLocalClient { get; private set; }
     }
 
-    
+   
     [XmlInclude(typeof(Frenetic.Player.Player))]
+    [XmlInclude(typeof(PlayerState))]
     [XmlInclude(typeof(NetworkPlayerSettings))]
     [XmlInclude(typeof(LocalPlayerSettings))]
     [XmlInclude(typeof(ChatMessage))]

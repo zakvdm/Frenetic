@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework;
 using ProjectMercury.Emitters;
 using Microsoft.Xna.Framework.Content;
 using Frenetic.Graphics;
+using Autofac;
 
 namespace Frenetic.Autofac
 {
@@ -40,7 +41,8 @@ namespace Frenetic.Autofac
 
             // WEAPONS:
             builder.Register<RailGun>().As<IRailGun>().FactoryScoped();
-            builder.Register<RailGunView>().As<IRailGunView>().ContainerScoped();
+            builder.Register<RailGunView>().As<IRailGunView>().FactoryScoped();
+            builder.RegisterGeneratedFactory<RailGunView.Factory>(new TypedService(typeof(IRailGunView)));
         }
     }
 }

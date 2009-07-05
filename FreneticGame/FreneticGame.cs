@@ -21,6 +21,7 @@ using Frenetic.UserInput;
 using Frenetic.Player;
 using System.Windows.Forms;
 using Frenetic.Weapons;
+using Frenetic.Engine;
 
 namespace Frenetic
 {
@@ -177,6 +178,8 @@ namespace Frenetic
             #region Engine
             builder.Register<Quitter>().SingletonScoped();
             builder.Register<SettingsPersister>().As<ISettingsPersister>().SingletonScoped();
+
+            builder.Register<Frenetic.Engine.Timer>().As<ITimer>().ContainerScoped();
             #endregion
 
             #region Menus
@@ -231,6 +234,7 @@ namespace Frenetic
             #endregion
 
             #region Player
+            builder.Register<PlayerUpdater>().ContainerScoped();
             builder.Register<NetworkPlayerSettings>().As<IPlayerSettings>().FactoryScoped();
             builder.Register<LocalPlayerSettings>().SingletonScoped();
             builder.Register<Frenetic.Player.Player>().As<IPlayer>().FactoryScoped();

@@ -19,6 +19,7 @@ using Frenetic.Autofac;
 using Frenetic.UserInput;
 using Frenetic.Player;
 using Frenetic.Weapons;
+using Frenetic.Engine;
 
 namespace Frenetic
 {
@@ -61,11 +62,16 @@ namespace Frenetic
 
             IGameSession gameSession = ServerContainer.Resolve<IGameSession>();
 
+            //gameSession.Controllers.Add(ServerContainer.Resolve<PhysicsController>());
+
             GameSessionController gameSessionController = ServerContainer.Resolve<GameSessionController>();
             GameSessionView gameSessionView = ServerContainer.Resolve<GameSessionView>();
 
+            gameSession.Controllers.Add(ServerContainer.Resolve<PlayerUpdater>());
+
             SnapCounter snapCounter = (SnapCounter)ServerContainer.Resolve<ISnapCounter>();
             gameSession.Controllers.Add(snapCounter);
+            gameSession.Controllers.Add(ServerContainer.Resolve<ITimer>());
 
             Log<ChatMessage> serverLog = ServerContainer.Resolve<Log<ChatMessage>>();
             IChatLogDiffer chatLogDiffer = ServerContainer.Resolve<IChatLogDiffer>(new TypedParameter(typeof(Log<ChatMessage>), serverLog));
@@ -116,13 +122,11 @@ namespace Frenetic
             GameSessionView gameSessionView = ClientContainer.Resolve<GameSessionView>();
 
 
-
             // THINGS TO SYNC OVER NETWORK:
             Log<ChatMessage> chatLog = _parentContainer.Resolve<IMessageConsole>().Log;
             gameSession.Controllers.Add(ClientContainer.Resolve<ChatLogProcessor>(new TypedParameter(typeof(Log<ChatMessage>), chatLog), new TypedParameter(typeof(IIncomingMessageQueue), incomingMessageQueue)));
             gameSession.Views.Add(ClientContainer.Resolve<ClientInputSender>(new TypedParameter(typeof(Log<ChatMessage>), chatLog)));
             // ****************************
-
 
             return new GameSessionControllerAndView(gameSession, gameSessionController, gameSessionView);
         }
@@ -148,8 +152,6 @@ namespace Frenetic
 
             gameSession.Controllers.Add(ClientContainer.Resolve<EffectUpdater>());
 
-            localPlayer.AddWeapon(ClientContainer.Resolve<IRailGun>());
-
             gameSession.Views.Add(ClientContainer.Resolve<PlayerView>()); // PlayerView must draw before VisibilityView (so players are underneath blackness!)
             gameSession.Views.Add(ClientContainer.Resolve<VisibilityView>(new TypedParameter(typeof(IPlayer), localPlayer)));
 
@@ -162,8 +164,6 @@ namespace Frenetic
 
             // TEMP CODE:
             // *********************************************************************************
-            //gameSession.Controllers.Add(ClientContainer.Resolve<DumbRayCasterTestController>());
-
             // DEBUG VIEW:  // TODO: Write a controller for this...
             // TODO: Instantiate with Autofac
             IPhysicsSimulator physicsSimulator = ClientContainer.Resolve<IPhysicsSimulator>();

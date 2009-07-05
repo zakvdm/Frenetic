@@ -19,13 +19,16 @@ namespace UnitTestLibrary
         IClientStateTracker clientStateTracker;
         NetworkPlayerProcessor networkPlayerController;
         Client client;
+        Client localClient;
         
         [SetUp]
         public void SetUp()
         {
-            client = new Client(new Player(null, null), new NetworkPlayerSettings()) { ID = 10 };
+            client = new Client(MockRepository.GenerateStub<IPlayer>(), new NetworkPlayerSettings()) { ID = 10 };
+            localClient = new Client(MockRepository.GenerateStub<IPlayer>(), new LocalPlayerSettings()) { ID = 99 };
             clientStateTracker = MockRepository.GenerateStub<IClientStateTracker>();
             clientStateTracker.Stub(me => me.FindNetworkClient(10)).Return(client);
+            clientStateTracker.Stub(me => me.LocalClient).Return(localClient);
             clientStateTracker.Stub(me => me.NetworkClients).Return(new List<Client>() { client });
             networkPlayerController = new NetworkPlayerProcessor(clientStateTracker);
         }
@@ -33,15 +36,14 @@ namespace UnitTestLibrary
         [Test]
         public void HandlesNonExistentClientIDWithoutComplaining()
         {
-            networkPlayerController.UpdatePlayerFromNetworkMessage(new Message() { ClientID = 11, Type = MessageType.Player, Data = new Player(null, null) });
+            networkPlayerController.UpdatePlayerFromNetworkMessage(new Message() { ClientID = 11, Type = MessageType.Player, Data = MockRepository.GenerateStub<IPlayer>() });
             networkPlayerController.UpdatePlayerSettingsFromNetworkMessage(new Message() { ClientID = 11, Type = MessageType.PlayerSettings, Data = MockRepository.GenerateStub<IPlayerSettings>() });
         }
-
 
         [Test]
         public void UpdatesPositionBasedOnMessage()
         {
-            Player receivedPlayer = new Player(null, null);
+            var receivedPlayer = MockRepository.GenerateStub<IPlayer>();
             receivedPlayer.Position = new Vector2(100, 200);
             clientStateTracker.FindNetworkClient(10).Player.Position = Vector2.Zero;
 
@@ -49,7 +51,44 @@ namespace UnitTestLibrary
 
             Assert.AreEqual(new Vector2(100, 200), clientStateTracker.FindNetworkClient(10).Player.Position);
         }
+        [Test]
+        public void UpdatesPendingShotBasedOnMessage()
+        {
+            var receivedPlayer = MockRepository.GenerateStub<IPlayer>();
+            receivedPlayer.PendingShot = Vector2.One;
 
+            networkPlayerController.UpdatePlayerFromNetworkMessage(new Message() { ClientID = 10, Type = MessageType.Player, Data = receivedPlayer });
+
+            Assert.AreEqual(Vector2.One, clientStateTracker.FindNetworkClient(10).Player.PendingShot);
+        }
+
+        // PlayerState
+        [Test]
+        public void UpdatePlayerFromPlayerStateMessageWorksCorrectly()
+        {
+            var stubPlayerState = MockRepository.GenerateStub<IPlayerState>();
+            stubPlayerState.Position = new Vector2(1, 2);
+            stubPlayerState.Shots = new List<Frenetic.Weapons.Shot>();
+            stubPlayerState.Shots.Add(new Frenetic.Weapons.Shot());
+
+            networkPlayerController.UpdatePlayerFromPlayerStateMessage(new Message() { ClientID = 10, Type = MessageType.Player, Data = stubPlayerState });
+
+            stubPlayerState.AssertWasCalled(me => me.RefreshPlayerValuesFromState(clientStateTracker.FindNetworkClient(10).Player, PlayerType.Network));
+        }
+        [Test]
+        public void DifferentiatesBetweenNetworkAndLocalPlayer()
+        {
+            var stubPlayerState = MockRepository.GenerateStub<IPlayerState>();
+            stubPlayerState.Position = new Vector2(1, 2);
+            stubPlayerState.Shots = new List<Frenetic.Weapons.Shot>();
+            stubPlayerState.Shots.Add(new Frenetic.Weapons.Shot());
+
+            networkPlayerController.UpdatePlayerFromPlayerStateMessage(new Message() { ClientID = 99, Type = MessageType.Player, Data = stubPlayerState });
+
+            stubPlayerState.AssertWasCalled(me => me.RefreshPlayerValuesFromState(localClient.Player, PlayerType.Local));
+        }
+
+        // PlayerSettings
         [Test]
         public void UpdatesPlayerSettingsBasedOnMessage()
         {
