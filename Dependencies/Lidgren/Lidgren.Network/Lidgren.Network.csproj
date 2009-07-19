@@ -71,10 +71,7 @@
     <Compile Include="NetEnums.cs" />
     <Compile Include="NetEventArgs.cs" />
     <Compile Include="NetException.cs" />
-<<<<<<< HEAD:Dependencies/Lidgren/Lidgren.Network/Lidgren.Network.csproj
-=======
     <Compile Include="NetFrequencyCounter.cs" />
->>>>>>> 263647c02aff249bff2ca1f850b5466e3ca9caf2:Dependencies/Lidgren/Lidgren.Network/Lidgren.Network.csproj
     <Compile Include="NetMessage.cs" />
     <Compile Include="NetPeer.cs" />
     <Compile Include="NetQueue.cs" />
@@ -92,8 +89,4 @@
   <Target Name="AfterBuild">
   </Target>
   -->
-<<<<<<< HEAD:Dependencies/Lidgren/Lidgren.Network/Lidgren.Network.csproj
 </Project>
-=======
-</Project>
->>>>>>> 263647c02aff249bff2ca1f850b5466e3ca9caf2:Dependencies/Lidgren/Lidgren.Network/Lidgren.Network.csproj
