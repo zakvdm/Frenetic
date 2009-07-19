@@ -25,7 +25,7 @@ namespace UnitTestLibrary
             queueMH = new QueuedMessageHelper<Message>();
             stubNS = MockRepository.GenerateStub<INetworkSession>();
             stubClientStateTracker = MockRepository.GenerateStub<IClientStateTracker>();
-            client = new Client(null, null) { ID = 100 };
+            client = new Client(null) { ID = 100 };
             stubClientStateTracker.Stub(me => me.FindNetworkClient(100)).Return(client);
 
             mq = new IncomingMessageQueue(stubNS, stubClientStateTracker);
@@ -92,7 +92,7 @@ namespace UnitTestLibrary
         {
             queueMH.QueuedMessages.Enqueue(new Message() { Type = MessageType.PlayerSettings, ClientID = 300, Data = 4 });
             stubNS.Stub(me => me.ReadMessage()).Do(queueMH.GetNextQueuedMessage);
-            stubClientStateTracker.Stub(me => me.LocalClient).Return(new LocalClient(null, null) { ID = 300 });
+            stubClientStateTracker.Stub(me => me.LocalClient).Return(new LocalClient(null) { ID = 300 });
 
             Assert.IsTrue(mq.HasAvailable(MessageType.PlayerSettings));
         }

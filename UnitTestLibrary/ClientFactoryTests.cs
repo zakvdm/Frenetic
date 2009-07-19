@@ -4,98 +4,86 @@ using NUnit.Framework;
 using Frenetic;
 using Frenetic.Player;
 using Rhino.Mocks;
+using Frenetic.Weapons;
+using System.Collections.Generic;
 
 namespace UnitTestLibrary
 {
     [TestFixture]
     public class ClientFactoryTest
     {
-        GameSession gameSession;
+        List<IPlayer> playerList;
         ClientSideClientFactory clientFactory;
         LocalClient localClient;
         Client.Factory clientFactoryDelegate;
-        PlayerView playerView;
-        Client createdClient = new Client(MockRepository.GenerateStub<IPlayer>(), MockRepository.GenerateStub<IPlayerSettings>());
+        Client createdClient = new Client(MockRepository.GenerateStub<IPlayer>());
         
         [SetUp]
         public void SetUp()
         {
-            gameSession = new GameSession();
-            localClient = new LocalClient(MockRepository.GenerateStub<IPlayer>(), MockRepository.GenerateStub<LocalPlayerSettings>());
-            playerView = new PlayerView(null, null, null, () => null);
+            playerList = new List<IPlayer>();
+            localClient = new LocalClient(MockRepository.GenerateStub<IPlayer>());
             clientFactoryDelegate = () => createdClient;
-            clientFactory = new ClientSideClientFactory(clientFactoryDelegate, gameSession, playerView, localClient);
+            clientFactory = new ClientSideClientFactory(clientFactoryDelegate, playerList, localClient);
         }
 
         [Test]
-        public void ServerSideFactoryAddsPlayersToPlayerUpdater()
+        public void ServerSideFactoryAddsPlayersToPlayerList()
         {
-            PlayerUpdater updater = new PlayerUpdater();
-            ServerSideClientFactory serverClientFactory = new ServerSideClientFactory(clientFactoryDelegate, gameSession, updater);
+            ServerSideClientFactory serverClientFactory = new ServerSideClientFactory(clientFactoryDelegate, playerList);
 
             Client newClient = serverClientFactory.MakeNewClient(300);
 
-            Assert.IsTrue(updater.Players.Contains(newClient.Player));
+            Assert.IsTrue(playerList.Contains(newClient.Player));
             Assert.AreEqual(300, newClient.ID);
         }
         [Test]
-        public void ServerSideFactoryRemovesPlayerFromUpdaterWhenDeletingClient()
+        public void ServerSideFactoryRemovesPlayerFromPlayerListWhenDeletingClient()
         {
-            PlayerUpdater updater = new PlayerUpdater();
-            ServerSideClientFactory serverClientFactory = new ServerSideClientFactory(clientFactoryDelegate, gameSession, updater);
-
+            ServerSideClientFactory serverClientFactory = new ServerSideClientFactory(clientFactoryDelegate, playerList);
             Client client = serverClientFactory.MakeNewClient(300);
 
             serverClientFactory.DeleteClient(client);
 
-            Assert.AreEqual(0, updater.Players.Count);
+            Assert.AreEqual(0, playerList.Count);
         }
 
         [Test]
-        public void AddsAPlayerToThePlayerViewAndSetsID()
-        {
-            Client newClient = clientFactory.MakeNewClient(100);
-
-            Assert.IsTrue(playerView.Players.Contains(newClient.Player));
-            Assert.AreEqual(100, newClient.ID);
-        }
-
-        [Test]
-        public void AddsAViewForLocalClient()
+        public void AddsLocalClientToPlayerList()
         {
             clientFactory.GetLocalClient();
 
             Assert.AreEqual(localClient, clientFactory.GetLocalClient());
-            Assert.AreEqual(1, playerView.Players.Count);
-            Assert.IsTrue(playerView.Players.Contains(localClient.Player));
+            Assert.AreEqual(1, playerList.Count);
+            Assert.IsTrue(playerList.Contains(localClient.Player));
         }
 
         [Test]
-        public void OnlyAddsViewForLocalClientOnce()
+        public void OnlyAddsPlayerForLocalClientOnce()
         {
             clientFactory.GetLocalClient();
             clientFactory.GetLocalClient();
 
-            Assert.AreEqual(1, playerView.Players.Count);
+            Assert.AreEqual(1, playerList.Count);
         }
 
         [Test]
         [ExpectedException(typeof(NotImplementedException))]
         public void ServerSideFactoryCantCreateLocalClient()
         {
-            ServerSideClientFactory factory = new ServerSideClientFactory(null, null, null);
+            ServerSideClientFactory factory = new ServerSideClientFactory(null, new List<IPlayer>());
 
             factory.GetLocalClient();
         }
 
         [Test]
-        public void RemovesViewWhenDeletingClient()
+        public void RemovesPlayerFromPlayerListWhenDeletingClientOnClientSide()
         {
             Client client = clientFactory.MakeNewClient(200);
 
             clientFactory.DeleteClient(client);
 
-            Assert.AreEqual(0, playerView.Players.Count);
+            Assert.AreEqual(0, playerList.Count);
         }
     }
 

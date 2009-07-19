@@ -49,7 +49,8 @@ namespace UnitTestLibrary
             stubSnapCounter = MockRepository.GenerateStub<ISnapCounter>();
             stubNetworkPlayerProcessor = MockRepository.GenerateStub<INetworkPlayerProcessor>();
             serverLog = new Log<ChatMessage>();
-            client = new Client(MockRepository.GenerateStub<IPlayer>(), new NetworkPlayerSettings());
+            client = new Client(MockRepository.GenerateStub<IPlayer>());
+            client.Player.Stub(me => me.PlayerSettings).Return(MockRepository.GenerateStub<IPlayerSettings>());
             clientInputProcessor = new ClientInputProcessor(stubNetworkPlayerProcessor, serverLog, stubClientStateTracker, stubChatLogDiffer, stubSnapCounter, stubIncomingMessageQueue);
         }
 
@@ -103,7 +104,7 @@ namespace UnitTestLibrary
         [Test]
         public void AddsClientNameToNewChatMessages()
         {
-            client.PlayerSettings.Name = "terence";
+            client.Player.PlayerSettings.Name = "terence";
             stubClientStateTracker.Stub(x => x.FindNetworkClient(1)).Return(client);
             stubChatLogDiffer.Stub(x => x.IsNewClientChatMessage(Arg<ChatMessage>.Is.Anything)).Return(true);
             chatLogQueueMessageHelper.QueuedMessages.Enqueue(new Message() { ClientID = 1, Type = MessageType.ChatLog, Data = new ChatMessage() { Message = "I am AWESOME" } });

@@ -37,7 +37,7 @@ namespace UnitTestLibrary
         [Test]
         public void CanSerialiseAndDeserialisePlayerPosition()
         {
-            Player player = new Player(null, null, null, null);
+            Player player = new Player(null, null, null, null, null);
             player.Position = new Vector2(100, 200);
             Message msg = new Message() { Type = MessageType.Player, Data = player };
 
@@ -54,6 +54,7 @@ namespace UnitTestLibrary
             state.Position = new Vector2(100, 200);
             state.Shots = new List<Shot>();
             state.Shots.Add(new Shot(Vector2.UnitY, Vector2.UnitX));
+            state.Score = new Frenetic.Gameplay.PlayerScore() { Deaths = 3, Kills = 4 };
             Message msg = new Message() { Type = MessageType.Player, Data = state };
 
             byte[] serializedMessage = serializer.Serialize(msg);
@@ -62,6 +63,8 @@ namespace UnitTestLibrary
             Assert.AreEqual(new Vector2(100, 200), recoveredState.Position);
             Assert.AreEqual(1, recoveredState.Shots.Count);
             Assert.AreEqual(new Shot(Vector2.UnitY, Vector2.UnitX), recoveredState.Shots[0]);
+            Assert.AreEqual(4, recoveredState.Score.Kills);
+            Assert.AreEqual(3, recoveredState.Score.Deaths);
         }
 
         [Test]

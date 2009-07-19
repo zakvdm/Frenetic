@@ -5,14 +5,18 @@ using Frenetic.Physics;
 using FarseerGames.FarseerPhysics.Dynamics;
 using Frenetic.Weapons;
 using Frenetic.Engine;
+using Frenetic.Gameplay;
 
 namespace Frenetic.Player
 {
     [Serializable()]
     public class Player : IPlayer
     {
-        public Player(IPhysicsComponent physicsComponent, IBoundaryCollider boundaryCollider, IRailGun weapon, ITimer timer)
+        public Player(IPlayerSettings playerSettings, IPhysicsComponent physicsComponent, IBoundaryCollider boundaryCollider, IRailGun weapon, ITimer timer)
         {
+            this.PlayerSettings = playerSettings;
+            this.PlayerScore = new PlayerScore();
+
             if (physicsComponent == null)
                 _physicsComponent = new DummyPhysicsComponent();
             else
@@ -22,6 +26,8 @@ namespace Frenetic.Player
             _physicsComponent.OnShot += () =>
                 {
                     IsAlive = false;
+                    OnDeath();  // TODO: Do i really need this event? (currently used by nothing?)
+                    this.PlayerScore.Deaths += 1;
                     timer.AddActionTimer(2f, () => this.IsAlive = true);
                     return;
                 };
@@ -37,6 +43,8 @@ namespace Frenetic.Player
         {
             _physicsComponent = new DummyPhysicsComponent();
         } // For XmlSerializer
+
+        public IPlayerSettings PlayerSettings { get; private set; }
 
         public bool IsAlive { get; set; }
         public Vector2 Position
@@ -55,6 +63,8 @@ namespace Frenetic.Player
         {
             get { return _weapon; }
         }
+
+        public PlayerScore PlayerScore { get; private set; }
 
         public void Update()
         {
@@ -94,6 +104,8 @@ namespace Frenetic.Player
         {
             _weapon.Shoot(this.Position, targetPosition);
         }
+
+        public event Action OnDeath = delegate { };
 
         public Vector2? PendingShot { get; set; }
 

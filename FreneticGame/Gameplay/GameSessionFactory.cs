@@ -20,6 +20,7 @@ using Frenetic.UserInput;
 using Frenetic.Player;
 using Frenetic.Weapons;
 using Frenetic.Engine;
+using Frenetic.Gameplay.HUD;
 
 namespace Frenetic
 {
@@ -56,13 +57,10 @@ namespace Frenetic
             serverNetworkSession.Create(14242);
             // *****************************************
 
-
             // Server needs a new PhysicsSimulator (can't use the client's... -- NOTE: the parameter value is irrelevant, all that matters is that it exists...)
             var simulator = ServerContainer.Resolve<IPhysicsSimulator>(new NamedParameter("isServer", true));
 
             IGameSession gameSession = ServerContainer.Resolve<IGameSession>();
-
-            //gameSession.Controllers.Add(ServerContainer.Resolve<PhysicsController>());
 
             GameSessionController gameSessionController = ServerContainer.Resolve<GameSessionController>();
             GameSessionView gameSessionView = ServerContainer.Resolve<GameSessionView>();
@@ -77,10 +75,9 @@ namespace Frenetic
             IChatLogDiffer chatLogDiffer = ServerContainer.Resolve<IChatLogDiffer>(new TypedParameter(typeof(Log<ChatMessage>), serverLog));
 
             // THINGS TO SYNC OVER NETWORK:
-            gameSession.Views.Add(ServerContainer.Resolve<ChatLogSender>(new TypedParameter(typeof(Log<ChatMessage>), serverLog)));
+            gameSession.Views.Add(ServerContainer.Resolve<GameStateSender>(new TypedParameter(typeof(Log<ChatMessage>), serverLog)));
             gameSession.Controllers.Add(ServerContainer.Resolve<ClientInputProcessor>(new TypedParameter(typeof(Log<ChatMessage>), serverLog)));
             // ****************************
-
 
             return new GameSessionControllerAndView(gameSession, gameSessionController, gameSessionView);
         }
@@ -117,6 +114,9 @@ namespace Frenetic
             ILevel level = ClientContainer.Resolve<ILevel>();
             gameSession.Controllers.Add(ClientContainer.Resolve<LevelController>(new TypedParameter(typeof(ILevel), level)));
 
+            gameSession.Views.Add(ClientContainer.Resolve<HudOverlaySetView>());
+            gameSession.Controllers.Add(ClientContainer.Resolve<HudController>());
+
             GameSessionController gameSessionController = ClientContainer.Resolve<GameSessionController>(
                 new TypedParameter(typeof(bool), false));
             GameSessionView gameSessionView = ClientContainer.Resolve<GameSessionView>();
@@ -124,7 +124,7 @@ namespace Frenetic
 
             // THINGS TO SYNC OVER NETWORK:
             Log<ChatMessage> chatLog = _parentContainer.Resolve<IMessageConsole>().Log;
-            gameSession.Controllers.Add(ClientContainer.Resolve<ChatLogProcessor>(new TypedParameter(typeof(Log<ChatMessage>), chatLog), new TypedParameter(typeof(IIncomingMessageQueue), incomingMessageQueue)));
+            gameSession.Controllers.Add(ClientContainer.Resolve<GameStateProcessor>(new TypedParameter(typeof(Log<ChatMessage>), chatLog), new TypedParameter(typeof(IIncomingMessageQueue), incomingMessageQueue)));
             gameSession.Views.Add(ClientContainer.Resolve<ClientInputSender>(new TypedParameter(typeof(Log<ChatMessage>), chatLog)));
             // ****************************
 
@@ -135,8 +135,8 @@ namespace Frenetic
         private IPlayer CreateClientComponents(IGameSession gameSession)
         {
             // Make local player:
-            LocalClient localClient = ClientContainer.Resolve<LocalClient>();
-            IPlayer localPlayer = localClient.Player;
+            IPlayer localPlayer = ClientContainer.Resolve<IPlayer>(new TypedParameter(typeof(IPlayerSettings), ClientContainer.Resolve<LocalPlayerSettings>()));
+            var localClient = ClientContainer.Resolve<LocalClient>(new TypedParameter(typeof(IPlayer), localPlayer));
 
             gameSession.Controllers.Add(ClientContainer.Resolve<PhysicsController>());
             ILevel level = ClientContainer.Resolve<ILevel>();

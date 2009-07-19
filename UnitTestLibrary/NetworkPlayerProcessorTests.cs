@@ -24,8 +24,8 @@ namespace UnitTestLibrary
         [SetUp]
         public void SetUp()
         {
-            client = new Client(MockRepository.GenerateStub<IPlayer>(), new NetworkPlayerSettings()) { ID = 10 };
-            localClient = new Client(MockRepository.GenerateStub<IPlayer>(), new LocalPlayerSettings()) { ID = 99 };
+            client = new Client(MockRepository.GenerateStub<IPlayer>()) { ID = 10 };
+            localClient = new Client(MockRepository.GenerateStub<IPlayer>()) { ID = 99 };
             clientStateTracker = MockRepository.GenerateStub<IClientStateTracker>();
             clientStateTracker.Stub(me => me.FindNetworkClient(10)).Return(client);
             clientStateTracker.Stub(me => me.LocalClient).Return(localClient);
@@ -93,11 +93,12 @@ namespace UnitTestLibrary
         public void UpdatesPlayerSettingsBasedOnMessage()
         {
             NetworkPlayerSettings receivedPlayerSettings = new NetworkPlayerSettings() { Name = "Test Name" };
-            client.PlayerSettings.Name = "Nom de Plume";
+            client.Player.Stub(me => me.PlayerSettings).Return(MockRepository.GenerateStub<IPlayerSettings>());
+            client.Player.PlayerSettings.Name = "Nom de Plume";
 
             networkPlayerController.UpdatePlayerSettingsFromNetworkMessage(new Message() { ClientID = 10, Type = MessageType.PlayerSettings, Data = receivedPlayerSettings });
 
-            Assert.AreEqual("Test Name", clientStateTracker.FindNetworkClient(10).PlayerSettings.Name);
+            Assert.AreEqual("Test Name", clientStateTracker.FindNetworkClient(10).Player.PlayerSettings.Name);
         }
     }
 }

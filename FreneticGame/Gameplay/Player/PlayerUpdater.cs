@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
+using Frenetic.Gameplay;
 
 namespace Frenetic.Player
 {
     public class PlayerUpdater : IController
     {
-        public PlayerUpdater()
+        public PlayerUpdater(List<IPlayer> playerList)
         {
-            Players = new List<IPlayer>();
+            Players = playerList;
         }
         
         #region IController Members
@@ -28,15 +29,6 @@ namespace Frenetic.Player
 
         #endregion
 
-        public void AddPlayer(IPlayer player)
-        {
-            Players.Add(player);
-        }
-        public void RemovePlayer(IPlayer player)
-        {
-            Players.Remove(player);
-        }
         public List<IPlayer> Players { get; private set; }
-
     }
 }

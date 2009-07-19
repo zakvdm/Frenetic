@@ -62,7 +62,7 @@ namespace Frenetic.Network
         {
             ChatMessage chatMsg = (ChatMessage)netMsg.Data;
 
-            chatMsg.ClientName = _clientStateTracker.FindNetworkClient(netMsg.ClientID).PlayerSettings.Name;
+            chatMsg.ClientName = _clientStateTracker.FindNetworkClient(netMsg.ClientID).Player.PlayerSettings.Name;
 
             // Before we add this message to the server log, let's check that we haven't already added it
             if (_chatLogDiffer.IsNewClientChatMessage(chatMsg))

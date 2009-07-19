@@ -19,6 +19,7 @@ namespace UnitTestLibrary
     public class PlayerTests
     {
         Frenetic.Player.Player player;
+        IPlayerSettings stubPlayerSettings;
         IPhysicsComponent stubPhysicsComponent;
         IBoundaryCollider stubBoundaryCollider;
         ITimer stubTimer;
@@ -26,10 +27,11 @@ namespace UnitTestLibrary
         [SetUp]
         public void SetUp()
         {
+            stubPlayerSettings = MockRepository.GenerateStub<IPlayerSettings>();
             stubPhysicsComponent = MockRepository.GenerateStub<IPhysicsComponent>();
             stubBoundaryCollider = MockRepository.GenerateStub<IBoundaryCollider>();
             stubTimer = MockRepository.GenerateStub<ITimer>();
-            player = new Frenetic.Player.Player(stubPhysicsComponent, stubBoundaryCollider, MockRepository.GenerateStub<IRailGun>(), stubTimer);
+            player = new Frenetic.Player.Player(stubPlayerSettings, stubPhysicsComponent, stubBoundaryCollider, MockRepository.GenerateStub<IRailGun>(), stubTimer);
         }
 
         [Test]
@@ -55,6 +57,16 @@ namespace UnitTestLibrary
             player.Update();
 
             stubBoundaryCollider.AssertWasCalled(x => x.MoveWithinBoundary(Arg<Vector2>.Is.Equal(player.Position)));
+        }
+
+        [Test]
+        public void CanUpdatePlayerScore()
+        {
+            player.PlayerScore.Deaths += 3;
+            player.PlayerScore.Kills += 1000;
+
+            Assert.AreEqual(3, player.PlayerScore.Deaths);
+            Assert.AreEqual(1000, player.PlayerScore.Kills);
         }
 
         // MOVEMENT:
@@ -122,11 +134,15 @@ namespace UnitTestLibrary
         [Test]
         public void GettingShotKillsThePlayer()
         {
+            bool raisedOnDeath = false;
             Assert.IsTrue(player.IsAlive);
+            player.OnDeath += () => raisedOnDeath = !raisedOnDeath;
 
             stubPhysicsComponent.Raise(me => me.OnShot += null);
 
             Assert.IsFalse(player.IsAlive);
+            Assert.IsTrue(raisedOnDeath);
+            Assert.AreEqual(1, player.PlayerScore.Deaths);
         }
         [Test]
         public void SetsRespawnTimerOnDead()

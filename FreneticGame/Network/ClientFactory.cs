@@ -1,16 +1,18 @@
 ﻿using System;
 
 using Frenetic.Player;
+using System.Collections.Generic;
 
 namespace Frenetic.Network
 {
     public class ServerSideClientFactory : IClientFactory
     {
-        public ServerSideClientFactory(Client.Factory clientFactory, IGameSession gameSession, PlayerUpdater playerUpdater)
+        public ServerSideClientFactory(Client.Factory clientFactory, List<IPlayer> playerList)
         {
+            _playerList = playerList;
             _clientFactory = clientFactory;
-            _gameSession = gameSession;
-            _playerUpdater = playerUpdater;
+
+            _playerList.Clear();
         }
 
         #region IClientFactory Members
@@ -20,10 +22,7 @@ namespace Frenetic.Network
             Client client = _clientFactory();
             client.ID = ID;
 
-            if (_playerUpdater != null)
-            {
-                _playerUpdater.AddPlayer(client.Player);
-            }
+            _playerList.Add(client.Player);
 
             return client;
         }
@@ -35,26 +34,20 @@ namespace Frenetic.Network
 
         public virtual void DeleteClient(Client client)
         {
-            if (_playerUpdater != null)
-            {
-                _playerUpdater.RemovePlayer(client.Player);
-            }
+            _playerList.Remove(client.Player);
         }
 
         #endregion
 
+        protected List<IPlayer> _playerList;
         Client.Factory _clientFactory;
-        protected IGameSession _gameSession;
-
-        PlayerUpdater _playerUpdater;
     }
 
     public class ClientSideClientFactory : ServerSideClientFactory
     {
-        public ClientSideClientFactory(Client.Factory clientFactory, IGameSession gameSession, PlayerView playerView, LocalClient localClient)
-            : base(clientFactory, gameSession, null)
+        public ClientSideClientFactory(Client.Factory clientFactory, List<IPlayer> playerList, LocalClient localClient)
+            : base(clientFactory, playerList)
         {
-            _playerView = playerView;
             _localClient = localClient;
         }
 
@@ -62,29 +55,19 @@ namespace Frenetic.Network
         {
             Client client = base.MakeNewClient(ID);
 
-            _playerView.AddPlayer(client.Player, client.PlayerSettings);
-
             return client;
         }
 
         public override LocalClient GetLocalClient()
         {
-            if (!_playerView.Players.Contains(_localClient.Player))
+            if (!_playerList.Contains(_localClient.Player))
             {
-                _playerView.AddPlayer(_localClient.Player, _localClient.PlayerSettings);
+                _playerList.Add(_localClient.Player);
             }
 
             return _localClient;
         }
 
-        public override void DeleteClient(Client client)
-        {
-            base.DeleteClient(client);
-
-            _playerView.RemovePlayer(client.Player);
-        }
-
         LocalClient _localClient;
-        PlayerView _playerView;
     }
 }

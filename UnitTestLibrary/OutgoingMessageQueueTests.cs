@@ -65,7 +65,7 @@ namespace UnitTestLibrary
         {
             var stubServerNetworkSession = MockRepository.GenerateStub<IServerNetworkSession>();
             Message msg = new Message() { Type = MessageType.ChatLog, Data = 3 };
-            Client client = new Client(null, null) { LastServerSnap = 1, ID = 20 };
+            Client client = new Client(null) { LastServerSnap = 1, ID = 20 };
             OutgoingMessageQueue outgoingMessageQueue = new OutgoingMessageQueue(null, stubServerNetworkSession);
 
             outgoingMessageQueue.WriteFor(msg, client);

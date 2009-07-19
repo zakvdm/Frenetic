@@ -25,7 +25,7 @@ namespace UnitTestLibrary
             stubSnapCounter = MockRepository.GenerateStub<ISnapCounter>();
             stubSnapCounter.CurrentSnap = 3;
             console = new MessageConsole(null, new Log<ChatMessage>());
-            client = new LocalClient(MockRepository.GenerateStub<IPlayer>(), new LocalPlayerSettings()) { ID = 9 };
+            client = new LocalClient(MockRepository.GenerateStub<IPlayer>()) { ID = 9 };
             clientInputSender = new ClientInputSender(client, console, stubSnapCounter, stubOutgoingMessageQueue); 
         }
 
@@ -135,7 +135,8 @@ namespace UnitTestLibrary
         [Test]
         public void SendsLocalPlayerSettings()
         {
-            client.PlayerSettings.Name = "zak";
+            client.Player.Stub(me => me.PlayerSettings).Return(new LocalPlayerSettings());
+            client.Player.PlayerSettings.Name = "zak";
 
             clientInputSender.Generate();
 

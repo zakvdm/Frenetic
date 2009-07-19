@@ -4,41 +4,57 @@ using Frenetic;
 using Rhino.Mocks;
 using Microsoft.Xna.Framework.Input;
 using Frenetic.UserInput;
+using Frenetic.Engine.Overlay;
 
 namespace UnitTestLibrary
 {
     [TestFixture]
     public class ConsoleControllerTests
     {
+        InputLine inputLine;
         ICommandConsole stubCommandConsole;
         IMessageConsole stubMessageConsole;
+        IOverlayView stubInputView;
+        IOverlayView stubCommandConsoleView;
+        IOverlayView stubMessageConsoleView;
+        IOverlayView stubPossibleCommandsView;
         IKeyboard stubKeyboard;
         ConsoleController consoleController;
         [SetUp]
         public void SetUp()
         {
+            inputLine = new InputLine();
             stubCommandConsole = MockRepository.GenerateStub<ICommandConsole>();
             stubMessageConsole = MockRepository.GenerateStub<IMessageConsole>();
+            stubInputView = MockRepository.GenerateStub<IOverlayView>();
+            stubCommandConsoleView = MockRepository.GenerateStub<IOverlayView>();
+            stubMessageConsoleView = MockRepository.GenerateStub<IOverlayView>();
+            stubPossibleCommandsView = MockRepository.GenerateStub<IOverlayView>();
             stubKeyboard = MockRepository.GenerateStub<IKeyboard>();
 
-            consoleController = new ConsoleController(stubCommandConsole, stubMessageConsole, stubKeyboard);
+            consoleController = new ConsoleController(inputLine, stubCommandConsole, stubMessageConsole, stubInputView, stubCommandConsoleView, stubMessageConsoleView, stubPossibleCommandsView, stubKeyboard);
         }
 
         [Test]
-        public void TildeActivatesConsoles()
+        public void TildeActivatesHudViews()
         {
             stubKeyboard.Stub(x => x.IsKeyDown(Keys.OemTilde)).Return(true);
             stubCommandConsole.Active = false;
             stubMessageConsole.Active = false;
+            stubInputView.Visible = false;
 
             consoleController.Process(1);
 
             Assert.IsTrue(stubCommandConsole.Active);
             Assert.IsTrue(stubMessageConsole.Active);
+            Assert.IsTrue(stubInputView.Visible);
+            Assert.IsTrue(stubCommandConsoleView.Visible);
+            Assert.IsTrue(stubMessageConsoleView.Visible);
+            Assert.IsTrue(stubPossibleCommandsView.Visible);
         }
 
         [Test]
-        public void TildeTogglesConsolesOnAndOff()
+        public void TildeTogglesHudViewsOnAndOff()
         {
             stubKeyboard.Stub(x => x.IsKeyDown(Keys.OemTilde)).Return(true);
             stubCommandConsole.Active = false;
@@ -48,7 +64,6 @@ namespace UnitTestLibrary
             consoleController.Process(1);   // Back to INACTIVE
 
             Assert.IsFalse(stubCommandConsole.Active);
-            Assert.IsFalse(stubMessageConsole.Active);
         }
 
         [Test]
@@ -62,7 +77,6 @@ namespace UnitTestLibrary
             consoleController.Process(1); 
 
             Assert.IsFalse(stubCommandConsole.Active);
-            Assert.IsFalse(stubMessageConsole.Active);
         }
 
         [Test]
@@ -102,7 +116,6 @@ namespace UnitTestLibrary
         {
             stubKeyboard.Stub(x => x.IsKeyDown(Keys.OemTilde)).Return(true);
             stubCommandConsole.Active = true;
-            ConsoleController consoleController = new ConsoleController(stubCommandConsole, stubMessageConsole, stubKeyboard);
 
             consoleController.Process(1);
 
@@ -114,15 +127,15 @@ namespace UnitTestLibrary
         {
             stubKeyboard.Stub(x => x.IsKeyDown(Keys.A)).Return(true);
             stubCommandConsole.Active = true;
-            Assert.AreEqual("", consoleController.CurrentInput);
+            Assert.AreEqual("", inputLine.CurrentInput);
 
             consoleController.Process(1);
 
-            Assert.AreEqual("a", consoleController.CurrentInput);
+            Assert.AreEqual("a", inputLine.CurrentInput);
 
             consoleController.Process(1);
 
-            Assert.AreEqual("aa", consoleController.CurrentInput);
+            Assert.AreEqual("aa", inputLine.CurrentInput);
         }
 
         [Test]
@@ -130,16 +143,16 @@ namespace UnitTestLibrary
         {
             stubKeyboard.Stub(x => x.IsKeyDown(Keys.B)).Return(true);
             stubCommandConsole.Active = true;
-            Assert.AreEqual("", consoleController.CurrentInput);
+            Assert.AreEqual("", inputLine.CurrentInput);
 
             consoleController.Process(1);
 
-            Assert.AreEqual("b", consoleController.CurrentInput);
+            Assert.AreEqual("b", inputLine.CurrentInput);
 
             stubKeyboard.Stub(x => x.WasKeyDown(Keys.B)).Return(true);
             consoleController.Process(1);
 
-            Assert.AreEqual("b", consoleController.CurrentInput);
+            Assert.AreEqual("b", inputLine.CurrentInput);
         }
 
         // Process Input:
@@ -148,7 +161,7 @@ namespace UnitTestLibrary
         {
             stubCommandConsole.Active = true;
             stubKeyboard.Stub(x => x.IsKeyDown(Keys.Enter)).Return(true);
-            consoleController.CurrentInput = "/hello";
+            inputLine.CurrentInput = "/hello";
 
             consoleController.Process(1);
 
@@ -159,7 +172,7 @@ namespace UnitTestLibrary
         {
             stubMessageConsole.Active = true;
             stubKeyboard.Stub(x => x.IsKeyDown(Keys.Enter)).Return(true);
-            consoleController.CurrentInput = "hello";
+            inputLine.CurrentInput = "hello";
 
             consoleController.Process(1);
 
@@ -170,11 +183,11 @@ namespace UnitTestLibrary
         {
             stubCommandConsole.Active = true;
             stubKeyboard.Stub(x => x.IsKeyDown(Keys.Enter)).Return(true);
-            consoleController.CurrentInput = "tmp";
+            inputLine.CurrentInput = "tmp";
 
             consoleController.Process(1);
 
-            Assert.AreEqual("", consoleController.CurrentInput);
+            Assert.AreEqual("", inputLine.CurrentInput);
         }
 
         [Test]
@@ -186,7 +199,7 @@ namespace UnitTestLibrary
 
             consoleController.Process(1);
 
-            Assert.AreEqual("C", consoleController.CurrentInput);
+            Assert.AreEqual("C", inputLine.CurrentInput);
         }
 
         [Test]
@@ -197,7 +210,7 @@ namespace UnitTestLibrary
 
             consoleController.Process(1);
 
-            Assert.AreEqual("1", consoleController.CurrentInput);
+            Assert.AreEqual("1", inputLine.CurrentInput);
         }
 
         [Test]
@@ -208,7 +221,7 @@ namespace UnitTestLibrary
 
             consoleController.Process(1);
 
-            Assert.AreEqual("6", consoleController.CurrentInput);
+            Assert.AreEqual("6", inputLine.CurrentInput);
         }
 
         [Test]
@@ -219,19 +232,19 @@ namespace UnitTestLibrary
 
             consoleController.Process(1);
 
-            Assert.AreEqual(" ", consoleController.CurrentInput);
+            Assert.AreEqual(" ", inputLine.CurrentInput);
         }
 
         [Test]
         public void CanUseBackspace()
         {
             stubCommandConsole.Active = true;
-            consoleController.CurrentInput = "smelly";
+            inputLine.CurrentInput = "smelly";
             stubKeyboard.Stub(x => x.IsKeyDown(Keys.Back)).Return(true);
 
             consoleController.Process(1);
 
-            Assert.AreEqual("smell", consoleController.CurrentInput);
+            Assert.AreEqual("smell", inputLine.CurrentInput);
         }
 
         [Test]
@@ -239,11 +252,11 @@ namespace UnitTestLibrary
         {
             stubCommandConsole.Active = true;
             stubKeyboard.Stub(x => x.IsKeyDown(Keys.Back)).Return(true);
-            consoleController.CurrentInput = "";
+            inputLine.CurrentInput = "";
 
             consoleController.Process(1);
 
-            Assert.AreEqual("", consoleController.CurrentInput);
+            Assert.AreEqual("", inputLine.CurrentInput);
         }
 
         [Test]
@@ -251,7 +264,7 @@ namespace UnitTestLibrary
         {
             stubCommandConsole.Active = true;
             stubKeyboard.Stub(x => x.IsKeyDown(Keys.Tab)).Return(true);
-            consoleController.CurrentInput = "";
+            inputLine.CurrentInput = "";
 
             consoleController.Process(1);
 
@@ -267,7 +280,7 @@ namespace UnitTestLibrary
 
             consoleController.Process(1);
 
-            Assert.AreEqual("/yo", consoleController.CurrentInput);
+            Assert.AreEqual("/yo", inputLine.CurrentInput);
         }
     }
 }

@@ -82,8 +82,9 @@
     <Compile Include="ClientFactoryTests.cs" />
     <Compile Include="ClientStateTrackerTests.cs" />
     <Compile Include="EffectUpdaterTests.cs" />
+    <Compile Include="HudControllerTests.cs" />
+    <Compile Include="OverlayViewImplementationTests.cs" />
     <Compile Include="LidgrenServerMessageSenderTests.cs" />
-    <Compile Include="LocalClientTests.cs" />
     <Compile Include="MessageConsoleTests.cs" />
     <Compile Include="LogTests.cs" />
     <Compile Include="ConsoleControllerTests.cs" />
@@ -91,7 +92,7 @@
     <Compile Include="CrosshairTests.cs" />
     <Compile Include="DumbLevelLoaderTests.cs" />
     <Compile Include="FarseerPhysicsComponentTests.cs" />
-    <Compile Include="ConsoleViewTests.cs" />
+    <Compile Include="ConsoleOverlaySetViewTests.cs" />
     <Compile Include="LevelControllerTests.cs" />
     <Compile Include="LevelPieceTests.cs" />
     <Compile Include="LevelTests.cs" />
@@ -99,8 +100,8 @@
     <Compile Include="LidgrenClientNetworkSessionTests.cs" />
     <Compile Include="LidgrenServerNetworkSessionTests.cs" />
     <Compile Include="MediatorTests.cs" />
-    <Compile Include="ChatLogProcessorTests.cs" />
-    <Compile Include="ChatLogSenderTests.cs" />
+    <Compile Include="GameStateProcessorTests.cs" />
+    <Compile Include="GameStateSenderTests.cs" />
     <Compile Include="ClientInputProcessorTests.cs" />
     <Compile Include="ClientInputSenderTests.cs" />
     <Compile Include="OutgoingMessageQueueTests.cs" />
@@ -110,6 +111,7 @@
     <Compile Include="PlayerViewTests.cs" />
     <Compile Include="QuitterTests.cs" />
     <Compile Include="RailGunTests.cs" />
+    <Compile Include="PlayerScoreTests.cs" />
     <Compile Include="SettingsPersisterTests.cs" />
     <Compile Include="SnapCounterTests.cs" />
     <Compile Include="TimerTests.cs" />

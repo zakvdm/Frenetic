@@ -4,9 +4,9 @@ using Frenetic.Player;
 
 namespace Frenetic
 {
-    public class ChatLogSender : IView
+    public class GameStateSender : IView
     {
-        public ChatLogSender(IChatLogDiffer chatLogDiffer, IClientStateTracker clientStateTracker, ISnapCounter snapCounter, IOutgoingMessageQueue outgoingMessageQueue)
+        public GameStateSender(IChatLogDiffer chatLogDiffer, IClientStateTracker clientStateTracker, ISnapCounter snapCounter, IOutgoingMessageQueue outgoingMessageQueue)
         {
             _chatLogDiffer = chatLogDiffer;
             _clientStateTracker = clientStateTracker;
@@ -53,7 +53,6 @@ namespace Frenetic
                 return;
 
             // We send the messages oldest to newest...
-            //foreach (var message in log.OldestToNewest)
             foreach (var message in diffedLog)
             {
                 Message msg = new Message() { Type = MessageType.ChatLog, Data = message };
@@ -67,6 +66,8 @@ namespace Frenetic
         {
             IPlayerState state = new PlayerState(client.Player);
             _outgoingMessageQueue.Write(new Message() { ClientID = client.ID, Type = MessageType.Player, Data = state });
+
+            _outgoingMessageQueue.Write(new Message() { ClientID = client.ID, Type = MessageType.PlayerSettings, Data = client.Player.PlayerSettings });
         }
 
         IChatLogDiffer _chatLogDiffer;

@@ -36,13 +36,12 @@ namespace Frenetic.Autofac
 
             builder.Register<EffectUpdater>().ContainerScoped();
 
-            builder.Register<MercuryParticleEffect>().SingletonScoped();
-            builder.Register<MercuryParticleEffect>().As<IEffect>().SingletonScoped();
+            builder.Register<MercuryParticleEffect>().As<IEffect>().FactoryScoped();
+            builder.RegisterGeneratedFactory<MercuryParticleEffect.Factory>(new TypedService(typeof(IEffect)));
 
             // WEAPONS:
             builder.Register<RailGun>().As<IRailGun>().FactoryScoped();
             builder.Register<RailGunView>().As<IRailGunView>().FactoryScoped();
-            builder.RegisterGeneratedFactory<RailGunView.Factory>(new TypedService(typeof(IRailGunView)));
         }
     }
 }

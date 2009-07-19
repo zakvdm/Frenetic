@@ -11,22 +11,21 @@ namespace Frenetic.Player
 {
     public class PlayerView : IView
     {
-        public PlayerView(ITextureBank<PlayerTexture> playerTextureBank, ISpriteBatch spriteBatch, ICamera camera, RailGunView.Factory railGunViewFactory)
+        public PlayerView(List<IPlayer> playerList, ITextureBank<PlayerTexture> playerTextureBank, ISpriteBatch spriteBatch, ICamera camera, IRailGunView railGunView)
         {
+            _players = playerList;
             _playerTextureBank = playerTextureBank;
             _spriteBatch = spriteBatch;
             _camera = camera;
-            _railGunViewFactory = railGunViewFactory;
+            _railGunView = railGunView;
         }
         #region IView Members
 
         public void Generate()
         {
-            foreach (KeyValuePair<IPlayer, PlayerDrawInfo> playerInfo in _players)
+            foreach (IPlayer player in _players)
             {
-                IPlayer player = playerInfo.Key;
-                IPlayerSettings playerSettings = playerInfo.Value.PlayerSettings;
-                IRailGunView weaponView = playerInfo.Value.WeaponView;
+                IPlayerSettings playerSettings = player.PlayerSettings;
 
                 ITexture texture = _playerTextureBank[playerSettings.Texture];
 
@@ -42,48 +41,18 @@ namespace Frenetic.Player
                         _spriteBatch.End();
                     }
                 }
-
-                weaponView.Draw(player.CurrentWeapon, _camera.TranslationMatrix);
             }
+
+            _railGunView.Draw(_camera.TranslationMatrix);
         }
 
         #endregion
 
-        public List<IPlayer> Players
-        {
-            get
-            {
-                return _players.Keys.ToList();
-            }
-        }
-
-        public void AddPlayer(IPlayer player, IPlayerSettings settings)
-        {
-            _players.Add(player, new PlayerDrawInfo(settings, _railGunViewFactory()));
-        }
-
-        public void RemovePlayer(IPlayer player)
-        {
-            _players.Remove(player);
-        }
-
-        Dictionary<IPlayer, PlayerDrawInfo> _players = new Dictionary<IPlayer,PlayerDrawInfo>();
+        List<IPlayer> _players;
 
         ITextureBank<PlayerTexture> _playerTextureBank;
         ISpriteBatch _spriteBatch;
         ICamera _camera;
-        RailGunView.Factory _railGunViewFactory;
-
-        class PlayerDrawInfo
-        {
-            public PlayerDrawInfo(IPlayerSettings settings, IRailGunView weaponView)
-            {
-                this.PlayerSettings = settings;
-                this.WeaponView = weaponView;
-            }
-
-            public IPlayerSettings PlayerSettings { get; set; }
-            public IRailGunView WeaponView { get; set; }
-        }
+        IRailGunView _railGunView;
     }
 }

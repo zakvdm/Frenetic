@@ -86,15 +86,21 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Autofac\GameSessionModule.cs" />
+    <Compile Include="Autofac\OverlaysModule.cs" />
     <Compile Include="Autofac\LevelModule.cs" />
     <Compile Include="Autofac\PhysicsModule.cs" />
     <Compile Include="Autofac\WeaponsModule.cs" />
     <Compile Include="Engine\Camera.cs" />
     <Compile Include="Engine\Console\ChatLogDifferByReference.cs" />
     <Compile Include="Engine\Console\ChatMessage.cs" />
+    <Compile Include="Engine\Console\ConsoleOverlaySetView.cs" />
+    <Compile Include="Engine\Console\InputLine.cs" />
     <Compile Include="Engine\Console\IChatLogDiffer.cs" />
     <Compile Include="Engine\Console\IConsole.cs" />
     <Compile Include="Engine\Console\IMessageConsole.cs" />
+    <Compile Include="Engine\Console\InputHudView.cs" />
+    <Compile Include="Engine\Console\IOverlayView.cs" />
+    <Compile Include="Engine\Console\LogOverlayView.cs" />
     <Compile Include="Engine\Console\MessageConsole.cs" />
     <Compile Include="Engine\EffectUpdater.cs" />
     <Compile Include="Engine\IGame.cs" />
@@ -105,6 +111,10 @@
     <Compile Include="Engine\Timer.cs" />
     <Compile Include="Engine\TweakablePropertiesLoader.cs" />
     <Compile Include="Engine\XnaGame.cs" />
+    <Compile Include="Gameplay\HUD\HudController.cs" />
+    <Compile Include="Gameplay\HUD\HudOverlaySetView.cs" />
+    <Compile Include="Gameplay\PlayerScore.cs" />
+    <Compile Include="Gameplay\HUD\ScoreHudView.cs" />
     <Compile Include="Gameplay\Player\INetworkPlayerProcessor.cs" />
     <Compile Include="Gameplay\Player\IPlayerSettings.cs" />
     <Compile Include="Gameplay\Player\PlayerState.cs" />
@@ -121,11 +131,11 @@
     <Compile Include="Level\ILevel.cs" />
     <Compile Include="Level\VisibilityView.cs" />
     <Compile Include="Network\ClientFactory.cs" />
-    <Compile Include="Network\Client\ChatLogProcessor.cs" />
+    <Compile Include="Network\Client\GameStateProcessor.cs" />
     <Compile Include="Network\IClientFactory.cs" />
     <Compile Include="Network\IServerMessageSender.cs" />
     <Compile Include="Network\Lidgren\LidgrenServerMessageSender.cs" />
-    <Compile Include="Network\Server\ChatLogSender.cs" />
+    <Compile Include="Network\Server\GameStateSender.cs" />
     <Compile Include="Engine\Console\Log.cs" />
     <Compile Include="Engine\Crosshair.cs" />
     <Compile Include="Engine\CrosshairView.cs" />

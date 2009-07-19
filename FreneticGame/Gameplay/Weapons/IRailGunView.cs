@@ -5,6 +5,6 @@ namespace Frenetic.Weapons
 {
     public interface IRailGunView
     {
-        void Draw(IRailGun railGun, Matrix translationMatrix);
+        void Draw(Matrix translationMatrix);
     }
 }

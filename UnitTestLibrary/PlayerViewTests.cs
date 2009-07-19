@@ -14,49 +14,30 @@ namespace UnitTestLibrary
     [TestFixture]
     public class PlayerViewTests
     {
+        List<IPlayer> playerList;
         ITexture stubTexture;
         ITextureBank<PlayerTexture> _stubTextureBank;
         ISpriteBatch stubSpriteBatch;
         ICamera stubCamera;
-        RailGunView.Factory railgunViewFactoryDelegate;
         IRailGunView stubRailGunView;
         IPlayer player;
         PlayerView playerView;
         [SetUp]
         public void SetUp()
         {
+            playerList = new List<IPlayer>();
             stubTexture = MockRepository.GenerateStub<ITexture>();
             _stubTextureBank = MockRepository.GenerateStub<ITextureBank<PlayerTexture>>();
             _stubTextureBank.Stub(x => x[PlayerTexture.Ball]).Return(stubTexture);
             stubSpriteBatch = MockRepository.GenerateStub<ISpriteBatch>();
             stubCamera = MockRepository.GenerateStub<ICamera>();
             stubRailGunView = MockRepository.GenerateStub<IRailGunView>();
-            railgunViewFactoryDelegate = () => stubRailGunView;
             player = MockRepository.GenerateStub<IPlayer>();
             player.IsAlive = true;
-            playerView = new PlayerView(_stubTextureBank, stubSpriteBatch, stubCamera, railgunViewFactoryDelegate);
-        }
-
-        [Test]
-        public void AddPlayerAlsoAddsWeaponView()
-        {
-            bool factoryWasUsed = false;
-            railgunViewFactoryDelegate = () => { factoryWasUsed = true; return stubRailGunView; };
-            playerView = new PlayerView(_stubTextureBank, stubSpriteBatch, stubCamera, railgunViewFactoryDelegate);
-            playerView.AddPlayer(player, null);
-
-            Assert.AreEqual(player, playerView.Players[0]);
-            Assert.IsTrue(factoryWasUsed);
-        }
-
-        [Test]
-        public void CanRemovePlayer()
-        {
-            playerView.AddPlayer(player, MockRepository.GenerateStub<IPlayerSettings>());
-
-            playerView.RemovePlayer(player);
-
-            Assert.AreEqual(0, playerView.Players.Count);
+            player.Stub(me => me.PlayerSettings).Return(new NetworkPlayerSettings());
+            player.Stub(me => me.CurrentWeapon).Return(new RailGun(null));
+            playerList.Add(player);
+            playerView = new PlayerView(playerList, _stubTextureBank, stubSpriteBatch, stubCamera, stubRailGunView);
         }
 
         [Test]
@@ -64,8 +45,8 @@ namespace UnitTestLibrary
         {
             var player2 = MockRepository.GenerateStub<IPlayer>();
             player2.IsAlive = true;
-            playerView.AddPlayer(player, MockRepository.GenerateStub<IPlayerSettings>());
-            playerView.AddPlayer(player2, MockRepository.GenerateStub<IPlayerSettings>());
+            player2.Stub(me => me.PlayerSettings).Return(new NetworkPlayerSettings());
+            playerList.Add(player2);
 
             playerView.Generate();
 
@@ -76,12 +57,10 @@ namespace UnitTestLibrary
         [Test]
         public void CallsDrawWithCorrectParameters()
         {
-            IPlayerSettings settings = new NetworkPlayerSettings();
-            settings.Texture = PlayerTexture.Ball;
+            player.PlayerSettings.Texture = PlayerTexture.Ball;
             stubTexture.Stub(x => x.Width).Return(100);
             stubTexture.Stub(x => x.Height).Return(200);
             player.Position = new Vector2(1, 1);
-            playerView.AddPlayer(player, settings);
 
             playerView.Generate();
 
@@ -95,10 +74,8 @@ namespace UnitTestLibrary
         [Test]
         public void UsesCameraCorrectly()
         {
-            IPlayerSettings settings = new NetworkPlayerSettings();
             ICamera camera = new Camera(player, new Vector2(100, 100));
-            playerView = new PlayerView(_stubTextureBank, stubSpriteBatch, camera, () => MockRepository.GenerateStub<IRailGunView>());
-            playerView.AddPlayer(player, settings);
+            playerView = new PlayerView(playerList, _stubTextureBank, stubSpriteBatch, camera, stubRailGunView);
 
             playerView.Generate();
 
@@ -109,7 +86,6 @@ namespace UnitTestLibrary
         public void DoesntDrawDeadPlayer()
         {
             player.IsAlive = false;
-            playerView.AddPlayer(player, MockRepository.GenerateStub<IPlayerSettings>());
 
             playerView.Generate();
 
@@ -118,37 +94,13 @@ namespace UnitTestLibrary
 
         // WEAPON:
         [Test]
-        public void DrawsPlayerWeapon()
+        public void DrawsWeaponView()
         {
-            RailGun railGun = new RailGun(null);
             stubCamera.Stub(me => me.TranslationMatrix).Return(Matrix.Identity);
-            var stubPlayer = MockRepository.GenerateStub<IPlayer>();
-            stubPlayer.Stub(me => me.CurrentWeapon).Return(railGun);
-            playerView.AddPlayer(stubPlayer, MockRepository.GenerateStub<IPlayerSettings>());
 
             playerView.Generate();
 
-            stubRailGunView.AssertWasCalled(me => me.Draw(railGun, Matrix.Identity));
-        }
-        [Test]
-        public void DrawsSeparateWeaponViewForEachPlayer()
-        {
-            var stubRailGunView1 = MockRepository.GenerateStub<IRailGunView>();
-            var stubRailGunView2 = MockRepository.GenerateStub<IRailGunView>();
-            Queue<IRailGunView> railgun_views = new Queue<IRailGunView>();
-            railgun_views.Enqueue(stubRailGunView1);
-            railgun_views.Enqueue(stubRailGunView2);
-            railgunViewFactoryDelegate = () => railgun_views.Dequeue();
-            playerView = new PlayerView(_stubTextureBank, stubSpriteBatch, stubCamera, railgunViewFactoryDelegate);
-            var player2 = MockRepository.GenerateStub<IPlayer>();
-            player2.IsAlive = true;
-            playerView.AddPlayer(player, MockRepository.GenerateStub<IPlayerSettings>());
-            playerView.AddPlayer(player2, MockRepository.GenerateStub<IPlayerSettings>());
-
-            playerView.Generate();
-
-            stubRailGunView2.AssertWasCalled(me => me.Draw(Arg<IRailGun>.Is.Anything, Arg<Matrix>.Is.Anything));
-            stubRailGunView1.AssertWasCalled(me => me.Draw(Arg<IRailGun>.Is.Anything, Arg<Matrix>.Is.Anything));
+            stubRailGunView.AssertWasCalled(me => me.Draw(Matrix.Identity));
         }
     }
 }

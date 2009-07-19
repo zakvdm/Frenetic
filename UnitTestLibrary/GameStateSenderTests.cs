@@ -12,13 +12,14 @@ using Frenetic.Weapons;
 namespace UnitTestLibrary
 {
     [TestFixture]
-    public class ChatLogSenderTests
+    public class GameStateSenderTests
     {
         IClientStateTracker stubClientStateTracker;
+        Client client;
         IChatLogDiffer stubChatLogDiffer;
         ISnapCounter stubSnapCounter;
         IOutgoingMessageQueue stubOutgoingMessageQueue;
-        ChatLogSender serverChatLogView;
+        GameStateSender serverChatLogView;
 
         [SetUp]
         public void SetUp()
@@ -26,19 +27,20 @@ namespace UnitTestLibrary
             stubClientStateTracker = MockRepository.GenerateStub<IClientStateTracker>();
             List<Client> clientList = new List<Client>();
             stubClientStateTracker.Stub(x => x.NetworkClients).Return(clientList);
+            client = new Client(MockRepository.GenerateStub<IPlayer>());
+            client.Player.Stub(me => me.PlayerSettings).Return(MockRepository.GenerateStub<IPlayerSettings>());
+            client.Player.Stub(me => me.CurrentWeapon).Return(MockRepository.GenerateStub<IRailGun>());
+            stubClientStateTracker.NetworkClients.Add(client);
             stubChatLogDiffer = MockRepository.GenerateStub<IChatLogDiffer>();
             stubSnapCounter = MockRepository.GenerateStub<ISnapCounter>();
+            stubSnapCounter.CurrentSnap = 3;
             stubOutgoingMessageQueue = MockRepository.GenerateStub<IOutgoingMessageQueue>();
-            serverChatLogView = new ChatLogSender(stubChatLogDiffer, stubClientStateTracker, stubSnapCounter, stubOutgoingMessageQueue);
+            serverChatLogView = new GameStateSender(stubChatLogDiffer, stubClientStateTracker, stubSnapCounter, stubOutgoingMessageQueue);
         }
 
         [Test]
         public void GenerateSendsCurrentServerSnap()
         {
-            stubSnapCounter.CurrentSnap = 3;
-            Client client = new Client(null, null);
-            stubClientStateTracker.NetworkClients.Add(client);
-
             serverChatLogView.Generate();
 
             stubOutgoingMessageQueue.AssertWasCalled(x => x.WriteFor(Arg<Message>.Matches(y => y.Type == MessageType.ServerSnap && (int)y.Data == 3), Arg<Client>.Is.Equal(client)));
@@ -47,10 +49,7 @@ namespace UnitTestLibrary
         [Test]
         public void GenerateSendsLastReceivedClientSnap()
         {
-            stubSnapCounter.CurrentSnap = 3;
-            Client client = new Client(null, null);
             client.LastClientSnap = 78;
-            stubClientStateTracker.NetworkClients.Add(client);
 
             serverChatLogView.Generate();
 
@@ -63,10 +62,7 @@ namespace UnitTestLibrary
             Log<ChatMessage> chatLog = new Log<ChatMessage>();
             ChatMessage chatMsg = new ChatMessage() { ClientName = "terence", Snap = 32 };
             chatLog.AddMessage(chatMsg);
-            Client client = new Client(null, null);
-            stubClientStateTracker.NetworkClients.Add(client);
             stubChatLogDiffer.Stub(x => x.GetOldestToYoungestDiff(client)).Return(chatLog);
-            stubSnapCounter.CurrentSnap = 3;
 
             serverChatLogView.Generate();
 
@@ -79,10 +75,7 @@ namespace UnitTestLibrary
             Log<ChatMessage> chatLog = new Log<ChatMessage>();
             chatLog.AddMessage(new ChatMessage() { Message = "Woohoo" });
             chatLog.AddMessage(new ChatMessage() { Message = "boohoo" });
-            Client client = new Client(null, null);
-            stubClientStateTracker.NetworkClients.Add(client);
             stubChatLogDiffer.Stub(x => x.GetOldestToYoungestDiff(client)).Return(chatLog);
-            stubSnapCounter.CurrentSnap = 3;
 
             serverChatLogView.Generate();
 
@@ -95,31 +88,41 @@ namespace UnitTestLibrary
         [Test]
         public void GetsADiffedLogForEachClient()
         {
-            Client client1 = new Client(null, null) { ID = 1 };
-            Client client2 = new Client(null, null) { ID = 2 };
-            stubClientStateTracker.NetworkClients.Add(client1);
+            client.ID = 1;
+            Client client2 = new Client(client.Player) { ID = 2 };
             stubClientStateTracker.NetworkClients.Add(client2);
-            stubSnapCounter.CurrentSnap = 3;
 
             serverChatLogView.Generate();
 
-            stubChatLogDiffer.AssertWasCalled(x => x.GetOldestToYoungestDiff(client1));
+            stubChatLogDiffer.AssertWasCalled(x => x.GetOldestToYoungestDiff(client));
             stubChatLogDiffer.AssertWasCalled(x => x.GetOldestToYoungestDiff(client2));
         }
 
         [Test]
         public void SendsPlayerStateToAllClients()
         {
-            Client client = new Client(null, null) { ID = 7 };
+            client.ID = 7;
             client.Player = MockRepository.GenerateStub<IPlayer>();
             client.Player.Position = new Vector2(100, 200);
             client.Player.Stub(me => me.CurrentWeapon).Return(new RailGun(null));
-            stubClientStateTracker.NetworkClients.Add(client);
-            stubSnapCounter.CurrentSnap = 3;
 
             serverChatLogView.Generate();
 
             stubOutgoingMessageQueue.AssertWasCalled(x => x.Write(Arg<Message>.Matches(y => y.Type == MessageType.Player && y.ClientID == 7 && ((IPlayerState)y.Data).Position == new Vector2(100, 200))));
+        }
+
+        [Test]
+        public void SendsPlayerSettingsToAllClients()
+        {
+            client.ID = 123;
+            client.Player = MockRepository.GenerateStub<IPlayer>();
+            var playerSettings = MockRepository.GenerateStub<IPlayerSettings>();
+            client.Player.Stub(me => me.PlayerSettings).Return(playerSettings);
+            client.Player.Stub(me => me.CurrentWeapon).Return(new RailGun(null));
+
+            serverChatLogView.Generate();
+
+            stubOutgoingMessageQueue.AssertWasCalled(x => x.Write(Arg<Message>.Matches(y => y.Type == MessageType.PlayerSettings && y.ClientID == 123 && ((IPlayerSettings)y.Data == playerSettings))));
         }
     }
 }

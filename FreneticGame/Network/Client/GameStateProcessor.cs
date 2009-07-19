@@ -4,9 +4,9 @@ using Frenetic.Player;
 
 namespace Frenetic
 {
-    public class ChatLogProcessor : IController
+    public class GameStateProcessor : IController
     {
-        public ChatLogProcessor(LocalClient localClient, Log<ChatMessage> chatLog, INetworkPlayerProcessor networkPlayerProcessor, IClientStateTracker clientStateTracker, IIncomingMessageQueue incomingMessageQueue)
+        public GameStateProcessor(LocalClient localClient, Log<ChatMessage> chatLog, INetworkPlayerProcessor networkPlayerProcessor, IClientStateTracker clientStateTracker, IIncomingMessageQueue incomingMessageQueue)
         {
             _localClient = localClient;
             _chatLog = chatLog;

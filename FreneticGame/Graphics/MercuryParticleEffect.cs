@@ -7,11 +7,15 @@ namespace Frenetic.Graphics
 {
     public class MercuryParticleEffect : IEffect
     {
+        public delegate MercuryParticleEffect Factory();
+
         public MercuryParticleEffect(Renderer renderer, Emitter emitter)
         {
             _renderer = renderer;
             _emitter = (LineEmitter)emitter;
         }
+
+        public int ShotsDrawn { get; set; }
 
         public void Trigger(Vector2 startPoint, Vector2 endPoint)
         {

@@ -1,18 +1,25 @@
 ﻿using System;
 using Microsoft.Xna.Framework.Input;
 using Frenetic.UserInput;
+using Frenetic.Engine.Overlay;
 
-namespace Frenetic
+namespace Frenetic.Engine.Overlay
 {
     public class ConsoleController : IController
     {
-        public ConsoleController(ICommandConsole commandConsole, IMessageConsole messageConsole, IKeyboard keyboard)
+        public ConsoleController(InputLine inputLine, ICommandConsole commandConsole, IMessageConsole messageConsole, 
+            IOverlayView inputView, IOverlayView commandConsoleView, IOverlayView messageConsoleView, IOverlayView possibleCommandsView, IKeyboard keyboard)
         {
+            this.InputLine = inputLine;
             _commandConsole = commandConsole;
             _messageConsole = messageConsole;
+            _inputView = inputView;
+            _commandConsoleView = commandConsoleView;
+            _messageConsoleView = messageConsoleView;
+            _possibleCommandsView = possibleCommandsView;
             _keyboard = keyboard;
 
-            CurrentInput = "";
+            this.InputLine.CurrentInput = "";
         }
 
         #region IController Members
@@ -25,6 +32,10 @@ namespace Frenetic
             {
                 _commandConsole.Active = !_commandConsole.Active;
                 _messageConsole.Active = !_messageConsole.Active;
+                _inputView.Visible = !_inputView.Visible;
+                _commandConsoleView.Visible = !_commandConsoleView.Visible;
+                _messageConsoleView.Visible = !_messageConsoleView.Visible;
+                _possibleCommandsView.Visible = !_possibleCommandsView.Visible;
             }
 
             if (!_commandConsole.Active && !_messageConsole.Active)
@@ -40,38 +51,36 @@ namespace Frenetic
                 {
                     // Check if it's upper or lower case
                     if (_keyboard.IsKeyDown(Keys.LeftShift) || _keyboard.IsKeyDown(Keys.RightShift))
-                        CurrentInput += key.GetStringValue();
+                        this.InputLine.CurrentInput += key.GetStringValue();
                     else
-                        CurrentInput += key.GetStringValue().ToLower();
+                        this.InputLine.CurrentInput += key.GetStringValue().ToLower();
                     
                 }
             }
 
             // OTHER KEYS:
             if (_keyboard.IsKeyDown(Keys.Space) && !_keyboard.WasKeyDown(Keys.Space))
-                CurrentInput += " ";
+                this.InputLine.CurrentInput += " ";
 
-            if (_keyboard.IsKeyDown(Keys.Back) && !_keyboard.WasKeyDown(Keys.Back) && (CurrentInput.Length > 0))
-                CurrentInput = CurrentInput.Remove(CurrentInput.Length - 1);
+            if (_keyboard.IsKeyDown(Keys.Back) && !_keyboard.WasKeyDown(Keys.Back) && (this.InputLine.CurrentInput.Length > 0))
+                this.InputLine.CurrentInput = this.InputLine.CurrentInput.Remove(this.InputLine.CurrentInput.Length - 1);
 
             if (_keyboard.IsKeyDown(Keys.Tab) && !_keyboard.WasKeyDown(Keys.Tab))
-                CurrentInput = _commandConsole.TryToCompleteInput(CurrentInput);
+                this.InputLine.CurrentInput = _commandConsole.TryToCompleteInput(this.InputLine.CurrentInput);
 
             if (_keyboard.IsKeyDown(Keys.Enter) && !_keyboard.WasKeyDown(Keys.Enter))   // ENTER
             {
-                if (CurrentInput.StartsWith("/"))
+                if (this.InputLine.CurrentInput.StartsWith("/"))
                 {
-                    _commandConsole.ProcessInput(CurrentInput);
+                    _commandConsole.ProcessInput(this.InputLine.CurrentInput);
                 }
                 else
                 {
                     // NOTE: We don't set ClientName or ServerSnap on the ChatMessage because this will have been set by the server when we get the message back...
-                    _messageConsole.ProcessInput(CurrentInput);
+                    _messageConsole.ProcessInput(this.InputLine.CurrentInput);
                 }
-                CurrentInput = "";
+                this.InputLine.CurrentInput = "";
             }
-
-
 
             // CLEANUP:
             _keyboard.SaveState();
@@ -80,10 +89,13 @@ namespace Frenetic
 
         #endregion
 
-        public string CurrentInput { get; set; }
-
+        InputLine InputLine;
         ICommandConsole _commandConsole;
         IMessageConsole _messageConsole;
+        IOverlayView _inputView;
+        IOverlayView _commandConsoleView;
+        IOverlayView _messageConsoleView;
+        IOverlayView _possibleCommandsView;
         IKeyboard _keyboard;
 
     }

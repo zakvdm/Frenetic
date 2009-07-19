@@ -8,7 +8,7 @@ using Frenetic.Player;
 namespace UnitTestLibrary
 {
     [TestFixture]
-    public class ChatLogProcessorTests
+    public class GameStateProcessorTests
     {
         LocalClient client;
         Log<ChatMessage> clientLog;
@@ -20,12 +20,12 @@ namespace UnitTestLibrary
         INetworkPlayerProcessor stubNetworkPlayerProcessor;
         IClientStateTracker stubClientStateTracker;
         IIncomingMessageQueue stubIncomingMessageQueue;
-        ChatLogProcessor chatLogProcessor;
+        GameStateProcessor chatLogProcessor;
 
         [SetUp]
         public void SetUp()
         {
-            client = new LocalClient(null, null);
+            client = new LocalClient(null);
             clientLog = new Log<ChatMessage>();
             stubClientStateTracker = MockRepository.GenerateStub<IClientStateTracker>();
             chatLogQueueMessageHelper = new QueuedMessageHelper<Message, MessageType>();
@@ -45,7 +45,7 @@ namespace UnitTestLibrary
             stubIncomingMessageQueue.Stub(x => x.ReadMessage(Arg<MessageType>.Is.Equal(MessageType.PlayerSettings))).Do(playerSettingsMessageHelper.GetNextQueuedMessage);
             stubIncomingMessageQueue.Stub(x => x.HasAvailable(MessageType.PlayerSettings)).Do(playerSettingsMessageHelper.HasMessageAvailable);
             stubNetworkPlayerProcessor = MockRepository.GenerateStub<INetworkPlayerProcessor>();
-            chatLogProcessor = new ChatLogProcessor(client, clientLog, stubNetworkPlayerProcessor, stubClientStateTracker, stubIncomingMessageQueue);
+            chatLogProcessor = new GameStateProcessor(client, clientLog, stubNetworkPlayerProcessor, stubClientStateTracker, stubIncomingMessageQueue);
         }
 
         [Test]

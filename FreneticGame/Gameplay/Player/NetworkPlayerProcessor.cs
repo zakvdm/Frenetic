@@ -56,7 +56,7 @@ namespace Frenetic.Player
             if (!IsValidClient(netMsg.ClientID))
                 return;
 
-            IPlayerSettings settings = _clientStateTracker.FindNetworkClient(netMsg.ClientID).PlayerSettings;
+            IPlayerSettings settings = _clientStateTracker.FindNetworkClient(netMsg.ClientID).Player.PlayerSettings;
             settings.Name = ((IPlayerSettings)netMsg.Data).Name;
         }
 
@@ -64,10 +64,6 @@ namespace Frenetic.Player
         {
             // We don't care about Clients who aren't currently connected...
             return (_clientStateTracker.FindNetworkClient(clientID) != null);
-        }
-
-        void UpdateLocalPlayer(Message stateMessage)
-        {
         }
 
         IClientStateTracker _clientStateTracker;

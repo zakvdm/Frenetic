@@ -1,41 +1,58 @@
 ﻿using System;
 using Frenetic.Graphics;
 using Microsoft.Xna.Framework;
+using System.Collections.Generic;
+using Frenetic.Player;
 
 namespace Frenetic.Weapons
 {
     public class RailGunView : IRailGunView
     {
-        public delegate IRailGunView Factory();
-
-        public RailGunView(MercuryParticleEffect mercuryParticleEffect)
+        public RailGunView(List<IPlayer> playerList, MercuryParticleEffect.Factory particleEffectFactory)
         {
-            _particleEffect = mercuryParticleEffect;
+            _players = playerList;
+            _particleEffectFactory = particleEffectFactory;
         }
 
         #region IRailGunView Members
 
-        public void Draw(IRailGun railGun, Matrix translationMatrix)
+        public void Draw(Matrix translationMatrix)
         {
-            if (railGun == null) return;
+            LookForNewPlayers();
 
-            if (railGun.Shots.Count > shot_count)
+            foreach (KeyValuePair<IRailGun, MercuryParticleEffect> railGunInfo in _railGuns)
             {
-                shot_count = railGun.Shots.Count;
+                var railGun = railGunInfo.Key;
+                var particleEffect = railGunInfo.Value;
 
-                Shot shot = railGun.Shots[shot_count - 1];
-                _particleEffect.Trigger(shot.StartPoint, shot.EndPoint);
+                if (railGun.Shots.Count > particleEffect.ShotsDrawn)
+                {
+                    particleEffect.ShotsDrawn = railGun.Shots.Count;
 
-                Console.WriteLine("Drawing Railgun Shot");
+                    Shot shot = railGun.Shots[particleEffect.ShotsDrawn - 1];
+                    particleEffect.Trigger(shot.StartPoint, shot.EndPoint);
+                }
+
+                particleEffect.Draw(ref translationMatrix);
             }
-
-            _particleEffect.Draw(ref translationMatrix);
         }
 
         #endregion
 
-        int shot_count = 0;
+        void LookForNewPlayers()
+        {
+            foreach (IPlayer player in _players)
+            {
+                if (!_railGuns.ContainsKey(player.CurrentWeapon))
+                {
+                    _railGuns.Add(player.CurrentWeapon, _particleEffectFactory());
+                }
+            }
+        }
 
-        MercuryParticleEffect _particleEffect;
+        List<IPlayer> _players;
+        MercuryParticleEffect.Factory _particleEffectFactory;
+
+        Dictionary<IRailGun, MercuryParticleEffect> _railGuns = new Dictionary<IRailGun, MercuryParticleEffect>();
     }
 }

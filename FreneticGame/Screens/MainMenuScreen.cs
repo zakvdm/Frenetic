@@ -53,7 +53,6 @@ namespace Frenetic
 
         private IGameSessionFactory _gameSessionFactory;
         private IScreenFactory _screenFactory;
-        private LocalClient _localClient;
         private Quitter _quitter;
         private GameplayScreen _gameplayScreen;
 
@@ -62,14 +61,13 @@ namespace Frenetic
         /// <summary>
         /// Constructs a new MainMenu object.
         /// </summary>
-        public MainMenuScreen(Viewport viewport, SpriteBatch spriteBatch, SpriteFont font, IGameSessionFactory gameSessionFactory, IScreenFactory screenFactory, Quitter quitter, LocalClient localClient) 
+        public MainMenuScreen(Viewport viewport, SpriteBatch spriteBatch, SpriteFont font, IGameSessionFactory gameSessionFactory, IScreenFactory screenFactory, Quitter quitter) 
             : base(viewport, spriteBatch, font)
         {
             // TODO: There must be a way to reduce the number of parameters here???
             _gameSessionFactory = gameSessionFactory;
             _screenFactory = screenFactory;
             _quitter = quitter;
-            _localClient = localClient;
 
             // set the transition times
             TransitionOnTime = TimeSpan.FromSeconds(1.0);
@@ -96,9 +94,8 @@ namespace Frenetic
             {
                 if (_gameplayScreen.ScreenState == ScreenState.Dead)
                 {
-                    // NOTE: Currently, this gets called over and over when the gamesession ends... This could burn our fingers at some point...
-                    _localClient.ID = 0;  // Client is no longer connected... what a hack... TODO: Fix this!
                     _gameSessionFactory.Dispose();
+                    _gameplayScreen = null;
                 }
             }
 

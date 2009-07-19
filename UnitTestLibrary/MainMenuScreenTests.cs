@@ -18,15 +18,13 @@ namespace UnitTestLibrary
         IGameSessionFactory stubGameSessionFactory;
         IScreenFactory stubScreenFactory;
         MainMenuScreen mainMenuScreen;
-        LocalClient localClient;
         
         [SetUp]
         public void Setup()
         {
-            localClient = new LocalClient(null, null);
             stubGameSessionFactory = MockRepository.GenerateStub<IGameSessionFactory>();
             stubScreenFactory = MockRepository.GenerateStub<IScreenFactory>();
-            mainMenuScreen = new MainMenuScreen(new Viewport(), null, null, stubGameSessionFactory, stubScreenFactory, null, localClient);
+            mainMenuScreen = new MainMenuScreen(new Viewport(), null, null, stubGameSessionFactory, stubScreenFactory, null);
         }
         
         [Test]

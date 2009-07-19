@@ -22,6 +22,9 @@ using Frenetic.Player;
 using System.Windows.Forms;
 using Frenetic.Weapons;
 using Frenetic.Engine;
+using Frenetic.Gameplay.HUD;
+using Frenetic.Gameplay;
+using Frenetic.Engine.Overlay;
 
 namespace Frenetic
 {
@@ -82,8 +85,14 @@ namespace Frenetic
             CreatePhysicsSystem();
             
             // Console:
-            _consoleView = CreateConsoleView();
-            _consoleController = Container.Resolve<ConsoleController>();
+            _consoleView = Container.Resolve<ConsoleOverlaySetView>();
+            _consoleController = Container.Resolve<ConsoleController>
+                        (
+                            new NamedParameter("inputView", Container.Resolve<InputOverlayView>()), 
+                            new NamedParameter("commandConsoleView", Container.Resolve<LogOverlayView<string>>()),
+                            new NamedParameter("messageConsoleView", Container.Resolve<LogOverlayView<ChatMessage>>()),
+                            new NamedParameter("possibleCommandsView", Container.Resolve<PossibleCommandsLogHudView>())
+                        );
 
             // NOTE: order is important here, first register, then set!
             RegisterTweakableProperties();
@@ -107,7 +116,6 @@ namespace Frenetic
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            //graphics.GraphicsDevice.Clear(Color.LightSlateGray);
             graphics.GraphicsDevice.Clear(new Color(20, 20, 20));
 
             base.Draw(gameTime);
@@ -134,19 +142,6 @@ namespace Frenetic
         void CreatePhysicsSystem()
         {
             IPhysicsSimulator simulator = Container.Resolve<IPhysicsSimulator>();
-        }
-
-        ConsoleView CreateConsoleView()
-        {
-            ITexture consoleTexture = Container.Resolve<ITexture>(new TypedParameter(typeof(Texture2D), Content.Load<Texture2D>("Textures/blank")));
-            IFont consoleFont = Container.Resolve<IFont>(new TypedParameter(typeof(SpriteFont), Content.Load<SpriteFont>("Fonts/detailsFont")));
-            int edgeGap = 4;
-            int inputWindowHeight = 24;
-            return Container.Resolve<ConsoleView>(
-                            new NamedParameter("inputWindow", new Rectangle(edgeGap, _screenHeight - edgeGap - inputWindowHeight, _screenWidth - 2 * edgeGap, inputWindowHeight)),
-                            new NamedParameter("commandWindow", new Rectangle(edgeGap, edgeGap, (_screenWidth / 2) - 30 - edgeGap, _screenHeight - inputWindowHeight - 3 * edgeGap)),
-                            new NamedParameter("messageWindow", new Rectangle((_screenWidth / 2) + 30 + edgeGap, edgeGap, (_screenWidth / 2) - 30 - 2 * edgeGap, (_screenHeight / 2) - 2 * edgeGap)),
-                            new TypedParameter(typeof(ITexture), consoleTexture), new TypedParameter(typeof(IFont), consoleFont));
         }
 
         void RegisterTweakableProperties()
@@ -200,7 +195,7 @@ namespace Frenetic
             builder.Register<OutgoingMessageQueue>().As<IOutgoingMessageQueue>().ContainerScoped();
             builder.Register<XmlMessageSerializer>().As<IMessageSerializer>().ContainerScoped();
 
-            builder.Register<LocalClient>().SingletonScoped();
+            builder.Register<LocalClient>().ContainerScoped();
             builder.Register<Client>().FactoryScoped();
             builder.RegisterGeneratedFactory<Client.Factory>(new TypedService(typeof(Client)));
             builder.Register<ServerSideClientFactory>().ContainerScoped();
@@ -238,6 +233,7 @@ namespace Frenetic
             builder.Register<NetworkPlayerSettings>().As<IPlayerSettings>().FactoryScoped();
             builder.Register<LocalPlayerSettings>().SingletonScoped();
             builder.Register<Frenetic.Player.Player>().As<IPlayer>().FactoryScoped();
+            builder.Register<List<IPlayer>>().ContainerScoped();
             builder.Register<PlayerView>().ContainerScoped();
             builder.Register((c) => (IBoundaryCollider)new WorldBoundaryCollider(_screenWidth, _screenHeight));
             builder.Register<KeyboardPlayerController>().ContainerScoped();
@@ -257,18 +253,9 @@ namespace Frenetic
             builder.RegisterModule(new LevelModule());
             #endregion
 
-            #region Console
-            builder.Register<Mediator>().As<IMediator>().SingletonScoped();
-            builder.Register<CommandConsole>().As<ICommandConsole>().SingletonScoped();
-            builder.Register<MessageConsole>().As<IMessageConsole>().SingletonScoped();
-            builder.Register<ConsoleView>().SingletonScoped();
-            builder.Register<ConsoleController>().SingletonScoped();
-            builder.Register<Log<string>>().FactoryScoped();
-            builder.Register<Log<ChatMessage>>().FactoryScoped();
-            builder.Register<ChatLogSender>().ContainerScoped();
-            builder.Register<ChatLogProcessor>().ContainerScoped();
+            #region HUD
+            builder.RegisterModule(new OverlaysModule() { ScreenSize = new Vector2(_screenWidth, _screenHeight), InputBoxHeight = 24, ContentManager = this.Content });
             #endregion
-
             // RAYCASTER:
             //builder.Register<DumbRayCaster>().SingletonScoped();
             //builder.Register<DumbRayCasterTestController>().ContainerScoped();
@@ -294,7 +281,7 @@ namespace Frenetic
         }
 
         MainMenuScreen MainMenuScreen { get; set; }
-        ConsoleView _consoleView;
+        OverlaySetView _consoleView;
         ConsoleController _consoleController;
         IContainer Container { get; set; }
         const int _screenWidth = 800;

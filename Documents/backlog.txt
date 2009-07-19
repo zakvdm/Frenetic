@@ -63,6 +63,7 @@ DONE - 8 - Basic visibility (All areas not directly visible from the current pla
 DONE - 8 - Player settings are saved over multiple game sessions
 DONE - 20 - As the player, I can click on the screen and fire a railgun at the point where I click.
 
+5 - Keeps and distributes/shows scores
 5 - Player death... DUM DUM DUM DUUUUH
 *****
 BUGS:

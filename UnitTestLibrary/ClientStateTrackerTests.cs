@@ -3,6 +3,8 @@ using NUnit.Framework;
 using Frenetic.Network;
 using Frenetic;
 using Rhino.Mocks;
+using Frenetic.Player;
+using System.Collections.Generic;
 
 namespace UnitTestLibrary
 {
@@ -18,7 +20,7 @@ namespace UnitTestLibrary
         public void SetUp()
         {
             clientFactory = MockRepository.GenerateStub<IClientFactory>();
-            clientFactory.Stub(x => x.MakeNewClient(Arg<int>.Is.Anything)).Return(new Client(null, null) { ID = 100 });
+            clientFactory.Stub(x => x.MakeNewClient(Arg<int>.Is.Anything)).Return(new Client(null) { ID = 100 });
             stubSnapCounter = MockRepository.GenerateStub<ISnapCounter>();
             stubNetworkSession = MockRepository.GenerateStub<INetworkSession>();
             clientStateTracker = new ClientStateTracker(stubSnapCounter, stubNetworkSession, clientFactory);
@@ -38,7 +40,7 @@ namespace UnitTestLibrary
         [Test]
         public void GetsLocalClientFromFactoryAndSetsID()
         {
-            clientFactory.Stub(x => x.GetLocalClient()).Return(new LocalClient(null, null));
+            clientFactory.Stub(x => x.GetLocalClient()).Return(new LocalClient(null));
 
             stubNetworkSession.Raise(me => me.ClientJoined += null, this, new ClientStatusChangeEventArgs(200, true));
 
@@ -71,7 +73,7 @@ namespace UnitTestLibrary
         [Test]
         public void RemovesDisconnectingClientWithClientFactory()
         {
-            Client client = new Client(null, null) { ID = 200 };
+            Client client = new Client(null) { ID = 200 };
             clientStateTracker.NetworkClients.Add(client);
             stubNetworkSession.Raise(me => me.ClientDisconnected += null, this, new ClientStatusChangeEventArgs(200, false));
 
