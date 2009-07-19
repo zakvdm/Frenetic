@@ -240,9 +240,15 @@ namespace FarseerGames.FarseerPhysics.Controllers
         /// </summary>
         /// <param name="node">The node to change the height of</param>
         /// <param name="offset">The amount to move the node up or down (negative values moves the node up, positive moves it down)</param>
-        public void Disturb(int node, float offset)
+        public void Disturb(float x, float offset)
         {
-            _currentWave[node] = _currentWave[node] + offset;
+            int i = 0;
+            
+            for (i = 0; i < _nodeCount - 1; i++)
+            {
+                if (x >= _xPosition[i] && x <= _xPosition[i+1])
+                    _currentWave[i] = _currentWave[i] + offset;
+            }  
         }
 
         /// <summary>
@@ -268,11 +274,12 @@ namespace FarseerGames.FarseerPhysics.Controllers
         }
 
         /// <summary>
-        /// Steps the wave algorithm.  The wave algorithm does not run at the same speed as the physics simulator. It runs at its 
+        /// Steps the wave algorithm.  The wave algorithm does not run at the same speed as the physics simulator. It runs at its
         /// own frequency set by the Frequency property.
         /// </summary>
-        /// <param name="dt"></param>
-        public override void Update(float dt)
+        /// <param name="dt">The time since last update.</param>
+        /// <param name="dtReal">The real time since last update.</param>
+        public override void Update(float dt, float dtReal)
         {
             if (_timePassed < _frequency)
             {
@@ -320,7 +327,7 @@ namespace FarseerGames.FarseerPhysics.Controllers
                     _waveGeneratorCount -= _waveGeneratorStep;
                 }
             }
-            _currentWave[_currentWave.Length - 1] = ConvertUnits.ToSimUnits(_waveGeneratorCount);
+            _currentWave[_currentWave.Length - 1] = _waveGeneratorCount;
         }
 
         public override void Validate()

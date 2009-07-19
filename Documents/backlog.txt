@@ -1,0 +1,111 @@
+*********
+SPRINT 1:
+*********
+DONE - Player Input:  
+	Player should be able to move around screen, jump, and (possibly) aim with the mouse.
+
+DONE - Basic Player physics: 
+	Player collides with level, player motion applied by physics engine
+
+DONE - Basic Level:  
+	Level built up out of farseer Body objects. Player collides against level. Level is rendered.
+
+DONE - Abstract Drawing Code:  
+	Make ISpriteBatch, with methods Draw(.....), then make an XNASpriteBatch : ISpriteBatch, that just wraps SpriteBatch's Draw methods (the one we need for now) and takes a XNA SpriteBatch in its constructor. This way we can unit test all the IViews.
+
+******************************
+SPRINT 2: Started on 2/02/2009
+******************************
+DONE - 2 - As the player, when I move the camera follows me so I'm always at the centre of the screen
+	Just calculates a simple transformation matrix (code already implemented). Needs to be given to every IView?
+
+DONE - 5 - Move crosshair and click to print position
+
+DONE - 3 - Can properly exit game
+
+DONE - 5 - Resources (network sockets) properly disposed on exit 
+2 - Can recreate a game session once you've exited a running game
+
+DONE - 13 - As the client I can bring down the console and type in a command
+
+13 - Client types in a message and this message is shown on the screen of all clients connected to the server.
+
+******************************COMMITED UP TO HERE FOR SPRINT 2 (32 sp commited to -- 28 sp completed in about 6 weeks)
+
+*******************************
+SPRINT 3: Started on 21/03/2009
+*******************************
+DONE - 3 - Console lifetime is changed to match game lifetime (so console can be used during menus and settings are sustained through multiple sessions)
+  DONE Console created as singleton service at top level
+  DONE Solve the problem with instances of PlayerSettings, PhysicsSettings, etc.
+  DONE Solve the problem with player textures... when do they get loaded?
+
+DONE - 5 - Player settings are synchronized over the network (eg. I can change my player name/color via the console, and all clients in the current game "see" it)
+  DONE - Figure out how to serialize PlayerSettings with Player
+  DONE - Test to see that the synchronization works properly
+
+CARRIED OVER FROM PREVIOUS SPRINT:
+DONE - 2 - Can recreate a game session once you've exited a running game
+
+CARRIED OVER FROM PREVIOUS SPRINT:
+DONE - 13 - Client types in a message and this message is shown on the screen of all clients connected to the server.
+  DONE - Message on console (i.e. whatever's not a command) is sent reliably to the server
+  DONE - Server sends messages reliably to all clients
+  DONE - Messages are written to the console with the client name
+
+*****
+BUGS:
+DONE - When joining a network session and then exiting, the resources are properly disposed 
+DONE - Players/objects are not visible if they are in the "black" areas
+*****
+
+DONE - 8 - Basic visibility (All areas not directly visible from the current player position are black)
+DONE - 8 - Player settings are saved over multiple game sessions
+DONE - 20 - As the player, I can click on the screen and fire a railgun at the point where I click.
+
+5 - Keeps and distributes/shows scores
+5 - Player death... DUM DUM DUM DUUUUH
+*****
+BUGS:
+1) When server dies, connected client has to shutdown gracefully
+2) When a client disconnects, we have to remove its associated physics objects (currently only removing it from PlayerView)
+3) PlayerSettings must be syncronized over network (currently they're not even sent by ChatLogSender (which also needs to be renamed))
+FIXED NetworkPlayerProcessor will have to also update the LocalClient state (like if the server sends new Health status, etc.)
+*****
+
+5 - Add some kind of logging framework (so we can start doing debug output, etc.)
+
+3 - Create a system of console-executable commands (probably with an attribute similar to [Tweakable] -- [Runnable]?)
+2 - Refactor Menu System: Change menu system to use same keyboard structure as game (this will allow the console to lock keyboard input during the menu stages)
+
+13 - I can bring down the console and type "connect 196.21.23.4" and connect to a game hosted somewhere on the internet.
+
+40 - Games can be recorded and played back 
+	STEP 1:
+	We need to investigate what effect Farseer has on this... Apparently it's not deterministic. Way around this? Do player physics manually?
+	STEP 2:
+	Implementation: Records all input (what? network incoming messages and local input? (if client)). Records a periodic 'summary' of the game state.
+	STEP 3:
+	Run game simulation from recorded files (instead of live input). Confirm that the game state reaches the expected 'summary' states.
+
+3 - Write chat messages to the screen (not just in console)
+
+5 - Game can be run in fullscreen and windowed mode
+13 - The game is resolution independent
+20 - Particle system (Mercury)
+40 - Item pickups
+40 - Can load a level format
+20 - Can load levels from menu
+40 - Various level items (jump pads, teleporters, etc.)
+40 - Can load arbitrarily shaped polygons from textures
+8 - As the client, I can reconfigure my keys
+40 - Player can use various techniques to move better/faster (trick jumping, strafe/circle jumping, wall/double jumping)
+40 - Various other visibility obscuring techniques (everything "behind" the player is not visible, using motion blurs, fade in/out, soft edges, etc.)
+100 - Player character is animated
+40 - Can search for sessions, see information on each one, and join one
+100 - On the client, player movement, etc. is predicted to make the game seem smoother during online play
+100 - Players earn experience and can use this experience to modify their appearance
+
+CONTENT
+Build +-5 levels
+Build menu stage

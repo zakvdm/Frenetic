@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Net;
 using Microsoft.Xna.Framework.GamerServices;
+using Frenetic.Network;
 
 namespace Frenetic
 {
@@ -52,20 +53,21 @@ namespace Frenetic
 
         private IGameSessionFactory _gameSessionFactory;
         private IScreenFactory _screenFactory;
-        private Game _game;
+        private Quitter _quitter;
+        private GameplayScreen _gameplayScreen;
 
         #region Initialization
 
         /// <summary>
         /// Constructs a new MainMenu object.
         /// </summary>
-        public MainMenuScreen(Viewport viewport, SpriteBatch spriteBatch, SpriteFont font, IGameSessionFactory gameSessionFactory, IScreenFactory screenFactory, Game game)
+        public MainMenuScreen(Viewport viewport, SpriteBatch spriteBatch, SpriteFont font, IGameSessionFactory gameSessionFactory, IScreenFactory screenFactory, Quitter quitter) 
             : base(viewport, spriteBatch, font)
         {
             // TODO: There must be a way to reduce the number of parameters here???
             _gameSessionFactory = gameSessionFactory;
             _screenFactory = screenFactory;
-            _game = game;
+            _quitter = quitter;
 
             // set the transition times
             TransitionOnTime = TimeSpan.FromSeconds(1.0);
@@ -88,10 +90,16 @@ namespace Frenetic
         {
             State = MainMenuState.Network;
 
-            base.Update(gameTime, otherScreenHasFocus, coveredByOtherScreen);
+            if (_gameplayScreen != null)
+            {
+                if (_gameplayScreen.ScreenState == ScreenState.Dead)
+                {
+                    _gameSessionFactory.Dispose();
+                    _gameplayScreen = null;
+                }
+            }
 
-            if (Microsoft.Xna.Framework.Input.Keyboard.GetState().IsKeyDown(Microsoft.Xna.Framework.Input.Keys.B))
-                GC.Collect();
+            base.Update(gameTime, otherScreenHasFocus, coveredByOtherScreen);
         }
 
         /// <summary>
@@ -132,7 +140,7 @@ namespace Frenetic
             const string message = "Exit Frenetic?";
             MessageBoxScreen messageBox = _screenFactory.MakeMessageBoxScreen(message);
             // TODO: Only using the reference to Game in this one method... this needs refactoring...
-            messageBox.Accepted += (sender, e) => _game.Exit();
+            messageBox.Accepted += (sender, e) => _quitter.Quit();
         }
 
         #endregion
@@ -148,7 +156,8 @@ namespace Frenetic
             var serverGameSessionCandV = _gameSessionFactory.MakeServerGameSession();
             var clientGameSessionCandV = _gameSessionFactory.MakeClientGameSession();
 
-            _screenFactory.MakeGameplayScreen(clientGameSessionCandV, serverGameSessionCandV);
+            _gameplayScreen = _screenFactory.MakeGameplayScreen(clientGameSessionCandV, serverGameSessionCandV);
+
 
             #region Old Network Code
             /*
@@ -243,9 +252,12 @@ namespace Frenetic
         {
             var clientGameSessionCandV = _gameSessionFactory.MakeClientGameSession();
 
-            _screenFactory.MakeGameplayScreen(clientGameSessionCandV, null);
+            _gameplayScreen = _screenFactory.MakeGameplayScreen(clientGameSessionCandV, null);
         }
 
+        #endregion
+
+        #region Unused old network code
         /// <summary>
         /// Start searching for a session of the given type.
         /// </summary>
@@ -344,7 +356,7 @@ namespace Frenetic
         /// message box.
         /// </summary>
         void FailedMessageBox(object sender, EventArgs e) { }
-        #endregion
 
+        #endregion
     }
 }

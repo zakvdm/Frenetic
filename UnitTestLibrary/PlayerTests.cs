@@ -9,24 +9,41 @@ using Frenetic.Physics;
 using NUnit.Framework;
 using Rhino.Mocks;
 using FarseerGames.FarseerPhysics.Dynamics;
+using Frenetic.Player;
+using Frenetic.Weapons;
+using Frenetic.Engine;
 
 namespace UnitTestLibrary
 {
     [TestFixture]
     public class PlayerTests
     {
-        [Test]
-        public void RequiresAPhysicsComponent()
+        Frenetic.Player.Player player;
+        IPlayerSettings stubPlayerSettings;
+        IPhysicsComponent stubPhysicsComponent;
+        IBoundaryCollider stubBoundaryCollider;
+        ITimer stubTimer;
+
+        [SetUp]
+        public void SetUp()
         {
-            Player player = new Player(1, null, MockRepository.GenerateMock<IBoundaryCollider>());
-            Assert.IsNotNull(player);
+            stubPlayerSettings = MockRepository.GenerateStub<IPlayerSettings>();
+            stubPhysicsComponent = MockRepository.GenerateStub<IPhysicsComponent>();
+            stubBoundaryCollider = MockRepository.GenerateStub<IBoundaryCollider>();
+            stubTimer = MockRepository.GenerateStub<ITimer>();
+            player = new Frenetic.Player.Player(stubPlayerSettings, stubPhysicsComponent, stubBoundaryCollider, MockRepository.GenerateStub<IRailGun>(), stubTimer);
+        }
+
+        [Test]
+        public void RegistersWithIPhysicsComponentForRelevantEvents()
+        {
+            stubPhysicsComponent.AssertWasCalled(me => me.CollidedWithWorld += Arg<Action>.Is.Anything);
+            stubPhysicsComponent.AssertWasCalled(me => me.OnShot += Arg<Action>.Is.Anything);
         }
 
         [Test]
         public void PositionImplementedInTermsOfPhysicsComponent()
         {
-            var stubPhysicsComponent = MockRepository.GenerateStub<IPhysicsComponent>();
-            Player player = new Player(1, stubPhysicsComponent, MockRepository.GenerateMock<IBoundaryCollider>());
             stubPhysicsComponent.Position = new Vector2(100, 200);
 
             Assert.AreEqual(new Vector2(100, 200), player.Position);
@@ -35,8 +52,6 @@ namespace UnitTestLibrary
         [Test]
         public void UpdateCallsMoveWithinBoundary()
         {
-            var stubBoundaryCollider = MockRepository.GenerateStub<IBoundaryCollider>();
-            Player player = new Player(1, MockRepository.GenerateStub<IPhysicsComponent>(), stubBoundaryCollider);
             stubBoundaryCollider.Stub(x => x.MoveWithinBoundary(Arg<Vector2>.Is.Anything)).Return(player.Position);
 
             player.Update();
@@ -45,122 +60,97 @@ namespace UnitTestLibrary
         }
 
         [Test]
-        public void CanSerialiseAndDeserialisePlayerPosition()
+        public void CanUpdatePlayerScore()
         {
-            XmlSerializer serializer = new XmlSerializer(typeof(Player));
-            Player player = new Player(1, null, null);
-            player.Position = new Vector2(100, 200);
-            MemoryStream stream = new MemoryStream();
+            player.PlayerScore.Deaths += 3;
+            player.PlayerScore.Kills += 1000;
 
-            serializer.Serialize(stream, player);
-            stream.Position = 0;
-            Player rebuiltPlayer = (Player)serializer.Deserialize(stream);
-
-            Assert.AreEqual(player.Position, rebuiltPlayer.Position);
+            Assert.AreEqual(3, player.PlayerScore.Deaths);
+            Assert.AreEqual(1000, player.PlayerScore.Kills);
         }
 
-        [Test]
-        public void SerializeAndDeserializeClearsInternalInstances()
-        {
-            XmlSerializer serializer = new XmlSerializer(typeof(Player));
-            var stubPhysicsComponent = MockRepository.GenerateStub<IPhysicsComponent>();
-            Player player = new Player(1, stubPhysicsComponent, null);
-            player.Position = new Vector2(100, 200);
-            MemoryStream stream = new MemoryStream();
-
-            serializer.Serialize(stream, player);
-            stream.Position = 0;
-            Player rebuiltPlayer = (Player)serializer.Deserialize(stream);
-            rebuiltPlayer.Position = new Vector2(1, 2);
-
-            stubPhysicsComponent.AssertWasNotCalled(x => x.Position = new Vector2(1, 2));
-        }
-
+        // MOVEMENT:
         [Test]
         public void JumpAppliesTheJumpVectorAsAnImpulseToThePlayersBodyIfCanJumpIsTrue()
         {
-            var stubPhysicsComponent = MockRepository.GenerateStub<IPhysicsComponent>();
-            Player player = new Player(1, stubPhysicsComponent, null);
-
             player.InContactWithLevel = true;
-            player.Jump(new TimeSpan(0, 0, 1).Ticks);
+
+            player.Jump();
 
             stubPhysicsComponent.AssertWasCalled(pc => pc.ApplyImpulse(Player.JumpImpulse));
         }
-
         [Test]
-        public void SecondJumpMustBeDelayedForSomePeriodOfTime()
+        public void JumpAppliesNoImpulseToThePlayersBodyIfNotInContactWithTheLevel()
         {
-            var stubPhysicsComponent = MockRepository.GenerateStub<IPhysicsComponent>();
-            Player player = new Player(1, stubPhysicsComponent, null);
-
-            player.InContactWithLevel = true;
-            player.Jump(new TimeSpan(0, 0, 0, 1).Ticks);
-
-            stubPhysicsComponent.AssertWasCalled(pc => pc.ApplyImpulse(Player.JumpImpulse));
-
-            Assert.IsFalse(player.CanJump(new TimeSpan(0, 0, 0, 1, 200).Ticks));
-            Assert.IsTrue(player.CanJump(new TimeSpan(0, 0, 0, 1, 1000).Ticks));
-        }
-
-        [Test]
-        public void JumpAppliesNoImpulseToThePlayersBodyIfCanJumpIsFalse()
-        {
-            var stubPhysicsComponent = MockRepository.GenerateStub<IPhysicsComponent>();
-            Player player = new Player(1, stubPhysicsComponent, null);
-
             player.InContactWithLevel = false;
-            player.Jump(1);
+
+            player.Jump();
 
             stubPhysicsComponent.AssertWasNotCalled(pc => pc.ApplyImpulse(Player.JumpImpulse));
         }
-
         [Test]
         public void MoveLeftAppliesTheCorrectForceToThePlayersBodyWhenStationary()
         {
-            var stubPhysicsComponent = MockRepository.GenerateStub<IPhysicsComponent>();
-            Player player = new Player(1, stubPhysicsComponent, null);
-
             player.MoveLeft();
 
             stubPhysicsComponent.AssertWasCalled(pc => pc.ApplyForce(Player.MoveForce));
         }
-
         [Test]
         public void MoveRightAppliesTheCorrectForceToThePlayersBodyWhenStationary()
         {
-            var stubPhysicsComponent = MockRepository.GenerateStub<IPhysicsComponent>();
-            Player player = new Player(1, stubPhysicsComponent, null);
-
             player.MoveRight();
 
             stubPhysicsComponent.AssertWasCalled(pc => pc.ApplyForce(Player.MoveForce * -1));
         }
-
         [Test]
         public void PlayerVelocityIsCappedToTheLeft()
         {
-            var stubPhysicsComponent = MockRepository.GenerateStub<IPhysicsComponent>();
-            Player player = new Player(1, stubPhysicsComponent, null);
-
             stubPhysicsComponent.Stub(spc => spc.LinearVelocity).Return(new Vector2(-50, 0));
 
             player.MoveLeft();
 
             stubPhysicsComponent.AssertWasNotCalled(pc => pc.ApplyForce(Player.MoveForce));
         }
-
         [Test]
         public void PlayerVelocityIsCappedToTheRight()
         {
-            var stubPhysicsComponent = MockRepository.GenerateStub<IPhysicsComponent>();
-            Player player = new Player(1, stubPhysicsComponent, null);
-
             stubPhysicsComponent.Stub(spc => spc.LinearVelocity).Return(new Vector2(50, 0));
 
             player.MoveRight();
 
             stubPhysicsComponent.AssertWasNotCalled(pc => pc.ApplyForce(Player.MoveForce * -1));
+        }
+
+        // SHOOTING AND BEING SHOT:
+        [Test]
+        public void ShootCallsShootOnCurrentWeapon()
+        {
+            player.Position = new Vector2(10, 20);
+
+            player.Shoot(new Vector2(30, 40));
+
+            player.CurrentWeapon.AssertWasCalled(me => me.Shoot(new Vector2(10, 20), new Vector2(30, 40)));
+        }
+        [Test]
+        public void GettingShotKillsThePlayer()
+        {
+            bool raisedOnDeath = false;
+            Assert.IsTrue(player.IsAlive);
+            player.OnDeath += () => raisedOnDeath = !raisedOnDeath;
+
+            stubPhysicsComponent.Raise(me => me.OnShot += null);
+
+            Assert.IsFalse(player.IsAlive);
+            Assert.IsTrue(raisedOnDeath);
+            Assert.AreEqual(1, player.PlayerScore.Deaths);
+        }
+        [Test]
+        public void SetsRespawnTimerOnDead()
+        {
+            // At the moment just Shooting the player kills it...
+            stubPhysicsComponent.Raise(me => me.OnShot += null);
+
+            stubTimer.AssertWasCalled(me => me.AddActionTimer(Arg<float>.Is.Anything, Arg<Action>.Is.Anything));
         }
     }
 }

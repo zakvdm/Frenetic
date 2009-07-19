@@ -15,7 +15,7 @@ namespace FarseerGames.FarseerPhysics.Collisions
     /// update it unless an extent on an axis "swaps" positions with its neighbor.
     /// Note: If your application has "teleporting" objects or objects that are 
     /// extremely high-speed in relation to other objects, then this Sweep and Prune
-    /// method may breakdown. 
+    /// method may breakdown.
     /// </summary>
     public class SweepAndPruneCollider : IBroadPhaseCollider
     {
@@ -55,21 +55,17 @@ namespace FarseerGames.FarseerPhysics.Collisions
         /// </summary>
         public void ProcessDisposedGeoms()
         {
-            //TODO: Could use lamda expressions. Need to test the performance first.
-            if (_xInfoList.RemoveAll(delegate(ExtentInfo i) { return i.Geometry.IsDisposed; }) > 0)
+            if (_xInfoList.RemoveAll(i => i.Geometry.IsDisposed) > 0)
             {
-                _xExtentList.RemoveAll(delegate(Extent n) { return n.Info.Geometry.IsDisposed; });
+                _xExtentList.RemoveAll(n => n.Info.Geometry.IsDisposed);
             }
 
-            if (_yInfoList.RemoveAll(delegate(ExtentInfo i) { return i.Geometry.IsDisposed; }) > 0)
+            if (_yInfoList.RemoveAll(i => i.Geometry.IsDisposed) > 0)
             {
-                _yExtentList.RemoveAll(delegate(Extent n) { return n.Info.Geometry.IsDisposed; });
+                _yExtentList.RemoveAll(n => n.Info.Geometry.IsDisposed);
             }
 
-            // We force a non-incremental update because that will insure that the
-            // CollisionPairs get recreated and that the geometry isn't being held
-            // by overlaps, etc. Its just easier this way.
-            ForceNonIncrementalUpdate();
+            CollisionPairs.Clear();
         }
 
         /// <summary>
@@ -78,27 +74,24 @@ namespace FarseerGames.FarseerPhysics.Collisions
         /// </summary>
         public void ProcessRemovedGeoms()
         {
-            if (_xInfoList.RemoveAll(delegate(ExtentInfo i) { return i.Geometry.isRemoved; }) > 0)
+            if (_xInfoList.RemoveAll(i => !i.Geometry.InSimulation) > 0)
             {
-                _xExtentList.RemoveAll(delegate(Extent n) { return n.Info.Geometry.isRemoved; });
+                _xExtentList.RemoveAll(n => !n.Info.Geometry.InSimulation);
             }
-            if (_yInfoList.RemoveAll(delegate(ExtentInfo i) { return i.Geometry.isRemoved; }) > 0)
+            if (_yInfoList.RemoveAll(i => !i.Geometry.InSimulation) > 0)
             {
-                _yExtentList.RemoveAll(delegate(Extent n) { return n.Info.Geometry.isRemoved; });
+                _yExtentList.RemoveAll(n => !n.Info.Geometry.InSimulation);
             }
 
-            // We force a non-incremental update because that will insure that the
-            // CollisionPairs get recreated and that the geometry isn't being held
-            // by overlaps, etc. Its just easier this way.
-            ForceNonIncrementalUpdate();
-        }
+            CollisionPairs.Clear();
+         }
 #else
         private int ExtentInfoListRemoveAllRemoved(ExtentInfoList l)
         {
             int removed = 0;
             for (int i = 0; i < l.Count; i++)
             {
-                if (l[i].Geometry.isRemoved)
+                if (!l[i].Geometry.InSimulation)
                 {
                     removed++;
                     l.RemoveAt(i);
@@ -113,7 +106,7 @@ namespace FarseerGames.FarseerPhysics.Collisions
             int removed = 0;
             for (int i = 0; i < l.Count; i++)
             {
-                if (l[i].Info.Geometry.isRemoved)
+                if (!l[i].Info.Geometry.InSimulation)
                 {
                     removed++;
                     l.RemoveAt(i);
@@ -168,11 +161,7 @@ namespace FarseerGames.FarseerPhysics.Collisions
                 ExtentListRemoveAllDisposed(_yExtentList);
             }
 
-
-            // We force a non-incremental update because that will insure that the
-            // CollisionPairs get recreated and that the geometry isn't being held
-            // by overlaps, etc. Its just easier this way.
-            ForceNonIncrementalUpdate();
+            CollisionPairs.Clear();
         }
         public void ProcessRemovedGeoms()
         {
@@ -185,10 +174,7 @@ namespace FarseerGames.FarseerPhysics.Collisions
                 ExtentListRemoveAllRemoved(_yExtentList);
             }
 
-            // We force a non-incremental update because that will insure that the
-            // CollisionPairs get recreated and that the geometry isn't being held
-            // by overlaps, etc. Its just easier this way.
-            ForceNonIncrementalUpdate();
+            CollisionPairs.Clear();
         }
 #endif
 
@@ -227,59 +213,6 @@ namespace FarseerGames.FarseerPhysics.Collisions
         #endregion
 
         /// <summary>
-        /// Test AABB collisions between two geometries. Tests include checking if the
-        /// geometries are enabled, static, in the right collision categories, etc.
-        /// </summary>
-        /// <returns>Returns true if there is a collision, false otherwise</returns>
-        public static bool DoCollision(Geom g1, Geom g2)
-        {
-            if (!g1.body.Enabled || !g2.body.Enabled)
-                return false;
-
-            if ((g1.collisionGroup == g2.collisionGroup) &&
-                g1.collisionGroup != 0 && g2.collisionGroup != 0)
-                return false;
-
-            if (!g1.collisionEnabled || !g2.collisionEnabled)
-                return false;
-
-            if (g1.body.isStatic && g2.body.isStatic)
-                return false;
-
-            if (g1.body == g2.body)
-                return false;
-
-            if (((g1.collisionCategories & g2.collidesWith) ==
-                 CollisionCategory.None) & ((g2.collisionCategories &
-                                             g1.collidesWith) == CollisionCategory.None))
-                return false;
-
-            //TMP
-            AABB aabb1 = new AABB();
-            AABB aabb2 = new AABB();
-            aabb1.min = g1.aabb.min;
-            aabb1.max = g1.aabb.max;
-            aabb2.min = g2.aabb.min;
-            aabb2.max = g2.aabb.max;
-            aabb1.min.X -= _floatTolerance;
-            aabb1.min.Y -= _floatTolerance;
-            aabb1.max.X += _floatTolerance;
-            aabb1.max.Y += _floatTolerance;
-            aabb2.min.X -= _floatTolerance;
-            aabb2.min.Y -= _floatTolerance;
-            aabb2.max.X += _floatTolerance;
-            aabb2.max.Y += _floatTolerance;
-
-            //NOTE: Changed from
-            //            if (AABB.Intersect(g1.aabb, g2.aabb) == false)
-            //                return false;
-            // return true
-
-            //TO:
-            return AABB.Intersect(aabb1, aabb2);
-        }
-
-        /// <summary>
         /// Updates the values in the x and y extent lists by the changing AABB values.
         /// </summary>
         private void UpdateExtentValues()
@@ -289,7 +222,7 @@ namespace FarseerGames.FarseerPhysics.Collisions
                 ExtentInfo xInfo = _xInfoList[i];
                 ExtentInfo yInfo = _yInfoList[i];
 
-                AABB aabb = xInfo.Geometry.aabb;
+                AABB aabb = xInfo.Geometry.AABB;
 
                 xInfo.Min.Value = aabb.min.X - _floatTolerance;
                 xInfo.Max.Value = aabb.max.X + _floatTolerance;
@@ -316,88 +249,6 @@ namespace FarseerGames.FarseerPhysics.Collisions
                 else
                     _physicsSimulator.arbiterPool.Insert(arbiter);
             }
-        }
-
-        /// <summary>
-        /// Just calls Update.
-        /// </summary>
-        public void Run()
-        {
-            //NOTE: bForce was always false, bug?
-            //if (bForce)
-            //    ForceNonIncrementalUpdate();
-            //else
-            Update();
-        }
-
-        /// <summary>
-        /// This function can be used for times when frame-coherence is temporarily lost
-        /// or when it is simply more convenient to completely rebuild all the cached
-        /// data instead of incrementally updating it. Currently it is used after
-        /// removing disposed/removed geometries. If your application had an object
-        /// that teleported across the universe or some other situation where
-        /// frame-coherence was lost, you might consider this function.
-        /// </summary>
-        public void ForceNonIncrementalUpdate()
-        {
-            UpdateExtentValues();
-
-            // First, wipe out the collision records
-            CollisionPairs.Clear();
-
-            // And clear out all the overlap records
-            Debug.Assert(_xInfoList.Count == _yInfoList.Count);
-            for (int i = 0; i < _xInfoList.Count; i++)
-            {
-                _xInfoList[i].Overlaps.Clear();
-                _xInfoList[i].UnderConsideration.Clear();
-                _yInfoList[i].Overlaps.Clear();
-                _yInfoList[i].UnderConsideration.Clear();
-            }
-
-            // Force sort
-            _xExtentList.Sort((l, r) => l.Value.CompareTo(r.Value));
-            _yExtentList.Sort((l, r) => l.Value.CompareTo(r.Value));
-
-            // Rebuild overlap information
-            List<Geom> overlaps = new List<Geom>();
-            for (int i = 0; i < 2; i++)
-            {
-                overlaps.Clear();
-
-                ExtentList extentList = i == 0 ? _xExtentList : _yExtentList;
-
-                foreach (Extent extent in extentList)
-                {
-                    if (extent.IsMin)
-                    {
-                        // Add whatever is currently in overlaps to this
-                        extent.Info.Overlaps.InsertRange(0, overlaps);
-
-                        // Now add, this geom to overlaps
-                        overlaps.Add(extent.Info.Geometry);
-                    }
-                    else
-                    {
-                        // remove this geom from overlaps
-                        overlaps.Remove(extent.Info.Geometry);
-
-                        // Test this geom against its overlaps for collisionpairs
-                        Geom thisGeom = extent.Info.Geometry;
-                        foreach (Geom g in extent.Info.Overlaps)
-                        {
-                            if (DoCollision(thisGeom, g) == false)
-                                continue;
-
-                            //TODO: Should call OnBroadPhaseCollision event here. But not until
-                            //the Run() method has been looked after
-
-                            CollisionPairs.AddPair(thisGeom, g);
-                        }
-                    }
-                }
-            }
-            HandleCollisions();
         }
 
         #region Nested type: CollisionPair
@@ -430,7 +281,7 @@ namespace FarseerGames.FarseerPhysics.Collisions
             {
                 // Arbitrarly choose 10000 as a number of colliders that we won't 
                 // approach any time soon.
-                return (Geom1.Id*10000 + Geom2.Id);
+                return (Geom1.id*10000 + Geom2.id);
             }
 
             public override bool Equals(object obj)
@@ -589,7 +440,7 @@ namespace FarseerGames.FarseerPhysics.Collisions
                     if (this[i].UnderConsideration.Count == 0)
                         continue;
 
-                    Geom g1 = this[i].Geometry;
+                    Geom geometryA = this[i].Geometry;
 
                     // First transfer those under consideration to overlaps,
                     // for, they have been considered...
@@ -599,25 +450,67 @@ namespace FarseerGames.FarseerPhysics.Collisions
 
                     for (int j = startIndex; j < this[i].Overlaps.Count; j++)
                     {
-                        Geom g2 = this[i].Overlaps[j];
+                        Geom geometryB = this[i].Overlaps[j];
 
                         // It is possible that we may test the same pair of geometries
                         // for both extents (x and y), however, I'm banking on that
                         // one of the extents has probably already been cached and
                         // therefore, won't be checked.
-                        if (DoCollision(g1, g2) == false)
+
+                        if (!geometryA.body.Enabled || !geometryB.body.Enabled)
                             continue;
 
+                        if ((geometryA.CollisionGroup == geometryB.CollisionGroup) &&
+                            geometryA.CollisionGroup != 0 && geometryB.CollisionGroup != 0)
+                            continue;
+
+                        if (!geometryA.CollisionEnabled || !geometryB.CollisionEnabled)
+                            continue;
+
+                        if (geometryA.body.isStatic && geometryB.body.isStatic)
+                            continue;
+
+                        if (geometryA.body == geometryB.body)
+                            continue;
+
+                        if (((geometryA.CollisionCategories & geometryB.CollidesWith) == CollisionCategory.None) &
+                            ((geometryB.CollisionCategories & geometryA.CollidesWith) == CollisionCategory.None))
+                            continue;
+
+                        if (geometryA.FindDNC(geometryB) || geometryB.FindDNC(geometryA))
+                        {
+                            continue;
+                        }
+
+                        //TMP
+                        AABB aabb1 = new AABB();
+                        AABB aabb2 = new AABB();
+                        aabb1.min = geometryA.AABB.min;
+                        aabb1.max = geometryA.AABB.max;
+                        aabb2.min = geometryB.AABB.min;
+                        aabb2.max = geometryB.AABB.max;
+                        aabb1.min.X -= _floatTolerance;
+                        aabb1.min.Y -= _floatTolerance;
+                        aabb1.max.X += _floatTolerance;
+                        aabb1.max.Y += _floatTolerance;
+                        aabb2.min.X -= _floatTolerance;
+                        aabb2.min.Y -= _floatTolerance;
+                        aabb2.max.X += _floatTolerance;
+                        aabb2.max.Y += _floatTolerance;
+
+                        if(!AABB.Intersect(aabb1, aabb2))
+                            continue;
+                        
                         //Call the OnBroadPhaseCollision event first. If the user aborts the collision
                         //it will not create an arbiter
                         if (Owner.OnBroadPhaseCollision != null)
                         {
-                            if (Owner.OnBroadPhaseCollision(g1, g2))
-                                Owner.CollisionPairs.AddPair(g1, g2);
+                            if (Owner.OnBroadPhaseCollision(geometryA, geometryB))
+                                Owner.CollisionPairs.AddPair(geometryA, geometryB);
                         }
                         else
                         {
-                            Owner.CollisionPairs.AddPair(g1, g2);
+                            Owner.CollisionPairs.AddPair(geometryA, geometryB);
                         }
                     }
                 }

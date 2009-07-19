@@ -11,14 +11,23 @@ namespace UnitTestLibrary
     [TestFixture]
     public class LidgrenClientNetworkSessionTests
     {
+        IMessageSerializer stubSerializer;
+        INetClient stubNetClient;
+        LidgrenClientNetworkSession clientNetworkSession;
+        [SetUp]
+        public void SetUp()
+        {
+            stubNetClient = MockRepository.GenerateStub<INetClient>();
+            stubSerializer = MockRepository.GenerateStub<IMessageSerializer>();
+            clientNetworkSession = new LidgrenClientNetworkSession(stubNetClient, stubSerializer);
+        }
+
+        // CONNECTING:
         [Test]
         public void ClientCanJoinSessionCorrectlyWithIP()
         {
-            var stubNetClient = MockRepository.GenerateStub<INetClient>();
             string ip = "ip";
             int port = 1;
-
-            LidgrenClientNetworkSession clientNetworkSession = new LidgrenClientNetworkSession(stubNetClient, null);
 
             clientNetworkSession.Join(ip, port);
 
@@ -29,10 +38,7 @@ namespace UnitTestLibrary
         [Test]
         public void ClientCanSearchForLocalSessions()
         {
-            var stubNetClient = MockRepository.GenerateStub<INetClient>();
             int port = 1;
-
-            LidgrenClientNetworkSession clientNetworkSession = new LidgrenClientNetworkSession(stubNetClient, null);
 
             clientNetworkSession.Join(port);
 
@@ -43,8 +49,6 @@ namespace UnitTestLibrary
         [Test]
         public void ClientConnectsToFoundServer()
         {
-            var stubNetClient = MockRepository.GenerateStub<INetClient>();
-            LidgrenClientNetworkSession clientNetworkSession = new LidgrenClientNetworkSession(stubNetClient, null);
             NetBuffer tmp = new NetBuffer();
 
             stubNetClient.Stub(x => x.CreateBuffer()).Return(tmp);
@@ -58,36 +62,73 @@ namespace UnitTestLibrary
             stubNetClient.AssertWasCalled(x => x.Connect(Arg<System.Net.IPEndPoint>.Is.Anything, Arg<byte[]>.Is.Anything));
         }
 
+        // RECEIVING DATA:
+        [Test]
+        public void RaisesClientJoinedEventForLocalPlayerWhenNotifiedOfSuccessfulJoin()
+        {
+            NetBuffer buffer = new NetBuffer();
+            stubNetClient.Stub(me => me.CreateBuffer()).Return(buffer);
+            stubNetClient.Stub(me => me.ReadMessage(Arg<NetBuffer>.Is.Equal(buffer), out Arg<NetMessageType>.Out(NetMessageType.Data).Dummy)).Return(true);
+            stubSerializer.Stub(me => me.Deserialize(buffer.ReadBytes(buffer.LengthBytes))).Return(new Message() { Type = MessageType.SuccessfulJoin, Data = 100 });
+            bool raisedEvent = false;
+            clientNetworkSession.ClientJoined += (obj, args) => { if ((args.ID == 100) && (args.IsLocalClient)) raisedEvent = true; };
+
+            clientNetworkSession.ReadMessage();
+
+            Assert.IsTrue(raisedEvent);
+        }
+        [Test]
+        public void RaisesClientJoinedEventForNetworkPlayersWhenNotifiedOfNewPlayers()
+        {
+            NetBuffer buffer = new NetBuffer();
+            stubNetClient.Stub(me => me.CreateBuffer()).Return(buffer);
+            stubNetClient.Stub(me => me.ReadMessage(Arg<NetBuffer>.Is.Equal(buffer), out Arg<NetMessageType>.Out(NetMessageType.Data).Dummy)).Return(true);
+            stubSerializer.Stub(me => me.Deserialize(buffer.ReadBytes(buffer.LengthBytes))).Return(new Message() { Type = MessageType.NewClient, Data = 100 });
+            bool raisedEvent = false;
+            clientNetworkSession.ClientJoined += (obj, args) => { if ((args.ID == 100) && (!args.IsLocalClient)) raisedEvent = true; };
+
+            clientNetworkSession.ReadMessage();
+
+            Assert.IsTrue(raisedEvent);
+        }
+        [Test]
+        public void RaisesClientDisconnectedEventCorrectlyForDisconnectingClients()
+        {
+            stubNetClient.Stub(me => me.CreateBuffer()).Return(new NetBuffer());
+            stubNetClient.Stub(me => me.ReadMessage(Arg<NetBuffer>.Is.Anything, out Arg<NetMessageType>.Out(NetMessageType.Data).Dummy)).Return(true);
+            stubSerializer.Stub(me => me.Deserialize(Arg<byte[]>.Is.Anything)).Return(new Message() { Type = MessageType.DisconnectingClient, Data = 100 });
+            bool raisedEvent = false;
+            clientNetworkSession.ClientDisconnected += (obj, args) => { if ((args.ID == 100) && (!args.IsLocalClient)) raisedEvent = true; };
+
+            clientNetworkSession.ReadMessage();
+
+            Assert.IsTrue(raisedEvent);
+        }
+
+        // SENDING DATA:
         [Test]
         [ExpectedException(ExceptionType = typeof(System.InvalidOperationException),
                             ExpectedMessage = "Client not connected to server")]
         public void ClientCantSendToServerWhenNotConnected()
         {
-            var stubNetClient = MockRepository.GenerateStub<INetClient>();
-            LidgrenClientNetworkSession clientNS = new LidgrenClientNetworkSession(stubNetClient, null);
-
-            clientNS.SendToServer(new Message(), NetChannel.Unreliable);
+            clientNetworkSession.SendToServer(new Message(), NetChannel.Unreliable);
         }
 
         [Test]
         public void ClientProcessesAndSendsToServer()
         {
-            var stubNetClient = MockRepository.GenerateStub<INetClient>();
-            LidgrenClientNetworkSession clientNetworkSession = new LidgrenClientNetworkSession(stubNetClient, new XmlMessageSerializer());
-
             NetBuffer tmpBuffer = new NetBuffer();
-            Message msg = new Message() { Type = MessageType.PlayerData, Data = 10 };
+            Message msg = new Message() { Type = MessageType.Player, Data = 10 };
             stubNetClient.Stub(x => x.CreateBuffer(Arg<int>.Is.Anything)).Return(tmpBuffer);
-            stubNetClient.Stub(x => x.Connected).Return(true);
+            stubNetClient.Stub(x => x.Status).Return(NetConnectionStatus.Connected);
+            byte[] data = { 0, 2 };
+            stubSerializer.Stub(x => x.Serialize(msg)).Return(data);
 
             clientNetworkSession.SendToServer(msg, NetChannel.ReliableUnordered);
 
             stubNetClient.AssertWasCalled(x => x.CreateBuffer(Arg<int>.Is.Anything));
             stubNetClient.AssertWasCalled(x => x.SendMessage(tmpBuffer, NetChannel.ReliableUnordered));
-
-            byte[] data = (new XmlMessageSerializer()).Serialize(msg);
             Assert.AreEqual(data, tmpBuffer.ReadBytes(data.Length));
         }
-
     }
 }

@@ -41,6 +41,7 @@ namespace Lidgren.Network
 		protected bool m_shutdownRequested;
 		protected string m_shutdownReason;
 		protected bool m_shutdownComplete;
+		protected NetFrequencyCounter m_heartbeatCounter;
 
 		// ready for reading by the application
 		internal NetQueue<IncomingNetMessage> m_receivedMessages;
@@ -70,6 +71,11 @@ namespace Lidgren.Network
 		/// </summary>
 		public int RunSleep { get { return m_runSleep; } set { m_runSleep = value; } }
 
+		/// <summary>
+		/// Average number of heartbeats performed per second; over a 3 seconds window
+		/// </summary>
+		public float HeartbeatAverageFrequency { get { return m_heartbeatCounter.AverageFrequency; } }
+		
 		/// <summary>
 		/// Enables or disables a particular type of message
 		/// </summary>
@@ -129,6 +135,7 @@ namespace Lidgren.Network
 			m_scratchBuffer = new NetBuffer(32);
 			m_bindLock = new object();
 			m_discovery = new NetDiscovery(this);
+			m_heartbeatCounter = new NetFrequencyCounter(3.0f);
 
 			m_randomIdentifier = new byte[8];
 			NetRandom.Instance.NextBytes(m_randomIdentifier);
@@ -238,6 +245,7 @@ namespace Lidgren.Network
 				}
 
 				m_heartbeatThread = new Thread(new ThreadStart(Run));
+				m_heartbeatThread.IsBackground = true;
 				m_heartbeatThread.Start();
 
 				return;
@@ -267,24 +275,23 @@ namespace Lidgren.Network
 		/// </summary>
 		public void CeaseHolePunching(IPEndPoint ep)
 		{
+			if (ep == null)
+				return;
+			
 			int hc = ep.GetHashCode();
 			if (m_holePunches != null)
 			{
-				bool wasRemoved = false;
-				do
+				for (int i = 0; i < m_holePunches.Count; )
 				{
-					for (int i = 0; i < m_holePunches.Count; i++)
+					if (m_holePunches[i] != null && m_holePunches[i].GetHashCode() == hc)
 					{
-						if (m_holePunches[i].GetHashCode() == hc)
-						{
-							m_holePunches.RemoveAt(i);
-							wasRemoved = true;
-							break;
-						}
+						LogVerbose("Ceasing hole punching to " + m_holePunches[i]);
+						m_holePunches.RemoveAt(i);
 					}
-				} while (m_holePunches.Count > 0 && wasRemoved);
-
-				if (m_holePunches.Count == 0)
+					else
+						i++;
+				}
+				if (m_holePunches.Count < 1)
 					m_holePunches = null;
 			}
 		}
@@ -517,6 +524,19 @@ namespace Lidgren.Network
 			NetBuffer toTwo = CreateBuffer();
 			toTwo.Write(one);
 			QueueSingleUnreliableSystemMessage(NetSystemType.NatIntroduction, toTwo, two, false);
+		}
+
+		/// <summary>
+		/// Send a NAT introduction messages to ONE about contacting TWO
+		/// </summary>
+		public void SendSingleNATIntroduction(
+			IPEndPoint one,
+			IPEndPoint two
+		)
+		{
+			NetBuffer toOne = CreateBuffer();
+			toOne.Write(two);
+			QueueSingleUnreliableSystemMessage(NetSystemType.NatIntroduction, toOne, one, false);
 		}
 
 		/// <summary>

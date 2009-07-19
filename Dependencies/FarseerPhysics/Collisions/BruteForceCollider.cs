@@ -50,13 +50,6 @@ namespace FarseerGames.FarseerPhysics.Collisions
         /// </summary>
         public void Update()
         {
-            DoCollision();
-        }
-
-        #endregion
-
-        private void DoCollision()
-        {
             //Iterate all the geoms and check against the next
             for (int i = 0; i < _physicsSimulator.geomList.Count - 1; i++)
             {
@@ -68,11 +61,11 @@ namespace FarseerGames.FarseerPhysics.Collisions
                     if (!_geometryA.body.Enabled || !_geometryB.body.Enabled)
                         continue;
 
-                    if ((_geometryA.collisionGroup == _geometryB.collisionGroup) &&
-                        _geometryA.collisionGroup != 0 && _geometryB.collisionGroup != 0)
+                    if ((_geometryA.CollisionGroup == _geometryB.CollisionGroup) &&
+                        _geometryA.CollisionGroup != 0 && _geometryB.CollisionGroup != 0)
                         continue;
 
-                    if (!_geometryA.collisionEnabled || !_geometryB.collisionEnabled)
+                    if (!_geometryA.CollisionEnabled || !_geometryB.CollisionEnabled)
                         continue;
 
                     if (_geometryA.body.isStatic && _geometryB.body.isStatic)
@@ -83,6 +76,9 @@ namespace FarseerGames.FarseerPhysics.Collisions
 
                     if (((_geometryA.CollisionCategories & _geometryB.CollidesWith) == CollisionCategory.None) &
                         ((_geometryB.CollisionCategories & _geometryA.CollidesWith) == CollisionCategory.None))
+                        continue;
+
+                    if (_geometryA.FindDNC(_geometryB) || _geometryB.FindDNC(_geometryA))
                     {
                         continue;
                     }
@@ -90,43 +86,20 @@ namespace FarseerGames.FarseerPhysics.Collisions
                     //Assume intersection
                     bool intersection = true;
 
-                    #region INLINE: if (AABB.Intersect(_geometryA.aabb, _geometryB.aabb)) ....
-
                     //Check if there is no intersection
                     if (_geometryA.AABB.min.X > _geometryB.AABB.max.X || _geometryB.AABB.min.X > _geometryA.AABB.max.X)
-                    {
                         intersection = false;
-                    }
-                    else if (_geometryA.AABB.min.Y > _geometryB.AABB.Max.Y ||
-                             _geometryB.AABB.min.Y > _geometryA.AABB.Max.Y)
-                    {
+                    else if (_geometryA.AABB.min.Y > _geometryB.AABB.Max.Y || _geometryB.AABB.min.Y > _geometryA.AABB.Max.Y)
                         intersection = false;
-                    }
-
-                    #endregion
 
                     //Call the OnBroadPhaseCollision event first. If the user aborts the collision
                     //it will not create an arbiter
-
                     if (OnBroadPhaseCollision != null)
                         intersection = OnBroadPhaseCollision(_geometryA, _geometryB);
 
                     //If the user aborted the intersection, continue to the next geometry.
                     if (!intersection)
                         continue;
-
-                    //Note: Commented this out and copy-paste into from other colliders
-                    //_arbiter = _physicsSimulator.arbiterPool.Fetch();
-                    //_arbiter.ConstructArbiter(_geometryA, _geometryB, _physicsSimulator);
-
-                    //if (_physicsSimulator.arbiterList.Contains(_arbiter))
-                    //{
-                    //    _physicsSimulator.arbiterPool.Insert(_arbiter);
-                    //}
-                    //else
-                    //{
-                    //    _physicsSimulator.arbiterList.Add(_arbiter);
-                    //}
 
                     Arbiter arbiter = _physicsSimulator.arbiterPool.Fetch();
                     arbiter.ConstructArbiter(_geometryA, _geometryB, _physicsSimulator);
@@ -138,5 +111,7 @@ namespace FarseerGames.FarseerPhysics.Collisions
                 }
             }
         }
+
+        #endregion
     }
 }

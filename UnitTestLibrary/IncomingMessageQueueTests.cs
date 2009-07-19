@@ -15,72 +15,107 @@ namespace UnitTestLibrary
     public class IncomingMessageQueueTests
     {
         QueuedMessageHelper<Message> queueMH;
+        INetworkSession stubNS;
+        IClientStateTracker stubClientStateTracker;
+        Client client;
+        IncomingMessageQueue mq;
         [SetUp]
         public void SetUp()
         {
             queueMH = new QueuedMessageHelper<Message>();
+            stubNS = MockRepository.GenerateStub<INetworkSession>();
+            stubClientStateTracker = MockRepository.GenerateStub<IClientStateTracker>();
+            client = new Client(null) { ID = 100 };
+            stubClientStateTracker.Stub(me => me.FindNetworkClient(100)).Return(client);
+
+            mq = new IncomingMessageQueue(stubNS, stubClientStateTracker);
         }
 
         [Test]
-        public void CanConstruct()
+        public void EmptyQueueReturnsFalseOnHasAvailableCall()
         {
-            var stubNS = MockRepository.GenerateStub<INetworkSession>();
-            IncomingMessageQueue mq = new IncomingMessageQueue(stubNS);
-
-            Assert.IsNotNull(mq);
-        }
-
-        [Test]
-        public void EmptyQueueReturnsFalseOnMessageAvailable()
-        {
-            var stubNS = MockRepository.GenerateStub<INetworkSession>();
-            IncomingMessageQueue mq = new IncomingMessageQueue(stubNS);
             stubNS.Stub(x => x.ReadMessage()).Return(null);
 
-            Assert.IsNull(mq.ReadMessage(MessageType.PlayerData));
+            Assert.IsFalse(mq.HasAvailable(MessageType.Player));
         }
 
+        [Test]
+        public void HasAvailableTrueWhenMessageAvailable()
+        {
+            queueMH.QueuedMessages.Enqueue(new Message() { Type = MessageType.Player, ClientID = 100 });
+            stubNS.Stub(x => x.ReadMessage()).Do(queueMH.GetNextQueuedMessage);
+
+            Assert.IsTrue(mq.HasAvailable(MessageType.Player));
+        }
+        
         [Test]
         public void ReturnsMessageWhenAvailable()
         {
-            var stubNS = MockRepository.GenerateStub<INetworkSession>();
-            IncomingMessageQueue mq = new IncomingMessageQueue(stubNS);
-            queueMH.QueuedMessages.Enqueue(new Message() { Type = MessageType.PlayerData, Data = new byte[3] { 1, 2, 3 } });
+            queueMH.QueuedMessages.Enqueue(new Message() { Type = MessageType.Player, Data = new byte[3] { 1, 2, 3 }, ClientID = 100 });
             stubNS.Stub(x => x.ReadMessage()).Do(queueMH.GetNextQueuedMessage);
 
-            Assert.AreEqual(new byte[3] { 1, 2, 3 }, mq.ReadMessage(MessageType.PlayerData));
+            Assert.AreEqual(new byte[3] { 1, 2, 3 }, mq.ReadMessage(MessageType.Player).Data);
+        }
+
+        [Test]
+        public void ReadMessageReturnsMessageObject()
+        {
+            Message msg = new Message() { Type = MessageType.SuccessfulJoin, ClientID = 100, Data = 1 };
+            queueMH.QueuedMessages.Enqueue(msg);
+            stubNS.Stub(x => x.ReadMessage()).Do(queueMH.GetNextQueuedMessage);
+
+            Assert.AreEqual(msg, mq.ReadMessage(MessageType.SuccessfulJoin));
         }
 
         [Test]
         public void CanQueueMoreThanOneMessage()
         {
-            var stubNS = MockRepository.GenerateStub<INetworkSession>();
-            IncomingMessageQueue mq = new IncomingMessageQueue(stubNS);
-            queueMH.QueuedMessages.Enqueue(new Message() { Type = MessageType.PlayerData, Data = new byte[3] { 1, 2, 3 } });
-            queueMH.QueuedMessages.Enqueue(new Message() { Type = MessageType.PlayerData, Data = new byte[2] { 4, 5 } });
+            queueMH.QueuedMessages.Enqueue(new Message() { Type = MessageType.Player, Data = new byte[3] { 1, 2, 3 }, ClientID = 100 });
+            queueMH.QueuedMessages.Enqueue(new Message() { Type = MessageType.Player, Data = new byte[2] { 4, 5 }, ClientID = 100 });
             stubNS.Stub(x => x.ReadMessage()).Do(queueMH.GetNextQueuedMessage);
 
-            Assert.AreEqual(new byte[3] { 1, 2, 3 }, mq.ReadMessage(MessageType.PlayerData));
-            Assert.AreEqual(new byte[2] { 4, 5 }, mq.ReadMessage(MessageType.PlayerData));
+            Assert.AreEqual(new byte[3] { 1, 2, 3 }, mq.ReadMessage(MessageType.Player).Data);
+            Assert.AreEqual(new byte[2] { 4, 5 }, mq.ReadMessage(MessageType.Player).Data);
         }
 
         [Test]
-        public void StoresSeperateQueuesForDifferentIDs()
+        public void StoresSeperateQueuesForDifferentMessageTypes()
         {
-            var stubNS = MockRepository.GenerateStub<INetworkSession>();
-            var mq = new IncomingMessageQueue(stubNS);
-            queueMH.QueuedMessages.Enqueue(new Message() { Type = MessageType.PlayerData, Data = new byte[3] { 1, 2, 3 } });
-            queueMH.QueuedMessages.Enqueue(new Message() { Type = MessageType.Event, Data = new byte[2] { 4, 5 } });
-            queueMH.QueuedMessages.Enqueue(new Message() { Type = MessageType.PlayerData, Data = new byte[3] { 6, 7, 8 } });
+            queueMH.QueuedMessages.Enqueue(new Message() { Type = MessageType.Player, Data = new byte[3] { 1, 2, 3 }, ClientID = 100 });
             stubNS.Stub(x => x.ReadMessage()).Do(queueMH.GetNextQueuedMessage);
 
-            Assert.AreEqual(new byte[3] { 1, 2, 3 }, mq.ReadMessage(MessageType.PlayerData));
-            Assert.AreEqual(new byte[3] { 6, 7, 8 }, mq.ReadMessage(MessageType.PlayerData));
-            Assert.IsNull(mq.ReadMessage(MessageType.PlayerData));
+            Assert.IsFalse(mq.HasAvailable(MessageType.PlayerSettings));
+        }
+
+        [Test]
+        public void DoesntDiscardMessagesAboutTheLocalClient()
+        {
+            queueMH.QueuedMessages.Enqueue(new Message() { Type = MessageType.PlayerSettings, ClientID = 300, Data = 4 });
+            stubNS.Stub(me => me.ReadMessage()).Do(queueMH.GetNextQueuedMessage);
+            stubClientStateTracker.Stub(me => me.LocalClient).Return(new LocalClient(null) { ID = 300 });
+
+            Assert.IsTrue(mq.HasAvailable(MessageType.PlayerSettings));
+        }
+        [Test]
+        public void HasAvailableDiscardsInvalidMessages()
+        {
+            queueMH.QueuedMessages.Enqueue(new Message() { Type = MessageType.Player, Data = 1, ClientID = 200 });
+            stubNS.Stub(me => me.ReadMessage()).Do(queueMH.GetNextQueuedMessage);
+            stubClientStateTracker.Stub(me => me.FindNetworkClient(200)).Return(null);
+
+            Assert.IsFalse(mq.HasAvailable(MessageType.Player));
+        }
+        [Test]
+        public void DoesntDiscardMessagesThatDontCareAboutHavingAValidClient()
+        {
+            queueMH.QueuedMessages.Enqueue(new Message() { Type = MessageType.ChatLog, Data = 1 }); // No ClientID set, so the ClientID's not relevant
+            stubNS.Stub(me => me.ReadMessage()).Do(queueMH.GetNextQueuedMessage);
+
+            Assert.IsTrue(mq.HasAvailable(MessageType.ChatLog));
         }
     }
 
-    public class QueuedMessageHelper<T> where T:class
+    public class QueuedMessageHelper<T>// where T:class
     {
         public QueuedMessageHelper()
         {
@@ -101,7 +136,8 @@ namespace UnitTestLibrary
             {
                 return QueuedMessages.Dequeue();
             }
-            return null;
+            //return null;
+            return default(T);
         }
     }
 
@@ -119,7 +155,15 @@ namespace UnitTestLibrary
                 return new DoDelegate(getNextQueuedMessage);
             }
         }
+        public HasAvailableDelegate HasMessageAvailable
+        {
+            get
+            {
+                return new HasAvailableDelegate(hasMessageAvailable);
+            }
+        }
         public delegate T DoDelegate(Arg arg);
+        public delegate bool HasAvailableDelegate(Arg arg);
         private T getNextQueuedMessage(Arg arg)
         {
             if (QueuedMessages.Count > 0)
@@ -127,6 +171,10 @@ namespace UnitTestLibrary
                 return QueuedMessages.Dequeue();
             }
             return null;
+        }
+        private bool hasMessageAvailable(Arg arg)
+        {
+            return (QueuedMessages.Count > 0);
         }
     }
 }

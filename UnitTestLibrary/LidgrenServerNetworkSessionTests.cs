@@ -4,6 +4,7 @@ using Rhino.Mocks;
 using Frenetic.Network.Lidgren;
 using Lidgren.Network;
 using Frenetic.Network;
+using Autofac.Builder;
 
 namespace UnitTestLibrary
 {
@@ -12,12 +13,53 @@ namespace UnitTestLibrary
     {
         XmlMessageSerializer _serializer = new XmlMessageSerializer();
 
+        INetServer stubNetServer;
+        IServerMessageSender stubMessageSender;
+        INetConnection stubNetConnection;
+        INetConnection stubDisconnectingConnection;
+        LidgrenServerNetworkSession serverNetworkSession;
+        [SetUp]
+        public void SetUp()
+        {
+            stubNetServer = MockRepository.GenerateStub<INetServer>();
+            stubMessageSender = MockRepository.GenerateStub<IServerMessageSender>();
+            stubNetConnection = MockRepository.GenerateStub<INetConnection>();
+            stubDisconnectingConnection = MockRepository.GenerateStub<INetConnection>();
+            serverNetworkSession = new LidgrenServerNetworkSession(stubNetServer, stubMessageSender, _serializer);
+
+            stubNetConnection.Stub(x => x.Status).Return(NetConnectionStatus.Connected);
+            stubNetConnection.Stub(x => x.ConnectionID).Return(100);
+            stubDisconnectingConnection.Stub(x => x.Status).Return(NetConnectionStatus.Disconnecting);
+            stubDisconnectingConnection.Stub(x => x.ConnectionID).Return(200);
+
+            serverNetworkSession.ActiveConnections.Add(200, stubDisconnectingConnection);
+        }
+
+        [Test]
+        public void CanBuildNetworkSessionsWithAutofac()
+        {
+            var builder = new ContainerBuilder();
+            builder.Register(MockRepository.GenerateStub<INetServer>()).SingletonScoped();
+            builder.Register(MockRepository.GenerateStub<INetClient>()).SingletonScoped();
+            builder.Register(MockRepository.GenerateStub<IServerMessageSender>()).SingletonScoped();
+            builder.Register(x => new NetConfiguration("Frenetic")).FactoryScoped();
+            builder.Register<LidgrenServerNetworkSession>();
+            builder.Register<LidgrenClientNetworkSession>();
+            builder.Register(MockRepository.GenerateStub<IMessageSerializer>()).SingletonScoped();
+
+            var container = builder.Build();
+
+            var serverNetworkSession = container.Resolve<LidgrenServerNetworkSession>();
+            Assert.IsNotNull(serverNetworkSession);
+
+            var clientNetworkSession = container.Resolve<LidgrenClientNetworkSession>();
+            Assert.IsNotNull(clientNetworkSession);
+        }
+
+
         [Test]
         public void ServerCanCreateSessionCorrectly()
         {
-            var stubNetServer = MockRepository.GenerateStub<INetServer>();
-            LidgrenServerNetworkSession serverNetworkSession = new LidgrenServerNetworkSession(stubNetServer, null);
-
             serverNetworkSession.Create(20);
 
             Assert.AreEqual(20, stubNetServer.Port);
@@ -29,44 +71,17 @@ namespace UnitTestLibrary
                             ExpectedMessage = "Session already created")]
         public void ServerCantBeStartedTwice()
         {
-            var stubNetServer = MockRepository.GenerateStub<INetServer>();
-
-            LidgrenServerNetworkSession session = new LidgrenServerNetworkSession(stubNetServer, null);
             stubNetServer.Stub(x => x.IsListening).Return(true);
 
-            session.Create(1);
+            serverNetworkSession.Create(1);
         }
 
-        [Test]
-        public void ServerApprovesClientCorrecly()
-        {
-            var stubNetServer = MockRepository.GenerateStub<INetServer>();
-            var stubNetConnection = MockRepository.GenerateStub<INetConnection>();
-            LidgrenServerNetworkSession serverNetworkSession = new LidgrenServerNetworkSession(stubNetServer, null);
-
-            NetBuffer tmpBuffer = new NetBuffer();
-            tmpBuffer.Write("hail data from client");
-
-            stubNetServer.Stub(x => x.CreateBuffer()).Return(tmpBuffer);
-            stubNetServer.Stub(x => x.ReadMessage(Arg<NetBuffer>.Is.Equal(tmpBuffer),
-                    out Arg<NetMessageType>.Out(NetMessageType.ConnectionApproval).Dummy,
-                    out Arg<INetConnection>.Out(stubNetConnection).Dummy)).Return(true);
-
-            serverNetworkSession.ReadMessage();
-
-            stubNetConnection.AssertWasCalled(x => x.Approve());
-        }
-
+        
         [Test]
         public void ServerReceivesDataFromClientAndCreatesMessage()
         {
-            var stubNetServer = MockRepository.GenerateStub<INetServer>();
-            var stubNetConnection = MockRepository.GenerateStub<INetConnection>();
-            LidgrenServerNetworkSession serverNetworkSession = new LidgrenServerNetworkSession(stubNetServer, _serializer);
             NetBuffer tmpBuffer = new NetBuffer();
-            tmpBuffer.Write(_serializer.Serialize(new Message() { Type = MessageType.PlayerData, Data = 10 }));
-
-            stubNetConnection.Stub(x => x.ConnectionID).Return(1);
+            tmpBuffer.Write(_serializer.Serialize(new Message() { Type = MessageType.Player, Data = 10 }));
             stubNetServer.Stub(x => x.CreateBuffer()).Return(tmpBuffer);
             stubNetServer.Stub(x => x.ReadMessage(Arg<NetBuffer>.Is.Anything,
                             out Arg<NetMessageType>.Out(NetMessageType.Data).Dummy,
@@ -78,20 +93,14 @@ namespace UnitTestLibrary
             stubNetServer.AssertWasCalled(x => x.ReadMessage(Arg<NetBuffer>.Is.Equal(tmpBuffer),
                                         out Arg<NetMessageType>.Out(NetMessageType.Data).Dummy,
                                         out Arg<INetConnection>.Out(stubNetConnection).Dummy));
-            Assert.AreEqual(MessageType.PlayerData, msg.Type);
+            Assert.AreEqual(MessageType.Player, msg.Type);
             Assert.AreEqual(10, msg.Data);
         }
 
-
-
+        // NEW CLIENT HANDLING:
         [Test]
         public void ServerApprovesNewConnection()
         {
-            var stubNetServer = MockRepository.GenerateStub<INetServer>();
-            var stubNetConnection = MockRepository.GenerateStub<INetConnection>();
-            LidgrenServerNetworkSession serverNetworkSession = new LidgrenServerNetworkSession(stubNetServer, null);
-
-            stubNetServer.Stub(x => x.CreateBuffer()).Return(new NetBuffer("test"));
             stubNetServer.Stub(x => x.ReadMessage(Arg<NetBuffer>.Is.Anything,
                     out Arg<NetMessageType>.Out(NetMessageType.ConnectionApproval).Dummy,
                     out Arg<INetConnection>.Out(stubNetConnection).Dummy)).Return(true);
@@ -101,45 +110,138 @@ namespace UnitTestLibrary
             Assert.IsNull(msg);
             stubNetConnection.AssertWasCalled(x => x.Approve());
         }
-
         [Test]
-        public void ServerCreatesNewPlayerMessageWhenConnectionStatusBecomesConnected()
+        public void ServerFiresClientJoinedEventWhenConnectionStatusBecomesConnected()
         {
-            var stubNetServer = MockRepository.GenerateStub<INetServer>();
-            var stubNetConnection = MockRepository.GenerateStub<INetConnection>();
-            stubNetConnection.Stub(x => x.Status).Return(NetConnectionStatus.Connected);
-            LidgrenServerNetworkSession serverNetworkSession = new LidgrenServerNetworkSession(stubNetServer, null);
-
-            stubNetServer.Stub(x => x.CreateBuffer()).Return(new NetBuffer("test"));
             stubNetServer.Stub(x => x.ReadMessage(Arg<NetBuffer>.Is.Anything,
                     out Arg<NetMessageType>.Out(NetMessageType.StatusChanged).Dummy,
                     out Arg<INetConnection>.Out(stubNetConnection).Dummy)).Return(true);
-            stubNetConnection.Stub(x => x.ConnectionID).Return(100);
+            bool eventRaised = false;
+            serverNetworkSession.ClientJoined += (obj, event_args) => { if (event_args.ID == 100) eventRaised = true; };
 
             Message msg = serverNetworkSession.ReadMessage();
-
-            Assert.AreEqual(MessageType.NewPlayer, msg.Type);
-            Assert.AreEqual(100, (int)msg.Data);
-        }
-        [Test]
-        public void ServerCreatesNewPlayerMessageONLYoncePerNewConnection()
-        {
-            var stubNetServer = MockRepository.GenerateStub<INetServer>();
-            var stubNetConnection = MockRepository.GenerateStub<INetConnection>();
-            stubNetConnection.Stub(x => x.Status).Return(NetConnectionStatus.Connected);
-            LidgrenServerNetworkSession serverNetworkSession = new LidgrenServerNetworkSession(stubNetServer, null);
-
-            stubNetServer.Stub(x => x.CreateBuffer()).Return(new NetBuffer("test"));
-            stubNetServer.Stub(x => x.ReadMessage(Arg<NetBuffer>.Is.Anything,
-                    out Arg<NetMessageType>.Out(NetMessageType.StatusChanged).Dummy,
-                    out Arg<INetConnection>.Out(stubNetConnection).Dummy)).Return(true);
-            stubNetConnection.Stub(x => x.ConnectionID).Return(100);
-
-            Message msg = serverNetworkSession.ReadMessage();
-            Assert.IsNotNull(msg);
-            msg = serverNetworkSession.ReadMessage();
 
             Assert.IsNull(msg);
+            Assert.IsTrue(eventRaised);
+        }
+        [Test]
+        public void AddsNewConnectionToListOfActiveConnections()
+        {
+            stubNetServer.Stub(x => x.ReadMessage(Arg<NetBuffer>.Is.Anything,
+                    out Arg<NetMessageType>.Out(NetMessageType.StatusChanged).Dummy,
+                    out Arg<INetConnection>.Out(stubNetConnection).Dummy)).Return(true);
+
+            serverNetworkSession.ReadMessage();
+
+            Assert.AreEqual(stubNetConnection, serverNetworkSession.ActiveConnections[100]);
+        }
+        [Test]
+        public void ServerFiresClientJoinedEventONLYoncePerNewConnection()
+        {
+            stubNetServer.Stub(x => x.ReadMessage(Arg<NetBuffer>.Is.Anything,
+                    out Arg<NetMessageType>.Out(NetMessageType.StatusChanged).Dummy,
+                    out Arg<INetConnection>.Out(stubNetConnection).Dummy)).Return(true);
+            int eventRaiseCount = 0;
+            serverNetworkSession.ClientJoined += (obj, event_args) => eventRaiseCount++;
+
+            serverNetworkSession.ReadMessage();
+            serverNetworkSession.ReadMessage();
+
+            Assert.AreEqual(1, eventRaiseCount);
+        }
+        [Test]
+        public void SendsSuccessfulJoinMessageToClientThatJustJoined()
+        {
+            stubNetServer.Stub(x => x.ReadMessage(Arg<NetBuffer>.Is.Anything,
+                    out Arg<NetMessageType>.Out(NetMessageType.StatusChanged).Dummy,
+                    out Arg<INetConnection>.Out(stubNetConnection).Dummy)).Return(true);
+
+            serverNetworkSession.ReadMessage();
+
+            stubMessageSender.AssertWasCalled(me => me.SendTo(Arg<Message>.Matches((msg) => (msg.Type == MessageType.SuccessfulJoin) && ((int)msg.Data == 100)), Arg<NetChannel>.Is.Equal(NetChannel.ReliableInOrder1), Arg<INetConnection>.Is.Equal(stubNetConnection)));
+        }
+        [Test]
+        public void SendsNewClientInfoToAllExistingClients()
+        {
+            stubNetServer.Stub(x => x.ReadMessage(Arg<NetBuffer>.Is.Anything,
+                    out Arg<NetMessageType>.Out(NetMessageType.StatusChanged).Dummy,
+                    out Arg<INetConnection>.Out(stubNetConnection).Dummy)).Return(true);
+
+            serverNetworkSession.ReadMessage();
+
+            stubMessageSender.AssertWasCalled(me => me.SendToAllExcept(Arg<Message>.Matches((msg) => (msg.Type == MessageType.NewClient) && ((int)msg.Data == 100)), Arg<NetChannel>.Is.Equal(NetChannel.ReliableUnordered), Arg<INetConnection>.Is.Equal(stubNetConnection)));
+        }
+        [Test]
+        public void SendsExistingClientsInfoToNewClient()
+        {
+            stubNetServer.Stub(x => x.ReadMessage(Arg<NetBuffer>.Is.Anything,
+                    out Arg<NetMessageType>.Out(NetMessageType.StatusChanged).Dummy,
+                    out Arg<INetConnection>.Out(stubNetConnection).Dummy)).Return(true);
+            var stubCon1 = MockRepository.GenerateStub<INetConnection>();
+            var stubCon2 = MockRepository.GenerateStub<INetConnection>();
+            stubCon1.Stub(me => me.ConnectionID).Return(20);
+            stubCon2.Stub(me => me.ConnectionID).Return(40);
+            serverNetworkSession.ActiveConnections.Add(20, stubCon1);
+            serverNetworkSession.ActiveConnections.Add(40, stubCon2);
+
+            serverNetworkSession.ReadMessage();
+
+            stubMessageSender.AssertWasNotCalled(me => me.SendTo(Arg<Message>.Matches((msg) => (msg.Type == MessageType.NewClient) && ((int)msg.Data == 100)), Arg<NetChannel>.Is.Anything, Arg<INetConnection>.Is.Equal(stubNetConnection)));
+
+            stubMessageSender.AssertWasCalled(me => me.SendTo(Arg<Message>.Matches((msg) => (msg.Type == MessageType.NewClient) && ((int)msg.Data == 20)), Arg<NetChannel>.Is.Equal(NetChannel.ReliableUnordered), Arg<INetConnection>.Is.Equal(stubNetConnection)));
+            stubMessageSender.AssertWasCalled(me => me.SendTo(Arg<Message>.Matches((msg) => (msg.Type == MessageType.NewClient) && ((int)msg.Data == 40)), Arg<NetChannel>.Is.Equal(NetChannel.ReliableUnordered), Arg<INetConnection>.Is.Equal(stubNetConnection)));
+        }
+
+        // DISCONNECTING CLIENT:
+        [Test]
+        public void ServerFiresClientDisconnectedEventWhenConnectionStatusBecomesDisconnected()
+        {
+            stubNetServer.Stub(x => x.ReadMessage(Arg<NetBuffer>.Is.Anything,
+                    out Arg<NetMessageType>.Out(NetMessageType.StatusChanged).Dummy,
+                    out Arg<INetConnection>.Out(stubDisconnectingConnection).Dummy)).Return(true);
+            bool eventRaised = false;
+            serverNetworkSession.ClientDisconnected += (obj, event_args) => { if (event_args.ID == 200) eventRaised = true; };
+
+            Message msg = serverNetworkSession.ReadMessage();
+
+            Assert.IsNull(msg);
+            Assert.IsTrue(eventRaised);
+        }
+        [Test]
+        public void RemovesConnectionFromListOfActiveConnections()
+        {
+            stubNetServer.Stub(x => x.ReadMessage(Arg<NetBuffer>.Is.Anything,
+                    out Arg<NetMessageType>.Out(NetMessageType.StatusChanged).Dummy,
+                    out Arg<INetConnection>.Out(stubDisconnectingConnection).Dummy)).Return(true);
+
+            serverNetworkSession.ReadMessage();
+
+            Assert.IsFalse(serverNetworkSession.ActiveConnections.ContainsValue(stubDisconnectingConnection));
+        }
+        [Test]
+        public void ServerFiresClientDisconnectedEventONLYoncePerDisconnectingConnection()
+        {
+            stubNetServer.Stub(x => x.ReadMessage(Arg<NetBuffer>.Is.Anything,
+                    out Arg<NetMessageType>.Out(NetMessageType.StatusChanged).Dummy,
+                    out Arg<INetConnection>.Out(stubDisconnectingConnection).Dummy)).Return(true);
+            int eventRaiseCount = 0;
+            serverNetworkSession.ClientDisconnected += (obj, event_args) => eventRaiseCount++;
+
+            serverNetworkSession.ReadMessage();
+            serverNetworkSession.ReadMessage();
+
+            Assert.AreEqual(1, eventRaiseCount);
+        }
+        [Test]
+        public void SendsDisconnectingClientInfoToAllExistingClients()
+        {
+            stubNetServer.Stub(x => x.ReadMessage(Arg<NetBuffer>.Is.Anything,
+                    out Arg<NetMessageType>.Out(NetMessageType.StatusChanged).Dummy,
+                    out Arg<INetConnection>.Out(stubDisconnectingConnection).Dummy)).Return(true);
+
+            serverNetworkSession.ReadMessage();
+
+            stubMessageSender.AssertWasCalled(me => me.SendToAll(Arg<Message>.Matches((msg) => (msg.Type == MessageType.DisconnectingClient) && ((int)msg.Data == 200)), Arg<NetChannel>.Is.Equal(NetChannel.ReliableUnordered))); 
         }
 
         // **************
@@ -148,18 +250,11 @@ namespace UnitTestLibrary
         [Test]
         public void ServerCanSendMessagesToAllClients()
         {
-            var stubNetServer = MockRepository.GenerateStub<INetServer>();
-            LidgrenServerNetworkSession serverNS = new LidgrenServerNetworkSession(stubNetServer, _serializer);
             Message msg = new Message() { Data = new byte[] { 1, 2, 3, 4 } };
-            NetBuffer tmpBuffer = new NetBuffer();
 
-            stubNetServer.Stub(x => x.CreateBuffer(Arg<int>.Is.Anything)).Return(tmpBuffer);
+            serverNetworkSession.SendToAll(msg, NetChannel.Unreliable);
 
-            serverNS.SendToAll(msg, NetChannel.Unreliable);
-
-            stubNetServer.AssertWasCalled(x => x.SendToAll(Arg<NetBuffer>.Is.Equal(tmpBuffer),
-                                                        Arg<NetChannel>.Is.Anything));
-            Assert.AreEqual(new byte[] { 1, 2, 3, 4 }, _serializer.Deserialize(tmpBuffer.ToArray()).Data);
+            stubMessageSender.AssertWasCalled(me => me.SendToAll(Arg<Message>.Is.Equal(msg), Arg<NetChannel>.Is.Equal(NetChannel.Unreliable)));
         }
 
         [Test]
@@ -167,11 +262,9 @@ namespace UnitTestLibrary
                     ExpectedMessage = "Not a valid player")]
         public void CanOnlySendToValidConnections()
         {
-            var stubNetServer = MockRepository.GenerateStub<INetServer>();
-            stubNetServer.Stub(x => x.Connected).Return(true); // Simply means that *somebody* has joined (might not be the current connection we are sending to...)
             var stubConnection = MockRepository.GenerateStub<INetConnection>();
+            stubNetServer.Stub(x => x.Connected).Return(true); // Simply means that *somebody* has joined the server (might not be the connection we are sending to...)
             stubConnection.Stub(x => x.Status).Return(NetConnectionStatus.Connecting);
-            LidgrenServerNetworkSession serverNetworkSession = new LidgrenServerNetworkSession(stubNetServer, _serializer);
             serverNetworkSession.ActiveConnections.Add(100, stubConnection);
 
             serverNetworkSession.SendTo(null, NetChannel.Unreliable, 100);
@@ -182,31 +275,20 @@ namespace UnitTestLibrary
                     ExpectedMessage = "Not a valid player")]
         public void CantSendToNullConnections()
         {
-            var stubNetServer = MockRepository.GenerateStub<INetServer>();
             stubNetServer.Stub(x => x.Connected).Return(true); // Simply means that *somebody* has joined (might not be the current connection we are sending to...)
-            LidgrenServerNetworkSession serverNS = new LidgrenServerNetworkSession(stubNetServer, _serializer);
 
-            serverNS.SendTo(null, NetChannel.Unreliable, 100);  // ID 100 not an active connection
+            serverNetworkSession.SendTo(null, NetChannel.Unreliable, 100);  // ID 100 not an active connection
         }
 
         [Test]
         public void ServerCanSendMessageToOneClient()
         {
-            var stubNetServer = MockRepository.GenerateStub<INetServer>();
-            var stubConnection = MockRepository.GenerateStub<INetConnection>();
-            stubConnection.Stub(x => x.Status).Return(NetConnectionStatus.Connected);
-            LidgrenServerNetworkSession serverNS = new LidgrenServerNetworkSession(stubNetServer, _serializer);
-            serverNS.ActiveConnections.Add(100, stubConnection);
+            serverNetworkSession.ActiveConnections.Add(100, stubNetConnection);
             Message msg = new Message() { Data = new byte[] { 1, 2, 3, 4 } };
-            NetBuffer tmpBuffer = new NetBuffer();
 
-            stubNetServer.Stub(x => x.CreateBuffer(Arg<int>.Is.Anything)).Return(tmpBuffer);
+            serverNetworkSession.SendTo(msg, NetChannel.Unreliable, 100);
 
-            serverNS.SendTo(msg, NetChannel.Unreliable, 100);
-
-            stubNetServer.AssertWasCalled(x => x.SendMessage(Arg<NetBuffer>.Is.Equal(tmpBuffer),
-                                                        Arg<NetChannel>.Is.Anything, Arg<INetConnection>.Is.Equal(stubConnection)));
-            Assert.AreEqual(new byte[] { 1, 2, 3, 4 }, _serializer.Deserialize(tmpBuffer.ToArray()).Data);
+            stubMessageSender.AssertWasCalled(me => me.SendTo(msg, NetChannel.Unreliable, stubNetConnection));
         }
 
         [Test]
@@ -214,29 +296,19 @@ namespace UnitTestLibrary
                     ExpectedMessage = "Excluded player not connected to network session")]
         public void SendToAllExceptConnectionCantBeNull()
         {
-            var stubNetServer = MockRepository.GenerateStub<INetServer>();
-            LidgrenServerNetworkSession serverNS = new LidgrenServerNetworkSession(stubNetServer, _serializer);
 
-            serverNS.SendToAllExcept(null, NetChannel.Unreliable, 100); // 100 not an active connection
+            serverNetworkSession.SendToAllExcept(null, NetChannel.Unreliable, 100); // 100 not an active connection
         }
 
         [Test]
         public void ServerCanSendMessageToAllExceptOneClient()
         {
-            var stubNetServer = MockRepository.GenerateStub<INetServer>();
-            var stubConnection = MockRepository.GenerateStub<INetConnection>();
-            LidgrenServerNetworkSession serverNS = new LidgrenServerNetworkSession(stubNetServer, _serializer);
-            serverNS.ActiveConnections.Add(100, stubConnection);
+            serverNetworkSession.ActiveConnections.Add(100, stubNetConnection);
             Message msg = new Message() { Data = new byte[] { 1, 2, 3, 4 } };
-            NetBuffer tmpBuffer = new NetBuffer();
 
-            stubNetServer.Stub(x => x.CreateBuffer(Arg<int>.Is.Anything)).Return(tmpBuffer);
+            serverNetworkSession.SendToAllExcept(msg, NetChannel.Unreliable, 100);
 
-            serverNS.SendToAllExcept(msg, NetChannel.Unreliable, 100);
-
-            stubNetServer.AssertWasCalled(x => x.SendToAll(Arg<NetBuffer>.Is.Equal(tmpBuffer),
-                                                        Arg<NetChannel>.Is.Anything, Arg<INetConnection>.Is.Equal(stubConnection)));
-            Assert.AreEqual(new byte[] { 1, 2, 3, 4 }, _serializer.Deserialize(tmpBuffer.ToArray()).Data);
+            stubMessageSender.AssertWasCalled(me => me.SendToAllExcept(msg, NetChannel.Unreliable, stubNetConnection));
         }
     }
 }

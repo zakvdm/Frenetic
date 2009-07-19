@@ -13,6 +13,12 @@ namespace Frenetic.Network
         
         #region IOutgoingMessageQueue Members
 
+        public void Write(Message message)
+        {
+            Write(message, NetChannel.UnreliableInOrder1);
+        }
+
+        // TODO: Make private
         public void Write(Message message, NetChannel channel)
         {
             if (_clientNetworkSession != null)
@@ -24,10 +30,19 @@ namespace Frenetic.Network
                 _serverNetworkSession.SendToAll(message, channel);
             }
         }
+
+        public void WriteFor(Message message, Client destinationClient)
+        {
+            WriteFor(message, NetChannel.Unreliable, destinationClient.ID);
+        }
+
+        // TODO: Make private...
         public void WriteFor(Message message, NetChannel channel, int destinationPlayerID)
         {
             _serverNetworkSession.SendTo(message, channel, destinationPlayerID);
         }
+
+        // TODO: DELETE:
         public void WriteForAllExcept(Message message, NetChannel channel, int excludedPlayerID)
         {
             _serverNetworkSession.SendToAllExcept(message, channel, excludedPlayerID);

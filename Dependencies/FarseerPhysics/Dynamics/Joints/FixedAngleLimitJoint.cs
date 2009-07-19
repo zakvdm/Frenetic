@@ -1,5 +1,8 @@
+using System.Xml.Serialization;
+
 #if (XNA)
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
 #else
 using FarseerGames.FarseerPhysics.Mathematics;
 #endif
@@ -11,6 +14,8 @@ namespace FarseerGames.FarseerPhysics.Dynamics.Joints
     /// </summary>
     public class FixedAngleLimitJoint : Joint
     {
+        public event FixedJointDelegate JointUpdated;
+
         private float _accumlatedAngularImpulseOld;
         private float _accumulatedAngularImpulse;
         private float _angularImpulse;
@@ -35,6 +40,10 @@ namespace FarseerGames.FarseerPhysics.Dynamics.Joints
             _upperLimit = upperLimit;
         }
 
+#if(XNA)
+        [ContentSerializerIgnore]
+#endif
+        [XmlIgnore]
         /// <summary>
         /// Gets or sets the body.
         /// </summary>
@@ -85,7 +94,10 @@ namespace FarseerGames.FarseerPhysics.Dynamics.Joints
 
         public override void PreStep(float inverseDt)
         {
-            if (IsDisposed)
+            if (_body.isStatic)
+                return;
+
+            if (!_body.Enabled)
                 return;
 
             _difference = _body.totalRotation;
@@ -141,7 +153,10 @@ namespace FarseerGames.FarseerPhysics.Dynamics.Joints
         {
             base.Update();
 
-            if (IsDisposed)
+            if (_body.isStatic)
+                return;
+
+            if (!_body.Enabled)
                 return;
 
             if (!_upperLimitViolated && !_lowerLimitViolated)
@@ -163,7 +178,13 @@ namespace FarseerGames.FarseerPhysics.Dynamics.Joints
 
             _angularImpulse = _accumulatedAngularImpulse - _accumlatedAngularImpulseOld;
 
-            _body.AngularVelocity += _body.inverseMomentOfInertia*_angularImpulse;
+            if (_angularImpulse != 0f)
+            {
+                _body.AngularVelocity += _body.inverseMomentOfInertia * _angularImpulse;
+
+                if (JointUpdated != null)
+                    JointUpdated(this, _body);
+            }
         }
     }
 }

@@ -129,7 +129,7 @@ namespace Frenetic
 
             for (int i = 0; i < menuEntries.Count; i++)
             {
-                Color color = Color.White;
+                Color color = Color.CornflowerBlue;
                 float scale = 1.0f;
 
                 if (IsActive && (i == selectedEntry))

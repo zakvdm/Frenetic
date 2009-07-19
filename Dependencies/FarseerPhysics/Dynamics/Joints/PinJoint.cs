@@ -12,6 +12,8 @@ namespace FarseerGames.FarseerPhysics.Dynamics.Joints
     /// </summary>
     public class PinJoint : Joint
     {
+        public event JointDelegate JointUpdated;
+
         private float _accumulatedImpulse;
         private Vector2 _anchor1;
         private Vector2 _anchor2;
@@ -138,10 +140,13 @@ namespace FarseerGames.FarseerPhysics.Dynamics.Joints
 
         public override void PreStep(float inverseDt)
         {
-            if (IsDisposed)
+            if (_body1.isStatic && _body2.isStatic)
                 return;
 
-            //calc _r1 and _r2 from the anchors
+            if (!_body1.Enabled && !_body2.Enabled)
+                return;
+
+            //calc r1 and r2 from the anchors
             _body1.GetBodyMatrix(out _body1MatrixTemp);
             _body2.GetBodyMatrix(out _body2MatrixTemp);
             Vector2.TransformNormal(ref _anchor1, ref _body1MatrixTemp, out _r1);
@@ -156,20 +161,20 @@ namespace FarseerGames.FarseerPhysics.Dynamics.Joints
             JointError = distance - _targetDistance;
 
             //normalize the difference vector
-            Vector2.Multiply(ref _worldAnchorDifference, 1/(distance != 0 ? distance : float.PositiveInfinity),
+            Vector2.Multiply(ref _worldAnchorDifference, 1 / (distance != 0 ? distance : float.PositiveInfinity),
                              out _worldAnchorDifferenceNormalized); //distance = 0 --> error (fix) 
 
             //calc velocity bias
-            _velocityBias = -BiasFactor*inverseDt*(distance - _targetDistance);
+            _velocityBias = -BiasFactor * inverseDt * (distance - _targetDistance);
 
             //calc mass normal (effective mass in relation to constraint)
             Calculator.Cross(ref _r1, ref _worldAnchorDifferenceNormalized, out _r1cn);
             Calculator.Cross(ref _r2, ref _worldAnchorDifferenceNormalized, out _r2cn);
-            _kNormal = _body1.inverseMass + _body2.inverseMass + _body1.inverseMomentOfInertia*_r1cn*_r1cn +
-                       _body2.inverseMomentOfInertia*_r2cn*_r2cn;
-            _effectiveMass = 1/(_kNormal + Softness);
+            _kNormal = _body1.inverseMass + _body2.inverseMass + _body1.inverseMomentOfInertia * _r1cn * _r1cn +
+                       _body2.inverseMomentOfInertia * _r2cn * _r2cn;
+            _effectiveMass = 1 / (_kNormal + Softness);
 
-            //convert scalar accumulated _impulse to vector
+            //convert scalar accumulated impulse to vector
             Vector2.Multiply(ref _worldAnchorDifferenceNormalized, _accumulatedImpulse, out _accumulatedImpulseVector);
 
             //apply accumulated impulses (warm starting)
@@ -187,41 +192,50 @@ namespace FarseerGames.FarseerPhysics.Dynamics.Joints
         {
             base.Update();
 
-            if (IsDisposed)
+            if (_body1.isStatic && _body2.isStatic)
                 return;
 
-            //calc velocity anchor points (angular component + linear)
+            if (!_body1.Enabled && !_body2.Enabled)
+                return;
+
+            //Calc velocity anchor points (angular component + linear)
             Calculator.Cross(ref _body1.AngularVelocity, ref _r1, out _angularVelocityComponent1);
             Vector2.Add(ref _body1.LinearVelocity, ref _angularVelocityComponent1, out _velocity1);
 
             Calculator.Cross(ref _body2.AngularVelocity, ref _r2, out _angularVelocityComponent2);
             Vector2.Add(ref _body2.LinearVelocity, ref _angularVelocityComponent2, out _velocity2);
 
-            //calc velocity difference
+            //Calc velocity difference
             Vector2.Subtract(ref _velocity2, ref _velocity1, out _dv);
 
-            //map the velocity difference into constraint space
+            //Map the velocity difference into constraint space
             Vector2.Dot(ref _dv, ref _worldAnchorDifferenceNormalized, out _dvNormal);
 
-            //calc the _impulse magnitude
-            _impulseMagnitude = (_velocityBias - _dvNormal - Softness*_accumulatedImpulse)*_effectiveMass;
-            //not sure if _softness is implemented correctly.
+            //Calc the impulse magnitude
+            _impulseMagnitude = (_velocityBias - _dvNormal - Softness * _accumulatedImpulse) * _effectiveMass;
+            //Note: Not sure if softness is implemented correctly.
 
-            //convert scalar _impulse to vector
+            //Convert scalar impulse to vector
             Vector2.Multiply(ref _worldAnchorDifferenceNormalized, _impulseMagnitude, out _impulse);
 
-            //apply _impulse
-            _body2.ApplyImmediateImpulse(ref _impulse);
-            Calculator.Cross(ref _r2, ref _impulse, out _angularImpulse);
-            _body2.ApplyAngularImpulse(_angularImpulse);
-
-            Vector2.Multiply(ref _impulse, -1, out _impulse);
-            _body1.ApplyImmediateImpulse(ref _impulse);
-            Calculator.Cross(ref _r1, ref _impulse, out _angularImpulse);
-            _body1.ApplyAngularImpulse(_angularImpulse);
-
-            //add to the accumulated _impulse
+            //Add to the accumulated impulse
             _accumulatedImpulse += _impulseMagnitude;
+
+            if (_impulse != Vector2.Zero)
+            {
+                //Apply impulse
+                _body2.ApplyImmediateImpulse(ref _impulse);
+                Calculator.Cross(ref _r2, ref _impulse, out _angularImpulse);
+                _body2.ApplyAngularImpulse(_angularImpulse);
+
+                Vector2.Multiply(ref _impulse, -1, out _impulse);
+                _body1.ApplyImmediateImpulse(ref _impulse);
+                Calculator.Cross(ref _r1, ref _impulse, out _angularImpulse);
+                _body1.ApplyAngularImpulse(_angularImpulse);
+
+                if (JointUpdated != null)
+                    JointUpdated(this, _body1, _body2);
+            }
         }
 
         #region Update variables

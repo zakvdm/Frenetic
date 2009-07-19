@@ -1,6 +1,7 @@
 using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Frenetic.Player;
 
 namespace Frenetic
 {
@@ -9,7 +10,23 @@ namespace Frenetic
         public Camera(IPlayer player, Vector2 screenSize)
         {
             _player = player;
+            _screenSize = screenSize;
             _screenSizeOffset = screenSize / 2;
+        }
+
+        public float ScreenWidth
+        {
+            get
+            {
+                return _screenSize.X;
+            }
+        }
+        public float ScreenHeight
+        {
+            get
+            {
+                return _screenSize.Y;
+            }
         }
 
         public Vector2 ConvertToWorldCoordinates(Vector2 screenPosition)
@@ -34,6 +51,7 @@ namespace Frenetic
         }
 
         IPlayer _player;
+        Vector2 _screenSize;
         Vector2 _screenSizeOffset;
     }
 }

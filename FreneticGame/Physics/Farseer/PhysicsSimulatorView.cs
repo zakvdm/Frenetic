@@ -1,19 +1,21 @@
 using System;
+using FarseerGames.AdvancedSamplesXNA.DrawingSystem;
 using FarseerGames.FarseerPhysics;
 using FarseerGames.FarseerPhysics.Dynamics.Joints;
 using FarseerGames.FarseerPhysics.Dynamics.Springs;
-using FarseerGames.GettingStarted.DrawingSystem;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Frenetic;
 using Frenetic.Graphics;
 
-namespace FarseerGames.GettingStarted
+namespace FarseerGames.AdvancedSamplesXNA
 {
-    public class PhysicsSimulatorView : IView
+    /// <summary>
+    /// Draws the elements inside a <see cref="PhysicsSimulator"/>. Great for debugging physics related problems.
+    /// </summary>
+    public sealed class PhysicsSimulatorView : IView
     {
-        #region Member Variables
         private PhysicsSimulator _physicsSimulator;
 
         //Performance panel
@@ -58,13 +60,6 @@ namespace FarseerGames.GettingStarted
         private int _coordinateAxisLineLength = 20;
         private int _coordinateAxisLineThickness = 1;
 
-        //Grid
-        private bool _enableGridView;
-        private bool _enablePinJointView = true;
-        private CircleBrush _gridCircleBrush;
-        private Color _gridColor = new Color(0, 0, 0, 150);
-        private int _gridRadius = 1;
-
         //Vertice
         private bool _enableVerticeView = true;
         private CircleBrush _verticeCircleBrush;
@@ -86,6 +81,7 @@ namespace FarseerGames.GettingStarted
         private RectangleBrush _revoluteJointRectangleBrush;
 
         //Pin joint
+        private bool _enablePinJointView = true;
         private Color _pinJointColor = new Color(0, 0, 0, 200);
         private LineBrush _pinJointLineBrush;
         private int _pinJointLineThickness = 1;
@@ -110,7 +106,6 @@ namespace FarseerGames.GettingStarted
         private int _springLineThickness = 1;
         private Vector2 _worldAttachPoint;
         private Vector2 _vectorTemp1;
-        #endregion
 
         public PhysicsSimulatorView(PhysicsSimulator physicsSimulator, SpriteBatch spriteBatch, ICamera camera)
         {
@@ -122,7 +117,6 @@ namespace FarseerGames.GettingStarted
                 _performancePanelWidth = 360;
         }
 
-        #region Properties
         //aabb
         public Color AABBColor
         {
@@ -178,25 +172,6 @@ namespace FarseerGames.GettingStarted
         {
             get { return _enableEdgeView; }
             set { _enableEdgeView = value; }
-        }
-
-        //grid
-        public int GridRadius
-        {
-            get { return _gridRadius; }
-            set { _gridRadius = value; }
-        }
-
-        public Color GridColor
-        {
-            get { return _gridColor; }
-            set { _gridColor = value; }
-        }
-
-        public bool EnableGridView
-        {
-            get { return _enableGridView; }
-            set { _enableGridView = value; }
         }
 
         //coordinate axis
@@ -347,14 +322,11 @@ namespace FarseerGames.GettingStarted
                 _performancePanelCount = value;
             }
         }
-        #endregion
 
-        #region Content Loading
-        public virtual void LoadContent(GraphicsDevice graphicsDevice, ContentManager content)
+        public void LoadContent(GraphicsDevice graphicsDevice, ContentManager content)
         {
             LoadVerticeContent(graphicsDevice);
             LoadEdgeContent(graphicsDevice);
-            LoadGridContent(graphicsDevice);
             LoadAABBContent(graphicsDevice);
             LoadCoordinateAxisContent(graphicsDevice);
             LoadContactContent(graphicsDevice);
@@ -365,11 +337,10 @@ namespace FarseerGames.GettingStarted
             LoadSliderJointContent(graphicsDevice);
         }
 
-        public virtual void UnloadContent(GraphicsDevice graphicsDevice, ContentManager content)
+        public void UnloadContent(GraphicsDevice graphicsDevice, ContentManager content)
         {
             //UnloadVerticeContent();
             //UnloadEdgeContent();
-            //UnloadGridContent();
             //UnloadAABBContent();
             //UnloadCoordinateAxisContent();
             //UnloadContactContent();
@@ -385,7 +356,7 @@ namespace FarseerGames.GettingStarted
             _performancePanelTexture = DrawingHelper.CreateRectangleTexture(graphicsDevice, _performancePanelWidth,
                                                                             _performancePanelHeight,
                                                                             new Color(0, 0, 0, 155));
-            _spriteFont = content.Load<SpriteFont>(@"Content\Fonts\diagnosticFont");
+            _spriteFont = content.Load<SpriteFont>(@"Fonts\diagnosticFont");
         }
 
         private void LoadContactContent(GraphicsDevice graphicsDevice)
@@ -404,12 +375,6 @@ namespace FarseerGames.GettingStarted
         {
             _edgeLineBrush = new LineBrush(_edgeLineThickness, _edgeColor);
             _edgeLineBrush.Load(graphicsDevice);
-        }
-
-        private void LoadGridContent(GraphicsDevice graphicsDevice)
-        {
-            _gridCircleBrush = new CircleBrush(_gridRadius, _gridColor, _gridColor);
-            _gridCircleBrush.Load(graphicsDevice);
         }
 
         private void LoadAABBContent(GraphicsDevice graphicsDevice)
@@ -460,7 +425,6 @@ namespace FarseerGames.GettingStarted
             _sliderJointLineBrush.Load(graphicsDevice);
             _sliderJointRectangleBrush.Load(graphicsDevice);
         }
-        #endregion
 
         public void Generate()
         {
@@ -485,10 +449,6 @@ namespace FarseerGames.GettingStarted
             {
                 DrawVerticesAndEdges(spriteBatch);
             }
-            if (_enableGridView)
-            {
-                DrawGrid(spriteBatch);
-            }
             if (_enableAABBView)
             {
                 DrawAABB(spriteBatch);
@@ -500,6 +460,10 @@ namespace FarseerGames.GettingStarted
             if (_enableContactView)
             {
                 DrawContacts(spriteBatch);
+            }
+            if (_enablePerformancePanelView)
+            {
+                //DrawPerformancePanel(spriteBatch);
             }
             if (EnableSpringView)
             {
@@ -632,25 +596,6 @@ namespace FarseerGames.GettingStarted
             }
         }
 
-        private void DrawGrid(SpriteBatch spriteBatch)
-        {
-            //draw grid
-            for (int i = 0; i < _physicsSimulator.GeomList.Count; i++)
-            {
-                if (_physicsSimulator.GeomList[i].Grid == null)
-                {
-                    continue;
-                }
-                int count = _physicsSimulator.GeomList[i].Grid.Points.Length;
-                for (int j = 0; j < count; j++)
-                {
-                    Vector2 point =
-                        _physicsSimulator.GeomList[i].GetWorldPosition(_physicsSimulator.GeomList[i].Grid.Points[j]);
-                    _gridCircleBrush.Draw(spriteBatch, point);
-                }
-            }
-        }
-
         private void DrawCoordinateAxis(SpriteBatch spriteBatch)
         {
             for (int i = 0; i < _physicsSimulator.BodyList.Count; i++)
@@ -732,13 +677,13 @@ namespace FarseerGames.GettingStarted
                 if (_physicsSimulator.JointList[i] is FixedRevoluteJoint)
                 {
                     FixedRevoluteJoint fixedRevoluteJoint = (FixedRevoluteJoint)_physicsSimulator.JointList[i];
-                    _revoluteJointRectangleBrush.Draw(spriteBatch, fixedRevoluteJoint.Anchor);
+                    _revoluteJointRectangleBrush.Draw(spriteBatch, fixedRevoluteJoint.Anchor, 0);
                 }
 
                 if (!(_physicsSimulator.JointList[i] is RevoluteJoint)) continue;
 
                 RevoluteJoint revoluteJoint = (RevoluteJoint)_physicsSimulator.JointList[i];
-                _revoluteJointRectangleBrush.Draw(spriteBatch, revoluteJoint.CurrentAnchor);
+                _revoluteJointRectangleBrush.Draw(spriteBatch, revoluteJoint.CurrentAnchor, 0);
                 _revoluteJointLineBrush.Draw(spriteBatch, revoluteJoint.CurrentAnchor, revoluteJoint.Body1.Position);
                 _revoluteJointLineBrush.Draw(spriteBatch, revoluteJoint.CurrentAnchor, revoluteJoint.Body2.Position);
             }
@@ -752,8 +697,8 @@ namespace FarseerGames.GettingStarted
                     continue;
 
                 PinJoint pinJoint = (PinJoint)_physicsSimulator.JointList[i];
-                _pinJointRectangleBrush.Draw(spriteBatch, pinJoint.WorldAnchor1);
-                _pinJointRectangleBrush.Draw(spriteBatch, pinJoint.WorldAnchor2);
+                _pinJointRectangleBrush.Draw(spriteBatch, pinJoint.WorldAnchor1, 0);
+                _pinJointRectangleBrush.Draw(spriteBatch, pinJoint.WorldAnchor2, 0);
                 _pinJointLineBrush.Draw(spriteBatch, pinJoint.WorldAnchor1, pinJoint.WorldAnchor2);
             }
         }
@@ -766,8 +711,8 @@ namespace FarseerGames.GettingStarted
                     continue;
 
                 SliderJoint sliderJoint = (SliderJoint)_physicsSimulator.JointList[i];
-                _sliderJointRectangleBrush.Draw(spriteBatch, sliderJoint.WorldAnchor1);
-                _sliderJointRectangleBrush.Draw(spriteBatch, sliderJoint.WorldAnchor2);
+                _sliderJointRectangleBrush.Draw(spriteBatch, sliderJoint.WorldAnchor1, 0);
+                _sliderJointRectangleBrush.Draw(spriteBatch, sliderJoint.WorldAnchor2, 0);
                 _sliderJointLineBrush.Draw(spriteBatch, sliderJoint.WorldAnchor1, sliderJoint.WorldAnchor2);
             }
         }

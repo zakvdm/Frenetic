@@ -4,13 +4,13 @@ namespace Frenetic.Level
 {
     public class LevelController : IController
     {
-        public LevelController(Level level)
+        public LevelController(ILevel level)
         {
             _level = level;
         }
         #region IController Members
 
-        public void Process(long ticks)
+        public void Process(float elapsedTime)
         {
             if (!_level.Loaded)
                 _level.Load();
@@ -18,6 +18,6 @@ namespace Frenetic.Level
 
         #endregion
 
-        Level _level;
+        ILevel _level;
     }
 }

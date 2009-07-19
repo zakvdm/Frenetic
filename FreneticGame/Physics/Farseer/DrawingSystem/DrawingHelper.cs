@@ -2,11 +2,11 @@ using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace FarseerGames.GettingStarted.DrawingSystem
+namespace FarseerGames.AdvancedSamplesXNA.DrawingSystem
 {
     public static class DrawingHelper
     {
-        public static Texture2D CreateLineTexture(GraphicsDevice graphicsDevice, int lineThickness, Color color)
+        public static Texture2D CreateLineTexture(GraphicsDevice graphicsDevice, int lineThickness)
         {
             Texture2D texture2D = new Texture2D(graphicsDevice, 2, lineThickness + 2, 1, TextureUsage.None,
                                                 SurfaceFormat.Color);
@@ -17,9 +17,9 @@ namespace FarseerGames.GettingStarted.DrawingSystem
             colorArray[0] = Color.TransparentWhite;
             colorArray[1] = Color.TransparentWhite;
 
-            for (int i = 2; i < count - 2; i++) 
+            for (int i = 2; i < count - 2; i++)
             {
-                colorArray[i] = color;
+                colorArray[i] = Color.White;
             }
 
             colorArray[count - 2] = Color.TransparentWhite;
@@ -259,7 +259,7 @@ namespace FarseerGames.GettingStarted.DrawingSystem
                     float distanceFromCurToBoundary = (pointOnEllipse - curPoint).Length();
 
 
-                    // hack to find out whether the current point is inside the ellipse
+                    //NOTE: hack to find out whether the current point is inside the ellipse
 
                     // calculate angle of a straight line intersecting the center of the ellipse and the current point
                     Vector2 lineFromCurPointToCenter = curPoint - center;

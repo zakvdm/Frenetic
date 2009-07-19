@@ -4,9 +4,9 @@ using Microsoft.Xna.Framework;
 
 namespace Frenetic.Graphics
 {
-    class XNASpriteBatch : ISpriteBatch
+    class XnaSpriteBatch : ISpriteBatch
     {
-        public XNASpriteBatch(SpriteBatch spriteBatch)
+        public XnaSpriteBatch(SpriteBatch spriteBatch)
         {
             _spriteBatch = spriteBatch;
         }
@@ -17,7 +17,7 @@ namespace Frenetic.Graphics
         }
         public void Begin(Matrix translationMatrix)
         {
-            _spriteBatch.Begin(SpriteBlendMode.AlphaBlend, SpriteSortMode.Deferred, SaveStateMode.None, translationMatrix);
+            _spriteBatch.Begin(SpriteBlendMode.AlphaBlend, SpriteSortMode.Immediate, SaveStateMode.None, translationMatrix);
         }
 
         public void End()
@@ -25,14 +25,19 @@ namespace Frenetic.Graphics
             _spriteBatch.End();
         }
 
-        public void Draw(ITexture texture, Rectangle destinationRectangle, Color color)
+        public void Draw(ITexture texture, Rectangle destinationRectangle, Color color, float layerDepth)
         {
-            _spriteBatch.Draw(texture.Texture2D, destinationRectangle, color);
+            _spriteBatch.Draw(texture.Texture2D, destinationRectangle, null, color, 0f, new Vector2(0, 0), SpriteEffects.None, layerDepth);
         }
         public void Draw(ITexture texture, Vector2 position, Nullable<Rectangle> sourceRectangle, Color color,
             float rotation, Vector2 origin, Vector2 scale, SpriteEffects effects, float layerDepth)
         {
             _spriteBatch.Draw(texture.Texture2D, position, sourceRectangle, color, rotation, origin, scale, effects, layerDepth);
+        }
+
+        public void DrawText(IFont font, string text, Vector2 position, Color color)
+        {
+            _spriteBatch.DrawString(font.SpriteFont, text, position, color);
         }
 
         SpriteBatch _spriteBatch;

@@ -37,6 +37,18 @@ namespace UnitTestLibrary
         }
 
         [Test]
+        public void WritesUnreliableMessagesFromClientToServer()
+        {
+            var stubClientNetworkSession = MockRepository.GenerateStub<IClientNetworkSession>();
+            OutgoingMessageQueue outgoingMessageQueue = new OutgoingMessageQueue(stubClientNetworkSession, null);
+            Message msg = new Message() { Type = MessageType.Event, Data = 2 };
+
+            outgoingMessageQueue.Write(msg);
+
+            stubClientNetworkSession.AssertWasCalled(x => x.SendToServer(Arg<Message>.Is.Equal(msg), Arg<NetChannel>.Is.Equal(NetChannel.UnreliableInOrder1)));
+        }
+
+        [Test]
         public void CanWriteAsServerNetworkSession()
         {
             var stubServerNetworkSession = MockRepository.GenerateStub<IServerNetworkSession>();
@@ -48,6 +60,20 @@ namespace UnitTestLibrary
             stubServerNetworkSession.AssertWasCalled(x => x.SendToAll(Arg<Message>.Is.Equal(msg), Arg<NetChannel>.Is.Anything));
         }
 
+        [Test]
+        public void CanWriteToASpecificClient()
+        {
+            var stubServerNetworkSession = MockRepository.GenerateStub<IServerNetworkSession>();
+            Message msg = new Message() { Type = MessageType.ChatLog, Data = 3 };
+            Client client = new Client(null) { LastServerSnap = 1, ID = 20 };
+            OutgoingMessageQueue outgoingMessageQueue = new OutgoingMessageQueue(null, stubServerNetworkSession);
+
+            outgoingMessageQueue.WriteFor(msg, client);
+
+            stubServerNetworkSession.AssertWasCalled(x => x.SendTo(Arg<Message>.Is.Equal(msg), Arg<NetChannel>.Is.Equal(NetChannel.Unreliable), Arg<int>.Is.Equal(client.ID)));
+        }
+
+        // TODO: REMOVE WHEN EVERYTHING IS UNRELIABLE (no more need for WriteForAllExcept...)
         [Test]
         public void ServerCanWriteMessageForACertainPlayer()
         {

@@ -7,18 +7,24 @@ namespace Frenetic.Physics
 {
     public class FarseerPhysicsComponent : IPhysicsComponent
     {
+        public delegate IPhysicsComponent Factory(Vector2 size);
+
         public FarseerPhysicsComponent(Body body, Geom geom)
         {
             _body = body;
             _geom = geom;
+            _geom.Tag = this;
 
-            _geom.OnCollision += new Geom.CollisionEventHandler((body1, body2, contactList) =>
+            _geom.FrictionCoefficient = 1.1f;
+
+            _geom.OnCollision += new CollisionEventHandler((geom1, geom2, contactList) =>
                 {
                     CollidedWithWorld();
                     return true;
                 });
         }
 
+        #region Properties
         public bool IsStatic
         {
             get
@@ -49,14 +55,9 @@ namespace Frenetic.Physics
             }
             set
             {
-                for (int i = 0; i < _geom.LocalVertices.Count; i++)
-                {
-                    Vector2 vertex = _geom.LocalVertices[i];
-                    vertex.X = vertex.X / _geom.AABB.Width;
-                    vertex.Y = vertex.Y / _geom.AABB.Height;
-                    _geom.LocalVertices[i] = vertex * value;
-                }
-                _geom.ComputeCollisionGrid();
+                throw new NotImplementedException();
+                //_geom.SetVertices(Vertices.CreateSimpleRectangle(value.X, value.Y));
+                //_geom.SetBody(_body);
             }
         }
         public Vector2 LinearVelocity
@@ -66,6 +67,7 @@ namespace Frenetic.Physics
                 return new Vector2(_body.LinearVelocity.X, _body.LinearVelocity.Y);
             }
         }
+        #endregion
 
         public void ApplyImpulse(Vector2 impulse)
         {
@@ -77,8 +79,13 @@ namespace Frenetic.Physics
             _body.ApplyForce(force);
         }
 
-        public event CollidedWithWorldDelegate CollidedWithWorld = delegate { };
-        
+        public void HitByWeapon()
+        {
+            OnShot();
+        }
+
+        public event Action OnShot = delegate { };
+        public event Action CollidedWithWorld = delegate { };
 
         Body _body;
         Geom _geom;

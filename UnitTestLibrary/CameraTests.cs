@@ -5,12 +5,21 @@ using Frenetic;
 using NUnit.Framework;
 using Rhino.Mocks;
 using Microsoft.Xna.Framework;
+using Frenetic.Player;
 
 namespace UnitTestLibrary
 {
     [TestFixture]
     public class CameraTests
     {
+        [Test]
+        public void CameraHasScreenWidthAndHeight()
+        {
+            Camera camera = new Camera(null, new Vector2(100, 200));
+
+            Assert.AreEqual(100, camera.ScreenWidth);
+            Assert.AreEqual(200, camera.ScreenHeight);
+        }
         [Test]
         public void CameraPositionBasedOnPlayerPosition()
         {

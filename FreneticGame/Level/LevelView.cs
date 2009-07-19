@@ -10,7 +10,7 @@ namespace Frenetic.Level
 {
     public class LevelView : IView
     {
-        public LevelView(Level level, ISpriteBatch spriteBatch, ITexture texture, ICamera camera)
+        public LevelView(ILevel level, ISpriteBatch spriteBatch, ITexture texture, ICamera camera)
         {
             _level = level;
             _spriteBatch = spriteBatch;
@@ -33,7 +33,7 @@ namespace Frenetic.Level
 
         #endregion
 
-        Level _level;
+        ILevel _level;
         ISpriteBatch _spriteBatch;
         ITexture _texture;
         ICamera _camera;

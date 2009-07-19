@@ -1,0 +1,26 @@
+I propose we try our best to copy the Quake 3 model (as detailed in the pdf file added to the repository).
+
+There are a couple of nice benefits:
+  * It's simple
+  * It's well suited to our gamestyle
+  * And we can implement it incrementally...
+
+Specifically, incremental implementation goes something like this:
+  1) Every packet contains complete state, we just pump these every tick (will work as long as we have LOTS of bandwidth)
+  2) We add delta compression (now we need to start storing state history, and differentiating between state that is reliable and fleeting)
+  3) We drop our naive xml packets, and switch to something more aggressive
+
+
+High Level Architecture:
+So that's how the networking model looks, but from a higher level, we need to abstract it away. If, for instance, I want to add an powerup class, and this needs to be synchronized over the network, I just need a way to do this without worrying about the network implementation. Probably some kind of attribute system will work nicely...
+
+e.g.
+[Networked]
+public class Powerup
+{
+  [Unreliable]
+  public Vector Location
+
+  [Reliable]
+  public Player CurrentOwner
+}

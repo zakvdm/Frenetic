@@ -47,7 +47,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\x86\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;WINDOWS;XNA</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;XNA</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>x86</PlatformTarget>
     <CodeAnalysisRules>-Microsoft.Design#CA1020;-Microsoft.Design#CA1021;-Microsoft.Design#CA1051;-Microsoft.Design#CA1002;-Microsoft.Design#CA1045;-Microsoft.Design#CA1034;-Microsoft.Design#CA1025;-Microsoft.Design#CA1024;-Microsoft.Maintainability#CA1500;-Microsoft.Naming#CA1702;-Microsoft.Naming#CA1709;-Microsoft.Naming#CA1704;-Microsoft.Naming#CA1708;-Microsoft.Naming#CA1710;-Microsoft.Performance#CA1822;-Microsoft.Usage#CA2225</CodeAnalysisRules>
@@ -57,7 +57,7 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <OutputPath>bin\x86\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
+    <DefineConstants>TRACE;XNA</DefineConstants>
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
     <PlatformTarget>x86</PlatformTarget>
@@ -68,35 +68,32 @@
   <ItemGroup>
     <Reference Include="Microsoft.Xna.Framework, Version=3.0.0.0, Culture=neutral, PublicKeyToken=6d5c3888ef60e27d, processorArchitecture=x86" />
     <Reference Include="System" />
-    <Reference Include="System.Xml.Linq">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
-    </Reference>
-    <Reference Include="System.Data.DataSetExtensions">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
-    </Reference>
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
+    <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Collisions\AABB.cs" />
     <Compile Include="Collisions\BruteForceCollider.cs" />
-    <Compile Include="Collisions\CollisionHelper.cs" />
     <Compile Include="Collisions\Contact.cs" />
     <Compile Include="Collisions\ContactId.cs" />
     <Compile Include="Collisions\ContactList.cs" />
+    <Compile Include="Collisions\DistanceGrid.cs" />
     <Compile Include="Collisions\Feature.cs" />
     <Compile Include="Collisions\Geom.cs" />
     <Compile Include="Collisions\GeomList.cs" />
-    <Compile Include="Collisions\Grid.cs" />
     <Compile Include="Collisions\LineIntersectInfo.cs" />
+    <Compile Include="Collisions\RayTester.cs" />
+    <Compile Include="Collisions\SAT.cs" />
     <Compile Include="Collisions\SelectiveSweepCollider.cs" />
+    <Compile Include="Collisions\SpatialHashCollider.cs" />
     <Compile Include="Collisions\SweepAndPruneCollider.cs" />
     <Compile Include="Collisions\Vertices.cs" />
     <Compile Include="Controllers\AABBFluidContainer.cs" />
     <Compile Include="Controllers\Controller.cs" />
     <Compile Include="Controllers\ControllerList.cs" />
     <Compile Include="Controllers\FluidDragController.cs" />
+    <Compile Include="Controllers\GravityController.cs" />
     <Compile Include="Controllers\InactivityController.cs" />
+    <Compile Include="Controllers\ScalingController.cs" />
     <Compile Include="Controllers\WaveController.cs" />
     <Compile Include="Dynamics\Arbiter.cs" />
     <Compile Include="Dynamics\ArbiterList.cs" />
@@ -113,6 +110,7 @@
     <Compile Include="Dynamics\Joints\PinJoint.cs" />
     <Compile Include="Dynamics\Joints\RevoluteJoint.cs" />
     <Compile Include="Dynamics\Joints\SliderJoint.cs" />
+    <Compile Include="Dynamics\Joints\WeldJoint.cs" />
     <Compile Include="Dynamics\Path.cs" />
     <Compile Include="Dynamics\Springs\AngleSpring.cs" />
     <Compile Include="Dynamics\Springs\FixedAngleSpring.cs" />
@@ -127,20 +125,18 @@
     <Compile Include="Factories\GeomFactory.cs" />
     <Compile Include="Factories\JointFactory.cs" />
     <Compile Include="Factories\SpringFactory.cs" />
+    <Compile Include="GenericList.cs" />
     <Compile Include="Interfaces\IBroadPhaseCollider.cs" />
     <Compile Include="Interfaces\IFluidContainer.cs" />
+    <Compile Include="Interfaces\IIsDisposable.cs" />
+    <Compile Include="Interfaces\INarrowPhaseCollider.cs" />
     <Compile Include="Mathematics\BilinearInterpolator.cs" />
     <Compile Include="Mathematics\Calculator.cs" />
     <Compile Include="Mathematics\CircularInterpolator.cs" />
     <Compile Include="Mathematics\ConvertUnits.cs" />
-    <Compile Include="Mathematics\MathHelper.cs" />
-    <Compile Include="Mathematics\Matrix.cs" />
-    <Compile Include="Mathematics\Vector2.cs" />
-    <Compile Include="Mathematics\Vector3.cs" />
     <Compile Include="PhysicsSimulator.cs" />
     <Compile Include="Pool.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Scaling.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

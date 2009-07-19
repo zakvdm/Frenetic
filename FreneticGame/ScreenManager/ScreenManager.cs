@@ -133,10 +133,10 @@ namespace Frenetic
         /// <summary>
         /// Constructs a new screen manager component.
         /// </summary>
-        public ScreenManager(Game game)
+        public ScreenManager(Game game, ContentManager contentManager)
             : base(game)
         {
-            content = new ContentManager(game.Services, "Content");
+            content = contentManager;
 
             graphicsDeviceService = (IGraphicsDeviceService)game.Services.GetService(
                                                         typeof(IGraphicsDeviceService));
@@ -179,7 +179,7 @@ namespace Frenetic
         protected override void UnloadContent()
         {
             // Unload content belonging to the screen manager.
-            content.Unload();
+            //content.Unload();
 
             // Tell each of the screens to unload their content.
             foreach (GameScreen screen in screens)
@@ -286,7 +286,7 @@ namespace Frenetic
 
             foreach (GameScreen screen in screensToDraw)
             {
-                if (screen.ScreenState == ScreenState.Hidden)
+                if (screen.ScreenState == ScreenState.Hidden || screen.ScreenState == ScreenState.Dead)
                     continue;
 
                 screen.Draw(gameTime);
@@ -348,6 +348,7 @@ namespace Frenetic
 
             screens.Remove(screen);
             screensToUpdate.Remove(screen);
+            screensToDraw.Remove(screen);
         }
 
 

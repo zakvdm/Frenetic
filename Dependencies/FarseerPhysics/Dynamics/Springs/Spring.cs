@@ -1,22 +1,37 @@
 using System;
+using FarseerGames.FarseerPhysics.Interfaces;
 
 namespace FarseerGames.FarseerPhysics.Dynamics.Springs
 {
     /// <summary>
     /// Provides common functionality for springs.
     /// </summary>
-    public abstract class Spring : IDisposable
+    public abstract class Spring : IIsDisposable
     {
         /// <summary>
         /// The Breakpoint simply indicates the maximum Value the JointError can be before it breaks.
+        /// The default value is float.MaxValue
         /// </summary>
         public float Breakpoint = float.MaxValue;
 
+        /// <summary>
+        /// The amount of spring damping to be applied.
+        /// </summary>
         public float DampingConstant;
+
+        /// <summary>
+        /// Determines if the spring is enabled or not.
+        /// </summary>
         public bool Enabled = true;
-        public bool IsDisposed;
+
+        /// <summary>
+        /// The amount of spring force to be applied.
+        /// </summary>
         public float SpringConstant;
 
+        /// <summary>
+        /// Tag that can contain a user specified object.
+        /// </summary>
         public Object Tag { get; set; }
 
         /// <summary>
@@ -25,6 +40,29 @@ namespace FarseerGames.FarseerPhysics.Dynamics.Springs
         /// </summary>
         /// <Value>The spring error.</Value>
         public float SpringError { get; protected set; }
+
+        /// <summary>
+        /// Fires when the spring is broken.
+        /// </summary>
+        public event EventHandler<EventArgs> Broke;
+
+        public abstract void Validate();
+
+        public virtual void Update(float dt)
+        {
+            if (!Enabled || Math.Abs(SpringError) <= Breakpoint)
+                return;
+
+            Enabled = false;
+
+            if (Broke != null)
+                Broke(this, EventArgs.Empty);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            IsDisposed = true;
+        }
 
         #region IDisposable Members
 
@@ -36,40 +74,16 @@ namespace FarseerGames.FarseerPhysics.Dynamics.Springs
 
         #endregion
 
-        /// <summary>
-        /// Fires when the spring is broken.
-        /// </summary>
-        public event EventHandler<EventArgs> Broke;
+        #region IIsDisposable Members
 
-        public abstract void Validate();
+        private bool _isDisposed;
 
-        public virtual void Update(float dt)
+        public bool IsDisposed
         {
-            //TODO: Ehhh, this makes no sense. Please test breakability!
-            if (!Enabled || Math.Abs(SpringError) <= Breakpoint)
-                return;
-
-            Enabled = false;
-
-            if (Broke != null)
-                Broke(this, EventArgs.Empty);
+            get { return _isDisposed; }
+            set { _isDisposed = value; }
         }
 
-
-        protected virtual void Dispose(bool disposing)
-        {
-            //subclasses can override incase they need to dispose of resources
-            //otherwise do nothing.
-            if (!IsDisposed)
-            {
-                if (disposing)
-                {
-                    //dispose managed resources 
-                }
-
-                //dispose unmanaged resources
-            }
-            IsDisposed = true;
-        }
+        #endregion
     }
 }

@@ -7,6 +7,8 @@ using Microsoft.Xna.Framework.Graphics;
 
 using NUnit.Framework;
 using Rhino.Mocks;
+using Frenetic.Network;
+using Microsoft.Xna.Framework;
 
 namespace UnitTestLibrary
 {

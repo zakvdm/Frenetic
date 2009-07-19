@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Frenetic.Level;
 using Microsoft.Xna.Framework;
 using FarseerGames.FarseerPhysics.Collisions;
 using FarseerGames.FarseerPhysics.Dynamics;
@@ -21,7 +20,7 @@ namespace Frenetic.Physics
         DumbRayCaster _dumbRayCaster;
         #region IController Members
 
-        public void Process(long ticks)
+        public void Process(float elapsedTime)
         {
             KeyboardState kbState = Microsoft.Xna.Framework.Input.Keyboard.GetState();
 

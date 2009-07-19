@@ -12,10 +12,15 @@ using FarseerGames.FarseerPhysics.Dynamics;
 using FarseerGames.FarseerPhysics.Collisions;
 using Frenetic.Graphics;
 using Microsoft.Xna.Framework;
-using FarseerGames.GettingStarted;
+using FarseerGames.AdvancedSamplesXNA;
 using Frenetic.Network.Lidgren;
 using Frenetic.Network;
 using Frenetic.Autofac;
+using Frenetic.UserInput;
+using Frenetic.Player;
+using Frenetic.Weapons;
+using Frenetic.Engine;
+using Frenetic.Gameplay.HUD;
 
 namespace Frenetic
 {
@@ -23,216 +28,147 @@ namespace Frenetic
     {
         const int _screenWidth = 800;
         const int _screenHeight = 600;
-        Vector2 _gravity = new Vector2(0, 6);
 
-        public GameSessionFactory(GraphicsDevice graphicsDevice, ContentManager contentManager)
+        public GameSessionFactory(GraphicsDevice graphicsDevice, ContentManager contentManager, IContainer parentContainer)
         {
             _graphicsDevice = graphicsDevice;
             _contentManager = contentManager;
+
+            _parentContainer = parentContainer;
+
         }
         #region IGameSessionFactory Members
 
         public GameSessionControllerAndView MakeServerGameSession()
         {
-            IContainer container = RegisterAllComponents();
+            ServerContainer = _parentContainer.CreateInnerContainer();
 
             // TODO: Move this somewhere more appropriate
             // Make queues for a SERVER network session:
             // *****************************************
-            IServerNetworkSession serverNetworkSession = container.Resolve<IServerNetworkSession>();
-            NetworkSessionManager networkSessionManager = container.Resolve<NetworkSessionManager>(
-                    new TypedParameter(typeof(IClientNetworkSession), null));
-            IIncomingMessageQueue incomingMessageQueue = container.Resolve<IIncomingMessageQueue>(
+            IServerNetworkSession serverNetworkSession = ServerContainer.Resolve<IServerNetworkSession>();
+            ServerContainer.Resolve<IClientStateTracker>(new TypedParameter(typeof(INetworkSession), serverNetworkSession),
+                                                         new TypedParameter(typeof(IClientFactory), ServerContainer.Resolve<ServerSideClientFactory>()));
+
+            IIncomingMessageQueue incomingMessageQueue = ServerContainer.Resolve<IIncomingMessageQueue>(
                     new TypedParameter(typeof(INetworkSession), serverNetworkSession));
-            IOutgoingMessageQueue outgoingMessageQueue = container.Resolve<IOutgoingMessageQueue>(
+            IOutgoingMessageQueue outgoingMessageQueue = ServerContainer.Resolve<IOutgoingMessageQueue>(
                     new TypedParameter(typeof(IClientNetworkSession), null));
-            networkSessionManager.Start(14242);
+            serverNetworkSession.Create(14242);
             // *****************************************
 
-            CreateGeneralComponents(container);
+            // Server needs a new PhysicsSimulator (can't use the client's... -- NOTE: the parameter value is irrelevant, all that matters is that it exists...)
+            var simulator = ServerContainer.Resolve<IPhysicsSimulator>(new NamedParameter("isServer", true));
 
+            IGameSession gameSession = ServerContainer.Resolve<IGameSession>();
 
-            GameSessionController gameSessionController = container.Resolve<GameSessionController>
-                            (
-                            new TypedParameter(typeof(IPlayer), null),
-                            new TypedParameter(typeof(ICamera), null),
-                            new TypedParameter(typeof(bool), true)
-                            );
-            GameSessionView gameSessionView = container.Resolve<GameSessionView>();
+            GameSessionController gameSessionController = ServerContainer.Resolve<GameSessionController>();
+            GameSessionView gameSessionView = ServerContainer.Resolve<GameSessionView>();
 
-            return new GameSessionControllerAndView(container.Resolve<IGameSession>(), gameSessionController, gameSessionView);
+            gameSession.Controllers.Add(ServerContainer.Resolve<PlayerUpdater>());
+
+            SnapCounter snapCounter = (SnapCounter)ServerContainer.Resolve<ISnapCounter>();
+            gameSession.Controllers.Add(snapCounter);
+            gameSession.Controllers.Add(ServerContainer.Resolve<ITimer>());
+
+            Log<ChatMessage> serverLog = ServerContainer.Resolve<Log<ChatMessage>>();
+            IChatLogDiffer chatLogDiffer = ServerContainer.Resolve<IChatLogDiffer>(new TypedParameter(typeof(Log<ChatMessage>), serverLog));
+
+            // THINGS TO SYNC OVER NETWORK:
+            gameSession.Views.Add(ServerContainer.Resolve<GameStateSender>(new TypedParameter(typeof(Log<ChatMessage>), serverLog)));
+            gameSession.Controllers.Add(ServerContainer.Resolve<ClientInputProcessor>(new TypedParameter(typeof(Log<ChatMessage>), serverLog)));
+            // ****************************
+
+            return new GameSessionControllerAndView(gameSession, gameSessionController, gameSessionView);
         }
 
         
         public GameSessionControllerAndView MakeClientGameSession()
         {
-            IContainer container = RegisterAllComponents();
-
+            ClientContainer = _parentContainer.CreateInnerContainer();
+            
             // TODO: Move this somewhere more appropriate
             // Make queues for a CLIENT network session:
             // *****************************************
-            IClientNetworkSession clientNetworkSession = container.Resolve<IClientNetworkSession>();
-            NetworkSessionManager networkSessionManager = container.Resolve<NetworkSessionManager>(
-                    new TypedParameter(typeof(IServerNetworkSession), null));
-            IIncomingMessageQueue incomingMessageQueue = container.Resolve<IIncomingMessageQueue>(
-                    new TypedParameter(typeof(INetworkSession), clientNetworkSession));
-            IOutgoingMessageQueue outgoingMessageQueue = container.Resolve<IOutgoingMessageQueue>(
-                    new TypedParameter(typeof(IServerNetworkSession), null));
-            networkSessionManager.Join(14242);
+            IClientNetworkSession clientNetworkSession = ClientContainer.Resolve<IClientNetworkSession>();
             // *****************************************
 
-            IPlayer localPlayer = CreateClientComponents(container);
+            IGameSession gameSession = ClientContainer.Resolve<IGameSession>();
 
-            CreateGeneralComponents(container);
+            SnapCounter snapCounter = (SnapCounter)ClientContainer.Resolve<ISnapCounter>();
+            gameSession.Controllers.Add(snapCounter);
 
-            GameSessionController gameSessionController = container.Resolve<GameSessionController>(
-                                new TypedParameter(typeof(IPlayer), localPlayer),
-                                new TypedParameter(typeof(bool), false));
-            GameSessionView gameSessionView = container.Resolve<GameSessionView>();
+            IPlayer localPlayer = CreateClientComponents(gameSession);
 
-            return new GameSessionControllerAndView(container.Resolve<IGameSession>(), gameSessionController, gameSessionView);
-        }
-        
-        private IContainer RegisterAllComponents()
-        {
-            var builder = new ContainerBuilder();
 
-            #region Networking
-            builder.Register(new NetServer(new NetConfiguration("Frenetic"))).SingletonScoped();
-            builder.Register(new NetClient(new NetConfiguration("Frenetic"))).SingletonScoped();
-            builder.Register<NetServerWrapper>().As<INetServer>().SingletonScoped();
-            builder.Register<NetClientWrapper>().As<INetClient>().SingletonScoped();
-            builder.Register<LidgrenServerNetworkSession>().As<IServerNetworkSession>().SingletonScoped();
-            builder.Register<LidgrenClientNetworkSession>().As<IClientNetworkSession>().SingletonScoped();
-            builder.Register<NetworkSessionManager>().SingletonScoped();
-            builder.Register<IncomingMessageQueue>().As<IIncomingMessageQueue>().SingletonScoped();
-            builder.Register<OutgoingMessageQueue>().As<IOutgoingMessageQueue>().SingletonScoped();
-            builder.Register<XmlMessageSerializer>().As<IMessageSerializer>().SingletonScoped();
-            #endregion
+            ClientContainer.Resolve<IClientStateTracker>(new TypedParameter(typeof(INetworkSession), clientNetworkSession),
+                                                         new TypedParameter(typeof(IClientFactory), ClientContainer.Resolve<ClientSideClientFactory>()));
+            IIncomingMessageQueue incomingMessageQueue = ClientContainer.Resolve<IIncomingMessageQueue>(
+                    new TypedParameter(typeof(INetworkSession), clientNetworkSession));
+            IOutgoingMessageQueue outgoingMessageQueue = ClientContainer.Resolve<IOutgoingMessageQueue>(
+                    new TypedParameter(typeof(IServerNetworkSession), null));
+            clientNetworkSession.Join(14242);
 
-            #region ViewFactory
-            builder.Register<ViewFactory>().As<IViewFactory>().SingletonScoped();
-            #endregion
-
-            #region Graphics
-            builder.Register<SpriteBatch>(new SpriteBatch(_graphicsDevice));
-            builder.Register<XNASpriteBatch>().As<ISpriteBatch>().FactoryScoped();
-            builder.Register<XNATexture>().As<ITexture>().FactoryScoped();
-            #endregion
-
-            #region GameSession
-            builder.Register<GameSession>().As<IGameSession>().SingletonScoped();
-            builder.Register<GameSessionController>().SingletonScoped();
-            builder.Register<GameSessionView>().SingletonScoped();
-            #endregion
-
-            #region Player
-            builder.Register<Player>().FactoryScoped();
-            builder.RegisterGeneratedFactory<Player.Factory>(new TypedService(typeof(Player)));
-            builder.Register((c) => (IBoundaryCollider)new WorldBoundaryCollider(_screenWidth, _screenHeight));
-            builder.Register<KeyboardPlayerController>().SingletonScoped();
-            builder.Register<NetworkPlayerView>().SingletonScoped();
-            #endregion
-
-            #region Physics
-            /*
-            PhysicsSimulator physicsSimulator = new PhysicsSimulator(_gravity);
-            builder.Register<PhysicsSimulator>(physicsSimulator).SingletonScoped();
-            // Body:
-            builder.Register((c, p) => BodyFactory.Instance.CreateRectangleBody(c.Resolve<PhysicsSimulator>(), p.Named<float>("width"), p.Named<float>("height"), p.Named<float>("mass"))).FactoryScoped();
-            // Geom:
-            builder.Register((c, p) => GeomFactory.Instance.CreateRectangleGeom(c.Resolve<PhysicsSimulator>(), p.Named<Body>("body"), p.Named<float>("width"), p.Named<float>("height"))).FactoryScoped();
-            // IPhysicsComponent:
-            builder.Register((c, p) =>
-            {
-                var width = new NamedParameter("width", 50f);
-                var height = new NamedParameter("height", 50f);
-                var mass = new NamedParameter("mass", 100f);
-                var bod = c.Resolve<Body>(width, height, mass);
-                var body = new NamedParameter("body", bod);
-                var geom = c.Resolve<Geom>(body, width, height, mass);
-                return (IPhysicsComponent)new FarseerPhysicsComponent(bod, geom);
-            }).FactoryScoped();
-            builder.Register<FarseerPhysicsController>().SingletonScoped();
-             */
-            builder.RegisterModule(new PhysicsModule() { Gravity = _gravity });
-            #endregion
-
-            #region Level
-            builder.Register<LevelPiece>().FactoryScoped();
-            builder.RegisterGeneratedFactory<LevelPiece.Factory>(new TypedService(typeof(LevelPiece)));
-            builder.Register<DumbLevelLoader>().As<ILevelLoader>().SingletonScoped();
-            builder.Register<Frenetic.Level.Level>().SingletonScoped();
-            builder.Register<LevelController>();
-            builder.Register<LevelView>();
-            #endregion
-
-            // RAYCASTER:
-            builder.Register<DumbRayCaster>().SingletonScoped();
-            builder.Register<DumbRayCasterTestController>().FactoryScoped();
-
-            // CAMERA:
-            builder.Register((c, p) => (ICamera)new Camera(p.TypedAs<IPlayer>(), new Vector2(_screenWidth, _screenHeight))).SingletonScoped();
-            builder.Register<Camera>().As<ICamera>().SingletonScoped();
-
-            // CROSSHAIR:
-            builder.Register<Crosshair>().As<ICrosshair>().SingletonScoped();
-            builder.Register<CrosshairView>().SingletonScoped();
-
-            // KEYBOARD:
-            builder.Register<Keyboard>().As<IKeyboard>().SingletonScoped();
-
-            return builder.Build();
-        }
-
-        private Player.Factory CreateGeneralComponents(IContainer container)
-        {
-            ITexture playerTexture = container.Resolve<ITexture>(new TypedParameter(typeof(Texture2D), _contentManager.Load<Texture2D>("Content/textures/ball")));
-            IViewFactory viewFactory = container.Resolve<IViewFactory>(new TypedParameter(typeof(ITexture), playerTexture));
-            IGameSession gameSession = container.Resolve<IGameSession>();
-
-            gameSession.Controllers.Add(container.Resolve<FarseerPhysicsController>());
-            Frenetic.Level.Level level = container.Resolve<Frenetic.Level.Level>();
+            gameSession.Controllers.Add(ClientContainer.Resolve<PhysicsController>());
             
-            gameSession.Controllers.Add(container.Resolve<LevelController>(new TypedParameter(typeof(Frenetic.Level.Level), level)));
+            ILevel level = ClientContainer.Resolve<ILevel>();
+            gameSession.Controllers.Add(ClientContainer.Resolve<LevelController>(new TypedParameter(typeof(ILevel), level)));
 
-            return container.Resolve<Player.Factory>();
+            gameSession.Views.Add(ClientContainer.Resolve<HudOverlaySetView>());
+            gameSession.Controllers.Add(ClientContainer.Resolve<HudController>());
+
+            GameSessionController gameSessionController = ClientContainer.Resolve<GameSessionController>(
+                new TypedParameter(typeof(bool), false));
+            GameSessionView gameSessionView = ClientContainer.Resolve<GameSessionView>();
+
+
+            // THINGS TO SYNC OVER NETWORK:
+            Log<ChatMessage> chatLog = _parentContainer.Resolve<IMessageConsole>().Log;
+            gameSession.Controllers.Add(ClientContainer.Resolve<GameStateProcessor>(new TypedParameter(typeof(Log<ChatMessage>), chatLog), new TypedParameter(typeof(IIncomingMessageQueue), incomingMessageQueue)));
+            gameSession.Views.Add(ClientContainer.Resolve<ClientInputSender>(new TypedParameter(typeof(Log<ChatMessage>), chatLog)));
+            // ****************************
+
+            return new GameSessionControllerAndView(gameSession, gameSessionController, gameSessionView);
         }
 
-        private IPlayer CreateClientComponents(IContainer container)
+
+        private IPlayer CreateClientComponents(IGameSession gameSession)
         {
             // Make local player:
-            IPlayer localPlayer = container.Resolve<Player>(new TypedParameter(typeof(int), 0));
+            IPlayer localPlayer = ClientContainer.Resolve<IPlayer>(new TypedParameter(typeof(IPlayerSettings), ClientContainer.Resolve<LocalPlayerSettings>()));
+            var localClient = ClientContainer.Resolve<LocalClient>(new TypedParameter(typeof(IPlayer), localPlayer));
 
-            IGameSession gameSession = container.Resolve<IGameSession>();
+            gameSession.Controllers.Add(ClientContainer.Resolve<PhysicsController>());
+            ILevel level = ClientContainer.Resolve<ILevel>();
+            gameSession.Controllers.Add(ClientContainer.Resolve<LevelController>(new TypedParameter(typeof(ILevel), level)));
 
-            gameSession.Controllers.Add(container.Resolve<KeyboardPlayerController>(new TypedParameter(typeof(IPlayer), localPlayer)));
-            gameSession.Views.Add(container.Resolve<NetworkPlayerView>
-                            (
-                            new TypedParameter(typeof(IPlayer), localPlayer)
-                            ));
-            ICamera camera = container.Resolve<ICamera>
+            ICamera camera = ClientContainer.Resolve<ICamera>
                                             (
                                             new TypedParameter(typeof(IPlayer), localPlayer),
                                             new TypedParameter(typeof(Vector2), new Vector2(_screenWidth, _screenHeight))
                                             );
 
-            ITexture levelTexture = container.Resolve<ITexture>(new TypedParameter(typeof(Texture2D), _contentManager.Load<Texture2D>("Content/Textures/blank")));
-            gameSession.Views.Add(container.Resolve<LevelView>(new TypedParameter(typeof(ITexture), levelTexture)));
+            gameSession.Controllers.Add(ClientContainer.Resolve<KeyboardPlayerController>(new TypedParameter(typeof(IPlayer), localPlayer)));
 
-            ITexture crosshairTexture = container.Resolve<ITexture>(new TypedParameter(typeof(Texture2D), _contentManager.Load<Texture2D>("Content/Textures/cursor")));
-            gameSession.Views.Add(container.Resolve<CrosshairView>(new TypedParameter(typeof(ITexture), crosshairTexture)));
+            gameSession.Controllers.Add(ClientContainer.Resolve<EffectUpdater>());
+
+            gameSession.Views.Add(ClientContainer.Resolve<PlayerView>()); // PlayerView must draw before VisibilityView (so players are underneath blackness!)
+            gameSession.Views.Add(ClientContainer.Resolve<VisibilityView>(new TypedParameter(typeof(IPlayer), localPlayer)));
+
+            ITexture levelTexture = ClientContainer.Resolve<ITexture>(new TypedParameter(typeof(Texture2D), _contentManager.Load<Texture2D>("Textures/blank")));
+            gameSession.Views.Add(ClientContainer.Resolve<LevelView>(new TypedParameter(typeof(ITexture), levelTexture)));
+
+            ITexture crosshairTexture = ClientContainer.Resolve<ITexture>(new TypedParameter(typeof(Texture2D), _contentManager.Load<Texture2D>("Textures/cursor")));
+            gameSession.Views.Add(ClientContainer.Resolve<CrosshairView>(new TypedParameter(typeof(ITexture), crosshairTexture)));
+
 
             // TEMP CODE:
             // *********************************************************************************
-            gameSession.Controllers.Add(container.Resolve<DumbRayCasterTestController>());
-
-
             // DEBUG VIEW:  // TODO: Write a controller for this...
             // TODO: Instantiate with Autofac
-            PhysicsSimulator physicsSimulator = container.Resolve<PhysicsSimulator>();
-            var debugView = new PhysicsSimulatorView(physicsSimulator, new SpriteBatch(_graphicsDevice), camera);
-            physicsSimulator.EnableDiagnostics = true;
+            IPhysicsSimulator physicsSimulator = ClientContainer.Resolve<IPhysicsSimulator>();
+            var debugView = new PhysicsSimulatorView(physicsSimulator.PhysicsSimulator, new SpriteBatch(_graphicsDevice), camera);
+            physicsSimulator.PhysicsSimulator.EnableDiagnostics = true;
             debugView.LoadContent(_graphicsDevice, _contentManager);
             gameSession.Views.Add(debugView);
             // *********************************************************************************
@@ -240,10 +176,25 @@ namespace Frenetic
             return localPlayer;
         }
 
+        public void Dispose()
+        {
+            if (ClientContainer != null)
+            {
+                ClientContainer.Dispose();
+            }
+            if (ServerContainer != null)
+            {
+                ServerContainer.Dispose();
+            }
+        }
+
         #endregion
 
         GraphicsDevice _graphicsDevice;
         ContentManager _contentManager;
+        IContainer _parentContainer;
+        IContainer ClientContainer { get; set; }
+        IContainer ServerContainer { get; set; }
     }
 
     public class GameSessionControllerAndView

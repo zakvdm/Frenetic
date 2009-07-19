@@ -34,7 +34,7 @@ namespace Lidgren.Network
 		protected List<NetConnection> m_connections;
 		protected Dictionary<IPEndPoint, NetConnection> m_connectionLookup;
 		protected bool m_allowOutgoingConnections; // used by NetPeer
-
+		
 		/// <summary>
 		/// Gets a copy of the list of connections
 		/// </summary>
@@ -65,6 +65,7 @@ namespace Lidgren.Network
 		protected override void Heartbeat()
 		{
 			double now = NetTime.Now;
+			m_heartbeatCounter.Count(now);
 
 			if (m_shutdownRequested)
 			{
@@ -154,7 +155,7 @@ namespace Lidgren.Network
 				{
 					case NetSystemType.Connect:
 
-						LogVerbose("Connection request received");
+						LogVerbose("Connection request received from " + senderEndpoint);
 
 						// check app ident
 						if (payLen < 4)
@@ -311,6 +312,8 @@ namespace Lidgren.Network
 		internal void AddConnection(double now, NetConnection conn)
 		{
 			conn.SetStatus(NetConnectionStatus.Connecting, "Connecting");
+
+			LogWrite("Adding connection " + conn);
 
 			// send response; even if connected
 			OutgoingNetMessage response = CreateSystemMessage(NetSystemType.ConnectResponse);

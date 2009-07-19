@@ -9,6 +9,16 @@ namespace Frenetic.Network.Lidgren
         {
             _netClient = netClient;
             _messageSerializer = messageSerializer;
+
+            ClientDisconnected += (obj, args) => Console.WriteLine("ZAK HERE: Client disconnected!");
+        }
+
+        public event EventHandler<ClientStatusChangeEventArgs> ClientJoined;
+        public event EventHandler<ClientStatusChangeEventArgs> ClientDisconnected;
+
+        public void Dispose()
+        {
+            Shutdown("Cleaning up connection.");
         }
 
         #region IClientNetworkSession Members
@@ -26,7 +36,7 @@ namespace Frenetic.Network.Lidgren
 
         public void SendToServer(Message msg, NetChannel channel)
         {
-            if (!_netClient.Connected)
+            if (_netClient.Status != NetConnectionStatus.Connected)
                 throw new System.InvalidOperationException("Client not connected to server");
 
             byte[] data = _messageSerializer.Serialize(msg);
@@ -63,20 +73,43 @@ namespace Frenetic.Network.Lidgren
                         NetBuffer buf = _netClient.CreateBuffer();
                         buf.Write("Hail from " + Environment.MachineName);
                         _netClient.Connect(inBuffer.ReadIPEndPoint(), buf.ToArray());
-                        return null;
+                        break;
                     case NetMessageType.DebugMessage:
                         Console.WriteLine(inBuffer.ReadString());
-                        return null;
+                        break;
                     case NetMessageType.VerboseDebugMessage:
-                        return null;
+                        break;
                     case NetMessageType.Data:
-                        return _messageSerializer.Deserialize(inBuffer.ReadBytes(inBuffer.LengthBytes));
+                        Message msg = _messageSerializer.Deserialize(inBuffer.ReadBytes(inBuffer.LengthBytes));
+                
+                        if (HandleMessageFromServer(msg))
+                            break;  // Message is handled in this class
+
+                        return msg; // Message needs to be handled externally
                 }
             }
             return null;
         }
         
         #endregion
+
+        bool HandleMessageFromServer(Message incomingMessage)
+        {
+            switch (incomingMessage.Type)
+            {
+                case MessageType.SuccessfulJoin:
+                    ClientJoined(this, new ClientStatusChangeEventArgs((int)incomingMessage.Data, true));
+                    return true;
+                case MessageType.NewClient:
+                    ClientJoined(this, new ClientStatusChangeEventArgs((int)incomingMessage.Data, false));
+                    return true;
+                case MessageType.DisconnectingClient:
+                    ClientDisconnected(this, new ClientStatusChangeEventArgs((int)incomingMessage.Data, false));
+                    return true;
+                default:
+                    return false;
+            }
+        }
 
         INetClient _netClient;
         IMessageSerializer _messageSerializer;

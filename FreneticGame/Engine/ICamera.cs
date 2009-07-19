@@ -4,8 +4,15 @@ namespace Frenetic
 {
     public interface ICamera
     {
-        Vector2 ConvertToWorldCoordinates(Microsoft.Xna.Framework.Vector2 screenPosition);
+        float ScreenWidth { get; }
+        float ScreenHeight { get; }
+
+        Vector2 ConvertToWorldCoordinates(Vector2 screenPosition);
         Vector2 Position { get; }
+
+        /// <summary>
+        /// The Matrix that converts world coordinates into screen coordinates
+        /// </summary>
         Matrix TranslationMatrix { get; }
     }
 }

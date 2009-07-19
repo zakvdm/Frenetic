@@ -2,7 +2,7 @@
 
 namespace Frenetic
 {
-    public interface IGameSessionFactory
+    public interface IGameSessionFactory : IDisposable
     {
         GameSessionControllerAndView MakeServerGameSession();
         GameSessionControllerAndView MakeClientGameSession();

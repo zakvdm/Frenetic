@@ -78,7 +78,6 @@
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
     <Reference Include="System.Data" />
-    <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq">
@@ -87,34 +86,97 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Autofac\GameSessionModule.cs" />
+    <Compile Include="Autofac\OverlaysModule.cs" />
+    <Compile Include="Autofac\LevelModule.cs" />
     <Compile Include="Autofac\PhysicsModule.cs" />
+    <Compile Include="Autofac\WeaponsModule.cs" />
     <Compile Include="Engine\Camera.cs" />
+    <Compile Include="Engine\Console\ChatLogDifferByReference.cs" />
+    <Compile Include="Engine\Console\ChatMessage.cs" />
+    <Compile Include="Engine\Console\ConsoleOverlaySetView.cs" />
+    <Compile Include="Engine\Console\InputLine.cs" />
+    <Compile Include="Engine\Console\IChatLogDiffer.cs" />
+    <Compile Include="Engine\Console\IConsole.cs" />
+    <Compile Include="Engine\Console\IMessageConsole.cs" />
+    <Compile Include="Engine\Console\InputHudView.cs" />
+    <Compile Include="Engine\Console\IOverlayView.cs" />
+    <Compile Include="Engine\Console\LogOverlayView.cs" />
+    <Compile Include="Engine\Console\MessageConsole.cs" />
+    <Compile Include="Engine\EffectUpdater.cs" />
+    <Compile Include="Engine\IGame.cs" />
+    <Compile Include="Engine\ISettingsPersister.cs" />
+    <Compile Include="Engine\ITimer.cs" />
+    <Compile Include="Engine\Quitter.cs" />
+    <Compile Include="Engine\SettingsPersister.cs" />
+    <Compile Include="Engine\Timer.cs" />
+    <Compile Include="Engine\TweakablePropertiesLoader.cs" />
+    <Compile Include="Engine\XnaGame.cs" />
+    <Compile Include="Gameplay\HUD\HudController.cs" />
+    <Compile Include="Gameplay\HUD\HudOverlaySetView.cs" />
+    <Compile Include="Gameplay\PlayerScore.cs" />
+    <Compile Include="Gameplay\HUD\ScoreHudView.cs" />
+    <Compile Include="Gameplay\Player\INetworkPlayerProcessor.cs" />
+    <Compile Include="Gameplay\Player\IPlayerSettings.cs" />
+    <Compile Include="Gameplay\Player\PlayerState.cs" />
+    <Compile Include="Gameplay\Player\PlayerUpdater.cs" />
+    <Compile Include="Gameplay\Weapons\IRailGun.cs" />
+    <Compile Include="Gameplay\Weapons\IRailGunView.cs" />
+    <Compile Include="Gameplay\Weapons\RailGun.cs" />
+    <Compile Include="Gameplay\Weapons\RailGunView.cs" />
+    <Compile Include="Gameplay\Weapons\Shot.cs" />
+    <Compile Include="Graphics\IEffect.cs" />
+    <Compile Include="Graphics\IPrimitiveDrawer.cs" />
+    <Compile Include="Graphics\MercuryParticleEffect.cs" />
+    <Compile Include="Graphics\XnaPrimitiveDrawer.cs" />
+    <Compile Include="Level\ILevel.cs" />
+    <Compile Include="Level\VisibilityView.cs" />
+    <Compile Include="Network\ClientFactory.cs" />
+    <Compile Include="Network\Client\GameStateProcessor.cs" />
+    <Compile Include="Network\IClientFactory.cs" />
+    <Compile Include="Network\IServerMessageSender.cs" />
+    <Compile Include="Network\Lidgren\LidgrenServerMessageSender.cs" />
+    <Compile Include="Network\Server\GameStateSender.cs" />
+    <Compile Include="Engine\Console\Log.cs" />
     <Compile Include="Engine\Crosshair.cs" />
     <Compile Include="Engine\CrosshairView.cs" />
+    <Compile Include="Engine\Console\CommandConsole.cs" />
+    <Compile Include="Engine\Console\ConsoleController.cs" />
+    <Compile Include="Engine\Console\ConsoleView.cs" />
     <Compile Include="Engine\ICamera.cs" />
     <Compile Include="Engine\ICrosshair.cs" />
+    <Compile Include="Engine\Console\ICommandConsole.cs" />
+    <Compile Include="Engine\IMediator.cs" />
+    <Compile Include="Engine\ISnapCounter.cs" />
     <Compile Include="Engine\Line.cs" />
-    <Compile Include="Gameplay\GameplayObject.cs" />
+    <Compile Include="Engine\Mediator.cs" />
+    <Compile Include="Engine\SnapCounter.cs" />
+    <Compile Include="FPS.cs" />
     <Compile Include="Gameplay\GameSession.cs" />
     <Compile Include="Gameplay\GameSessionController.cs" />
     <Compile Include="Gameplay\GameSessionFactory.cs" />
     <Compile Include="Gameplay\GameSessionView.cs" />
-    <Compile Include="Gameplay\IController.cs" />
+    <Compile Include="Engine\IController.cs" />
     <Compile Include="Gameplay\IGameSession.cs" />
-    <Compile Include="Gameplay\IPlayer.cs" />
-    <Compile Include="Gameplay\IView.cs" />
-    <Compile Include="Gameplay\IViewFactory.cs" />
-    <Compile Include="Gameplay\KeyboardPlayerController.cs" />
-    <Compile Include="Gameplay\NetworkPlayerController.cs" />
-    <Compile Include="Gameplay\NetworkPlayerView.cs" />
-    <Compile Include="Gameplay\Player.cs" />
-    <Compile Include="Gameplay\PlayerView.cs" />
-    <Compile Include="Gameplay\ViewFactory.cs" />
-    <Compile Include="Gameplay\World.cs" />
+    <Compile Include="Gameplay\Player\IPlayer.cs" />
+    <Compile Include="Engine\IView.cs" />
+    <Compile Include="Gameplay\Player\KeyboardPlayerController.cs" />
+    <Compile Include="Network\Client.cs" />
+    <Compile Include="Network\ClientStateTracker.cs" />
+    <Compile Include="Network\Client\ClientInputSender.cs" />
+    <Compile Include="Gameplay\Player\NetworkPlayerProcessor.cs" />
+    <Compile Include="Gameplay\Player\Player.cs" />
+    <Compile Include="Gameplay\Player\PlayerSettings.cs" />
+    <Compile Include="Gameplay\Player\PlayerView.cs" />
+    <Compile Include="Graphics\IContentManager.cs" />
+    <Compile Include="Graphics\IFont.cs" />
     <Compile Include="Graphics\ISpriteBatch.cs" />
     <Compile Include="Graphics\ITexture.cs" />
-    <Compile Include="Graphics\XNASpriteBatch.cs" />
-    <Compile Include="Graphics\XNATexture2D.cs" />
+    <Compile Include="Graphics\ITextureBank.cs" />
+    <Compile Include="Graphics\XnaTextureBank.cs" />
+    <Compile Include="Graphics\XnaContentManager.cs" />
+    <Compile Include="Graphics\XnaFont.cs" />
+    <Compile Include="Graphics\XnaSpriteBatch.cs" />
+    <Compile Include="Graphics\XnaTexture.cs" />
     <Compile Include="Level\DumbLevelLoader.cs" />
     <Compile Include="Level\ILevelLoader.cs" />
     <Compile Include="Level\Level.cs" />
@@ -122,6 +184,7 @@
     <Compile Include="Level\LevelPiece.cs" />
     <Compile Include="Level\LevelView.cs" />
     <Compile Include="Network\IClientNetworkSession.cs" />
+    <Compile Include="Network\IClientStateTracker.cs" />
     <Compile Include="Network\IIncomingMessageQueue.cs" />
     <Compile Include="Network\IMessageSerializer.cs" />
     <Compile Include="Network\INetworkSession.cs" />
@@ -137,14 +200,19 @@
     <Compile Include="Network\Lidgren\NetConnectionWrapper.cs" />
     <Compile Include="Network\Lidgren\NetServerWrapper.cs" />
     <Compile Include="Network\IncomingMessageQueue.cs" />
-    <Compile Include="Network\NetworkSessionManager.cs" />
     <Compile Include="Network\OutgoingMessageQueue.cs" />
+    <Compile Include="Network\Server\ClientInputProcessor.cs" />
     <Compile Include="Network\XmlMessageSerializer.cs" />
     <Compile Include="OperationCompletedEventArgs.cs" />
     <Compile Include="Physics\DumbRayCaster.cs" />
     <Compile Include="Physics\DummyPhysicsComponent.cs" />
     <Compile Include="Physics\FarseerPhysicsComponent.cs" />
-    <Compile Include="Physics\FarseerPhysicsController.cs" />
+    <Compile Include="Physics\FarseerRayCaster.cs" />
+    <Compile Include="Physics\Farseer\DrawingSystem\EllipseBrush.cs" />
+    <Compile Include="Physics\Farseer\DrawingSystem\PolygonBrush.cs" />
+    <Compile Include="Physics\IRayCaster.cs" />
+    <Compile Include="Physics\PhysicsController.cs" />
+    <Compile Include="Physics\FarseerPhysicsSimulator.cs" />
     <Compile Include="Physics\Farseer\DrawingSystem\CircleBrush.cs" />
     <Compile Include="Physics\Farseer\DrawingSystem\DrawingHelper.cs" />
     <Compile Include="Physics\Farseer\DrawingSystem\LineBrush.cs" />
@@ -152,6 +220,8 @@
     <Compile Include="Physics\Farseer\PhysicsSimulatorView.cs" />
     <Compile Include="Physics\IBoundaryCollider.cs" />
     <Compile Include="Physics\IPhysicsComponent.cs" />
+    <Compile Include="Physics\IPhysicsSimulator.cs" />
+    <Compile Include="Physics\PhysicsSettings.cs" />
     <Compile Include="Physics\WorldBoundaryCollider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Program.cs" />
@@ -168,7 +238,9 @@
     <Compile Include="Screens\ScreenFactory.cs" />
     <Compile Include="Screens\SearchResultsScreen.cs" />
     <Compile Include="UserInput\IKeyboard.cs" />
-    <Compile Include="UserInput\Keyboard.cs" />
+    <Compile Include="UserInput\XNAKeyboard.cs" />
+    <Compile Include="UserInput\IMouse.cs" />
+    <Compile Include="UserInput\Mouse.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Game.ico" />
@@ -216,10 +288,10 @@
       <Project>{BA202214-F6F8-4853-BCC9-CA4F13C5F479}</Project>
       <Name>Lidgren.Network</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Engine\Level\" />
-    <Folder Include="Gameplay\Weapons\" />
+    <ProjectReference Include="..\Dependencies\ProjectMercury\ProjectMercury.Windows\ProjectMercury.Windows.csproj">
+      <Project>{1E3FDDBD-A15F-42CF-A83E-754476079B30}</Project>
+      <Name>ProjectMercury.Windows</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\XNA Game Studio\Microsoft.Xna.GameStudio.targets" Condition="" />

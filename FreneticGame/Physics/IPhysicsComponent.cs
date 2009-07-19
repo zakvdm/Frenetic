@@ -6,8 +6,6 @@ using Microsoft.Xna.Framework;
 
 namespace Frenetic.Physics
 {
-    public delegate void CollidedWithWorldDelegate();
-
     public interface IPhysicsComponent
     {
         bool IsStatic { get; set; }
@@ -18,6 +16,9 @@ namespace Frenetic.Physics
         void ApplyImpulse(Vector2 impulse);
         void ApplyForce(Vector2 force);
 
-        event CollidedWithWorldDelegate CollidedWithWorld;
+        void HitByWeapon();
+
+        event Action CollidedWithWorld;
+        event Action OnShot;
     }
 }
