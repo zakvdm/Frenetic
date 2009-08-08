@@ -6,6 +6,7 @@ using FarseerGames.FarseerPhysics.Dynamics;
 using Frenetic.Weapons;
 using Frenetic.Engine;
 using Frenetic.Gameplay;
+using System.Xml.Serialization;
 
 namespace Frenetic.Player
 {
@@ -44,6 +45,7 @@ namespace Frenetic.Player
             _physicsComponent = new DummyPhysicsComponent();
         } // For XmlSerializer
 
+        [XmlIgnore]
         public IPlayerSettings PlayerSettings { get; private set; }
 
         public bool IsAlive { get; set; }
@@ -64,7 +66,7 @@ namespace Frenetic.Player
             get { return _weapon; }
         }
 
-        public PlayerScore PlayerScore { get; private set; }
+        public PlayerScore PlayerScore { get; set; }
 
         public void Update()
         {
