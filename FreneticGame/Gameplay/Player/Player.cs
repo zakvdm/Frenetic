@@ -9,7 +9,6 @@ using Frenetic.Gameplay;
 
 namespace Frenetic.Player
 {
-    [Serializable()]
     public class Player : IPlayer
     {
         public Player(IPlayerSettings playerSettings, IPhysicsComponent physicsComponent, IBoundaryCollider boundaryCollider, IRailGun weapon, ITimer timer)
@@ -43,7 +42,8 @@ namespace Frenetic.Player
         {
             _physicsComponent = new DummyPhysicsComponent();
         } // For XmlSerializer
-
+        
+        [System.Xml.Serialization.XmlIgnore]
         public IPlayerSettings PlayerSettings { get; private set; }
 
         public bool IsAlive { get; set; }
