@@ -104,6 +104,7 @@
     <Compile Include="Engine\Console\IMessageConsole.cs" />
     <Compile Include="Engine\Console\InputHudView.cs" />
     <Compile Include="Engine\Console\IOverlayView.cs" />
+    <Compile Include="Engine\Console\GameConsoleAppender.cs" />
     <Compile Include="Engine\Console\LogOverlayView.cs" />
     <Compile Include="Engine\Console\MessageConsole.cs" />
     <Compile Include="Engine\EffectUpdater.cs" />

@@ -93,7 +93,7 @@ namespace Frenetic
                             new NamedParameter("messageConsoleView", Container.Resolve<LogOverlayView<ChatMessage>>()),
                             new NamedParameter("possibleCommandsView", Container.Resolve<PossibleCommandsLogHudView>())
                         );
-
+            
             // NOTE: order is important here, first register, then set!
             RegisterTweakableProperties();
             LoadSettings();
