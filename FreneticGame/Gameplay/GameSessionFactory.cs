@@ -21,6 +21,7 @@ using Frenetic.Player;
 using Frenetic.Weapons;
 using Frenetic.Engine;
 using Frenetic.Gameplay.HUD;
+using log4net;
 
 namespace Frenetic
 {
@@ -46,7 +47,8 @@ namespace Frenetic
             // TODO: Move this somewhere more appropriate
             // Make queues for a SERVER network session:
             // *****************************************
-            IServerNetworkSession serverNetworkSession = ServerContainer.Resolve<IServerNetworkSession>();
+            IServerNetworkSession serverNetworkSession = ServerContainer.Resolve<IServerNetworkSession>(
+                    new TypedParameter(typeof(ILog), ServerContainer.Resolve<ILog>(new TypedParameter(typeof(Type), typeof(IServerNetworkSession)))));
             ServerContainer.Resolve<IClientStateTracker>(new TypedParameter(typeof(INetworkSession), serverNetworkSession),
                                                          new TypedParameter(typeof(IClientFactory), ServerContainer.Resolve<ServerSideClientFactory>()));
 
@@ -90,7 +92,8 @@ namespace Frenetic
             // TODO: Move this somewhere more appropriate
             // Make queues for a CLIENT network session:
             // *****************************************
-            IClientNetworkSession clientNetworkSession = ClientContainer.Resolve<IClientNetworkSession>();
+            IClientNetworkSession clientNetworkSession = ClientContainer.Resolve<IClientNetworkSession>(
+                        new TypedParameter(typeof(ILog), ClientContainer.Resolve<ILog>(new TypedParameter(typeof(Type), typeof(IClientNetworkSession)))));
             // *****************************************
 
             IGameSession gameSession = ClientContainer.Resolve<IGameSession>();

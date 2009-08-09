@@ -24,7 +24,19 @@ namespace Frenetic.Autofac
             #region Console
             builder.Register<Mediator>().As<IMediator>().SingletonScoped();
             builder.Register<InputLine>().SingletonScoped();
-            builder.Register<CommandConsole>().As<ICommandConsole>().SingletonScoped();
+            builder.Register<CommandConsole>().As<ICommandConsole>().SingletonScoped()
+                .OnActivating((o, e) =>
+                    {
+                        // Set the GameConsoleLog on the GameConsoleAppender
+                        //  NOTE: It would be BETTER if I could get Autofac to inject the appenders for log4net, but I'm not leet enough...
+                        foreach (log4net.Appender.IAppender appender in log4net.LogManager.GetRepository().GetAppenders())
+                        {
+                            if (appender.GetType() == typeof(Frenetic.Engine.Console.GameConsoleAppender))
+                            {
+                                ((Frenetic.Engine.Console.GameConsoleAppender)appender).GameConsoleLog = ((ICommandConsole)e.Instance).Log;
+                            }
+                        }
+                    });
             builder.Register<MessageConsole>().As<IMessageConsole>().SingletonScoped();
             builder.Register<InputOverlayView>().SingletonScoped();
             builder.Register<LogOverlayView<string>>().SingletonScoped();

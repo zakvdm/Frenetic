@@ -127,6 +127,5 @@ namespace UnitTestLibrary
 
             stubPrimitiveDrawer.AssertWasNotCalled(me => me.DrawTriangleFan(Arg<VertexPositionColor[]>.Is.Anything));
         }
-
     }
 }

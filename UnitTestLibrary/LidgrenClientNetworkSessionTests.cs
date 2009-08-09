@@ -19,7 +19,7 @@ namespace UnitTestLibrary
         {
             stubNetClient = MockRepository.GenerateStub<INetClient>();
             stubSerializer = MockRepository.GenerateStub<IMessageSerializer>();
-            clientNetworkSession = new LidgrenClientNetworkSession(stubNetClient, stubSerializer);
+            clientNetworkSession = new LidgrenClientNetworkSession(stubNetClient, stubSerializer, MockRepository.GenerateStub<log4net.ILog>());
         }
 
         // CONNECTING:

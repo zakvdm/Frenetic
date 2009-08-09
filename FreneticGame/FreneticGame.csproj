@@ -66,6 +66,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Dependencies\Autofac\Autofac.dll</HintPath>
     </Reference>
+    <Reference Include="log4net, Version=1.2.10.0, Culture=neutral, PublicKeyToken=1b44e1d426115821, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Dependencies\log4net\release\log4net.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Xna.Framework, Version=3.0.0.0, Culture=neutral, PublicKeyToken=6d5c3888ef60e27d, processorArchitecture=x86" />
     <Reference Include="Microsoft.Xna.Framework.Game, Version=3.0.0.0, Culture=neutral, PublicKeyToken=6d5c3888ef60e27d, processorArchitecture=MSIL" />
     <Reference Include="mscorlib">
@@ -100,6 +104,7 @@
     <Compile Include="Engine\Console\IMessageConsole.cs" />
     <Compile Include="Engine\Console\InputHudView.cs" />
     <Compile Include="Engine\Console\IOverlayView.cs" />
+    <Compile Include="Engine\Console\GameConsoleAppender.cs" />
     <Compile Include="Engine\Console\LogOverlayView.cs" />
     <Compile Include="Engine\Console\MessageConsole.cs" />
     <Compile Include="Engine\EffectUpdater.cs" />
@@ -292,6 +297,11 @@
       <Project>{1E3FDDBD-A15F-42CF-A83E-754476079B30}</Project>
       <Name>ProjectMercury.Windows</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="log4net.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\XNA Game Studio\Microsoft.Xna.GameStudio.targets" Condition="" />

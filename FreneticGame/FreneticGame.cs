@@ -75,6 +75,7 @@ namespace Frenetic
             CreatePhysicsSystem();
             
             // Console:
+            Container.Resolve<IMediator>(new TypedParameter(typeof(log4net.ILog), Container.Resolve<log4net.ILog>(new TypedParameter(typeof(Type), typeof(IMediator)))));
             _consoleView = Container.Resolve<ConsoleOverlaySetView>();
             _consoleController = Container.Resolve<ConsoleController>
                         (
@@ -83,7 +84,7 @@ namespace Frenetic
                             new NamedParameter("messageConsoleView", Container.Resolve<LogOverlayView<ChatMessage>>()),
                             new NamedParameter("possibleCommandsView", Container.Resolve<PossibleCommandsLogHudView>())
                         );
-
+            
             // NOTE: order is important here, first register, then set!
             RegisterTweakableProperties();
             LoadSettings();
@@ -170,6 +171,8 @@ namespace Frenetic
             builder.Register<SettingsPersister>().As<ISettingsPersister>().SingletonScoped();
 
             builder.Register<Frenetic.Engine.Timer>().As<ITimer>().ContainerScoped();
+
+            builder.Register<log4net.ILog>((c, p) => log4net.LogManager.GetLogger(p.TypedAs<Type>())).FactoryScoped();
             #endregion
 
             #region Menus

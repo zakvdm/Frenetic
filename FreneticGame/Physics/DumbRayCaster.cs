@@ -11,6 +11,7 @@ using FarseerGames.FarseerPhysics.Factories;
 
 namespace Frenetic.Physics
 {
+    // TODO: DELETE THIS CLASS (Farseer now supports ray casting)
     public class DumbRayCasterTestController : IController
     {
         public DumbRayCasterTestController(DumbRayCaster rayCaster)

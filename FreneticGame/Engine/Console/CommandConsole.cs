@@ -29,7 +29,6 @@ namespace Frenetic
                 {
                     _mediator.Get(pieces[0]);
                 }
-                Log.AddMessage(commandLine);
             }
         }
 
