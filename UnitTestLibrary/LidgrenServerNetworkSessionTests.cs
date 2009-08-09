@@ -25,7 +25,7 @@ namespace UnitTestLibrary
             stubMessageSender = MockRepository.GenerateStub<IServerMessageSender>();
             stubNetConnection = MockRepository.GenerateStub<INetConnection>();
             stubDisconnectingConnection = MockRepository.GenerateStub<INetConnection>();
-            serverNetworkSession = new LidgrenServerNetworkSession(stubNetServer, stubMessageSender, _serializer);
+            serverNetworkSession = new LidgrenServerNetworkSession(stubNetServer, stubMessageSender, _serializer, MockRepository.GenerateStub<log4net.ILog>());
 
             stubNetConnection.Stub(x => x.Status).Return(NetConnectionStatus.Connected);
             stubNetConnection.Stub(x => x.ConnectionID).Return(100);
@@ -34,28 +34,6 @@ namespace UnitTestLibrary
 
             serverNetworkSession.ActiveConnections.Add(200, stubDisconnectingConnection);
         }
-
-        [Test]
-        public void CanBuildNetworkSessionsWithAutofac()
-        {
-            var builder = new ContainerBuilder();
-            builder.Register(MockRepository.GenerateStub<INetServer>()).SingletonScoped();
-            builder.Register(MockRepository.GenerateStub<INetClient>()).SingletonScoped();
-            builder.Register(MockRepository.GenerateStub<IServerMessageSender>()).SingletonScoped();
-            builder.Register(x => new NetConfiguration("Frenetic")).FactoryScoped();
-            builder.Register<LidgrenServerNetworkSession>();
-            builder.Register<LidgrenClientNetworkSession>();
-            builder.Register(MockRepository.GenerateStub<IMessageSerializer>()).SingletonScoped();
-
-            var container = builder.Build();
-
-            var serverNetworkSession = container.Resolve<LidgrenServerNetworkSession>();
-            Assert.IsNotNull(serverNetworkSession);
-
-            var clientNetworkSession = container.Resolve<LidgrenClientNetworkSession>();
-            Assert.IsNotNull(clientNetworkSession);
-        }
-
 
         [Test]
         public void ServerCanCreateSessionCorrectly()

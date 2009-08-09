@@ -175,6 +175,8 @@ namespace Frenetic
             builder.Register<SettingsPersister>().As<ISettingsPersister>().SingletonScoped();
 
             builder.Register<Frenetic.Engine.Timer>().As<ITimer>().ContainerScoped();
+
+            builder.Register<log4net.ILog>((c, p) => log4net.LogManager.GetLogger(p.TypedAs<Type>())).FactoryScoped();
             #endregion
 
             #region Menus

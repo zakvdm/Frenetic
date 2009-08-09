@@ -1,16 +1,18 @@
 ﻿using System;
 using Lidgren.Network;
 using System.Collections.Generic;
+using log4net;
 
 namespace Frenetic.Network.Lidgren
 {
     public class LidgrenServerNetworkSession : IServerNetworkSession
     {
-        public LidgrenServerNetworkSession(INetServer netServer, IServerMessageSender serverMessageSender, IMessageSerializer messageSerializer)
+        public LidgrenServerNetworkSession(INetServer netServer, IServerMessageSender serverMessageSender, IMessageSerializer messageSerializer, ILog logger)
         {
             _netServer = netServer;
             _serverMessageSender = serverMessageSender;
             _messageSerializer = messageSerializer;
+            _logger = logger;
 
             ActiveConnections = new Dictionary<int, INetConnection>();
         }
@@ -20,6 +22,7 @@ namespace Frenetic.Network.Lidgren
 
         public void Dispose()
         {
+            _logger.Info("Shutting down server");
             Shutdown("Cleaning up connection");
         }
 
@@ -82,7 +85,10 @@ namespace Frenetic.Network.Lidgren
                         HandleClientStatusChanged(sender);
                         break;
                     case NetMessageType.DebugMessage:
-                        Console.WriteLine(inBuffer.ReadString());
+                        _logger.Info(inBuffer.ReadString());
+                        break;
+                    case NetMessageType.VerboseDebugMessage:
+                        _logger.Debug(inBuffer.ReadString());
                         break;
                     case NetMessageType.Data:
                         return _messageSerializer.Deserialize(inBuffer.ReadBytes(inBuffer.LengthBytes));
@@ -97,12 +103,13 @@ namespace Frenetic.Network.Lidgren
 
         void ApproveNewClient(INetConnection client)
         {
+            _logger.Info("Client attempted to connect, approving...");
             client.Approve();
         }
 
         void HandleClientStatusChanged(INetConnection clientConnection)
         {
-            Console.WriteLine("Status for " + clientConnection.ConnectionID.ToString() + " is: " + clientConnection.Status);
+            _logger.Info("Status for " + clientConnection.ConnectionID.ToString() + " is: " + clientConnection.Status);
             if ((clientConnection.Status == NetConnectionStatus.Connected) && (!ActiveConnections.ContainsKey(clientConnection.ConnectionID)))
             {
                 ActiveConnections.Add(clientConnection.ConnectionID, clientConnection);
@@ -119,6 +126,7 @@ namespace Frenetic.Network.Lidgren
 
         void ProcessNewClient(int newClientID)
         {
+            _logger.Info("Processing new client " + newClientID.ToString());
             if (ClientJoined != null)
                 ClientJoined(this, new ClientStatusChangeEventArgs(newClientID, false));
 
@@ -139,6 +147,7 @@ namespace Frenetic.Network.Lidgren
         }
         void ProcessDisconnectingClient(int disconnectingClientID)
         {
+            _logger.Info("Processing disconnecting client " + disconnectingClientID.ToString());
             if (ClientDisconnected != null)
                 ClientDisconnected(this, new ClientStatusChangeEventArgs(disconnectingClientID, false));
 
@@ -149,5 +158,6 @@ namespace Frenetic.Network.Lidgren
         INetServer _netServer;
         IServerMessageSender _serverMessageSender;
         IMessageSerializer _messageSerializer;
+        ILog _logger;
     }
 }
