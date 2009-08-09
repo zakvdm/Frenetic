@@ -30,12 +30,13 @@ namespace Frenetic.Engine.Overlay
 
             if (_keyboard.IsKeyDown(Keys.OemTilde) && !_keyboard.WasKeyDown(Keys.OemTilde))
             {
-                _commandConsole.Active = !_commandConsole.Active;
-                _messageConsole.Active = !_messageConsole.Active;
-                _inputView.Visible = !_inputView.Visible;
-                _commandConsoleView.Visible = !_commandConsoleView.Visible;
-                _messageConsoleView.Visible = !_messageConsoleView.Visible;
-                _possibleCommandsView.Visible = !_possibleCommandsView.Visible;
+                bool newState = !_commandConsole.Active;
+                _commandConsole.Active = newState;
+                _messageConsole.Active = newState;
+                _inputView.Visible = newState;
+                _commandConsoleView.Visible = newState;
+                _messageConsoleView.Visible = newState;
+                _possibleCommandsView.Visible = newState;
             }
 
             if (!_commandConsole.Active && !_messageConsole.Active)
