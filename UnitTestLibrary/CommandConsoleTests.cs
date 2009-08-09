@@ -65,18 +65,6 @@ namespace UnitTestLibrary
             stubMediator.AssertWasNotCalled(x => x.Get(Arg<string>.Is.Anything));
         }
 
-        [Test]
-        public void KeepsCommandsInCommandLog()
-        {
-            // COMMANDS need a prefixing "/"
-            console.ProcessInput("/command1");
-            console.ProcessInput("/command2");
-
-            Assert.AreEqual(2, console.Log.Count);
-            Assert.AreEqual("command1", console.Log[1]);
-            Assert.AreEqual("command2", console.Log[0]);
-        }
-
         // TryToCompleteCurrentInput:
         [Test]
         public void CompletesCommandWhenUnambiguousCompletionAvailable()

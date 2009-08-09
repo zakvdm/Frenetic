@@ -85,6 +85,7 @@ namespace Frenetic
             CreatePhysicsSystem();
             
             // Console:
+            Container.Resolve<IMediator>(new TypedParameter(typeof(log4net.ILog), Container.Resolve<log4net.ILog>(new TypedParameter(typeof(Type), typeof(IMediator)))));
             _consoleView = Container.Resolve<ConsoleOverlaySetView>();
             _consoleController = Container.Resolve<ConsoleController>
                         (

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using UnitTestLibrary.Test.FakeName;
+using Rhino.Mocks;
 
 namespace UnitTestLibrary
 {
@@ -15,7 +16,7 @@ namespace UnitTestLibrary
         [SetUp]
         public void SetUp()
         {
-            mediator = new Mediator();
+            mediator = new Mediator(MockRepository.GenerateStub<log4net.ILog>());
         }
 
         [Test]

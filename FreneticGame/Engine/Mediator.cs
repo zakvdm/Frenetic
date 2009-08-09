@@ -5,13 +5,15 @@ using System.Reflection;
 using System.Linq.Expressions;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using log4net;
 
 namespace Frenetic
 {
     public class Mediator : IMediator
     {
-        public Mediator()
+        public Mediator(ILog logger)
         {
+            _logger = logger;
             _properties = new Dictionary<string, List<Delegate>>();
         }
 
@@ -94,19 +96,25 @@ namespace Frenetic
             Func<object> getter = (Func<object>)_properties[name][1];
 
             Type type = GetTypeOfProperty(name);
+            string value = "";
 
             if (type == typeof(Vector2))
             {
                 Vector2 tmp = (Vector2)getter();
-                return tmp.X + " " + tmp.Y;
+                value = tmp.X + " " + tmp.Y;
             }
-            if (type == typeof(Color))
+            else if (type == typeof(Color))
             {
                 Color tmp = (Color)getter();
-                return tmp.R + " " + tmp.G + " " + tmp.B;
+                value = tmp.R + " " + tmp.G + " " + tmp.B;
+            }
+            else
+            {
+                value = getter().ToString();
             }
 
-            return getter().ToString();
+            _logger.Info(name + " is : " + value);
+            return value;
         }
         
         private void RegisterSetterAndGetter<PropertyType>(PropertyInfo property, object instance)
@@ -126,9 +134,11 @@ namespace Frenetic
             {
                 PropertyType convertedValue = ConvertTo<PropertyType>(value);
                 setter(convertedValue);
+                _logger.Info(name + " set to : " + value);
             }
             catch (FormatException)
             {
+                _logger.Info(value + " is not valid for : " + name);
                 // NOTE: If the conversion from string to the property type fails, we just do nothing...
             }
         }
@@ -179,7 +189,10 @@ namespace Frenetic
         private bool IsPropertyRegistered(string name)
         {
             if (!_properties.ContainsKey(name))
+            {
+                _logger.Info("Unknown command: " + name);
                 return false;
+            }
 
             return true;
         }
@@ -192,6 +205,7 @@ namespace Frenetic
             return endOfNamespace + "." + property.Name;
         }
 
+        ILog _logger;
         private Dictionary<string, List<Delegate>> _properties;
     }
 }
