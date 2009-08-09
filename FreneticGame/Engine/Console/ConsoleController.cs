@@ -40,7 +40,6 @@ namespace Frenetic.Engine.Overlay
 
             if (!_commandConsole.Active && !_messageConsole.Active)
             {
-                _keyboard.SaveState();  // Save state so that we can't toggle off and immediately back on...
                 return;
             }
 
@@ -83,7 +82,6 @@ namespace Frenetic.Engine.Overlay
             }
 
             // CLEANUP:
-            _keyboard.SaveState();
             _keyboard.Lock();
         }
 

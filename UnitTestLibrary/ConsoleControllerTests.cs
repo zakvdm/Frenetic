@@ -80,17 +80,6 @@ namespace UnitTestLibrary
         }
 
         [Test]
-        public void ConsoleSavesKeyboardState()
-        {
-            stubCommandConsole.Active = true;
-            stubMessageConsole.Active = true;
-
-            consoleController.Process(1);
-
-            stubKeyboard.AssertWasCalled(x => x.SaveState());
-        }
-
-        [Test]
         public void ActiveConsoleLocksKeyboard()
         {
             stubCommandConsole.Active = true;
@@ -109,17 +98,6 @@ namespace UnitTestLibrary
             consoleController.Process(1);
 
             stubKeyboard.AssertWasNotCalled(x => x.Lock());
-        }
-
-        [Test]
-        public void DeactivatingConsoleDOESSaveKeyboardState()
-        {
-            stubKeyboard.Stub(x => x.IsKeyDown(Keys.OemTilde)).Return(true);
-            stubCommandConsole.Active = true;
-
-            consoleController.Process(1);
-
-            stubKeyboard.AssertWasCalled(x => x.SaveState());
         }
 
         [Test]

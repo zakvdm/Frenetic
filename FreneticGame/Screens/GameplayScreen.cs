@@ -43,7 +43,7 @@ namespace Frenetic
         /// Lets the game respond to player input. Unlike the Update method,
         /// this will only be called when the gameplay screen is active.
         /// </summary>
-        public override void HandleInput(InputState input)
+        public override void HandleInput(MenuInputState input)
         {
             if (input == null)
                 throw new ArgumentNullException("input");

@@ -29,13 +29,28 @@ namespace Frenetic
     /// </remarks>
     public class ScreenManager : DrawableGameComponent
     {
+        /// <summary>
+        /// Constructs a new screen manager component.
+        /// </summary>
+        public ScreenManager(Game game, ContentManager contentManager, MenuInputState menuInputState)
+            : base(game)
+        {
+            content = contentManager;
+            _menuInputState = menuInputState;
+
+            graphicsDeviceService = (IGraphicsDeviceService)game.Services.GetService(
+                                                        typeof(IGraphicsDeviceService));
+
+            if (graphicsDeviceService == null)
+                throw new InvalidOperationException("No graphics device service.");
+        }
+
+
         #region Fields
 
         List<GameScreen> screens = new List<GameScreen>();
         List<GameScreen> screensToUpdate = new List<GameScreen>();
         List<GameScreen> screensToDraw = new List<GameScreen>();
-
-        InputState input = new InputState();
 
         IGraphicsDeviceService graphicsDeviceService;
 
@@ -130,21 +145,6 @@ namespace Frenetic
         #region Initialization
 
 
-        /// <summary>
-        /// Constructs a new screen manager component.
-        /// </summary>
-        public ScreenManager(Game game, ContentManager contentManager)
-            : base(game)
-        {
-            content = contentManager;
-
-            graphicsDeviceService = (IGraphicsDeviceService)game.Services.GetService(
-                                                        typeof(IGraphicsDeviceService));
-
-            if (graphicsDeviceService == null)
-                throw new InvalidOperationException("No graphics device service.");
-        }
-
 
         /// <summary>
         /// Load your graphics content.
@@ -200,9 +200,6 @@ namespace Frenetic
         /// </summary>
         public override void Update(GameTime gameTime)
         {
-            // Read the keyboard and gamepad.
-            input.Update();
-
             // Make a copy of the master screen list, to avoid confusion if
             // the process of updating one screen adds or removes others
             // (or it happens on another thread)
@@ -239,7 +236,7 @@ namespace Frenetic
                     // give it a chance to handle input.
                     if (!otherScreenHasFocus)
                     {
-                        screen.HandleInput(input);
+                        screen.HandleInput(_menuInputState);
 
                         otherScreenHasFocus = true;
                     }
@@ -362,10 +359,8 @@ namespace Frenetic
             return screens.ToArray();
         }
 
-
-       
-
-
         #endregion
+
+        MenuInputState _menuInputState;
     }
 }

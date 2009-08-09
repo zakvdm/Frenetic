@@ -80,7 +80,7 @@ namespace Frenetic
         /// <summary>
         /// Responds to user input, accepting or cancelling the message box.
         /// </summary>
-        public override void HandleInput(InputState input)
+        public override void HandleInput(MenuInputState input)
         {
             if (input.MenuSelect && (!pauseMenu ||
                 (input.CurrentGamePadState.Buttons.A == ButtonState.Pressed)))

@@ -83,6 +83,7 @@
     <Compile Include="ClientStateTrackerTests.cs" />
     <Compile Include="EffectUpdaterTests.cs" />
     <Compile Include="HudControllerTests.cs" />
+    <Compile Include="MenuInputStateTests.cs" />
     <Compile Include="OverlayViewImplementationTests.cs" />
     <Compile Include="LidgrenServerMessageSenderTests.cs" />
     <Compile Include="MessageConsoleTests.cs" />

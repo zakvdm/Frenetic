@@ -35,8 +35,6 @@ namespace Frenetic
     {
         GraphicsDeviceManager graphics;
 
-        ScreenManager screenManager;
-
         public FreneticGame()
         {
             // initialize the graphics device manager
@@ -56,18 +54,8 @@ namespace Frenetic
 
             Content.RootDirectory = "Content";
 
-            // initialize the gamer-services component
-            //   this component enables Live sign-in functionality
-            //   and updates the Gamer.SignedInGamers collection.
-            //Components.Add(new GamerServicesComponent(this));
-
-            // initialize the screen manager
-            screenManager = new ScreenManager(this, Content);
-            Components.Add(screenManager);
-
             // TODO: REMOVE:
             Components.Add(new Frenetic.MyConsole.Components.FPS(this));
-            //Components.Add(new Frenetic.MyConsole.Components.EmitterTest(this, graphics));
         }
 
         /// <summary>
@@ -78,9 +66,11 @@ namespace Frenetic
         /// </summary>
         protected override void Initialize()
         {
-            base.Initialize();
-
             Container = BuildContainer();
+
+            // initialize the screen manager
+            Components.Add(Container.Resolve<ScreenManager>());
+            base.Initialize();
 
             CreatePhysicsSystem();
             
@@ -101,6 +91,7 @@ namespace Frenetic
             PreloadTextures();
 
             MainMenuScreen = Container.Resolve<IScreenFactory>().MakeMainMenuScreen(Container);
+            
         }
 
         protected override void Update(GameTime gameTime)
@@ -108,6 +99,10 @@ namespace Frenetic
             _consoleController.Process((float)gameTime.ElapsedGameTime.TotalMilliseconds);
 
             base.Update(gameTime);
+
+            // NOTE: This must come last, after everything that wants to has had a chance to process new input.
+            //          TODO: Move this somewhere more appropriate...
+            Container.Resolve<IKeyboard>().SaveState();
         }
 
         /// <summary>
@@ -178,7 +173,8 @@ namespace Frenetic
             #endregion
 
             #region Menus
-            builder.Register<ScreenManager>(screenManager).SingletonScoped();
+            builder.Register<ScreenManager>((c, p) => new ScreenManager(this, Content, c.Resolve<MenuInputState>())).SingletonScoped();
+            builder.Register<MenuInputState>().SingletonScoped();
             builder.Register<ScreenFactory>().As<IScreenFactory>().SingletonScoped();
             builder.Register<MainMenuScreen>().SingletonScoped();
             #endregion
@@ -213,8 +209,8 @@ namespace Frenetic
 
             #region Graphics
             builder.Register<Viewport>(graphics.GraphicsDevice.Viewport);
-            builder.Register<SpriteFont>(screenManager.Font);
-            builder.Register<SpriteBatch>(screenManager.SpriteBatch);
+            builder.Register<SpriteFont>((c, p) => c.Resolve<ScreenManager>().Font);
+            builder.Register<SpriteBatch>((c, p) => c.Resolve<ScreenManager>().SpriteBatch);
             builder.Register<XnaSpriteBatch>().As<ISpriteBatch>().FactoryScoped();
             builder.Register<XnaTexture>().As<ITexture>().FactoryScoped();
             builder.Register<XnaFont>().As<IFont>().FactoryScoped();
