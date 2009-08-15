@@ -95,11 +95,9 @@
     <Compile Include="Autofac\PhysicsModule.cs" />
     <Compile Include="Autofac\WeaponsModule.cs" />
     <Compile Include="Engine\Camera.cs" />
-    <Compile Include="Engine\Console\ChatLogDifferByReference.cs" />
     <Compile Include="Engine\Console\ChatMessage.cs" />
     <Compile Include="Engine\Console\ConsoleOverlaySetView.cs" />
     <Compile Include="Engine\Console\InputLine.cs" />
-    <Compile Include="Engine\Console\IChatLogDiffer.cs" />
     <Compile Include="Engine\Console\IConsole.cs" />
     <Compile Include="Engine\Console\IMessageConsole.cs" />
     <Compile Include="Engine\Console\InputHudView.cs" />

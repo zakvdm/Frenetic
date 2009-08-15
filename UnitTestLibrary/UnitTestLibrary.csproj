@@ -81,7 +81,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CameraTests.cs" />
-    <Compile Include="ChatLogDifferByReferenceTests.cs" />
     <Compile Include="ChatMessageTests.cs" />
     <Compile Include="ClientFactoryTests.cs" />
     <Compile Include="ClientStateTrackerTests.cs" />

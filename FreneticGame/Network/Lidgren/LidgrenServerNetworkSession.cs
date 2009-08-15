@@ -40,7 +40,7 @@ namespace Frenetic.Network.Lidgren
         #region Sending
         public void Send(Message msg, NetChannel channel)
         {
-            throw new NotImplementedException();
+            SendToAll(msg, channel);
         }
         public void SendTo(Message msg, NetChannel channel, int destinationClientID)
         {

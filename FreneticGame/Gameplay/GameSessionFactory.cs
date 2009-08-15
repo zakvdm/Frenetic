@@ -55,7 +55,7 @@ namespace Frenetic
             IIncomingMessageQueue incomingMessageQueue = ServerContainer.Resolve<IIncomingMessageQueue>(
                     new TypedParameter(typeof(INetworkSession), serverNetworkSession));
             IOutgoingMessageQueue outgoingMessageQueue = ServerContainer.Resolve<IOutgoingMessageQueue>(
-                    new TypedParameter(typeof(IClientNetworkSession), null));
+                                        new TypedParameter(typeof(INetworkSession), serverNetworkSession));
             serverNetworkSession.Create(14242);
             // *****************************************
 
@@ -74,7 +74,6 @@ namespace Frenetic
             gameSession.Controllers.Add(ServerContainer.Resolve<ITimer>());
 
             Log<ChatMessage> serverLog = ServerContainer.Resolve<Log<ChatMessage>>();
-            IChatLogDiffer chatLogDiffer = ServerContainer.Resolve<IChatLogDiffer>(new TypedParameter(typeof(Log<ChatMessage>), serverLog));
 
             // THINGS TO SYNC OVER NETWORK:
             gameSession.Views.Add(ServerContainer.Resolve<GameStateSender>(new TypedParameter(typeof(Log<ChatMessage>), serverLog)));
@@ -109,8 +108,7 @@ namespace Frenetic
             IIncomingMessageQueue incomingMessageQueue = ClientContainer.Resolve<IIncomingMessageQueue>(
                     new TypedParameter(typeof(INetworkSession), clientNetworkSession));
             IOutgoingMessageQueue outgoingMessageQueue = ClientContainer.Resolve<IOutgoingMessageQueue>(
-                    new TypedParameter(typeof(INetworkSession), clientNetworkSession), new TypedParameter(typeof(int), -1));
-                    //new TypedParameter(typeof(IServerNetworkSession), null));
+                    new TypedParameter(typeof(INetworkSession), clientNetworkSession));
             clientNetworkSession.Join(14242);
 
             gameSession.Controllers.Add(ClientContainer.Resolve<PhysicsController>());
@@ -128,8 +126,9 @@ namespace Frenetic
 
             // THINGS TO SYNC OVER NETWORK:
             Log<ChatMessage> chatLog = _parentContainer.Resolve<IMessageConsole>().Log;
+            Log<ChatMessage> pendingLog = _parentContainer.Resolve<IMessageConsole>().PendingLog;
             gameSession.Controllers.Add(ClientContainer.Resolve<GameStateProcessor>(new TypedParameter(typeof(Log<ChatMessage>), chatLog), new TypedParameter(typeof(IIncomingMessageQueue), incomingMessageQueue)));
-            gameSession.Views.Add(ClientContainer.Resolve<ClientInputSender>(new TypedParameter(typeof(Log<ChatMessage>), chatLog)));
+            gameSession.Views.Add(ClientContainer.Resolve<ClientInputSender>(new TypedParameter(typeof(Log<ChatMessage>), pendingLog)));
             // ****************************
 
             return new GameSessionControllerAndView(gameSession, gameSessionController, gameSessionView);

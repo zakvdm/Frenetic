@@ -32,7 +32,6 @@ namespace Frenetic.Network
             else
             {
                 Client newClient = _clientFactory.MakeNewClient(newClientInfo.ID);
-                newClient.LastServerSnap = _snapCounter.CurrentSnap; // No point in sending info about what happened before they joined...
                 NetworkClients.Add(newClient);
             }
         }

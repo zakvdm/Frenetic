@@ -9,11 +9,11 @@ namespace Frenetic
     {
         public Log(List<T> messageList)
         {
-            _messageList = messageList;
+            this.MessageList = messageList;
         }
         public Log()
         {
-            _messageList = new List<T>();
+            this.MessageList = new List<T>();
         }
 
         /// <summary>
@@ -26,13 +26,32 @@ namespace Frenetic
 
         public void AddMessage(T message)
         {
-            _messageList.Insert(0, message);
+            this.MessageList.Insert(0, message);
+            this.DiffedList.Insert(0, message);
         }
+
+        // CACHE STUFF:
+        public bool IsDirty
+        {
+            get
+            {
+                return this.DiffedList.Count > 0;
+            }
+        }
+        public List<T> GetDiff()
+        {
+            return this.DiffedList;
+        }
+        public void Clean()
+        {
+            this.DiffedList = new List<T>();
+        }
+        // ****************
 
         public T StripOldestMessage()
         {
-            T tmp = _messageList[_messageList.Count - 1];
-            _messageList.RemoveAt(_messageList.Count - 1);
+            T tmp = this.MessageList[this.MessageList.Count - 1];
+            this.MessageList.RemoveAt(this.MessageList.Count - 1);
             return tmp;
         }
 
@@ -41,27 +60,27 @@ namespace Frenetic
         {
             get
             {
-                return _messageList[index];
+                return this.MessageList[index];
             }
         }
         public bool TrueForAll(Predicate<T> match)
         {
-            return _messageList.TrueForAll(match);
+            return this.MessageList.TrueForAll(match);
         }
         public int Count
         {
             get
             {
-                return _messageList.Count;
+                return this.MessageList.Count;
             }
         }
         public bool Exists(Predicate<T> match)
         {
-            return _messageList.Exists(match);
+            return this.MessageList.Exists(match);
         }
         public void Clear()
         {
-            _messageList.Clear();
+            this.MessageList.Clear();
         }
         #endregion
 
@@ -69,7 +88,7 @@ namespace Frenetic
 
         public IEnumerator GetEnumerator()
         {
-            foreach (T message in _messageList)
+            foreach (T message in this.MessageList)
                 yield return message;
         }
 
@@ -77,12 +96,13 @@ namespace Frenetic
         {
             get
             {
-                return _messageList.Reverse<T>();
+                return this.MessageList.Reverse<T>();
             }
         }
 
         #endregion
 
-        List<T> _messageList;
+        List<T> MessageList;
+        List<T> DiffedList = new List<T>();
     }
 }

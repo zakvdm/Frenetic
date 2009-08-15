@@ -205,7 +205,6 @@ namespace Frenetic
 
             builder.Register<ClientStateTracker>().As<IClientStateTracker>().ContainerScoped();
             builder.Register<SnapCounter>().As<ISnapCounter>().ContainerScoped();
-            builder.Register<ChatLogDifferByReference>().As<IChatLogDiffer>().ContainerScoped();
 
             builder.Register<NetworkPlayerProcessor>().As<INetworkPlayerProcessor>().ContainerScoped();
             #endregion

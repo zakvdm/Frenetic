@@ -16,7 +16,7 @@ namespace UnitTestLibrary
     {
         IClientStateTracker stubClientStateTracker;
         Client client;
-        IChatLogDiffer stubChatLogDiffer;
+        Log<ChatMessage> chatLog;
         ISnapCounter stubSnapCounter;
         IOutgoingMessageQueue stubOutgoingMessageQueue;
         GameStateSender serverChatLogView;
@@ -31,11 +31,11 @@ namespace UnitTestLibrary
             client.Player.Stub(me => me.PlayerSettings).Return(MockRepository.GenerateStub<IPlayerSettings>());
             client.Player.Stub(me => me.CurrentWeapon).Return(MockRepository.GenerateStub<IRailGun>());
             stubClientStateTracker.NetworkClients.Add(client);
-            stubChatLogDiffer = MockRepository.GenerateStub<IChatLogDiffer>();
+            chatLog = new Log<ChatMessage>();
             stubSnapCounter = MockRepository.GenerateStub<ISnapCounter>();
             stubSnapCounter.CurrentSnap = 3;
             stubOutgoingMessageQueue = MockRepository.GenerateStub<IOutgoingMessageQueue>();
-            serverChatLogView = new GameStateSender(stubChatLogDiffer, stubClientStateTracker, stubSnapCounter, stubOutgoingMessageQueue);
+            serverChatLogView = new GameStateSender(chatLog, stubClientStateTracker, stubSnapCounter, stubOutgoingMessageQueue);
         }
 
         [Test]
@@ -47,63 +47,25 @@ namespace UnitTestLibrary
         }
 
         [Test]
-        public void GenerateSendsCurrentServerSnap()
+        public void GenerateSendsClientNameWithChatMessage()
         {
-            serverChatLogView.Generate();
-
-            stubOutgoingMessageQueue.AssertWasCalled(x => x.WriteFor(Arg<Message>.Matches(y => y.Items[0].Type == ItemType.ServerSnap && (int)y.Items[0].Data == 3), Arg<Client>.Is.Equal(client)));
-        }
-
-        [Test]
-        public void GenerateSendsLastReceivedClientSnap()
-        {
-            client.LastClientSnap = 78;
-
-            serverChatLogView.Generate();
-
-            stubOutgoingMessageQueue.AssertWasCalled(x => x.WriteFor(Arg<Message>.Matches(y => y.Items[0].Type == ItemType.ClientSnap && (int)y.Items[0].Data == 78), Arg<Client>.Is.Equal(client)));
-        }
-
-        [Test]
-        public void GenerateSendsCurrentSnapAndClientNameWithChatMessage()
-        {
-            Log<ChatMessage> chatLog = new Log<ChatMessage>();
-            ChatMessage chatMsg = new ChatMessage() { ClientName = "terence", Snap = 32 };
+            ChatMessage chatMsg = new ChatMessage() { ClientName = "terence", Message = "Test" };
             chatLog.AddMessage(chatMsg);
-            stubChatLogDiffer.Stub(x => x.GetOldestToYoungestDiff(client)).Return(chatLog);
 
             serverChatLogView.Generate();
 
-            stubOutgoingMessageQueue.AssertWasCalled(x => x.WriteFor(Arg<Message>.Matches(y => y.Items[0].Type == ItemType.ChatLog && ((ChatMessage)y.Items[0].Data).ClientName == "terence" && ((ChatMessage)y.Items[0].Data).Snap == 32), Arg<Client>.Is.Equal(client)));
+            stubOutgoingMessageQueue.AssertWasCalled(x => x.AddToReliableQueue(Arg<Item>.Matches(y => y.Type == ItemType.ChatLog && ((List<ChatMessage>)y.Data)[0].ClientName == "terence")));
         }
 
         [Test]
-        public void GenerateSendsChatMessageLogOneMessageAtATimeToClient()
+        public void GenerateSendsNewChatMessages()
         {
-            Log<ChatMessage> chatLog = new Log<ChatMessage>();
             chatLog.AddMessage(new ChatMessage() { Message = "Woohoo" });
             chatLog.AddMessage(new ChatMessage() { Message = "boohoo" });
-            stubChatLogDiffer.Stub(x => x.GetOldestToYoungestDiff(client)).Return(chatLog);
 
             serverChatLogView.Generate();
 
-            stubOutgoingMessageQueue.AssertWasCalled(x => x.WriteFor(Arg<Message>.Matches(y => y.Items[0].Type == ItemType.ChatLog && ((ChatMessage)y.Items[0].Data).Message == "Woohoo"), Arg<Client>.Is.Equal(client)));
-            stubOutgoingMessageQueue.AssertWasCalled(x => x.WriteFor(Arg<Message>.Matches(y => y.Items[0].Type == ItemType.ChatLog && ((ChatMessage)y.Items[0].Data).Message == "boohoo"), Arg<Client>.Is.Equal(client)));
-        }
-
-       
-
-        [Test]
-        public void GetsADiffedLogForEachClient()
-        {
-            client.ID = 1;
-            Client client2 = new Client(client.Player) { ID = 2 };
-            stubClientStateTracker.NetworkClients.Add(client2);
-
-            serverChatLogView.Generate();
-
-            stubChatLogDiffer.AssertWasCalled(x => x.GetOldestToYoungestDiff(client));
-            stubChatLogDiffer.AssertWasCalled(x => x.GetOldestToYoungestDiff(client2));
+            stubOutgoingMessageQueue.AssertWasCalled(me => me.AddToReliableQueue(Arg<Item>.Matches(y => (y.Type == ItemType.ChatLog) && ((List<ChatMessage>)y.Data).Count == 2 && ((List<ChatMessage>)y.Data)[0].Message == "boohoo")));
         }
 
         [Test]

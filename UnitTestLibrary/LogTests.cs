@@ -31,9 +31,45 @@ namespace UnitTestLibrary
         {
             Log<ChatMessage> chatMsgLog = new Log<ChatMessage>();
             
-            chatMsgLog.AddMessage(new ChatMessage() { ClientName = "Zak", Snap = 100, Message = "yo" });
+            chatMsgLog.AddMessage(new ChatMessage() { ClientName = "Zak", Message = "yo" });
 
             Assert.AreEqual(1, chatMsgLog.Count);
+        }
+
+        [Test]
+        public void AddingMessagesSetsIsDirty()
+        {
+            Log<ChatMessage> chatMsgLog = new Log<ChatMessage>();
+            Assert.IsFalse(chatMsgLog.IsDirty);
+
+            chatMsgLog.AddMessage(new ChatMessage() { ClientName = "zak", Message = "homo" });
+
+            Assert.IsTrue(chatMsgLog.IsDirty);
+        }
+
+        [Test]
+        public void BuildsDiffCorrectly()
+        {
+            Log<ChatMessage> chatMsgLog = new Log<ChatMessage>();
+
+            chatMsgLog.AddMessage(new ChatMessage() { ClientName = "1", Message = "beef" });
+            chatMsgLog.AddMessage(new ChatMessage() { ClientName = "2", Message = "stick" });
+
+            Assert.AreEqual(2, chatMsgLog.GetDiff().Count);
+            Assert.AreEqual("stick", chatMsgLog.GetDiff()[0].Message);
+            Assert.AreEqual("beef", chatMsgLog.GetDiff()[1].Message);
+        }
+
+        [Test]
+        public void CleanResultsInEmptyDiff()
+        {
+            Log<ChatMessage> chatMsgLog = new Log<ChatMessage>();
+            chatMsgLog.AddMessage(new ChatMessage() { ClientName = "1", Message = "beef" });
+            chatMsgLog.AddMessage(new ChatMessage() { ClientName = "2", Message = "stick" });
+
+            chatMsgLog.Clean();
+
+            Assert.AreEqual(0, chatMsgLog.GetDiff().Count);
         }
 
         [Test]
@@ -115,40 +151,6 @@ namespace UnitTestLibrary
             Assert.AreEqual(2, chatMsgLog.Count);
         }
 
-        /*
-        [Test]
-        public void BuildFromAnotherMessageLogWorks()
-        {
-            Log<string> sourceLog = new Log<string>();
-            Log<string> destinationLog = new Log<string>();
-            destinationLog.AddMessage("blah blah");
-            sourceLog.AddMessage("profound statement");
-            sourceLog.AddMessage("witty rejoinder");
-
-            destinationLog.BuildFromAnotherMessageLog(sourceLog);
-
-            Assert.AreEqual(2, destinationLog.Count);
-            Assert.AreEqual("witty rejoinder", destinationLog[0]);
-            Assert.AreEqual("profound statement", destinationLog[1]);
-        }
-
-        [Test]
-        public void BuildFromAnotherMessageLogWorksForChatMessages()
-        {
-            Log<ChatMessage> sourceLog = new Log<ChatMessage>();
-            Log<ChatMessage> destinationLog = new Log<ChatMessage>();
-            ChatMessage tmpMsg = new ChatMessage() { Message = "pft" };
-            destinationLog.AddMessage(new ChatMessage() { Message = "blah blah" });
-            sourceLog.AddMessage(tmpMsg);
-
-            destinationLog.BuildFromAnotherMessageLog(sourceLog);
-            tmpMsg.Message = "tmp";
-
-            Assert.AreEqual(1, destinationLog.Count);
-            Assert.AreEqual("pft", destinationLog[0].Message);
-        }
-        */
-
         [Test]
         public void CanStripOldestMessage()
         {
@@ -159,35 +161,5 @@ namespace UnitTestLibrary
             Assert.AreEqual("old msg", log.StripOldestMessage());
             Assert.AreEqual("newer msg", log.StripOldestMessage());
         }
-
-        /*
-        [Test]
-        public void CanCopy()
-        {
-            Log<string> original = new Log<string>();
-            original.AddMessage("1");
-
-            Log<string> copy = original.Copy();
-            original.AddMessage("2");
-
-            Assert.AreEqual(1, copy.Count);
-            Assert.AreEqual("1", copy[0]);
-        }
-
-        [Test]
-        public void CanCopyWithChatMessages()
-        {
-            Log<ChatMessage> original = new Log<ChatMessage>();
-            ChatMessage chatMsg = new ChatMessage() { Message = "1" };
-            original.AddMessage(chatMsg);
-
-            Log<ChatMessage> copy = original.Copy();
-            original.AddMessage(new ChatMessage() { Message = "2" });
-            chatMsg.Message = "7";
-
-            Assert.AreEqual(1, copy.Count);
-            Assert.AreEqual("1", copy[0].Message);
-        }
-        */
     }
 }

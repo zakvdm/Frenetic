@@ -22,8 +22,6 @@ namespace Frenetic.Network
     
     public enum ItemType
     {
-        ServerSnap,
-        ClientSnap,
         Player,
         PlayerSettings,
         Event,
@@ -50,7 +48,7 @@ namespace Frenetic.Network
     [XmlInclude(typeof(PlayerState))]
     [XmlInclude(typeof(NetworkPlayerSettings))]
     [XmlInclude(typeof(LocalPlayerSettings))]
-    [XmlInclude(typeof(ChatMessage))]
+    [XmlInclude(typeof(List<ChatMessage>))]
     public class Message
     {
         public Message() { Items = new List<Item>(); }

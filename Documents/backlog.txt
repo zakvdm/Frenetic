@@ -71,6 +71,7 @@ BUGS:
 2) When a client disconnects, we have to remove its associated physics objects (currently only removing it from PlayerView)
 3) PlayerSettings must be syncronized over network (currently they're not even sent by ChatLogSender (which also needs to be renamed))
 FIXED NetworkPlayerProcessor will have to also update the LocalClient state (like if the server sends new Health status, etc.)
+4) Fix the bug where you kill yourself if you click inside yourself...
 *****
 
 DONE - 2 - Refactor Menu System: Change menu system to use same keyboard structure as game (this will allow the console to lock keyboard input during the menu stages)

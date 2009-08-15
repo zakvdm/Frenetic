@@ -226,6 +226,16 @@ namespace UnitTestLibrary
         // SENDING TESTS:
         // **************
         [Test]
+        public void SendIsForwardedCorrectly()
+        {
+            Message msg = new Message();
+
+            serverNetworkSession.Send(msg, NetChannel.UnreliableInOrder11);
+
+            stubMessageSender.AssertWasCalled(me => me.SendToAll(msg, NetChannel.UnreliableInOrder11));
+        }
+
+        [Test]
         public void ServerCanSendMessagesToAllClients()
         {
             Message msg = new Message() { Items = { new Item() { Data = new byte[] { 1, 2, 3, 4 } } } };

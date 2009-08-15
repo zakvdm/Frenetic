@@ -9,11 +9,8 @@ namespace Frenetic.Network
     public interface IOutgoingMessageQueue
     {
         void AddToQueue(Item item);
-        void SendMessagesOnQueue();
+        void AddToReliableQueue(Item item);
 
-        void Write(Message message);
-        void Write(Message message, NetChannel channel);
-        void WriteFor(Message message, NetChannel channel, int destinationPlayerID);
-        void WriteFor(Message message, Client destinationClient);
+        void SendMessagesOnQueue();
     }
 }

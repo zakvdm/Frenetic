@@ -5,10 +5,10 @@ namespace Frenetic.Network
 {
     public class ClientInputSender : IView
     {
-        public ClientInputSender(LocalClient localClient, IMessageConsole messageConsole, ISnapCounter snapCounter, IOutgoingMessageQueue outgoingMessageQueue)
+        public ClientInputSender(LocalClient localClient, Log<ChatMessage> chatLog, ISnapCounter snapCounter, IOutgoingMessageQueue outgoingMessageQueue)
         {
             this.LocalClient = localClient;
-            this.MessageConsole = messageConsole;
+            this.ChatLog = chatLog;
             this.SnapCounter = snapCounter;
             this.OutgoingMessageQueue = outgoingMessageQueue;
         }
@@ -42,32 +42,16 @@ namespace Frenetic.Network
 
         void AddItemsToOutgoingMessageQueue()
         {
-            SendLastReceivedServerSnapAndCurrentClientSnap();
-            SendAllPendingChatMessages();
+            NewSendAllPendingChatMessages();
             SendLocalPlayerAndPlayerSettings();
         }
 
-        void SendLastReceivedServerSnapAndCurrentClientSnap()
+        void NewSendAllPendingChatMessages()
         {
-            // the last received server snap:
-            this.OutgoingMessageQueue.AddToQueue(new Item() { ClientID = this.LocalClient.ID, Type = ItemType.ServerSnap, Data = this.LocalClient.LastServerSnap });
-
-            // the current client snap:
-            this.OutgoingMessageQueue.AddToQueue(new Item() { ClientID = this.LocalClient.ID, Type = ItemType.ClientSnap, Data = this.SnapCounter.CurrentSnap });
-        }
-
-        void SendAllPendingChatMessages()
-        {
-            // First. If there are new messages, we need to set the current client snap on them so we can keep sending them until this snap is acknowledged.
-            foreach (ChatMessage newMsg in this.MessageConsole.UnsortedMessages)
+            if (this.ChatLog.IsDirty)
             {
-                newMsg.Snap = this.SnapCounter.CurrentSnap;
-            }
-
-            // NOTE: We use the LastClientSnap on the local client as the last client snap acknowledged by the server
-            foreach (ChatMessage unAckedMsg in this.MessageConsole.GetPendingMessagesFromAfter(this.LocalClient.LastClientSnap))
-            {
-                this.OutgoingMessageQueue.AddToQueue(new Item() { ClientID = this.LocalClient.ID, Type = ItemType.ChatLog, Data = unAckedMsg });
+                this.OutgoingMessageQueue.AddToReliableQueue( new Item() { ClientID = this.LocalClient.ID, Type = ItemType.ChatLog, Data = this.ChatLog.GetDiff() });
+                this.ChatLog.Clean();
             }
         }
 
@@ -78,7 +62,7 @@ namespace Frenetic.Network
             this.OutgoingMessageQueue.AddToQueue(new Item() { ClientID = this.LocalClient.ID, Type = ItemType.PlayerSettings, Data = this.LocalClient.Player.PlayerSettings });
         }
 
-        IMessageConsole MessageConsole;
+        Log<ChatMessage> ChatLog;
         IOutgoingMessageQueue OutgoingMessageQueue;
         LocalClient LocalClient;
         ISnapCounter SnapCounter;

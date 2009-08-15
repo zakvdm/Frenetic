@@ -1,6 +1,7 @@
 ﻿using System;
 using Frenetic.Network;
 using Frenetic.Player;
+using System.Collections.Generic;
 
 namespace Frenetic
 {
@@ -8,69 +9,65 @@ namespace Frenetic
     {
         public GameStateProcessor(LocalClient localClient, Log<ChatMessage> chatLog, INetworkPlayerProcessor networkPlayerProcessor, IClientStateTracker clientStateTracker, IIncomingMessageQueue incomingMessageQueue)
         {
-            _localClient = localClient;
-            _chatLog = chatLog;
-            _clientStateTracker = clientStateTracker;
-            _incomingMessageQueue = incomingMessageQueue;
-            _networkPlayerProcessor = networkPlayerProcessor;
+            this.LocalClient = localClient;
+            this.ChatLog = chatLog;
+            this.ClientStateTracker = clientStateTracker;
+            this.IncomingMessageQueue = incomingMessageQueue;
+            this.NetworkPlayerProcessor = networkPlayerProcessor;
         }
 
         #region IController Members
 
         public void Process(float elapsedSeconds)
         {
-            // Set most recently received server snap:
-            while (_incomingMessageQueue.HasAvailable(ItemType.ServerSnap))
-            {
-                var item = _incomingMessageQueue.ReadItem(ItemType.ServerSnap);
-                _localClient.LastServerSnap = (int)item.Data;
-            }
-
-            // Set last acknowledged client snap:
-            while (_incomingMessageQueue.HasAvailable(ItemType.ClientSnap))
-            {
-                var item = _incomingMessageQueue.ReadItem(ItemType.ClientSnap);
-                _localClient.LastClientSnap = (int)item.Data;
-            }
-
             // update chat log from server:
-            while (_incomingMessageQueue.HasAvailable(ItemType.ChatLog))
+            while (this.IncomingMessageQueue.HasAvailable(ItemType.ChatLog))
             {
-                var item = _incomingMessageQueue.ReadItem(ItemType.ChatLog);
+                var item = this.IncomingMessageQueue.ReadItem(ItemType.ChatLog);
 
-                AddChatMessage((ChatMessage)item.Data);
+                AddChatMessage(item);
             }
             // update the players:
-            while (_incomingMessageQueue.HasAvailable(ItemType.Player))
+            while (this.IncomingMessageQueue.HasAvailable(ItemType.Player))
             {
-                var item = _incomingMessageQueue.ReadItem(ItemType.Player);
+                var item = this.IncomingMessageQueue.ReadItem(ItemType.Player);
 
-                _networkPlayerProcessor.UpdatePlayerFromPlayerStateItem(item);
+                this.NetworkPlayerProcessor.UpdatePlayerFromPlayerStateItem(item);
             }
             // update the player settings:
-            while (_incomingMessageQueue.HasAvailable(ItemType.PlayerSettings))
+            while (this.IncomingMessageQueue.HasAvailable(ItemType.PlayerSettings))
             {
-                var item = _incomingMessageQueue.ReadItem(ItemType.PlayerSettings);
+                var item = this.IncomingMessageQueue.ReadItem(ItemType.PlayerSettings);
 
-                _networkPlayerProcessor.UpdatePlayerSettingsFromNetworkItem(item);
+                this.NetworkPlayerProcessor.UpdatePlayerSettingsFromNetworkItem(item);
             }
         }
 
         #endregion
 
-        void AddChatMessage(ChatMessage newMsg)
+        void AddChatMessage(Item item)
         {
+            var diffedLog = (List<ChatMessage>)item.Data;
+            diffedLog.Reverse(); // We receive the List<> with newest element at index 0. We want to iterate from oldest to newest...
+
+            foreach (var msg in diffedLog)
+            {
+                this.ChatLog.AddMessage(msg);
+            }
+            /*
+             * TODO: DELETE
             // We don't want to add duplicate messages:
-            if (_chatLog.Exists(msg => msg == newMsg))
+            if (this.ChatLog.Exists(msg => msg == newMsg))
                 return;
 
-            _chatLog.AddMessage(newMsg);
+            this.ChatLog.AddMessage(newMsg);
+            */
         }
 
-        LocalClient _localClient;
-        Log<ChatMessage> _chatLog;
-        IClientStateTracker _clientStateTracker;
-        IIncomingMessageQueue _incomingMessageQueue;
-        INetworkPlayerProcessor _networkPlayerProcessor;
+        LocalClient LocalClient;
+        Log<ChatMessage> ChatLog;
+        IClientStateTracker ClientStateTracker;
+        IIncomingMessageQueue IncomingMessageQueue;
+        INetworkPlayerProcessor NetworkPlayerProcessor;
     }
 }

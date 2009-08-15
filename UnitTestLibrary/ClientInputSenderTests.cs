@@ -6,6 +6,7 @@ using Rhino.Mocks;
 using Lidgren.Network;
 using Microsoft.Xna.Framework;
 using Frenetic.Player;
+using System.Collections.Generic;
 
 namespace UnitTestLibrary
 {
@@ -15,7 +16,7 @@ namespace UnitTestLibrary
         IOutgoingMessageQueue stubOutgoingMessageQueue;
         LocalClient client;
         ISnapCounter stubSnapCounter;
-        MessageConsole console;
+        Log<ChatMessage> chatLog;
         ClientInputSender clientInputSender;
 
         [SetUp]
@@ -24,9 +25,9 @@ namespace UnitTestLibrary
             stubOutgoingMessageQueue = MockRepository.GenerateStub<IOutgoingMessageQueue>();
             stubSnapCounter = MockRepository.GenerateStub<ISnapCounter>();
             stubSnapCounter.CurrentSnap = 3;
-            console = new MessageConsole(null, new Log<ChatMessage>());
+            chatLog = new Log<ChatMessage>();
             client = new LocalClient(MockRepository.GenerateStub<IPlayer>()) { ID = 9 };
-            clientInputSender = new ClientInputSender(client, console, stubSnapCounter, stubOutgoingMessageQueue); 
+            clientInputSender = new ClientInputSender(client, chatLog, stubSnapCounter, stubOutgoingMessageQueue); 
         }
 
         [Test]
@@ -64,63 +65,16 @@ namespace UnitTestLibrary
         }
 
         [Test]
-        public void SendsCurrentClientSnap()
-        {
-            stubSnapCounter.CurrentSnap = 99;
-
-            clientInputSender.Generate();
-
-            stubOutgoingMessageQueue.AssertWasCalled(x => x.AddToQueue(Arg<Item>.Matches(y => y.ClientID == 9 && y.Type == ItemType.ClientSnap && (int)y.Data == 99)));
-        }
-
-        [Test]
-        public void SendsLastReceivedServerSnap()
-        {
-            client.LastServerSnap = 33;
-
-            clientInputSender.Generate();
-
-            stubOutgoingMessageQueue.AssertWasCalled(x => x.AddToQueue(Arg<Item>.Matches(y => y.ClientID == 9 && y.Type == ItemType.ServerSnap && (int)y.Data == 33)));
-        }
-
-        [Test]
         public void SendsChatLogMessages()
         {
-            // Arrange:
-            client.LastClientSnap = 23; // Set last acknowledged client snap
-            stubSnapCounter.CurrentSnap = 20;
-            console.ProcessInput("new message 1"); // Won't be sent
+            stubSnapCounter.CurrentSnap = 24;
+            chatLog.AddMessage(new ChatMessage() { Message = "new message 1" });
+            chatLog.AddMessage(new ChatMessage() { Message = "new message 2" });
+            chatLog.AddMessage(new ChatMessage() { Message = "new message 3" });
+
             clientInputSender.Generate();
 
-            // Action:
-            stubSnapCounter.CurrentSnap = 40;
-            console.ProcessInput("new message 2");  // Will be sent (40 > 23)
-            clientInputSender.Generate();
-
-            stubSnapCounter.CurrentSnap = 80;
-            console.ProcessInput("new message 3"); // Will send msg 3 and msg 2
-            clientInputSender.Generate();
-
-            // Assert:
-            stubOutgoingMessageQueue.AssertWasCalled(me => me.AddToQueue(Arg<Item>.Matches(y => y.ClientID == 9 && y.Type == ItemType.ChatLog && ((ChatMessage)y.Data).Message == "new message 2")), o => o.Repeat.Twice());
-            stubOutgoingMessageQueue.AssertWasCalled(me => me.AddToQueue(Arg<Item>.Matches(y => y.ClientID == 9 && y.Type == ItemType.ChatLog && ((ChatMessage)y.Data).Message == "new message 3")), o => o.Repeat.Once());
-        }
-
-        [Test]
-        public void SendsTheClientSnapOnTheChatMessage()
-        {
-            // Arrange:
-            client.LastClientSnap = 4;
-            stubSnapCounter.CurrentSnap = 7;
-            console.ProcessInput("hello");
-            clientInputSender.Generate();
-            stubSnapCounter.CurrentSnap = 8;
-
-            // Action:
-            clientInputSender.Generate(); // Even though we're at snap 8, the snap on the chat message should still be '7'
-
-            // Assert:
-            stubOutgoingMessageQueue.AssertWasCalled(x => x.AddToQueue(Arg<Item>.Matches(y => y.Type == ItemType.ChatLog && ((ChatMessage)y.Data).Snap == 7)), o => o.Repeat.Twice());
+            stubOutgoingMessageQueue.AssertWasCalled(me => me.AddToReliableQueue(Arg<Item>.Matches(y => y.ClientID == 9 && y.Type == ItemType.ChatLog && ((List<ChatMessage>)y.Data).Count == 3 && ((List<ChatMessage>)y.Data)[0].Message == "new message 3")), o => o.Repeat.Once());
         }
 
         [Test]
