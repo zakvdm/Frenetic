@@ -5,6 +5,7 @@ using Frenetic.Network.Lidgren;
 using System.Xml.Serialization;
 using Frenetic.Player;
 using Frenetic.Weapons;
+using System.Collections.Generic;
 
 namespace Frenetic.Network
 {
@@ -13,11 +14,13 @@ namespace Frenetic.Network
         event EventHandler<ClientStatusChangeEventArgs> ClientJoined;
         event EventHandler<ClientStatusChangeEventArgs> ClientDisconnected;
 
+        void Send(Message msg, NetChannel channel);
+
         void Shutdown(string reason);
-        Message ReadMessage();
+        Message ReadNextMessage();
     }
     
-    public enum MessageType
+    public enum ItemType
     {
         ServerSnap,
         ClientSnap,
@@ -50,8 +53,14 @@ namespace Frenetic.Network
     [XmlInclude(typeof(ChatMessage))]
     public class Message
     {
+        public Message() { Items = new List<Item>(); }
+
+        public List<Item> Items { get; set; }
+    }
+    public class Item
+    {
         public int ClientID { get; set; }
-        public MessageType Type { get; set; }
+        public ItemType Type { get; set; }
         public object Data { get; set; }
     }
 }

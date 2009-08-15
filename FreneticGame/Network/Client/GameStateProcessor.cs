@@ -20,39 +20,39 @@ namespace Frenetic
         public void Process(float elapsedSeconds)
         {
             // Set most recently received server snap:
-            while (_incomingMessageQueue.HasAvailable(MessageType.ServerSnap))
+            while (_incomingMessageQueue.HasAvailable(ItemType.ServerSnap))
             {
-                Message message = _incomingMessageQueue.ReadMessage(MessageType.ServerSnap);
-                _localClient.LastServerSnap = (int)message.Data;
+                var item = _incomingMessageQueue.ReadItem(ItemType.ServerSnap);
+                _localClient.LastServerSnap = (int)item.Data;
             }
 
             // Set last acknowledged client snap:
-            while (_incomingMessageQueue.HasAvailable(MessageType.ClientSnap))
+            while (_incomingMessageQueue.HasAvailable(ItemType.ClientSnap))
             {
-                Message message = _incomingMessageQueue.ReadMessage(MessageType.ClientSnap);
-                _localClient.LastClientSnap = (int)message.Data;
+                var item = _incomingMessageQueue.ReadItem(ItemType.ClientSnap);
+                _localClient.LastClientSnap = (int)item.Data;
             }
 
             // update chat log from server:
-            while (_incomingMessageQueue.HasAvailable(MessageType.ChatLog))
+            while (_incomingMessageQueue.HasAvailable(ItemType.ChatLog))
             {
-                Message message = _incomingMessageQueue.ReadMessage(MessageType.ChatLog);
+                var item = _incomingMessageQueue.ReadItem(ItemType.ChatLog);
 
-                AddChatMessage((ChatMessage)message.Data);
+                AddChatMessage((ChatMessage)item.Data);
             }
             // update the players:
-            while (_incomingMessageQueue.HasAvailable(MessageType.Player))
+            while (_incomingMessageQueue.HasAvailable(ItemType.Player))
             {
-                Message stateMsg = _incomingMessageQueue.ReadMessage(MessageType.Player);
+                var item = _incomingMessageQueue.ReadItem(ItemType.Player);
 
-                _networkPlayerProcessor.UpdatePlayerFromPlayerStateMessage(stateMsg);
+                _networkPlayerProcessor.UpdatePlayerFromPlayerStateItem(item);
             }
             // update the player settings:
-            while (_incomingMessageQueue.HasAvailable(MessageType.PlayerSettings))
+            while (_incomingMessageQueue.HasAvailable(ItemType.PlayerSettings))
             {
-                Message netMsg = _incomingMessageQueue.ReadMessage(MessageType.PlayerSettings);
+                var item = _incomingMessageQueue.ReadItem(ItemType.PlayerSettings);
 
-                _networkPlayerProcessor.UpdatePlayerSettingsFromNetworkMessage(netMsg);
+                _networkPlayerProcessor.UpdatePlayerSettingsFromNetworkItem(item);
             }
         }
 

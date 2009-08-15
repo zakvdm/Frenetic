@@ -8,10 +8,10 @@ namespace Frenetic
     {
         public GameStateSender(IChatLogDiffer chatLogDiffer, IClientStateTracker clientStateTracker, ISnapCounter snapCounter, IOutgoingMessageQueue outgoingMessageQueue)
         {
-            _chatLogDiffer = chatLogDiffer;
-            _clientStateTracker = clientStateTracker;
-            _snapCounter = snapCounter;
-            _outgoingMessageQueue = outgoingMessageQueue;
+            this.ChatLogDiffer = chatLogDiffer;
+            this.ClientStateTracker = clientStateTracker;
+            this.SnapCounter = snapCounter;
+            this.OutgoingMessageQueue = outgoingMessageQueue;
         }
 
 
@@ -19,11 +19,11 @@ namespace Frenetic
 
         public void Generate()
         {
-            if (_snapCounter.CurrentSnap > _lastSentSnap)   // Time to send out state
+            if (this.SnapCounter.CurrentSnap > this.LastSentSnap)   // Time to send out state
             {
-                _lastSentSnap = _snapCounter.CurrentSnap;
+                this.LastSentSnap = this.SnapCounter.CurrentSnap;
 
-                foreach (Client client in _clientStateTracker.NetworkClients)
+                foreach (Client client in this.ClientStateTracker.NetworkClients)
                 {
                     SendServerAndClientSnap(client); // We always send the latest snap
 
@@ -39,15 +39,15 @@ namespace Frenetic
         void SendServerAndClientSnap(Client client)
         {
             // Send the current server snap:
-            _outgoingMessageQueue.WriteFor(new Message() { Type = MessageType.ServerSnap, Data = _lastSentSnap }, client);
+            this.OutgoingMessageQueue.WriteFor(new Message() { Items = { new Item() { Type = ItemType.ServerSnap, Data = this.LastSentSnap } } }, client);
 
             // Send the last received client snap:
-            _outgoingMessageQueue.WriteFor(new Message() { Type = MessageType.ClientSnap, Data = client.LastClientSnap }, client);
+            this.OutgoingMessageQueue.WriteFor(new Message() { Items = { new Item() { Type = ItemType.ClientSnap, Data = client.LastClientSnap } } }, client);
         }
 
         void SendChatLog(Client client)
         {
-            Log<ChatMessage> diffedLog = _chatLogDiffer.GetOldestToYoungestDiff(client);
+            Log<ChatMessage> diffedLog = this.ChatLogDiffer.GetOldestToYoungestDiff(client);
 
             if (diffedLog == null) // Diff didn't return new messages
                 return;
@@ -55,26 +55,28 @@ namespace Frenetic
             // We send the messages oldest to newest...
             foreach (var message in diffedLog)
             {
-                Message msg = new Message() { Type = MessageType.ChatLog, Data = message };
+                Message msg = new Message() { Items = { new Item() { Type = ItemType.ChatLog, Data = message } } };
 
                 // Send chat msg to clients
-                _outgoingMessageQueue.WriteFor(msg, client);
+                this.OutgoingMessageQueue.WriteFor(msg, client);
             }
         }
 
         void SendPlayerToAllClients(Client client)
         {
             IPlayerState state = new PlayerState(client.Player);
-            _outgoingMessageQueue.Write(new Message() { ClientID = client.ID, Type = MessageType.Player, Data = state });
+            //this.OutgoingMessageQueue.AddToQueue(new Item() { ClientID = client.ID, Type = ItemType.Player, Data = state });
+            //this.OutgoingMessageQueue.AddToQueue(new Item() { ClientID = client.ID, Type = ItemType.PlayerSettings, Data = client.Player.PlayerSettings });
 
-            _outgoingMessageQueue.Write(new Message() { ClientID = client.ID, Type = MessageType.PlayerSettings, Data = client.Player.PlayerSettings });
+            this.OutgoingMessageQueue.Write(new Message() { Items = { new Item() { ClientID = client.ID, Type = ItemType.Player, Data = state }}});
+            this.OutgoingMessageQueue.Write(new Message() { Items = { new Item() { ClientID = client.ID, Type = ItemType.PlayerSettings, Data = client.Player.PlayerSettings }}});
         }
 
-        IChatLogDiffer _chatLogDiffer;
-        IClientStateTracker _clientStateTracker;
-        IOutgoingMessageQueue _outgoingMessageQueue;
-        ISnapCounter _snapCounter;
+        IChatLogDiffer ChatLogDiffer;
+        IClientStateTracker ClientStateTracker;
+        IOutgoingMessageQueue OutgoingMessageQueue;
+        ISnapCounter SnapCounter;
 
-        int _lastSentSnap = 0;
+        int LastSentSnap = 0;
     }
 }

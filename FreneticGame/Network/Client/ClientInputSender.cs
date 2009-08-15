@@ -7,10 +7,10 @@ namespace Frenetic.Network
     {
         public ClientInputSender(LocalClient localClient, IMessageConsole messageConsole, ISnapCounter snapCounter, IOutgoingMessageQueue outgoingMessageQueue)
         {
-            _localClient = localClient;
-            _messageConsole = messageConsole;
-            _snapCounter = snapCounter;
-            _outgoingMessageQueue = outgoingMessageQueue;
+            this.LocalClient = localClient;
+            this.MessageConsole = messageConsole;
+            this.SnapCounter = snapCounter;
+            this.OutgoingMessageQueue = outgoingMessageQueue;
         }
 
         #region IView Members
@@ -18,60 +18,71 @@ namespace Frenetic.Network
         public void Generate()
         {
             // If the client ID is still 0 then we can't be connected yet, so no point in trying to send...
-            if (_localClient.ID == 0)
+            if (this.LocalClient.ID == 0)
                 return;
 
-            if (_snapCounter.CurrentSnap > _lastSentSnap)
+            if (this.SnapCounter.CurrentSnap > this.LastSentSnap)
             {
-                _lastSentSnap = _snapCounter.CurrentSnap;
+                this.LastSentSnap = this.SnapCounter.CurrentSnap;
 
-                SendLastReceivedServerSnapAndCurrentClientSnap();
+                AddItemsToOutgoingMessageQueue();
 
-                SendAllPendingChatMessages();
-
-                SendLocalPlayerAndPlayerSettings();
+                this.OutgoingMessageQueue.SendMessagesOnQueue();
+               
+                /*
+                 * TODO:
+                 *      GOOD GOD THIS IS UGLY!
+                 *          This can NOT stay here. The solution is probably to send InputState which can be cleared every tick
+                 */
+                this.LocalClient.Player.PendingShot = null; // Only want to send this once...
             }
         }
 
         #endregion
 
+        void AddItemsToOutgoingMessageQueue()
+        {
+            SendLastReceivedServerSnapAndCurrentClientSnap();
+            SendAllPendingChatMessages();
+            SendLocalPlayerAndPlayerSettings();
+        }
+
         void SendLastReceivedServerSnapAndCurrentClientSnap()
         {
             // the last received server snap:
-            _outgoingMessageQueue.Write(new Message() { ClientID = _localClient.ID, Type = MessageType.ServerSnap, Data = _localClient.LastServerSnap });
+            this.OutgoingMessageQueue.AddToQueue(new Item() { ClientID = this.LocalClient.ID, Type = ItemType.ServerSnap, Data = this.LocalClient.LastServerSnap });
 
             // the current client snap:
-            _outgoingMessageQueue.Write(new Message() { ClientID = _localClient.ID, Type = MessageType.ClientSnap, Data = _snapCounter.CurrentSnap });
+            this.OutgoingMessageQueue.AddToQueue(new Item() { ClientID = this.LocalClient.ID, Type = ItemType.ClientSnap, Data = this.SnapCounter.CurrentSnap });
         }
 
         void SendAllPendingChatMessages()
         {
             // First. If there are new messages, we need to set the current client snap on them so we can keep sending them until this snap is acknowledged.
-            foreach (ChatMessage newMsg in _messageConsole.UnsortedMessages)
+            foreach (ChatMessage newMsg in this.MessageConsole.UnsortedMessages)
             {
-                newMsg.Snap = _snapCounter.CurrentSnap;
+                newMsg.Snap = this.SnapCounter.CurrentSnap;
             }
 
             // NOTE: We use the LastClientSnap on the local client as the last client snap acknowledged by the server
-            foreach (ChatMessage unAckedMsg in _messageConsole.GetPendingMessagesFromAfter(_localClient.LastClientSnap))
+            foreach (ChatMessage unAckedMsg in this.MessageConsole.GetPendingMessagesFromAfter(this.LocalClient.LastClientSnap))
             {
-                _outgoingMessageQueue.Write(new Message() { ClientID = _localClient.ID, Type = MessageType.ChatLog, Data = unAckedMsg });
+                this.OutgoingMessageQueue.AddToQueue(new Item() { ClientID = this.LocalClient.ID, Type = ItemType.ChatLog, Data = unAckedMsg });
             }
         }
 
         void SendLocalPlayerAndPlayerSettings()
         {
-            _outgoingMessageQueue.Write(new Message() { ClientID = _localClient.ID, Type = MessageType.Player, Data = _localClient.Player });
-            _localClient.Player.PendingShot = null; // Only want to send this once...
+            this.OutgoingMessageQueue.AddToQueue(new Item() { ClientID = this.LocalClient.ID, Type = ItemType.Player, Data = this.LocalClient.Player });
 
-            _outgoingMessageQueue.Write(new Message() { ClientID = _localClient.ID, Type = MessageType.PlayerSettings, Data = _localClient.Player.PlayerSettings });
+            this.OutgoingMessageQueue.AddToQueue(new Item() { ClientID = this.LocalClient.ID, Type = ItemType.PlayerSettings, Data = this.LocalClient.Player.PlayerSettings });
         }
 
-        IMessageConsole _messageConsole;
-        IOutgoingMessageQueue _outgoingMessageQueue;
-        LocalClient _localClient;
-        ISnapCounter _snapCounter;
+        IMessageConsole MessageConsole;
+        IOutgoingMessageQueue OutgoingMessageQueue;
+        LocalClient LocalClient;
+        ISnapCounter SnapCounter;
 
-        int _lastSentSnap = 0;
+        int LastSentSnap = 0;
     }
 }

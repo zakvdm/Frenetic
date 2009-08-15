@@ -39,11 +39,19 @@ namespace UnitTestLibrary
         }
 
         [Test]
+        public void GenerateFlushesOutgoingQueueAtEnd()
+        {
+            serverChatLogView.Generate();
+
+            stubOutgoingMessageQueue.AssertWasCalled(me => me.SendMessagesOnQueue(), x => x.Repeat.Once());
+        }
+
+        [Test]
         public void GenerateSendsCurrentServerSnap()
         {
             serverChatLogView.Generate();
 
-            stubOutgoingMessageQueue.AssertWasCalled(x => x.WriteFor(Arg<Message>.Matches(y => y.Type == MessageType.ServerSnap && (int)y.Data == 3), Arg<Client>.Is.Equal(client)));
+            stubOutgoingMessageQueue.AssertWasCalled(x => x.WriteFor(Arg<Message>.Matches(y => y.Items[0].Type == ItemType.ServerSnap && (int)y.Items[0].Data == 3), Arg<Client>.Is.Equal(client)));
         }
 
         [Test]
@@ -53,7 +61,7 @@ namespace UnitTestLibrary
 
             serverChatLogView.Generate();
 
-            stubOutgoingMessageQueue.AssertWasCalled(x => x.WriteFor(Arg<Message>.Matches(y => y.Type == MessageType.ClientSnap && (int)y.Data == 78), Arg<Client>.Is.Equal(client)));
+            stubOutgoingMessageQueue.AssertWasCalled(x => x.WriteFor(Arg<Message>.Matches(y => y.Items[0].Type == ItemType.ClientSnap && (int)y.Items[0].Data == 78), Arg<Client>.Is.Equal(client)));
         }
 
         [Test]
@@ -66,7 +74,7 @@ namespace UnitTestLibrary
 
             serverChatLogView.Generate();
 
-            stubOutgoingMessageQueue.AssertWasCalled(x => x.WriteFor(Arg<Message>.Matches(y => y.Type == MessageType.ChatLog && ((ChatMessage)y.Data).ClientName == "terence" && ((ChatMessage)y.Data).Snap == 32), Arg<Client>.Is.Equal(client)));
+            stubOutgoingMessageQueue.AssertWasCalled(x => x.WriteFor(Arg<Message>.Matches(y => y.Items[0].Type == ItemType.ChatLog && ((ChatMessage)y.Items[0].Data).ClientName == "terence" && ((ChatMessage)y.Items[0].Data).Snap == 32), Arg<Client>.Is.Equal(client)));
         }
 
         [Test]
@@ -79,8 +87,8 @@ namespace UnitTestLibrary
 
             serverChatLogView.Generate();
 
-            stubOutgoingMessageQueue.AssertWasCalled(x => x.WriteFor(Arg<Message>.Matches(y => y.Type == MessageType.ChatLog && ((ChatMessage)y.Data).Message == "Woohoo"), Arg<Client>.Is.Equal(client)));
-            stubOutgoingMessageQueue.AssertWasCalled(x => x.WriteFor(Arg<Message>.Matches(y => y.Type == MessageType.ChatLog && ((ChatMessage)y.Data).Message == "boohoo"), Arg<Client>.Is.Equal(client)));
+            stubOutgoingMessageQueue.AssertWasCalled(x => x.WriteFor(Arg<Message>.Matches(y => y.Items[0].Type == ItemType.ChatLog && ((ChatMessage)y.Items[0].Data).Message == "Woohoo"), Arg<Client>.Is.Equal(client)));
+            stubOutgoingMessageQueue.AssertWasCalled(x => x.WriteFor(Arg<Message>.Matches(y => y.Items[0].Type == ItemType.ChatLog && ((ChatMessage)y.Items[0].Data).Message == "boohoo"), Arg<Client>.Is.Equal(client)));
         }
 
        
@@ -108,7 +116,7 @@ namespace UnitTestLibrary
 
             serverChatLogView.Generate();
 
-            stubOutgoingMessageQueue.AssertWasCalled(x => x.Write(Arg<Message>.Matches(y => y.Type == MessageType.Player && y.ClientID == 7 && ((IPlayerState)y.Data).Position == new Vector2(100, 200))));
+            stubOutgoingMessageQueue.AssertWasCalled(x => x.AddToQueue(Arg<Item>.Matches(y => y.Type == ItemType.Player && y.ClientID == 7 && ((IPlayerState)y.Data).Position == new Vector2(100, 200))));
         }
 
         [Test]
@@ -122,7 +130,7 @@ namespace UnitTestLibrary
 
             serverChatLogView.Generate();
 
-            stubOutgoingMessageQueue.AssertWasCalled(x => x.Write(Arg<Message>.Matches(y => y.Type == MessageType.PlayerSettings && y.ClientID == 123 && ((IPlayerSettings)y.Data == playerSettings))));
+            stubOutgoingMessageQueue.AssertWasCalled(x => x.AddToQueue(Arg<Item>.Matches(y => y.Type == ItemType.PlayerSettings && y.ClientID == 123 && ((IPlayerSettings)y.Data == playerSettings))));
         }
     }
 }

@@ -36,7 +36,7 @@ namespace Frenetic.Network.Lidgren
             _netClient.DiscoverLocalServers(port);
         }
 
-        public void SendToServer(Message msg, NetChannel channel)
+        public void Send(Message msg, NetChannel channel)
         {
             if (_netClient.Status != NetConnectionStatus.Connected)
                 throw new System.InvalidOperationException("Client not connected to server");
@@ -46,6 +46,8 @@ namespace Frenetic.Network.Lidgren
             buffer.Write(data);
 
             _netClient.SendMessage(buffer, channel);
+
+            _logger.Debug("Sent Message with " + msg.Items.Count + " items " + " and total length " + data.Length + " bytes to the server.");
         }
 
         #endregion
@@ -58,7 +60,7 @@ namespace Frenetic.Network.Lidgren
             _netClient.Shutdown(reason);
         }
 
-        public Message ReadMessage()
+        public Message ReadNextMessage()
         {
             NetBuffer inBuffer = _netClient.CreateBuffer();
             NetMessageType type;
@@ -99,21 +101,42 @@ namespace Frenetic.Network.Lidgren
 
         bool HandleMessageFromServer(Message incomingMessage)
         {
-            switch (incomingMessage.Type)
+            var itemsToHandle = incomingMessage.Items.FindAll(NetworkSessionHandledItems);
+
+            foreach (Item item in itemsToHandle)
             {
-                case MessageType.SuccessfulJoin:
-                    ClientJoined(this, new ClientStatusChangeEventArgs((int)incomingMessage.Data, true));
-                    return true;
-                case MessageType.NewClient:
-                    ClientJoined(this, new ClientStatusChangeEventArgs((int)incomingMessage.Data, false));
-                    return true;
-                case MessageType.DisconnectingClient:
-                    ClientDisconnected(this, new ClientStatusChangeEventArgs((int)incomingMessage.Data, false));
+                switch (item.Type)
+                {
+                    case ItemType.SuccessfulJoin:
+                        ClientJoined(this, new ClientStatusChangeEventArgs((int)item.Data, true));
+                        break;
+                    case ItemType.NewClient:
+                        ClientJoined(this, new ClientStatusChangeEventArgs((int)item.Data, false));
+                        break;
+                    case ItemType.DisconnectingClient:
+                        ClientDisconnected(this, new ClientStatusChangeEventArgs((int)item.Data, false));
+                        break;
+                }
+            }
+
+            incomingMessage.Items.RemoveAll(NetworkSessionHandledItems);
+
+            return (incomingMessage.Items.Count == 0); // If the count is 0, then we handled all Items successfully here (so return true)
+        }
+
+        bool NetworkSessionHandledItems(Item item)
+        {
+            switch (item.Type)
+            {
+                case ItemType.SuccessfulJoin:
+                case ItemType.NewClient:
+                case ItemType.DisconnectingClient:
                     return true;
                 default:
                     return false;
             }
         }
+
 
         INetClient _netClient;
         IMessageSerializer _messageSerializer;

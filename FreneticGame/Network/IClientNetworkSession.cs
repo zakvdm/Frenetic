@@ -7,7 +7,5 @@ namespace Frenetic.Network
     {
         void Join(string IP, int port);
         void Join(int port);
-
-        void SendToServer(Message msg, NetChannel channel);
     }
 }

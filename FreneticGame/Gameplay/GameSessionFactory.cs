@@ -109,7 +109,8 @@ namespace Frenetic
             IIncomingMessageQueue incomingMessageQueue = ClientContainer.Resolve<IIncomingMessageQueue>(
                     new TypedParameter(typeof(INetworkSession), clientNetworkSession));
             IOutgoingMessageQueue outgoingMessageQueue = ClientContainer.Resolve<IOutgoingMessageQueue>(
-                    new TypedParameter(typeof(IServerNetworkSession), null));
+                    new TypedParameter(typeof(INetworkSession), clientNetworkSession), new TypedParameter(typeof(int), -1));
+                    //new TypedParameter(typeof(IServerNetworkSession), null));
             clientNetworkSession.Join(14242);
 
             gameSession.Controllers.Add(ClientContainer.Resolve<PhysicsController>());

@@ -5,14 +5,39 @@ namespace Frenetic.Network
 {
     public class OutgoingMessageQueue : IOutgoingMessageQueue
     {
+        public OutgoingMessageQueue(INetworkSession networkSession)
+        {
+            this.NetworkSession = networkSession;
+
+            this.CurrentMessage = new Message();
+        }
+        public OutgoingMessageQueue(INetworkSession networkSession, int TODOtemp)
+            : this(networkSession)
+        { }
+
+        public void AddToQueue(Item item)
+        {
+            this.CurrentMessage.Items.Add(item);
+        }
+
+        public void SendMessagesOnQueue()
+        {
+            this.NetworkSession.Send(this.CurrentMessage, NetChannel.Unreliable);
+
+            this.CurrentMessage = new Message();
+        }
+
+        public Message CurrentMessage { get; private set;  }
+
+        INetworkSession NetworkSession;
+
+        // TODO: Delete everything below here (once i dont' need it anymore...)
         public OutgoingMessageQueue(IClientNetworkSession clientNetworkSession, IServerNetworkSession serverNetworkSession)
         {
             _clientNetworkSession = clientNetworkSession;
             _serverNetworkSession = serverNetworkSession;
         }
         
-        #region IOutgoingMessageQueue Members
-
         public void Write(Message message)
         {
             Write(message, NetChannel.UnreliableInOrder1);
@@ -23,7 +48,7 @@ namespace Frenetic.Network
         {
             if (_clientNetworkSession != null)
             {
-                _clientNetworkSession.SendToServer(message, channel);
+                _clientNetworkSession.Send(message, channel);
             }
             if (_serverNetworkSession != null)
             {
@@ -42,14 +67,7 @@ namespace Frenetic.Network
             _serverNetworkSession.SendTo(message, channel, destinationPlayerID);
         }
 
-        // TODO: DELETE:
-        public void WriteForAllExcept(Message message, NetChannel channel, int excludedPlayerID)
-        {
-            _serverNetworkSession.SendToAllExcept(message, channel, excludedPlayerID);
-        }
-
-        #endregion
-
+        
         IClientNetworkSession _clientNetworkSession;
         IServerNetworkSession _serverNetworkSession;
     }

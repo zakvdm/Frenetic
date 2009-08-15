@@ -29,7 +29,7 @@ namespace UnitTestLibrary
         [Test]
         public void ServerCanSendMessagesToAllClients()
         {
-            Message msg = new Message() { Data = new byte[] { 1, 2, 3, 4 } };
+            Message msg = new Message() { Items = { new Item() { Data = new byte[] { 1, 2, 3, 4 } } } };
             NetBuffer tmpBuffer = new NetBuffer();
 
             stubNetServer.Stub(x => x.CreateBuffer(Arg<int>.Is.Anything)).Return(tmpBuffer);
@@ -38,13 +38,13 @@ namespace UnitTestLibrary
 
             stubNetServer.AssertWasCalled(x => x.SendToAll(Arg<NetBuffer>.Is.Equal(tmpBuffer),
                                                         Arg<NetChannel>.Is.Equal(NetChannel.Unreliable)));
-            Assert.AreEqual(new byte[] { 1, 2, 3, 4 }, _serializer.Deserialize(tmpBuffer.ToArray()).Data);
+            Assert.AreEqual(new byte[] { 1, 2, 3, 4 }, _serializer.Deserialize(tmpBuffer.ToArray()).Items[0].Data);
         }
 
         [Test]
         public void ServerCanSendMessageToOneClient()
         {
-            Message msg = new Message() { Data = new byte[] { 1, 2, 3, 4 } };
+            Message msg = new Message() { Items = { new Item() { Data = new byte[] { 1, 2, 3, 4 } } } };
             NetBuffer tmpBuffer = new NetBuffer();
 
             stubNetServer.Stub(x => x.CreateBuffer(Arg<int>.Is.Anything)).Return(tmpBuffer);
@@ -53,13 +53,13 @@ namespace UnitTestLibrary
 
             stubNetServer.AssertWasCalled(x => x.SendMessage(Arg<NetBuffer>.Is.Equal(tmpBuffer),
                                                         Arg<NetChannel>.Is.Equal(NetChannel.Unreliable), Arg<INetConnection>.Is.Equal(stubNetConnection)));
-            Assert.AreEqual(new byte[] { 1, 2, 3, 4 }, _serializer.Deserialize(tmpBuffer.ToArray()).Data);
+            Assert.AreEqual(new byte[] { 1, 2, 3, 4 }, _serializer.Deserialize(tmpBuffer.ToArray()).Items[0].Data);
         }
 
         [Test]
         public void ServerCanSendMessageToAllExceptOneClient()
         {
-            Message msg = new Message() { Data = new byte[] { 1, 2, 3, 4 } };
+            Message msg = new Message() { Items = { new Item() { Data = new byte[] { 1, 2, 3, 4 } } } };
             NetBuffer tmpBuffer = new NetBuffer();
 
             stubNetServer.Stub(x => x.CreateBuffer(Arg<int>.Is.Anything)).Return(tmpBuffer);
@@ -68,7 +68,7 @@ namespace UnitTestLibrary
 
             stubNetServer.AssertWasCalled(x => x.SendToAll(Arg<NetBuffer>.Is.Equal(tmpBuffer),
                                                         Arg<NetChannel>.Is.Equal(NetChannel.Unreliable), Arg<INetConnection>.Is.Equal(stubNetConnection)));
-            Assert.AreEqual(new byte[] { 1, 2, 3, 4 }, _serializer.Deserialize(tmpBuffer.ToArray()).Data);
+            Assert.AreEqual(new byte[] { 1, 2, 3, 4 }, _serializer.Deserialize(tmpBuffer.ToArray()).Items[0].Data);
         }
     }
 }

@@ -4,8 +4,8 @@ namespace Frenetic.Player
 {
     public interface INetworkPlayerProcessor
     {
-        void UpdatePlayerFromNetworkMessage(Frenetic.Network.Message netMsg);
-        void UpdatePlayerFromPlayerStateMessage(Frenetic.Network.Message stateMessage);
-        void UpdatePlayerSettingsFromNetworkMessage(Frenetic.Network.Message netMsg);
+        void UpdatePlayerFromNetworkItem(Frenetic.Network.Item item);
+        void UpdatePlayerFromPlayerStateItem(Frenetic.Network.Item stateItem);
+        void UpdatePlayerSettingsFromNetworkItem(Frenetic.Network.Item item);
     }
 }

@@ -20,49 +20,49 @@ namespace Frenetic.Network
         public void Process(float elapsedTime)
         {
             // Update the last server snap received by the client:
-            while (_incomingMessageQueue.HasAvailable(MessageType.ServerSnap))
+            while (_incomingMessageQueue.HasAvailable(ItemType.ServerSnap))
             {
-                Message message = _incomingMessageQueue.ReadMessage(MessageType.ServerSnap);
+                var item = _incomingMessageQueue.ReadItem(ItemType.ServerSnap);
 
-                _clientStateTracker.FindNetworkClient(message.ClientID).LastServerSnap = (int)message.Data;
+                _clientStateTracker.FindNetworkClient(item.ClientID).LastServerSnap = (int)item.Data;
             }
             // Update the last client snap received here by the server:
-            while (_incomingMessageQueue.HasAvailable(MessageType.ClientSnap))
+            while (_incomingMessageQueue.HasAvailable(ItemType.ClientSnap))
             {
-                Message message = _incomingMessageQueue.ReadMessage(MessageType.ClientSnap);
+                var item = _incomingMessageQueue.ReadItem(ItemType.ClientSnap);
 
-                _clientStateTracker.FindNetworkClient(message.ClientID).LastClientSnap = (int)message.Data;
+                _clientStateTracker.FindNetworkClient(item.ClientID).LastClientSnap = (int)item.Data;
             }
             // Update server chat log:
-            while (_incomingMessageQueue.HasAvailable(MessageType.ChatLog))
+            while (_incomingMessageQueue.HasAvailable(ItemType.ChatLog))
             {
-                Message netMsg = _incomingMessageQueue.ReadMessage(MessageType.ChatLog);
+                var item = _incomingMessageQueue.ReadItem(ItemType.ChatLog);
 
-                AddClientChatMessageToServerLog(netMsg);
+                AddClientChatMessageToServerLog(item);
             }
             // Update player:
-            while (_incomingMessageQueue.HasAvailable(MessageType.Player))
+            while (_incomingMessageQueue.HasAvailable(ItemType.Player))
             {
-                Message netMsg = _incomingMessageQueue.ReadMessage(MessageType.Player);
+                var item = _incomingMessageQueue.ReadItem(ItemType.Player);
 
-                _networkPlayerProcessor.UpdatePlayerFromNetworkMessage(netMsg);
+                _networkPlayerProcessor.UpdatePlayerFromNetworkItem(item);
             }
             // Update Player Settings:
-            while (_incomingMessageQueue.HasAvailable(MessageType.PlayerSettings))
+            while (_incomingMessageQueue.HasAvailable(ItemType.PlayerSettings))
             {
-                Message netMsg = _incomingMessageQueue.ReadMessage(MessageType.PlayerSettings);
+                var item = _incomingMessageQueue.ReadItem(ItemType.PlayerSettings);
 
-                _networkPlayerProcessor.UpdatePlayerSettingsFromNetworkMessage(netMsg);
+                _networkPlayerProcessor.UpdatePlayerSettingsFromNetworkItem(item);
             }
         }
 
         #endregion
 
-        void AddClientChatMessageToServerLog(Message netMsg)
+        void AddClientChatMessageToServerLog(Item item)
         {
-            ChatMessage chatMsg = (ChatMessage)netMsg.Data;
+            ChatMessage chatMsg = (ChatMessage)item.Data;
 
-            chatMsg.ClientName = _clientStateTracker.FindNetworkClient(netMsg.ClientID).Player.PlayerSettings.Name;
+            chatMsg.ClientName = _clientStateTracker.FindNetworkClient(item.ClientID).Player.PlayerSettings.Name;
 
             // Before we add this message to the server log, let's check that we haven't already added it
             if (_chatLogDiffer.IsNewClientChatMessage(chatMsg))

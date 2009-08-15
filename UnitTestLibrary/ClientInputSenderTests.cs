@@ -36,7 +36,7 @@ namespace UnitTestLibrary
 
             clientInputSender.Generate();
 
-            stubOutgoingMessageQueue.AssertWasNotCalled(me => me.Write(Arg<Message>.Is.Anything));
+            stubOutgoingMessageQueue.AssertWasNotCalled(me => me.AddToQueue(Arg<Item>.Is.Anything));
         }
 
         [Test]
@@ -45,12 +45,22 @@ namespace UnitTestLibrary
             stubSnapCounter.CurrentSnap = 0;
 
             clientInputSender.Generate();
-            stubOutgoingMessageQueue.AssertWasNotCalled(me => me.Write(Arg<Message>.Is.Anything));
+            stubOutgoingMessageQueue.AssertWasNotCalled(me => me.AddToQueue(Arg<Item>.Is.Anything));
             stubSnapCounter.CurrentSnap = 2;
             
             clientInputSender.Generate();
 
-            stubOutgoingMessageQueue.AssertWasCalled(me => me.Write(Arg<Message>.Is.Anything), o => o.Repeat.AtLeastOnce());
+            stubOutgoingMessageQueue.AssertWasCalled(me => me.AddToQueue(Arg<Item>.Is.Anything), o => o.Repeat.AtLeastOnce());
+        }
+
+        [Test]
+        public void FlushesTheOutgoingQueue()
+        {
+            stubSnapCounter.CurrentSnap = 100;
+
+            clientInputSender.Generate();
+
+            stubOutgoingMessageQueue.AssertWasCalled(me => me.SendMessagesOnQueue());
         }
 
         [Test]
@@ -60,7 +70,7 @@ namespace UnitTestLibrary
 
             clientInputSender.Generate();
 
-            stubOutgoingMessageQueue.AssertWasCalled(x => x.Write(Arg<Message>.Matches(y => y.ClientID == 9 && y.Type == MessageType.ClientSnap && (int)y.Data == 99)));
+            stubOutgoingMessageQueue.AssertWasCalled(x => x.AddToQueue(Arg<Item>.Matches(y => y.ClientID == 9 && y.Type == ItemType.ClientSnap && (int)y.Data == 99)));
         }
 
         [Test]
@@ -70,7 +80,7 @@ namespace UnitTestLibrary
 
             clientInputSender.Generate();
 
-            stubOutgoingMessageQueue.AssertWasCalled(x => x.Write(Arg<Message>.Matches(y => y.ClientID == 9 && y.Type == MessageType.ServerSnap && (int)y.Data == 33)));
+            stubOutgoingMessageQueue.AssertWasCalled(x => x.AddToQueue(Arg<Item>.Matches(y => y.ClientID == 9 && y.Type == ItemType.ServerSnap && (int)y.Data == 33)));
         }
 
         [Test]
@@ -92,8 +102,8 @@ namespace UnitTestLibrary
             clientInputSender.Generate();
 
             // Assert:
-            stubOutgoingMessageQueue.AssertWasCalled(me => me.Write(Arg<Message>.Matches(y => y.ClientID == 9 && y.Type == MessageType.ChatLog && ((ChatMessage)y.Data).Message == "new message 2")), o => o.Repeat.Twice());
-            stubOutgoingMessageQueue.AssertWasCalled(me => me.Write(Arg<Message>.Matches(y => y.ClientID == 9 && y.Type == MessageType.ChatLog && ((ChatMessage)y.Data).Message == "new message 3")), o => o.Repeat.Once());
+            stubOutgoingMessageQueue.AssertWasCalled(me => me.AddToQueue(Arg<Item>.Matches(y => y.ClientID == 9 && y.Type == ItemType.ChatLog && ((ChatMessage)y.Data).Message == "new message 2")), o => o.Repeat.Twice());
+            stubOutgoingMessageQueue.AssertWasCalled(me => me.AddToQueue(Arg<Item>.Matches(y => y.ClientID == 9 && y.Type == ItemType.ChatLog && ((ChatMessage)y.Data).Message == "new message 3")), o => o.Repeat.Once());
         }
 
         [Test]
@@ -110,7 +120,7 @@ namespace UnitTestLibrary
             clientInputSender.Generate(); // Even though we're at snap 8, the snap on the chat message should still be '7'
 
             // Assert:
-            stubOutgoingMessageQueue.AssertWasCalled(x => x.Write(Arg<Message>.Matches(y => y.Type == MessageType.ChatLog && ((ChatMessage)y.Data).Snap == 7)), o => o.Repeat.Twice());
+            stubOutgoingMessageQueue.AssertWasCalled(x => x.AddToQueue(Arg<Item>.Matches(y => y.Type == ItemType.ChatLog && ((ChatMessage)y.Data).Snap == 7)), o => o.Repeat.Twice());
         }
 
         [Test]
@@ -120,7 +130,7 @@ namespace UnitTestLibrary
 
             clientInputSender.Generate();
 
-            stubOutgoingMessageQueue.AssertWasCalled(x => x.Write(Arg<Message>.Matches(y => y.Type == MessageType.Player && ((IPlayer)y.Data).Position == new Vector2(100, 200))));
+            stubOutgoingMessageQueue.AssertWasCalled(x => x.AddToQueue(Arg<Item>.Matches(y => y.Type == ItemType.Player && ((IPlayer)y.Data).Position == new Vector2(100, 200))));
         }
         [Test]
         public void OnlySendsPendingShotOnce()
@@ -140,7 +150,7 @@ namespace UnitTestLibrary
 
             clientInputSender.Generate();
 
-            stubOutgoingMessageQueue.AssertWasCalled(x => x.Write(Arg<Message>.Matches(y => y.Type == MessageType.PlayerSettings && ((LocalPlayerSettings)y.Data).Name == "zak")));
+            stubOutgoingMessageQueue.AssertWasCalled(x => x.AddToQueue(Arg<Item>.Matches(y => y.Type == ItemType.PlayerSettings && ((LocalPlayerSettings)y.Data).Name == "zak")));
         }
     }
 }

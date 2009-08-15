@@ -38,6 +38,10 @@ namespace Frenetic.Network.Lidgren
         }
 
         #region Sending
+        public void Send(Message msg, NetChannel channel)
+        {
+            throw new NotImplementedException();
+        }
         public void SendTo(Message msg, NetChannel channel, int destinationClientID)
         {
             if ((!ActiveConnections.ContainsKey(destinationClientID)) || (ActiveConnections[destinationClientID].Status != NetConnectionStatus.Connected))
@@ -67,7 +71,7 @@ namespace Frenetic.Network.Lidgren
             _netServer.Shutdown(reason);
         }
 
-        public Message ReadMessage()
+        public Message ReadNextMessage()
         {
             NetBuffer inBuffer = _netServer.CreateBuffer();
             NetMessageType type;
@@ -131,7 +135,7 @@ namespace Frenetic.Network.Lidgren
                 ClientJoined(this, new ClientStatusChangeEventArgs(newClientID, false));
 
             // send ack to new client:
-            SendTo(new Message() { Type = MessageType.SuccessfulJoin, Data = newClientID }, NetChannel.ReliableInOrder1, newClientID);
+            SendTo(new Message() { Items = { new Item() { Type = ItemType.SuccessfulJoin, Data = newClientID } } }, NetChannel.ReliableInOrder1, newClientID);
 
             // send existent clients' info to new client:
             foreach (INetConnection connection in ActiveConnections.Values)
@@ -139,11 +143,12 @@ namespace Frenetic.Network.Lidgren
                 if (connection.ConnectionID == newClientID)
                     continue;   // We don't want to send the client to itself...
 
-                SendTo(new Message() { Type = MessageType.NewClient, Data = connection.ConnectionID }, NetChannel.ReliableUnordered, newClientID);
+                // TODO: Send all in one message
+                SendTo(new Message() { Items = { new Item() { Type = ItemType.NewClient, Data = connection.ConnectionID } } }, NetChannel.ReliableUnordered, newClientID);
             }
                 
             // tell existent clients about new client:
-            SendToAllExcept(new Message() { Type = MessageType.NewClient, Data = newClientID }, NetChannel.ReliableUnordered, newClientID);
+            SendToAllExcept(new Message() { Items = { new Item() { Type = ItemType.NewClient, Data = newClientID } } }, NetChannel.ReliableUnordered, newClientID);
         }
         void ProcessDisconnectingClient(int disconnectingClientID)
         {
@@ -152,7 +157,7 @@ namespace Frenetic.Network.Lidgren
                 ClientDisconnected(this, new ClientStatusChangeEventArgs(disconnectingClientID, false));
 
             // tell all remaining clients about the disconnecting client
-            SendToAll(new Message() { Type = MessageType.DisconnectingClient, Data = disconnectingClientID }, NetChannel.ReliableUnordered);
+            SendToAll(new Message() { Items = { new Item() { Type = ItemType.DisconnectingClient, Data = disconnectingClientID } } }, NetChannel.ReliableUnordered);
         }
 
         INetServer _netServer;

@@ -26,12 +26,12 @@ namespace UnitTestLibrary
         [Test]
         public void CanSerializeAndDeserializeAMessage()
         {
-            Message msg = new Message() { Type = MessageType.NewClient, Data = 10 };
+            Message msg = new Message() { Items = { new Item() { Type = ItemType.NewClient, Data = 10 } } };
 
             byte[] serializedMessage = serializer.Serialize(msg);
 
-            Assert.AreEqual(MessageType.NewClient, (serializer.Deserialize(serializedMessage)).Type);
-            Assert.AreEqual(10, (serializer.Deserialize(serializedMessage)).Data);
+            Assert.AreEqual(ItemType.NewClient, (serializer.Deserialize(serializedMessage)).Items[0].Type);
+            Assert.AreEqual(10, (serializer.Deserialize(serializedMessage)).Items[0].Data);
         }
 
         [Test]
@@ -39,10 +39,10 @@ namespace UnitTestLibrary
         {
             Player player = new Player(null, null, null, null, null);
             player.Position = new Vector2(100, 200);
-            Message msg = new Message() { Type = MessageType.Player, Data = player };
+            Message msg = new Message() { Items = { new Item() { Type = ItemType.Player, Data = player } } };
 
             byte[] serializedMsg = serializer.Serialize(msg);
-            Player recoveredPlayer = (Player)(serializer.Deserialize(serializedMsg)).Data;
+            Player recoveredPlayer = (Player)(serializer.Deserialize(serializedMsg)).Items[0].Data;
 
             Assert.AreEqual(player.Position, recoveredPlayer.Position);
         }
@@ -55,10 +55,10 @@ namespace UnitTestLibrary
             state.Shots = new List<Shot>();
             state.Shots.Add(new Shot(Vector2.UnitY, Vector2.UnitX));
             state.Score = new Frenetic.Gameplay.PlayerScore() { Deaths = 3, Kills = 4 };
-            Message msg = new Message() { Type = MessageType.Player, Data = state };
+            Message msg = new Message() { Items = { new Item() { Type = ItemType.Player, Data = state } } };
 
             byte[] serializedMessage = serializer.Serialize(msg);
-            PlayerState recoveredState = (PlayerState)(serializer.Deserialize(serializedMessage)).Data;
+            PlayerState recoveredState = (PlayerState)(serializer.Deserialize(serializedMessage)).Items[0].Data;
 
             Assert.AreEqual(new Vector2(100, 200), recoveredState.Position);
             Assert.AreEqual(1, recoveredState.Shots.Count);
@@ -72,12 +72,12 @@ namespace UnitTestLibrary
         {
             NetworkPlayerSettings playerSettings = new NetworkPlayerSettings();
             playerSettings.Name = "Jean Pant";
-            Message msg = new Message() { Type = MessageType.PlayerSettings, Data = playerSettings };
+            Message msg = new Message() { Items = { new Item() { Type = ItemType.PlayerSettings, Data = playerSettings } } };
 
             byte[] serializedMessage = serializer.Serialize(msg);
 
             Message recoveredMessage = serializer.Deserialize(serializedMessage);
-            Assert.AreEqual("Jean Pant", ((NetworkPlayerSettings)recoveredMessage.Data).Name);
+            Assert.AreEqual("Jean Pant", ((NetworkPlayerSettings)recoveredMessage.Items[0].Data).Name);
         }
 
         [Test]
@@ -85,12 +85,33 @@ namespace UnitTestLibrary
         {
             LocalPlayerSettings playerSettings = new LocalPlayerSettings();
             playerSettings.Name = "Jean Pant";
-            Message msg = new Message() { Type = MessageType.PlayerSettings, Data = playerSettings };
+            Message msg = new Message() { Items = { new Item() { Type = ItemType.PlayerSettings, Data = playerSettings } } };
 
             byte[] serializedMessage = serializer.Serialize(msg);
 
             Message recoveredMessage = serializer.Deserialize(serializedMessage);
-            Assert.AreEqual("Jean Pant", ((IPlayerSettings)recoveredMessage.Data).Name);
+            Assert.AreEqual("Jean Pant", ((IPlayerSettings)recoveredMessage.Items[0].Data).Name);
+        }
+
+        //[Test]
+        public void PrintOutSerializedData()
+        {
+            XmlSerializer realSerializer = new XmlSerializer(typeof(Message));
+            Player player = new Player(null, null, null, null, null);
+            player.Position = new Vector2(100, 200);
+            NetworkPlayerSettings playerSettings = new NetworkPlayerSettings() { Name = "test" };
+            PlayerState state = new PlayerState() { Shots = new List<Shot>() { new Shot(), new Shot() } };
+
+            var msg = new Message() { Items = { new Item() { ClientID = 1, Type = ItemType.Player, Data = player }, new Item() { ClientID = 2, Type = ItemType.PlayerSettings, Data = playerSettings }, new Item() { ClientID = 3, Type = ItemType.Player, Data = state } } };
+
+            var stream = new MemoryStream();
+            realSerializer.Serialize(stream, msg);
+            stream.Position = 0;
+
+            Console.WriteLine("Message is " + stream.ToArray().Length + " bytes long!");
+
+            string tmp = new StreamReader(stream).ReadToEnd();
+            Console.Write(tmp);
         }
     }
 }

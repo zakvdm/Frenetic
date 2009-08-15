@@ -36,42 +36,42 @@ namespace UnitTestLibrary
         [Test]
         public void HandlesNonExistentClientIDWithoutComplaining()
         {
-            networkPlayerController.UpdatePlayerFromNetworkMessage(new Message() { ClientID = 11, Type = MessageType.Player, Data = MockRepository.GenerateStub<IPlayer>() });
-            networkPlayerController.UpdatePlayerSettingsFromNetworkMessage(new Message() { ClientID = 11, Type = MessageType.PlayerSettings, Data = MockRepository.GenerateStub<IPlayerSettings>() });
+            networkPlayerController.UpdatePlayerFromNetworkItem(new Item() { ClientID = 11, Type = ItemType.Player, Data = MockRepository.GenerateStub<IPlayer>() });
+            networkPlayerController.UpdatePlayerSettingsFromNetworkItem(new Item() { ClientID = 11, Type = ItemType.PlayerSettings, Data = MockRepository.GenerateStub<IPlayerSettings>() });
         }
 
         [Test]
-        public void UpdatesPositionBasedOnMessage()
+        public void UpdatesPositionBasedOnItem()
         {
             var receivedPlayer = MockRepository.GenerateStub<IPlayer>();
             receivedPlayer.Position = new Vector2(100, 200);
             clientStateTracker.FindNetworkClient(10).Player.Position = Vector2.Zero;
 
-            networkPlayerController.UpdatePlayerFromNetworkMessage(new Message() { ClientID = 10, Type = MessageType.Player, Data = receivedPlayer });
+            networkPlayerController.UpdatePlayerFromNetworkItem(new Item() { ClientID = 10, Type = ItemType.Player, Data = receivedPlayer });
 
             Assert.AreEqual(new Vector2(100, 200), clientStateTracker.FindNetworkClient(10).Player.Position);
         }
         [Test]
-        public void UpdatesPendingShotBasedOnMessage()
+        public void UpdatesPendingShotBasedOnItem()
         {
             var receivedPlayer = MockRepository.GenerateStub<IPlayer>();
             receivedPlayer.PendingShot = Vector2.One;
 
-            networkPlayerController.UpdatePlayerFromNetworkMessage(new Message() { ClientID = 10, Type = MessageType.Player, Data = receivedPlayer });
+            networkPlayerController.UpdatePlayerFromNetworkItem(new Item() { ClientID = 10, Type = ItemType.Player, Data = receivedPlayer });
 
             Assert.AreEqual(Vector2.One, clientStateTracker.FindNetworkClient(10).Player.PendingShot);
         }
 
         // PlayerState
         [Test]
-        public void UpdatePlayerFromPlayerStateMessageWorksCorrectly()
+        public void UpdatePlayerFromPlayerStateItemWorksCorrectly()
         {
             var stubPlayerState = MockRepository.GenerateStub<IPlayerState>();
             stubPlayerState.Position = new Vector2(1, 2);
             stubPlayerState.Shots = new List<Frenetic.Weapons.Shot>();
             stubPlayerState.Shots.Add(new Frenetic.Weapons.Shot());
 
-            networkPlayerController.UpdatePlayerFromPlayerStateMessage(new Message() { ClientID = 10, Type = MessageType.Player, Data = stubPlayerState });
+            networkPlayerController.UpdatePlayerFromPlayerStateItem(new Item() { ClientID = 10, Type = ItemType.Player, Data = stubPlayerState });
 
             stubPlayerState.AssertWasCalled(me => me.RefreshPlayerValuesFromState(clientStateTracker.FindNetworkClient(10).Player, PlayerType.Network));
         }
@@ -83,20 +83,20 @@ namespace UnitTestLibrary
             stubPlayerState.Shots = new List<Frenetic.Weapons.Shot>();
             stubPlayerState.Shots.Add(new Frenetic.Weapons.Shot());
 
-            networkPlayerController.UpdatePlayerFromPlayerStateMessage(new Message() { ClientID = 99, Type = MessageType.Player, Data = stubPlayerState });
+            networkPlayerController.UpdatePlayerFromPlayerStateItem(new Item() { ClientID = 99, Type = ItemType.Player, Data = stubPlayerState });
 
             stubPlayerState.AssertWasCalled(me => me.RefreshPlayerValuesFromState(localClient.Player, PlayerType.Local));
         }
 
         // PlayerSettings
         [Test]
-        public void UpdatesPlayerSettingsBasedOnMessage()
+        public void UpdatesPlayerSettingsBasedOnItem()
         {
             NetworkPlayerSettings receivedPlayerSettings = new NetworkPlayerSettings() { Name = "Test Name" };
             client.Player.Stub(me => me.PlayerSettings).Return(MockRepository.GenerateStub<IPlayerSettings>());
             client.Player.PlayerSettings.Name = "Nom de Plume";
 
-            networkPlayerController.UpdatePlayerSettingsFromNetworkMessage(new Message() { ClientID = 10, Type = MessageType.PlayerSettings, Data = receivedPlayerSettings });
+            networkPlayerController.UpdatePlayerSettingsFromNetworkItem(new Item() { ClientID = 10, Type = ItemType.PlayerSettings, Data = receivedPlayerSettings });
 
             Assert.AreEqual("Test Name", clientStateTracker.FindNetworkClient(10).Player.PlayerSettings.Name);
         }

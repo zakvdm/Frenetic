@@ -4,8 +4,8 @@ namespace Frenetic.Network
 {
     public interface IIncomingMessageQueue
     {
-        bool HasAvailable(MessageType type);
+        bool HasAvailable(ItemType type);
 
-        Message ReadMessage(MessageType type);
+        Item ReadItem(ItemType type);
     }
 }
