@@ -1,16 +1,17 @@
 ﻿using System;
 using Lidgren.Network;
 using log4net;
+using Frenetic.Engine;
 
 namespace Frenetic.Network.Lidgren
 {
     public class LidgrenClientNetworkSession : IClientNetworkSession
     {
-        public LidgrenClientNetworkSession(INetClient netClient, IMessageSerializer messageSerializer, ILog logger)
+        public LidgrenClientNetworkSession(INetClient netClient, IMessageSerializer messageSerializer, ILoggerFactory loggerFactory)
         {
             _netClient = netClient;
             _messageSerializer = messageSerializer;
-            _logger = logger;
+            _logger = loggerFactory.GetLogger(this.GetType());
 
             ClientDisconnected += (obj, args) => _logger.Info("ZAK HERE: Client disconnected");
         }
@@ -47,7 +48,7 @@ namespace Frenetic.Network.Lidgren
 
             _netClient.SendMessage(buffer, channel);
 
-            _logger.Debug("Sent Message with " + msg.Items.Count + " items " + " and total length " + data.Length + " bytes to the server.");
+            _logger.Debug("Sent Message with " + msg.Items.Count + " items and total length " + data.Length + " bytes to the server.");
         }
 
         #endregion

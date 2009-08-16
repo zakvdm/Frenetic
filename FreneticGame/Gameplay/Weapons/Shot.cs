@@ -11,11 +11,6 @@ namespace Frenetic.Weapons
             EndPoint = endPoint;
         }
 
-        //public Shot()
-        //{
-            // ONLY FOR XML SERIALIZATION!
-        //}
-
         public Vector2 StartPoint { get; set; }
         public Vector2 EndPoint { get; set; }
     }

@@ -53,9 +53,6 @@ namespace Frenetic
             graphics.SynchronizeWithVerticalRetrace = false;
 
             Content.RootDirectory = "Content";
-
-            // TODO: REMOVE:
-            Components.Add(new Frenetic.MyConsole.Components.FPS(this));
         }
 
         /// <summary>
@@ -70,12 +67,15 @@ namespace Frenetic
 
             // initialize the screen manager
             Components.Add(Container.Resolve<ScreenManager>());
+
+            // TODO: REMOVE:
+            Components.Add(new Frenetic.MyConsole.Components.FPS(this));
+
             base.Initialize();
 
             CreatePhysicsSystem();
             
             // Console:
-            Container.Resolve<IMediator>(new TypedParameter(typeof(log4net.ILog), Container.Resolve<log4net.ILog>(new TypedParameter(typeof(Type), typeof(IMediator)))));
             _consoleView = Container.Resolve<ConsoleOverlaySetView>();
             _consoleController = Container.Resolve<ConsoleController>
                         (
@@ -172,7 +172,8 @@ namespace Frenetic
 
             builder.Register<Frenetic.Engine.Timer>().As<ITimer>().ContainerScoped();
 
-            builder.Register<log4net.ILog>((c, p) => log4net.LogManager.GetLogger(p.TypedAs<Type>())).FactoryScoped();
+            //builder.Register<log4net.ILog>((c, p) => log4net.LogManager.GetLogger(p.TypedAs<Type>())).FactoryScoped();
+            builder.Register<log4netLoggerFactory>().As<ILoggerFactory>().SingletonScoped();
             #endregion
 
             #region Menus

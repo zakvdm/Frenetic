@@ -19,6 +19,7 @@ namespace Frenetic.Network.Lidgren
 
             _netServer.SetMessageTypeEnabled(NetMessageType.ConnectionApproval, true);
             _netServer.SetMessageTypeEnabled(NetMessageType.VerboseDebugMessage, true);
+
         }
 
         #region INetServer Members
@@ -34,6 +35,10 @@ namespace Frenetic.Network.Lidgren
         public bool Connected
         {
             get { return (_netServer.Connections.Count > 0); }
+        }
+        public int ConnectionCount
+        {
+            get { return _netServer.Connections.Count; }
         }
 
         public void Start()

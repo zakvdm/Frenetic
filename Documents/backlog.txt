@@ -84,10 +84,9 @@ DONE - 5 - Add some kind of logging framework (so we can start doing debug outpu
 
 ZAK - 13 - Network Code improvements:
   3 - Send InputState instead of Player object
-  3 - Group data into single sends (so send one message that contains all UnreliableInOrder data, one for all ReliableOutOfOrder, and so forth)
-  5 - Only send objects when they change (and eventually only send the changed bits...)
-  2 - Make everything consistent (i.e. fix Shots and Chat messages)
-  3 - Use Attributes to mark how objects are serialized (this is probably just a nice-to-have)
+  DONE - 3 - Group data into single sends (so send one message that contains all UnreliableInOrder data, one for all ReliableOutOfOrder, and so forth)
+  DONE - 5 - Only send objects when they change (Including Shots) (and eventually only send the changed bits...)
+  DONE - 2 - Make everything consistent (i.e. fix Shots and Chat messages)
 
 40 - Games can be recorded and played back 
 	STEP 1:

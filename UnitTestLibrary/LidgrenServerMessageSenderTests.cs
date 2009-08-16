@@ -23,7 +23,7 @@ namespace UnitTestLibrary
         {
             stubNetServer = MockRepository.GenerateStub<INetServer>();
             stubNetConnection = MockRepository.GenerateStub<INetConnection>();
-            serverMessageSender = new LidgrenServerMessageSender(stubNetServer, _serializer);
+            serverMessageSender = new LidgrenServerMessageSender(stubNetServer, _serializer, DummyLogger.Factory);
         }
 
         [Test]

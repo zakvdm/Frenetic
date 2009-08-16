@@ -1,16 +1,19 @@
 ﻿using System;
 using Lidgren.Network;
+using log4net;
+using Frenetic.Engine;
 
 namespace Frenetic.Network
 {
     public class ClientInputSender : IView
     {
-        public ClientInputSender(LocalClient localClient, Log<ChatMessage> chatLog, ISnapCounter snapCounter, IOutgoingMessageQueue outgoingMessageQueue)
+        public ClientInputSender(LocalClient localClient, Log<ChatMessage> chatLog, ISnapCounter snapCounter, IOutgoingMessageQueue outgoingMessageQueue, ILoggerFactory loggerFactory)
         {
             this.LocalClient = localClient;
             this.ChatLog = chatLog;
             this.SnapCounter = snapCounter;
             this.OutgoingMessageQueue = outgoingMessageQueue;
+            this.Logger = loggerFactory.GetLogger(this.GetType());
         }
 
         #region IView Members
@@ -28,7 +31,8 @@ namespace Frenetic.Network
                 AddItemsToOutgoingMessageQueue();
 
                 this.OutgoingMessageQueue.SendMessagesOnQueue();
-               
+
+                this.Logger.Debug("Sent ClientInput state for snap " + this.LastSentSnap);
                 /*
                  * TODO:
                  *      GOOD GOD THIS IS UGLY!
@@ -59,13 +63,18 @@ namespace Frenetic.Network
         {
             this.OutgoingMessageQueue.AddToQueue(new Item() { ClientID = this.LocalClient.ID, Type = ItemType.Player, Data = this.LocalClient.Player });
 
-            this.OutgoingMessageQueue.AddToQueue(new Item() { ClientID = this.LocalClient.ID, Type = ItemType.PlayerSettings, Data = this.LocalClient.Player.PlayerSettings });
+            if (this.LocalClient.Player.PlayerSettings.IsDirty)
+            {
+                this.OutgoingMessageQueue.AddToReliableQueue(new Item() { ClientID = this.LocalClient.ID, Type = ItemType.PlayerSettings, Data = this.LocalClient.Player.PlayerSettings.GetDiff() });
+                this.LocalClient.Player.PlayerSettings.Clean();
+            }
         }
 
         Log<ChatMessage> ChatLog;
         IOutgoingMessageQueue OutgoingMessageQueue;
         LocalClient LocalClient;
         ISnapCounter SnapCounter;
+        ILog Logger;
 
         int LastSentSnap = 0;
     }

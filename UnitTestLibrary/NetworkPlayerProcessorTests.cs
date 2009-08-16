@@ -68,8 +68,8 @@ namespace UnitTestLibrary
         {
             var stubPlayerState = MockRepository.GenerateStub<IPlayerState>();
             stubPlayerState.Position = new Vector2(1, 2);
-            stubPlayerState.Shots = new List<Frenetic.Weapons.Shot>();
-            stubPlayerState.Shots.Add(new Frenetic.Weapons.Shot());
+            stubPlayerState.NewShots = new List<Frenetic.Weapons.Shot>();
+            stubPlayerState.NewShots.Add(new Frenetic.Weapons.Shot());
 
             networkPlayerController.UpdatePlayerFromPlayerStateItem(new Item() { ClientID = 10, Type = ItemType.Player, Data = stubPlayerState });
 
@@ -80,8 +80,8 @@ namespace UnitTestLibrary
         {
             var stubPlayerState = MockRepository.GenerateStub<IPlayerState>();
             stubPlayerState.Position = new Vector2(1, 2);
-            stubPlayerState.Shots = new List<Frenetic.Weapons.Shot>();
-            stubPlayerState.Shots.Add(new Frenetic.Weapons.Shot());
+            stubPlayerState.NewShots = new List<Frenetic.Weapons.Shot>();
+            stubPlayerState.NewShots.Add(new Frenetic.Weapons.Shot());
 
             networkPlayerController.UpdatePlayerFromPlayerStateItem(new Item() { ClientID = 99, Type = ItemType.Player, Data = stubPlayerState });
 

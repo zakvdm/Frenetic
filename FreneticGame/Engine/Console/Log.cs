@@ -2,10 +2,11 @@
 using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
+using Frenetic.Engine;
 
 namespace Frenetic
 {
-    public class Log<T> : IEnumerable
+    public class Log<T> : IEnumerable, IDiffable<List<T>>
     {
         public Log(List<T> messageList)
         {
@@ -30,6 +31,7 @@ namespace Frenetic
             this.DiffedList.Insert(0, message);
         }
 
+        #region IDiffable
         // CACHE STUFF:
         public bool IsDirty
         {
@@ -46,7 +48,7 @@ namespace Frenetic
         {
             this.DiffedList = new List<T>();
         }
-        // ****************
+        #endregion
 
         public T StripOldestMessage()
         {

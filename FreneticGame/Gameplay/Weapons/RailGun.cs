@@ -12,7 +12,7 @@ namespace Frenetic.Weapons
         public RailGun(IRayCaster rayCaster)
         {
             _rayCaster = rayCaster;
-            Shots = new List<Shot>();
+            Shots = new Shots();
         }
 
         public RailGun()
@@ -20,7 +20,7 @@ namespace Frenetic.Weapons
             // ONLY FOR XML SERIALIZER!
         }
 
-        public List<Shot> Shots { get; private set; }
+        public Shots Shots { get; private set; }
 
         public void Shoot(Vector2 origin, Vector2 direction)
         {

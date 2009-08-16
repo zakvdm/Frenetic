@@ -31,39 +31,5 @@ namespace Frenetic.Network
         public Message CurrentMessage { get; private set;  }
 
         INetworkSession NetworkSession;
-
-        // TODO: Delete everything below here (once i dont' need it anymore...)
-        
-        private void Write(Message message)
-        {
-            Write(message, NetChannel.UnreliableInOrder1);
-        }
-
-        // TODO: Make private
-        private void Write(Message message, NetChannel channel)
-        {
-            /*
-            if (_clientNetworkSession != null)
-            {
-                _clientNetworkSession.Send(message, channel);
-            }
-            if (_serverNetworkSession != null)
-            {
-                _serverNetworkSession.SendToAll(message, channel);
-            }*/
-        }
-
-        private void WriteFor(Message message, Client destinationClient)
-        {
-            WriteFor(message, NetChannel.Unreliable, destinationClient.ID);
-        }
-
-        // TODO: Make private...
-        private void WriteFor(Message message, NetChannel channel, int destinationPlayerID)
-        {
-            /*
-            _serverNetworkSession.SendTo(message, channel, destinationPlayerID);
-             */
-        }
     }
 }

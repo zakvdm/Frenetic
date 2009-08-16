@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using UnitTestLibrary.Test.FakeName;
 using Rhino.Mocks;
+using Frenetic.Engine;
 
 namespace UnitTestLibrary
 {
@@ -16,7 +17,7 @@ namespace UnitTestLibrary
         [SetUp]
         public void SetUp()
         {
-            mediator = new Mediator(MockRepository.GenerateStub<log4net.ILog>());
+            mediator = new Mediator(DummyLogger.Factory);
         }
 
         [Test]

@@ -139,7 +139,6 @@ namespace Frenetic
         {
             const string message = "Exit Frenetic?";
             MessageBoxScreen messageBox = _screenFactory.MakeMessageBoxScreen(message);
-            // TODO: Only using the reference to Game in this one method... this needs refactoring...
             messageBox.Accepted += (sender, e) => _quitter.Quit();
         }
 

@@ -45,7 +45,7 @@ namespace Frenetic.Engine.Overlay
             }
 
             // READ TEXT INPUT:
-            foreach (Keys key in XnaKeyboard.AlphaNumericKeys)  // TODO: Is there a way to make this more general? (no XNAKeyboard reference?)
+            foreach (Keys key in XnaKeyboard.AlphaNumericKeys) 
             {
                 if (_keyboard.IsKeyDown(key) && !_keyboard.WasKeyDown(key))
                 {

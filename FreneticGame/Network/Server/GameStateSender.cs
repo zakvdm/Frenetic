@@ -52,7 +52,12 @@ namespace Frenetic
         {
             IPlayerState state = new PlayerState(client.Player);
             this.OutgoingMessageQueue.AddToQueue(new Item() { ClientID = client.ID, Type = ItemType.Player, Data = state });
-            this.OutgoingMessageQueue.AddToQueue(new Item() { ClientID = client.ID, Type = ItemType.PlayerSettings, Data = client.Player.PlayerSettings });
+
+            if (client.Player.PlayerSettings.IsDirty)
+            {
+                this.OutgoingMessageQueue.AddToReliableQueue(new Item() { ClientID = client.ID, Type = ItemType.PlayerSettings, Data = client.Player.PlayerSettings.GetDiff() });
+                client.Player.PlayerSettings.Clean();
+            }
         }
 
         Log<ChatMessage> ChatLog;

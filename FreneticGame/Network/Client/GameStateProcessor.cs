@@ -54,14 +54,6 @@ namespace Frenetic
             {
                 this.ChatLog.AddMessage(msg);
             }
-            /*
-             * TODO: DELETE
-            // We don't want to add duplicate messages:
-            if (this.ChatLog.Exists(msg => msg == newMsg))
-                return;
-
-            this.ChatLog.AddMessage(newMsg);
-            */
         }
 
         LocalClient LocalClient;

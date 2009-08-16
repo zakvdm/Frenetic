@@ -7,6 +7,7 @@ using Lidgren.Network;
 using Microsoft.Xna.Framework;
 using Frenetic.Player;
 using System.Collections.Generic;
+using Frenetic.Engine;
 
 namespace UnitTestLibrary
 {
@@ -27,7 +28,8 @@ namespace UnitTestLibrary
             stubSnapCounter.CurrentSnap = 3;
             chatLog = new Log<ChatMessage>();
             client = new LocalClient(MockRepository.GenerateStub<IPlayer>()) { ID = 9 };
-            clientInputSender = new ClientInputSender(client, chatLog, stubSnapCounter, stubOutgoingMessageQueue); 
+            client.Player.Stub(me => me.PlayerSettings).Return(MockRepository.GenerateStub<IPlayerSettings>());
+            clientInputSender = new ClientInputSender(client, chatLog, stubSnapCounter, stubOutgoingMessageQueue, DummyLogger.Factory); 
         }
 
         [Test]
@@ -99,12 +101,13 @@ namespace UnitTestLibrary
         [Test]
         public void SendsLocalPlayerSettings()
         {
-            client.Player.Stub(me => me.PlayerSettings).Return(new LocalPlayerSettings());
             client.Player.PlayerSettings.Name = "zak";
+            client.Player.PlayerSettings.Stub(me => me.IsDirty).Return(true);
+            client.Player.PlayerSettings.Stub(me => me.GetDiff()).Return(client.Player.PlayerSettings);
 
             clientInputSender.Generate();
 
-            stubOutgoingMessageQueue.AssertWasCalled(x => x.AddToQueue(Arg<Item>.Matches(y => y.Type == ItemType.PlayerSettings && ((LocalPlayerSettings)y.Data).Name == "zak")));
+            stubOutgoingMessageQueue.AssertWasCalled(x => x.AddToReliableQueue(Arg<Item>.Matches(y => y.Type == ItemType.PlayerSettings && ((IPlayerSettings)y.Data).Name == "zak")));
         }
     }
 }

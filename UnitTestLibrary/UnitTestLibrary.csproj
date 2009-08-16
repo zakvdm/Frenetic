@@ -84,6 +84,7 @@
     <Compile Include="ChatMessageTests.cs" />
     <Compile Include="ClientFactoryTests.cs" />
     <Compile Include="ClientStateTrackerTests.cs" />
+    <Compile Include="DummyLogger.cs" />
     <Compile Include="EffectUpdaterTests.cs" />
     <Compile Include="HudControllerTests.cs" />
     <Compile Include="MenuInputStateTests.cs" />
@@ -110,6 +111,7 @@
     <Compile Include="ClientInputSenderTests.cs" />
     <Compile Include="OutgoingMessageQueueTests.cs" />
     <Compile Include="PlayerPacketsTests.cs" />
+    <Compile Include="PlayerSettingsTests.cs" />
     <Compile Include="PlayerTextureBankTests.cs" />
     <Compile Include="PlayerUpdaterTests.cs" />
     <Compile Include="PlayerViewTests.cs" />
@@ -117,6 +119,7 @@
     <Compile Include="RailGunTests.cs" />
     <Compile Include="PlayerScoreTests.cs" />
     <Compile Include="SettingsPersisterTests.cs" />
+    <Compile Include="ShotsTests.cs" />
     <Compile Include="SnapCounterTests.cs" />
     <Compile Include="TimerTests.cs" />
     <Compile Include="TweakablePropertiesLoaderTests.cs" />

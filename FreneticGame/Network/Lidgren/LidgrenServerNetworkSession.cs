@@ -2,17 +2,18 @@
 using Lidgren.Network;
 using System.Collections.Generic;
 using log4net;
+using Frenetic.Engine;
 
 namespace Frenetic.Network.Lidgren
 {
     public class LidgrenServerNetworkSession : IServerNetworkSession
     {
-        public LidgrenServerNetworkSession(INetServer netServer, IServerMessageSender serverMessageSender, IMessageSerializer messageSerializer, ILog logger)
+        public LidgrenServerNetworkSession(INetServer netServer, IServerMessageSender serverMessageSender, IMessageSerializer messageSerializer, ILoggerFactory loggerFactory)
         {
             _netServer = netServer;
             _serverMessageSender = serverMessageSender;
             _messageSerializer = messageSerializer;
-            _logger = logger;
+            _logger = loggerFactory.GetLogger(this.GetType());
 
             ActiveConnections = new Dictionary<int, INetConnection>();
         }

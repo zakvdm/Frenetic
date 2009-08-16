@@ -66,8 +66,8 @@ namespace UnitTestLibrary
         {
             PlayerState state = new PlayerState();
             state.Position = new Vector2(100, 200);
-            state.Shots = new List<Shot>();
-            state.Shots.Add(new Shot(Vector2.UnitY, Vector2.UnitX));
+            state.NewShots = new List<Shot>();
+            state.NewShots.Add(new Shot(Vector2.UnitY, Vector2.UnitX));
             state.Score = new Frenetic.Gameplay.PlayerScore() { Deaths = 3, Kills = 4 };
             Message msg = new Message() { Items = { new Item() { Type = ItemType.Player, Data = state } } };
 
@@ -75,8 +75,8 @@ namespace UnitTestLibrary
             PlayerState recoveredState = (PlayerState)(serializer.Deserialize(serializedMessage)).Items[0].Data;
 
             Assert.AreEqual(new Vector2(100, 200), recoveredState.Position);
-            Assert.AreEqual(1, recoveredState.Shots.Count);
-            Assert.AreEqual(new Shot(Vector2.UnitY, Vector2.UnitX), recoveredState.Shots[0]);
+            Assert.AreEqual(1, recoveredState.NewShots.Count);
+            Assert.AreEqual(new Shot(Vector2.UnitY, Vector2.UnitX), recoveredState.NewShots[0]);
             Assert.AreEqual(4, recoveredState.Score.Kills);
             Assert.AreEqual(3, recoveredState.Score.Deaths);
         }
@@ -107,18 +107,19 @@ namespace UnitTestLibrary
             Assert.AreEqual("Jean Pant", ((IPlayerSettings)recoveredMessage.Items[0].Data).Name);
         }
 
-        //[Test]
+        [Test]
         public void PrintOutSerializedData()
         {
             XmlSerializer realSerializer = new XmlSerializer(typeof(Message));
-            Player player = new Player(null, null, null, null, null);
+            Player player = new Player(null, null, null, new RailGun(null), null);
+            player.CurrentWeapon.Shots.Add(new Shot(player.Position, new Vector2(100, 200)));
             player.Position = new Vector2(100, 200);
             NetworkPlayerSettings playerSettings = new NetworkPlayerSettings() { Name = "test" };
-            PlayerState state = new PlayerState() { Shots = new List<Shot>() { new Shot(), new Shot() } };
+            PlayerState state = new PlayerState(player);
             var chatLog = new List<ChatMessage>();
             chatLog.Add(new ChatMessage() { ClientName = "1", Message = "hello" });
 
-            var msg = new Message() { Items = { new Item() { ClientID = 1, Type = ItemType.Player, Data = player }, new Item() { ClientID = 2, Type = ItemType.PlayerSettings, Data = playerSettings }, new Item() { ClientID = 3, Type = ItemType.Player, Data = state }, new Item() { ClientID = 5, Data = chatLog } } };
+            var msg = new Message() { Items = { new Item() { ClientID = 1, Type = ItemType.Player, Data = player }, new Item() { ClientID = 2, Type = ItemType.PlayerSettings, Data = playerSettings }, new Item() { ClientID = 3, Type = ItemType.Player, Data = state }, new Item() { Type = ItemType.ChatLog, ClientID = 5, Data = chatLog } } };
 
             var stream = new MemoryStream();
             realSerializer.Serialize(stream, msg);

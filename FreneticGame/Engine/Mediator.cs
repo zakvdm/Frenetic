@@ -6,14 +6,15 @@ using System.Linq.Expressions;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using log4net;
+using Frenetic.Engine;
 
 namespace Frenetic
 {
     public class Mediator : IMediator
     {
-        public Mediator(ILog logger)
+        public Mediator(ILoggerFactory loggerFactory)
         {
-            _logger = logger;
+            _logger = loggerFactory.GetLogger(this.GetType());
             _properties = new Dictionary<string, List<Delegate>>();
         }
 

@@ -5,6 +5,7 @@ using Frenetic.Network.Lidgren;
 using Lidgren.Network;
 using Frenetic.Network;
 using Autofac.Builder;
+using Frenetic.Engine;
 
 namespace UnitTestLibrary
 {
@@ -25,7 +26,7 @@ namespace UnitTestLibrary
             stubMessageSender = MockRepository.GenerateStub<IServerMessageSender>();
             stubNetConnection = MockRepository.GenerateStub<INetConnection>();
             stubDisconnectingConnection = MockRepository.GenerateStub<INetConnection>();
-            serverNetworkSession = new LidgrenServerNetworkSession(stubNetServer, stubMessageSender, _serializer, MockRepository.GenerateStub<log4net.ILog>());
+            serverNetworkSession = new LidgrenServerNetworkSession(stubNetServer, stubMessageSender, _serializer, DummyLogger.Factory);
 
             stubNetConnection.Stub(x => x.Status).Return(NetConnectionStatus.Connected);
             stubNetConnection.Stub(x => x.ConnectionID).Return(100);

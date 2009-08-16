@@ -7,6 +7,6 @@ namespace Frenetic.Weapons
     public interface IRailGun
     {
         void Shoot(Vector2 origin, Vector2 direction);
-        List<Shot> Shots { get; }
+        Shots Shots { get; }
     }
 }

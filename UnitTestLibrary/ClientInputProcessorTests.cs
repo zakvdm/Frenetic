@@ -17,7 +17,6 @@ namespace UnitTestLibrary
         QueuedMessageHelper<Item, ItemType> playerQueueMessageHelper;
         QueuedMessageHelper<Item, ItemType> playerSettingsQueueMessageHelper;
         IClientStateTracker stubClientStateTracker;
-        ISnapCounter stubSnapCounter;
         INetworkPlayerProcessor stubNetworkPlayerProcessor;
         Log<ChatMessage> serverLog;
         Client client;
@@ -37,12 +36,11 @@ namespace UnitTestLibrary
             stubIncomingMessageQueue.Stub(x => x.ReadItem(Arg<ItemType>.Is.Equal(ItemType.PlayerSettings))).Do(playerSettingsQueueMessageHelper.GetNextQueuedMessage);
             stubIncomingMessageQueue.Stub(x => x.HasAvailable(ItemType.PlayerSettings)).Do(playerSettingsQueueMessageHelper.HasMessageAvailable);
             stubClientStateTracker = MockRepository.GenerateStub<IClientStateTracker>();
-            stubSnapCounter = MockRepository.GenerateStub<ISnapCounter>();
             stubNetworkPlayerProcessor = MockRepository.GenerateStub<INetworkPlayerProcessor>();
             serverLog = new Log<ChatMessage>();
             client = new Client(MockRepository.GenerateStub<IPlayer>());
             client.Player.Stub(me => me.PlayerSettings).Return(MockRepository.GenerateStub<IPlayerSettings>());
-            clientInputProcessor = new ClientInputProcessor(stubNetworkPlayerProcessor, serverLog, stubClientStateTracker, stubSnapCounter, stubIncomingMessageQueue);
+            clientInputProcessor = new ClientInputProcessor(stubNetworkPlayerProcessor, serverLog, stubClientStateTracker, stubIncomingMessageQueue);
         }
 
         [Test]

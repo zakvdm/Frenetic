@@ -6,12 +6,11 @@ namespace Frenetic.Network
 {
     public class ClientInputProcessor : IController
     {
-        public ClientInputProcessor(INetworkPlayerProcessor networkPlayerProcessor, Log<ChatMessage> serverChatLog, IClientStateTracker clientStateTracker, ISnapCounter snapCounter, IIncomingMessageQueue incomingMessageQueue)
+        public ClientInputProcessor(INetworkPlayerProcessor networkPlayerProcessor, Log<ChatMessage> serverChatLog, IClientStateTracker clientStateTracker, IIncomingMessageQueue incomingMessageQueue)
         {
             this.NetworkPlayerProcessor = networkPlayerProcessor;
             this.ServerChatLog = serverChatLog;
             this.ClientStateTracker = clientStateTracker;
-            this.SnapCounter = snapCounter;
             this.IncomingMessageQueue = incomingMessageQueue;
         }
 
@@ -53,29 +52,11 @@ namespace Frenetic.Network
                 chatMsg.ClientName = this.ClientStateTracker.FindNetworkClient(item.ClientID).Player.PlayerSettings.Name;
                 this.ServerChatLog.AddMessage(chatMsg);
             }
-
-
-            /*
-             * TODO: DELETE
-            ChatMessage chatMsg = (ChatMessage)item.Data;
-
-            chatMsg.ClientName = this.ClientStateTracker.FindNetworkClient(item.ClientID).Player.PlayerSettings.Name;
-
-            // Before we add this message to the server log, let's check that we haven't already added it
-            if (_chatLogDiffer.IsNewClientChatMessage(chatMsg))
-            {
-                // ChatMessages should be added to the server log with the current server snap:
-                chatMsg.Snap = this.SnapCounter.CurrentSnap;
-
-                this.ServerChatLog.AddMessage(chatMsg);
-            }
-             */
         }
 
         INetworkPlayerProcessor NetworkPlayerProcessor;
         Log<ChatMessage> ServerChatLog;
         IClientStateTracker ClientStateTracker;
-        ISnapCounter SnapCounter; // TODO: DO I STILL NEED THIS?
         IIncomingMessageQueue IncomingMessageQueue;
     }
 }

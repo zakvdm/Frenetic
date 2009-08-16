@@ -4,6 +4,7 @@ using Frenetic.Network.Lidgren;
 using Rhino.Mocks;
 using Lidgren.Network;
 using Frenetic.Network;
+using Frenetic.Engine;
 
 
 namespace UnitTestLibrary
@@ -19,7 +20,7 @@ namespace UnitTestLibrary
         {
             stubNetClient = MockRepository.GenerateStub<INetClient>();
             stubSerializer = MockRepository.GenerateStub<IMessageSerializer>();
-            clientNetworkSession = new LidgrenClientNetworkSession(stubNetClient, stubSerializer, MockRepository.GenerateStub<log4net.ILog>());
+            clientNetworkSession = new LidgrenClientNetworkSession(stubNetClient, stubSerializer, DummyLogger.Factory);
         }
 
         // CONNECTING:

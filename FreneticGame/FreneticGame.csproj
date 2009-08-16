@@ -97,6 +97,7 @@
     <Compile Include="Engine\Camera.cs" />
     <Compile Include="Engine\Console\ChatMessage.cs" />
     <Compile Include="Engine\Console\ConsoleOverlaySetView.cs" />
+    <Compile Include="Engine\IDiffable.cs" />
     <Compile Include="Engine\Console\InputLine.cs" />
     <Compile Include="Engine\Console\IConsole.cs" />
     <Compile Include="Engine\Console\IMessageConsole.cs" />
@@ -109,6 +110,7 @@
     <Compile Include="Engine\IGame.cs" />
     <Compile Include="Engine\ISettingsPersister.cs" />
     <Compile Include="Engine\ITimer.cs" />
+    <Compile Include="Engine\ILoggerFactory.cs" />
     <Compile Include="Engine\Quitter.cs" />
     <Compile Include="Engine\SettingsPersister.cs" />
     <Compile Include="Engine\Timer.cs" />
@@ -127,6 +129,7 @@
     <Compile Include="Gameplay\Weapons\RailGun.cs" />
     <Compile Include="Gameplay\Weapons\RailGunView.cs" />
     <Compile Include="Gameplay\Weapons\Shot.cs" />
+    <Compile Include="Gameplay\Weapons\Shots.cs" />
     <Compile Include="Graphics\IEffect.cs" />
     <Compile Include="Graphics\IPrimitiveDrawer.cs" />
     <Compile Include="Graphics\MercuryParticleEffect.cs" />
@@ -207,7 +210,6 @@
     <Compile Include="Network\Server\ClientInputProcessor.cs" />
     <Compile Include="Network\XmlMessageSerializer.cs" />
     <Compile Include="OperationCompletedEventArgs.cs" />
-    <Compile Include="Physics\DumbRayCaster.cs" />
     <Compile Include="Physics\DummyPhysicsComponent.cs" />
     <Compile Include="Physics\FarseerPhysicsComponent.cs" />
     <Compile Include="Physics\FarseerRayCaster.cs" />

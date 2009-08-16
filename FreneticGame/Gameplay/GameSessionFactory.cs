@@ -47,8 +47,7 @@ namespace Frenetic
             // TODO: Move this somewhere more appropriate
             // Make queues for a SERVER network session:
             // *****************************************
-            IServerNetworkSession serverNetworkSession = ServerContainer.Resolve<IServerNetworkSession>(
-                    new TypedParameter(typeof(ILog), ServerContainer.Resolve<ILog>(new TypedParameter(typeof(Type), typeof(IServerNetworkSession)))));
+            IServerNetworkSession serverNetworkSession = ServerContainer.Resolve<IServerNetworkSession>();
             ServerContainer.Resolve<IClientStateTracker>(new TypedParameter(typeof(INetworkSession), serverNetworkSession),
                                                          new TypedParameter(typeof(IClientFactory), ServerContainer.Resolve<ServerSideClientFactory>()));
 
@@ -91,8 +90,7 @@ namespace Frenetic
             // TODO: Move this somewhere more appropriate
             // Make queues for a CLIENT network session:
             // *****************************************
-            IClientNetworkSession clientNetworkSession = ClientContainer.Resolve<IClientNetworkSession>(
-                        new TypedParameter(typeof(ILog), ClientContainer.Resolve<ILog>(new TypedParameter(typeof(Type), typeof(IClientNetworkSession)))));
+            IClientNetworkSession clientNetworkSession = ClientContainer.Resolve<IClientNetworkSession>();
             // *****************************************
 
             IGameSession gameSession = ClientContainer.Resolve<IGameSession>();

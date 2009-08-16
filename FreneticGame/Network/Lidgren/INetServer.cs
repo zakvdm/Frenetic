@@ -9,6 +9,7 @@ namespace Frenetic.Network.Lidgren
         int Port { get; set; }
         bool Connected { get; }
         bool IsListening { get; }
+        int ConnectionCount { get; }
 
         void Start();
         void Shutdown(string reason);

@@ -49,15 +49,6 @@ namespace Frenetic
             return true;
         }
 
-        /*
-        bool IsStaticProperty(PropertyInfo propertyInfo)
-        {
-            if (!propertyInfo.GetSetMethod().IsStatic || !propertyInfo.GetGetMethod().IsStatic)
-                throw new InvalidOperationException("Tweakable property {" + propertyInfo.ReflectedType + "." + propertyInfo.Name + "} is of the wrong type (should be public static read/write)");
-
-            return true;
-        }*/
-
         IMediator _mediator;
     }
 }
