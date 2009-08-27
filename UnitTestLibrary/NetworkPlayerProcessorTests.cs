@@ -73,10 +73,10 @@ namespace UnitTestLibrary
 
             networkPlayerController.UpdatePlayerFromPlayerStateItem(new Item() { ClientID = 10, Type = ItemType.Player, Data = stubPlayerState });
 
-            stubPlayerState.AssertWasCalled(me => me.RefreshPlayerValuesFromState(clientStateTracker.FindNetworkClient(10).Player, PlayerType.Network));
+            stubPlayerState.AssertWasCalled(me => me.RefreshPlayerValuesFromState(clientStateTracker.FindNetworkClient(10).Player));
         }
         [Test]
-        public void DifferentiatesBetweenNetworkAndLocalPlayer()
+        public void UpdatesLocalPlayerFromPlayerStateItem()
         {
             var stubPlayerState = MockRepository.GenerateStub<IPlayerState>();
             stubPlayerState.Position = new Vector2(1, 2);
@@ -85,7 +85,7 @@ namespace UnitTestLibrary
 
             networkPlayerController.UpdatePlayerFromPlayerStateItem(new Item() { ClientID = 99, Type = ItemType.Player, Data = stubPlayerState });
 
-            stubPlayerState.AssertWasCalled(me => me.RefreshPlayerValuesFromState(localClient.Player, PlayerType.Local));
+            stubPlayerState.AssertWasCalled(me => me.RefreshPlayerValuesFromState(localClient.Player));
         }
 
         // PlayerSettings

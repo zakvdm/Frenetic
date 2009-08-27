@@ -12,11 +12,11 @@ namespace UnitTestLibrary
     [TestFixture]
     public class PlayerPacketsTests
     {
-        Player player;
+        BasePlayer player;
         [SetUp]
         public void SetUp()
         {
-            player = new Player(null, null, null, new RailGun(null), null);
+            player = new NetworkPlayer(null, null, new RailGun(null), null);
         }
 
         [Test]
@@ -48,6 +48,9 @@ namespace UnitTestLibrary
         [Test]
         public void CanRefreshNetworkPlayerObjectWithPlayerState()
         {
+            var player = MockRepository.GenerateStub<IPlayer>();
+            player.Stub(me => me.CurrentWeapon).Return(new RailGun(null));
+            player.Stub(me => me.PlayerScore).Return(new PlayerScore());
             player.CurrentWeapon.Shots.Add(new Shot());
             PlayerState state = new PlayerState();
             state.IsAlive = true;
@@ -58,34 +61,15 @@ namespace UnitTestLibrary
             state.NewShots.Add(new Shot(Vector2.UnitY, Vector2.Zero));
             state.Score = new PlayerScore() { Deaths = 3, Kills = 20 };
 
-            state.RefreshPlayerValuesFromState(player, PlayerType.Network);
+            state.RefreshPlayerValuesFromState(player);
 
             Assert.IsTrue(state.IsAlive);
-            Assert.AreEqual(new Vector2(4, 8), player.Position);
+            player.AssertWasCalled(me => me.UpdatePositionFromNetwork(state.Position, 0.05f));
             Assert.AreEqual(3, player.CurrentWeapon.Shots.Count);
             Assert.AreEqual(new Shot(Vector2.One, Vector2.UnitX), player.CurrentWeapon.Shots[1]);
             Assert.AreEqual(new Shot(Vector2.UnitY, Vector2.Zero), player.CurrentWeapon.Shots[2]);
             Assert.AreEqual(3, player.PlayerScore.Deaths);
             Assert.AreEqual(20, player.PlayerScore.Kills);
-        }
-        [Test]
-        public void DoesntRefreshPositionOfLocalPlayer()
-        {
-            PlayerState state = new PlayerState();
-            state.IsAlive = false;
-            state.Position = new Vector2(4, 8);
-            state.NewShots = new List<Shot>();
-            state.NewShots.Add(new Shot(Vector2.One, Vector2.UnitX));
-            state.NewShots.Add(new Shot(Vector2.UnitY, Vector2.Zero));
-            player.Position = Vector2.Zero;
-
-            state.RefreshPlayerValuesFromState(player, PlayerType.Local);
-
-            Assert.IsFalse(player.IsAlive);
-            Assert.AreEqual(Vector2.Zero, player.Position);
-            Assert.AreEqual(2, player.CurrentWeapon.Shots.Count);
-            Assert.AreEqual(new Shot(Vector2.One, Vector2.UnitX), player.CurrentWeapon.Shots[0]);
-            Assert.AreEqual(new Shot(Vector2.UnitY, Vector2.Zero), player.CurrentWeapon.Shots[1]);
         }
     }
 }

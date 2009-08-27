@@ -21,7 +21,11 @@ namespace Frenetic.Player
         void MoveRight();
         void Shoot(Vector2 targetPosition);
 
-        event Action OnDeath;
+        // NETWORK:
+        void UpdatePositionFromNetwork(Vector2 newestPosition, float deliveryTime);
+
+        // EVENTS:
+        event Action Died;
 
         Vector2? PendingShot { get; set; }
     }

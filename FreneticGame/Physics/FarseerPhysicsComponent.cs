@@ -5,6 +5,14 @@ using Microsoft.Xna.Framework;
 
 namespace Frenetic.Physics
 {
+    public class LocalPlayerFarseerPhysicsComponent : FarseerPhysicsComponent
+    {
+        public LocalPlayerFarseerPhysicsComponent(Body body, Geom geom)
+            : base(body, geom)
+        {
+            //body.IgnoreGravity = false;
+        }       
+    }
     public class FarseerPhysicsComponent : IPhysicsComponent
     {
         public delegate IPhysicsComponent Factory(Vector2 size);
@@ -16,6 +24,7 @@ namespace Frenetic.Physics
             _geom.Tag = this;
 
             _geom.FrictionCoefficient = 1.1f;
+            //_body.IgnoreGravity = true;
 
             _geom.OnCollision += new CollisionEventHandler((geom1, geom2, contactList) =>
                 {
@@ -66,6 +75,10 @@ namespace Frenetic.Physics
             {
                 return new Vector2(_body.LinearVelocity.X, _body.LinearVelocity.Y);
             }
+            set
+            {
+                _body.LinearVelocity = value;
+            }
         }
         #endregion
 
@@ -79,12 +92,12 @@ namespace Frenetic.Physics
             _body.ApplyForce(force);
         }
 
-        public void HitByWeapon()
+        public void OnShot()
         {
-            OnShot();
+            Shot();
         }
 
-        public event Action OnShot = delegate { };
+        public event Action Shot = delegate { };
         public event Action CollidedWithWorld = delegate { };
 
         Body _body;

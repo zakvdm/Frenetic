@@ -79,12 +79,22 @@ namespace UnitTestLibrary
         }
 
         [Test]
-        public void RaisesEventWhenHitByWeapon()
+        public void CanGetAndSetLinearVelocity()
+        {
+            Assert.AreEqual(new Vector2(0, 0), farseerPComponent.LinearVelocity);
+
+            farseerPComponent.LinearVelocity = new Vector2(3, 5);
+
+            Assert.AreEqual(new Vector2(3, 5), farseerPComponent.LinearVelocity);
+        }
+
+        [Test]
+        public void RaisesEventWhenShot()
         {
             bool raisedEvent = false;
-            farseerPComponent.OnShot += () => raisedEvent = true;
+            farseerPComponent.Shot += () => raisedEvent = true;
 
-            farseerPComponent.HitByWeapon();
+            farseerPComponent.OnShot();
 
             Assert.IsTrue(raisedEvent);
         }

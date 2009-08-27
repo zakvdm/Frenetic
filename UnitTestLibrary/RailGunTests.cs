@@ -61,8 +61,8 @@ namespace UnitTestLibrary
 
             railGun.Shoot(Vector2.Zero, Vector2.One);
 
-            physicsComp1.AssertWasCalled(me => me.HitByWeapon());
-            physicsComp2.AssertWasCalled(me => me.HitByWeapon());
+            physicsComp1.AssertWasCalled(me => me.OnShot());
+            physicsComp2.AssertWasCalled(me => me.OnShot());
         }
 
         [Test]

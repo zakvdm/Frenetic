@@ -34,7 +34,7 @@ namespace Frenetic.Weapons
 
             foreach (IPhysicsComponent physicsComponent in hitObjects)
             {
-                physicsComponent.HitByWeapon();
+                physicsComponent.OnShot();
             }
             
             this.Shots.Add(new Shot(origin, endPoint));

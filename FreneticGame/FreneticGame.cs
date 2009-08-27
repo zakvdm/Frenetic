@@ -231,7 +231,8 @@ namespace Frenetic
             builder.Register<PlayerUpdater>().ContainerScoped();
             builder.Register<NetworkPlayerSettings>().As<IPlayerSettings>().FactoryScoped();
             builder.Register<LocalPlayerSettings>().SingletonScoped();
-            builder.Register<Frenetic.Player.Player>().As<IPlayer>().FactoryScoped();
+            builder.Register<NetworkPlayer>().As<IPlayer>().FactoryScoped();
+            builder.Register<LocalPlayer>().FactoryScoped();
             builder.Register<List<IPlayer>>().ContainerScoped();
             builder.Register<PlayerView>().ContainerScoped();
             builder.Register((c) => (IBoundaryCollider)new WorldBoundaryCollider(_screenWidth, _screenHeight));
@@ -285,6 +286,6 @@ namespace Frenetic
         IContainer Container { get; set; }
         const int _screenWidth = 800;
         const int _screenHeight = 600;
-        Vector2 _gravity = new Vector2(0, 0.0002f);
+        Vector2 _gravity = new Vector2(0, 110f);
     }
 }

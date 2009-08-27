@@ -44,7 +44,7 @@ namespace Frenetic.Network
     }
 
    
-    [XmlInclude(typeof(Frenetic.Player.Player))]
+    [XmlInclude(typeof(LocalPlayer))]
     [XmlInclude(typeof(PlayerState))]
     [XmlInclude(typeof(NetworkPlayerSettings))]
     [XmlInclude(typeof(LocalPlayerSettings))]

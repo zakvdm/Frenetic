@@ -108,6 +108,7 @@ namespace Frenetic
             IOutgoingMessageQueue outgoingMessageQueue = ClientContainer.Resolve<IOutgoingMessageQueue>(
                     new TypedParameter(typeof(INetworkSession), clientNetworkSession));
             clientNetworkSession.Join(14242);
+            //clientNetworkSession.Join("5.224.172.196", 14242);
 
             gameSession.Controllers.Add(ClientContainer.Resolve<PhysicsController>());
             
@@ -136,7 +137,7 @@ namespace Frenetic
         private IPlayer CreateClientComponents(IGameSession gameSession)
         {
             // Make local player:
-            IPlayer localPlayer = ClientContainer.Resolve<IPlayer>(new TypedParameter(typeof(IPlayerSettings), ClientContainer.Resolve<LocalPlayerSettings>()));
+            IPlayer localPlayer = ClientContainer.Resolve<LocalPlayer>(new TypedParameter(typeof(IPlayerSettings), ClientContainer.Resolve<LocalPlayerSettings>()));
             var localClient = ClientContainer.Resolve<LocalClient>(new TypedParameter(typeof(IPlayer), localPlayer));
 
             gameSession.Controllers.Add(ClientContainer.Resolve<PhysicsController>());

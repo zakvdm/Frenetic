@@ -6,12 +6,6 @@ using Frenetic.Gameplay;
 
 namespace Frenetic.Player
 {
-    public enum PlayerType
-    {
-        Local,
-        Network
-    }
-
     public interface IPlayerState
     {
         bool IsAlive { get; set; }
@@ -20,7 +14,7 @@ namespace Frenetic.Player
 
         PlayerScore Score { get; set; }
 
-        void RefreshPlayerValuesFromState(IPlayer player, PlayerType playerType);
+        void RefreshPlayerValuesFromState(IPlayer player);
     }
 
     public class PlayerState : IPlayerState
@@ -51,12 +45,10 @@ namespace Frenetic.Player
         public List<Shot> NewShots { get; set; }
         public PlayerScore Score { get; set; }
 
-        public void RefreshPlayerValuesFromState(IPlayer player, PlayerType playerType)
+        public void RefreshPlayerValuesFromState(IPlayer player)
         {
-            if (playerType == PlayerType.Network)
-            {
-                player.Position = this.Position;
-            }
+            // TODO: Implement a rolling average
+            player.UpdatePositionFromNetwork(this.Position, 0.40f);
 
             player.IsAlive = this.IsAlive;
             player.CurrentWeapon.Shots.AddRange(this.NewShots);

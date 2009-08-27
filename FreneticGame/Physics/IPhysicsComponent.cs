@@ -10,15 +10,15 @@ namespace Frenetic.Physics
     {
         bool IsStatic { get; set; }
         Vector2 Position { get; set; }
-        Vector2 LinearVelocity { get; }
+        Vector2 LinearVelocity { get; set; }
         Vector2 Size { get; set; }
 
         void ApplyImpulse(Vector2 impulse);
         void ApplyForce(Vector2 force);
 
-        void HitByWeapon();
+        void OnShot();
 
         event Action CollidedWithWorld;
-        event Action OnShot;
+        event Action Shot;
     }
 }

@@ -16,7 +16,7 @@ namespace Frenetic.Physics
 
         public void Process(float elapsedTime)
         {
-            _physicsSimulator.Update(elapsedTime * 1000f); // We convert to milliseconds
+            _physicsSimulator.Update(elapsedTime);
         }
 
         #endregion

@@ -122,6 +122,8 @@
     <Compile Include="Gameplay\HUD\ScoreHudView.cs" />
     <Compile Include="Gameplay\Player\INetworkPlayerProcessor.cs" />
     <Compile Include="Gameplay\Player\IPlayerSettings.cs" />
+    <Compile Include="Gameplay\Player\LocalPlayer.cs" />
+    <Compile Include="Gameplay\Player\NetworkPlayer.cs" />
     <Compile Include="Gameplay\Player\PlayerState.cs" />
     <Compile Include="Gameplay\Player\PlayerUpdater.cs" />
     <Compile Include="Gameplay\Weapons\IRailGun.cs" />
@@ -170,7 +172,7 @@
     <Compile Include="Network\ClientStateTracker.cs" />
     <Compile Include="Network\Client\ClientInputSender.cs" />
     <Compile Include="Gameplay\Player\NetworkPlayerProcessor.cs" />
-    <Compile Include="Gameplay\Player\Player.cs" />
+    <Compile Include="Gameplay\Player\BasePlayer.cs" />
     <Compile Include="Gameplay\Player\PlayerSettings.cs" />
     <Compile Include="Gameplay\Player\PlayerView.cs" />
     <Compile Include="Graphics\IContentManager.cs" />

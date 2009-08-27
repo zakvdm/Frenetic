@@ -18,7 +18,7 @@ namespace UnitTestLibrary
     [TestFixture]
     public class PlayerTests
     {
-        Frenetic.Player.Player player;
+        Frenetic.Player.BasePlayer player;
         IPlayerSettings stubPlayerSettings;
         IPhysicsComponent stubPhysicsComponent;
         IBoundaryCollider stubBoundaryCollider;
@@ -31,14 +31,14 @@ namespace UnitTestLibrary
             stubPhysicsComponent = MockRepository.GenerateStub<IPhysicsComponent>();
             stubBoundaryCollider = MockRepository.GenerateStub<IBoundaryCollider>();
             stubTimer = MockRepository.GenerateStub<ITimer>();
-            player = new Frenetic.Player.Player(stubPlayerSettings, stubPhysicsComponent, stubBoundaryCollider, MockRepository.GenerateStub<IRailGun>(), stubTimer);
+            player = new BasePlayer(stubPlayerSettings, stubPhysicsComponent, stubBoundaryCollider, MockRepository.GenerateStub<IRailGun>(), stubTimer);
         }
 
         [Test]
         public void RegistersWithIPhysicsComponentForRelevantEvents()
         {
             stubPhysicsComponent.AssertWasCalled(me => me.CollidedWithWorld += Arg<Action>.Is.Anything);
-            stubPhysicsComponent.AssertWasCalled(me => me.OnShot += Arg<Action>.Is.Anything);
+            stubPhysicsComponent.AssertWasCalled(me => me.Shot += Arg<Action>.Is.Anything);
         }
 
         [Test]
@@ -77,7 +77,7 @@ namespace UnitTestLibrary
 
             player.Jump();
 
-            stubPhysicsComponent.AssertWasCalled(pc => pc.ApplyImpulse(Player.JumpImpulse));
+            stubPhysicsComponent.AssertWasCalled(pc => pc.ApplyImpulse(BasePlayer.JumpImpulse));
         }
         [Test]
         public void JumpAppliesNoImpulseToThePlayersBodyIfNotInContactWithTheLevel()
@@ -86,21 +86,21 @@ namespace UnitTestLibrary
 
             player.Jump();
 
-            stubPhysicsComponent.AssertWasNotCalled(pc => pc.ApplyImpulse(Player.JumpImpulse));
+            stubPhysicsComponent.AssertWasNotCalled(pc => pc.ApplyImpulse(BasePlayer.JumpImpulse));
         }
         [Test]
         public void MoveLeftAppliesTheCorrectForceToThePlayersBodyWhenStationary()
         {
             player.MoveLeft();
 
-            stubPhysicsComponent.AssertWasCalled(pc => pc.ApplyForce(Player.MoveForce));
+            stubPhysicsComponent.AssertWasCalled(pc => pc.ApplyForce(BasePlayer.MoveForce));
         }
         [Test]
         public void MoveRightAppliesTheCorrectForceToThePlayersBodyWhenStationary()
         {
             player.MoveRight();
 
-            stubPhysicsComponent.AssertWasCalled(pc => pc.ApplyForce(Player.MoveForce * -1));
+            stubPhysicsComponent.AssertWasCalled(pc => pc.ApplyForce(BasePlayer.MoveForce * -1));
         }
         [Test]
         public void PlayerVelocityIsCappedToTheLeft()
@@ -109,7 +109,7 @@ namespace UnitTestLibrary
 
             player.MoveLeft();
 
-            stubPhysicsComponent.AssertWasNotCalled(pc => pc.ApplyForce(Player.MoveForce));
+            stubPhysicsComponent.AssertWasNotCalled(pc => pc.ApplyForce(BasePlayer.MoveForce));
         }
         [Test]
         public void PlayerVelocityIsCappedToTheRight()
@@ -118,7 +118,7 @@ namespace UnitTestLibrary
 
             player.MoveRight();
 
-            stubPhysicsComponent.AssertWasNotCalled(pc => pc.ApplyForce(Player.MoveForce * -1));
+            stubPhysicsComponent.AssertWasNotCalled(pc => pc.ApplyForce(BasePlayer.MoveForce * -1));
         }
 
         // SHOOTING AND BEING SHOT:
@@ -136,9 +136,9 @@ namespace UnitTestLibrary
         {
             bool raisedOnDeath = false;
             Assert.IsTrue(player.IsAlive);
-            player.OnDeath += () => raisedOnDeath = !raisedOnDeath;
+            player.Died += () => raisedOnDeath = !raisedOnDeath;
 
-            stubPhysicsComponent.Raise(me => me.OnShot += null);
+            stubPhysicsComponent.Raise(me => me.Shot += null);
 
             Assert.IsFalse(player.IsAlive);
             Assert.IsTrue(raisedOnDeath);
@@ -148,7 +148,7 @@ namespace UnitTestLibrary
         public void SetsRespawnTimerOnDead()
         {
             // At the moment just Shooting the player kills it...
-            stubPhysicsComponent.Raise(me => me.OnShot += null);
+            stubPhysicsComponent.Raise(me => me.Shot += null);
 
             stubTimer.AssertWasCalled(me => me.AddActionTimer(Arg<float>.Is.Anything, Arg<Action>.Is.Anything));
         }

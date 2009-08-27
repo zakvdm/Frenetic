@@ -8,6 +8,7 @@ using FarseerGames.FarseerPhysics.Dynamics;
 using FarseerGames.FarseerPhysics.Collisions;
 using Microsoft.Xna.Framework;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace Frenetic.Autofac
 {
@@ -31,31 +32,43 @@ namespace Frenetic.Autofac
             builder.Register<PhysicsSettings>().SingletonScoped();
 
             //IPhysicsComponent
-            builder.Register((c, p) =>
-                {
-                    Vector2 size;
-                    if (p.Count() > 0)
-                        size = p.Named<Vector2>("size");
-                    else
-                        size = new Vector2(20f, 30f);
-
-                    var simulator = c.Resolve<IPhysicsSimulator>().PhysicsSimulator;
-
-                    var vertices = Vertices.CreateSimpleRectangle(size.X, size.Y);
-                    var body = BodyFactory.Instance.CreatePolygonBody(simulator, vertices, 1000f);
-                    var geom = GeomFactory.Instance.CreateSATPolygonGeom(simulator, body, vertices, 1)[0];
-
-                    body.MomentOfInertia = float.MaxValue;
-
-                    simulator.ProcessAddedAndRemoved();
-
-                    return new FarseerPhysicsComponent(body, geom);
-                }).As<IPhysicsComponent>().FactoryScoped();
+            builder.Register((c, p) => { return CreatePhysicsComponent<FarseerPhysicsComponent>(c, p, false); }).As<IPhysicsComponent>().FactoryScoped();
+            builder.Register((c, p) => { return CreatePhysicsComponent<LocalPlayerFarseerPhysicsComponent>(c, p, true); }).As<LocalPlayerFarseerPhysicsComponent>().ContainerScoped();
             builder.RegisterGeneratedFactory<FarseerPhysicsComponent.Factory>(new TypedService(typeof(IPhysicsComponent))).ContainerScoped();
 
             builder.Register<PhysicsController>().ContainerScoped();
 
             builder.Register<FarseerRayCaster>().As<IRayCaster>().ContainerScoped();
+        }
+
+        PhysicsComponentType CreatePhysicsComponent<PhysicsComponentType>(IContext container, IEnumerable<Parameter> parameters, bool localPlayer) where PhysicsComponentType : IPhysicsComponent
+        {
+            Vector2 size;
+            object tmp;
+            if (parameters.Count() > 0)
+            {
+                size = parameters.Named<Vector2>("size");
+            }
+            else
+            {
+                size = new Vector2(20f, 30f);
+            }
+
+            var simulator = container.Resolve<IPhysicsSimulator>().PhysicsSimulator;
+
+            var vertices = Vertices.CreateSimpleRectangle(size.X, size.Y);
+            var body = BodyFactory.Instance.CreatePolygonBody(simulator, vertices, 1000f);
+            var geom = GeomFactory.Instance.CreateSATPolygonGeom(simulator, body, vertices, 1)[0];
+
+            body.MomentOfInertia = float.MaxValue;
+
+            simulator.ProcessAddedAndRemoved();
+
+            if (typeof(PhysicsComponentType) == typeof(FarseerPhysicsComponent))
+            {
+                return (PhysicsComponentType)(IPhysicsComponent)new FarseerPhysicsComponent(body, geom);
+            }
+            return (PhysicsComponentType)(IPhysicsComponent)new LocalPlayerFarseerPhysicsComponent(body, geom);
         }
 
         IPhysicsSimulator _clientPhysicsSimulator;
