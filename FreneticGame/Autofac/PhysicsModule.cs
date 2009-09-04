@@ -32,8 +32,8 @@ namespace Frenetic.Autofac
             builder.Register<PhysicsSettings>().SingletonScoped();
 
             //IPhysicsComponent
-            builder.Register((c, p) => { return CreatePhysicsComponent<FarseerPhysicsComponent>(c, p, false); }).As<IPhysicsComponent>().FactoryScoped();
-            builder.Register((c, p) => { return CreatePhysicsComponent<LocalPlayerFarseerPhysicsComponent>(c, p, true); }).As<LocalPlayerFarseerPhysicsComponent>().ContainerScoped();
+            builder.Register((c, p) => { return CreatePhysicsComponent<FarseerPhysicsComponent>(c, p, (body, geom) => new FarseerPhysicsComponent(body, geom)); }).As<IPhysicsComponent>().FactoryScoped();
+            builder.Register((c, p) => { return CreatePhysicsComponent<LocalPlayerFarseerPhysicsComponent>(c, p, (body, geom) => new LocalPlayerFarseerPhysicsComponent(body, geom)); }).As<LocalPlayerFarseerPhysicsComponent>().ContainerScoped();
             builder.RegisterGeneratedFactory<FarseerPhysicsComponent.Factory>(new TypedService(typeof(IPhysicsComponent))).ContainerScoped();
 
             builder.Register<PhysicsController>().ContainerScoped();
@@ -41,7 +41,7 @@ namespace Frenetic.Autofac
             builder.Register<FarseerRayCaster>().As<IRayCaster>().ContainerScoped();
         }
 
-        PhysicsComponentType CreatePhysicsComponent<PhysicsComponentType>(IContext container, IEnumerable<Parameter> parameters, bool localPlayer) where PhysicsComponentType : IPhysicsComponent
+        PhysicsComponentType CreatePhysicsComponent<PhysicsComponentType>(IContext container, IEnumerable<Parameter> parameters, Func<Body, Geom, PhysicsComponentType> create) where PhysicsComponentType : IPhysicsComponent
         {
             Vector2 size;
             object tmp;
@@ -64,11 +64,7 @@ namespace Frenetic.Autofac
 
             simulator.ProcessAddedAndRemoved();
 
-            if (typeof(PhysicsComponentType) == typeof(FarseerPhysicsComponent))
-            {
-                return (PhysicsComponentType)(IPhysicsComponent)new FarseerPhysicsComponent(body, geom);
-            }
-            return (PhysicsComponentType)(IPhysicsComponent)new LocalPlayerFarseerPhysicsComponent(body, geom);
+            return create(body, geom);
         }
 
         IPhysicsSimulator _clientPhysicsSimulator;

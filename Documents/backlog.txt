@@ -95,6 +95,8 @@ ZAK - 13 - Client-side Prediction
   3 - Better prediction/smoothing algorithm
   2 - Cleanup Autofac's creation of PhysicsComponents
 
+ZAK - 8 - Investigate more efficient serialization techniques.
+
 40 - Games can be recorded and played back 
 	STEP 1:
 	We need to investigate what effect Farseer has on this... Apparently it's not deterministic. Way around this? Do player physics manually?
