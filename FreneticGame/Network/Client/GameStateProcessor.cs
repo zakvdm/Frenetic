@@ -52,7 +52,7 @@ namespace Frenetic
 
             foreach (var msg in diffedLog)
             {
-                this.ChatLog.AddMessage(msg);
+                this.ChatLog.Add(msg);
             }
         }
 

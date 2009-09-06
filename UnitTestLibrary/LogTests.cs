@@ -13,9 +13,9 @@ namespace UnitTestLibrary
         public void CanIterateThroughLog()
         {
             Log<string> chatMsgLog = new Log<string>();
-            chatMsgLog.AddMessage("hello there");
-            chatMsgLog.AddMessage("you suck");
-            chatMsgLog.AddMessage("i'm just kidding, you're pretty cool.");
+            chatMsgLog.Add("hello there");
+            chatMsgLog.Add("you suck");
+            chatMsgLog.Add("i'm just kidding, you're pretty cool.");
 
             int count = 0;
             foreach (string message in chatMsgLog)
@@ -31,7 +31,7 @@ namespace UnitTestLibrary
         {
             Log<ChatMessage> chatMsgLog = new Log<ChatMessage>();
             
-            chatMsgLog.AddMessage(new ChatMessage() { ClientName = "Zak", Message = "yo" });
+            chatMsgLog.Add(new ChatMessage() { ClientName = "Zak", Message = "yo" });
 
             Assert.AreEqual(1, chatMsgLog.Count);
         }
@@ -42,7 +42,7 @@ namespace UnitTestLibrary
             Log<ChatMessage> chatMsgLog = new Log<ChatMessage>();
             Assert.IsFalse(chatMsgLog.IsDirty);
 
-            chatMsgLog.AddMessage(new ChatMessage() { ClientName = "zak", Message = "homo" });
+            chatMsgLog.Add(new ChatMessage() { ClientName = "zak", Message = "homo" });
 
             Assert.IsTrue(chatMsgLog.IsDirty);
         }
@@ -52,8 +52,8 @@ namespace UnitTestLibrary
         {
             Log<ChatMessage> chatMsgLog = new Log<ChatMessage>();
 
-            chatMsgLog.AddMessage(new ChatMessage() { ClientName = "1", Message = "beef" });
-            chatMsgLog.AddMessage(new ChatMessage() { ClientName = "2", Message = "stick" });
+            chatMsgLog.Add(new ChatMessage() { ClientName = "1", Message = "beef" });
+            chatMsgLog.Add(new ChatMessage() { ClientName = "2", Message = "stick" });
 
             Assert.AreEqual(2, chatMsgLog.GetDiff().Count);
             Assert.AreEqual("stick", chatMsgLog.GetDiff()[0].Message);
@@ -64,8 +64,8 @@ namespace UnitTestLibrary
         public void CleanResultsInEmptyDiff()
         {
             Log<ChatMessage> chatMsgLog = new Log<ChatMessage>();
-            chatMsgLog.AddMessage(new ChatMessage() { ClientName = "1", Message = "beef" });
-            chatMsgLog.AddMessage(new ChatMessage() { ClientName = "2", Message = "stick" });
+            chatMsgLog.Add(new ChatMessage() { ClientName = "1", Message = "beef" });
+            chatMsgLog.Add(new ChatMessage() { ClientName = "2", Message = "stick" });
 
             chatMsgLog.Clean();
 
@@ -76,9 +76,9 @@ namespace UnitTestLibrary
         public void LogReturnsMessagesWithNewestFirst()
         {
             Log<string> chatMsgLog = new Log<string>();
-            chatMsgLog.AddMessage("1");
-            chatMsgLog.AddMessage("2");
-            chatMsgLog.AddMessage("3");
+            chatMsgLog.Add("1");
+            chatMsgLog.Add("2");
+            chatMsgLog.Add("3");
 
             foreach (string message in chatMsgLog)
             {
@@ -91,8 +91,8 @@ namespace UnitTestLibrary
         public void CanIterateThroughLogFromOldestToNewest()
         {
             Log<string> chatLog = new Log<string>();
-            chatLog.AddMessage("old");
-            chatLog.AddMessage("new");
+            chatLog.Add("old");
+            chatLog.Add("new");
 
             int count = 1;
             foreach (string msg in chatLog.OldestToNewest)
@@ -109,9 +109,9 @@ namespace UnitTestLibrary
         public void LogIndexesMessagesWithNewestAtZero()
         {
             Log<string> chatMsgLog = new Log<string>();
-            chatMsgLog.AddMessage("1");
-            chatMsgLog.AddMessage("2");
-            chatMsgLog.AddMessage("3");
+            chatMsgLog.Add("1");
+            chatMsgLog.Add("2");
+            chatMsgLog.Add("3");
 
             Assert.AreEqual("3", chatMsgLog[0]);
             Assert.AreEqual("1", chatMsgLog[2]);
@@ -121,7 +121,7 @@ namespace UnitTestLibrary
         public void CanAccessElementsMoreThanOnce()
         {
             Log<string> chatMsgLog = new Log<string>();
-            chatMsgLog.AddMessage("hey");
+            chatMsgLog.Add("hey");
 
             foreach (string message in chatMsgLog)
                 Assert.AreEqual("hey", message);
@@ -145,8 +145,8 @@ namespace UnitTestLibrary
         public void KeepsCount()
         {
             Log<string> chatMsgLog = new Log<string>();
-            chatMsgLog.AddMessage("1");
-            chatMsgLog.AddMessage("2");
+            chatMsgLog.Add("1");
+            chatMsgLog.Add("2");
 
             Assert.AreEqual(2, chatMsgLog.Count);
         }
@@ -155,8 +155,8 @@ namespace UnitTestLibrary
         public void CanStripOldestMessage()
         {
             Log<string> log = new Log<string>();
-            log.AddMessage("old msg");
-            log.AddMessage("newer msg");
+            log.Add("old msg");
+            log.Add("newer msg");
 
             Assert.AreEqual("old msg", log.StripOldestMessage());
             Assert.AreEqual("newer msg", log.StripOldestMessage());

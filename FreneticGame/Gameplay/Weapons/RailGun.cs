@@ -15,11 +15,6 @@ namespace Frenetic.Weapons
             Shots = new Shots();
         }
 
-        public RailGun()
-        {
-            // ONLY FOR XML SERIALIZER!
-        }
-
         public Shots Shots { get; private set; }
 
         public void Shoot(Vector2 origin, Vector2 direction)

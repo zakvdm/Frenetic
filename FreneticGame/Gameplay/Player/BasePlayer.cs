@@ -38,12 +38,6 @@ namespace Frenetic.Player
             IsAlive = true;
             Position = new Vector2(400, 100);
         }
-        public BasePlayer() 
-        {
-            // TODO: REMOVE
-            this.PhysicsComponent = new DummyPhysicsComponent();
-        } // For XmlSerializer
-
         
         public IPlayerSettings PlayerSettings { get; protected set; }
 

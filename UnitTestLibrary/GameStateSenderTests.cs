@@ -51,7 +51,7 @@ namespace UnitTestLibrary
         public void GenerateSendsClientNameWithChatMessage()
         {
             ChatMessage chatMsg = new ChatMessage() { ClientName = "terence", Message = "Test" };
-            chatLog.AddMessage(chatMsg);
+            chatLog.Add(chatMsg);
 
             serverChatLogView.Generate();
 
@@ -61,8 +61,8 @@ namespace UnitTestLibrary
         [Test]
         public void GenerateSendsNewChatMessages()
         {
-            chatLog.AddMessage(new ChatMessage() { Message = "Woohoo" });
-            chatLog.AddMessage(new ChatMessage() { Message = "boohoo" });
+            chatLog.Add(new ChatMessage() { Message = "Woohoo" });
+            chatLog.Add(new ChatMessage() { Message = "boohoo" });
 
             serverChatLogView.Generate();
 

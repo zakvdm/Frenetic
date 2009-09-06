@@ -16,9 +16,5 @@ namespace Frenetic.Player
         public LocalPlayer(IPlayerSettings playerSettings, LocalPlayerFarseerPhysicsComponent physicsComponent, IBoundaryCollider boundaryCollider, IRailGun weapon, ITimer timer)
             : base(playerSettings, physicsComponent, boundaryCollider, weapon, timer)
         { }
-        public LocalPlayer()
-            : base()
-        {
-        } // For XmlSerializer
     }
 }

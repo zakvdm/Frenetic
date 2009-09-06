@@ -15,7 +15,7 @@ namespace Frenetic
         
         public void ProcessInput(string input)
         {
-            this.PendingLog.AddMessage(new ChatMessage() { Message = input });
+            this.PendingLog.Add(new ChatMessage() { Message = input });
         }
 
         public Log<ChatMessage> Log { get; set; }

@@ -50,7 +50,7 @@ namespace Frenetic.Network
             foreach (var chatMsg in diffedLog)
             {
                 chatMsg.ClientName = this.ClientStateTracker.FindNetworkClient(item.ClientID).Player.PlayerSettings.Name;
-                this.ServerChatLog.AddMessage(chatMsg);
+                this.ServerChatLog.Add(chatMsg);
             }
         }
 

@@ -70,9 +70,9 @@ namespace UnitTestLibrary
         public void SendsChatLogMessages()
         {
             stubSnapCounter.CurrentSnap = 24;
-            chatLog.AddMessage(new ChatMessage() { Message = "new message 1" });
-            chatLog.AddMessage(new ChatMessage() { Message = "new message 2" });
-            chatLog.AddMessage(new ChatMessage() { Message = "new message 3" });
+            chatLog.Add(new ChatMessage() { Message = "new message 1" });
+            chatLog.Add(new ChatMessage() { Message = "new message 2" });
+            chatLog.Add(new ChatMessage() { Message = "new message 3" });
 
             clientInputSender.Generate();
 

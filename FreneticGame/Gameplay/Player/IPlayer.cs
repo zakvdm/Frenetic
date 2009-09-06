@@ -5,10 +5,9 @@ using Frenetic.Weapons;
 using Frenetic.Gameplay;
 namespace Frenetic.Player
 {
-    public interface IPlayer
+    public interface IPlayer : IPlayerInput
     {
         bool IsAlive { get; set; }
-        Vector2 Position { get; set; }
 
         IRailGun CurrentWeapon { get; }
 
@@ -26,7 +25,5 @@ namespace Frenetic.Player
 
         // EVENTS:
         event Action Died;
-
-        Vector2? PendingShot { get; set; }
     }
 }

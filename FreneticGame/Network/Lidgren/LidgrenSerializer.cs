@@ -44,7 +44,7 @@ namespace Frenetic.Network.Lidgren
             switch (item.Type)
             {
                 case ItemType.PlayerInput:
-                    netbuffer.Write((IPlayer)item.Data);
+                    netbuffer.Write((IPlayerInput)item.Data);
                     break;
                 case ItemType.Player:
                     netbuffer.Write((IPlayerState)item.Data);
@@ -52,11 +52,16 @@ namespace Frenetic.Network.Lidgren
                 case ItemType.PlayerSettings:
                     netbuffer.Write((IPlayerSettings)item.Data);
                     break;
+                case ItemType.ChatLog:
+                    netbuffer.Write((List<ChatMessage>)item.Data);
+                    break;
                 case ItemType.NewClient:
                 case ItemType.SuccessfulJoin:
                 case ItemType.DisconnectingClient:
                     netbuffer.Write((int)item.Data);
                     break;
+                default:
+                    throw new NotImplementedException("Trying to serialize an unsupported type: " + item.Type.ToString());
             }
         }
         public static Item ReadItem(this NetBuffer netbuffer)
@@ -77,6 +82,9 @@ namespace Frenetic.Network.Lidgren
                 case ItemType.PlayerSettings:
                     item.Data = netbuffer.ReadPlayerSettings();
                     break;
+                case ItemType.ChatLog:
+                    item.Data = netbuffer.ReadChatLog();
+                    break;
                 case ItemType.NewClient:
                 case ItemType.SuccessfulJoin:
                 case ItemType.DisconnectingClient:
@@ -88,30 +96,30 @@ namespace Frenetic.Network.Lidgren
         }
 
         // PLAYERINPUT:
-        public static void Write(this NetBuffer netbuffer, IPlayer player)
+        public static void Write(this NetBuffer netbuffer, IPlayerInput input)
         {
-            netbuffer.Write(player.Position);
-            if (player.PendingShot != null)
+            netbuffer.Write(input.Position);
+            if (input.PendingShot != null)
             {
                 netbuffer.Write(true);
-                netbuffer.Write((Vector2)player.PendingShot);
+                netbuffer.Write((Vector2)input.PendingShot);
             }
             else
             {
                 netbuffer.Write(false);
             }
         }
-        public static IPlayer ReadPlayerInput(this NetBuffer netbuffer)
+        public static PlayerInput ReadPlayerInput(this NetBuffer netbuffer)
         {
-            IPlayer player = new LocalPlayer();
+            PlayerInput input = new PlayerInput();
 
-            player.Position = netbuffer.ReadVector2();
+            input.Position = netbuffer.ReadVector2();
             if (netbuffer.ReadBoolean())
             {
-                player.PendingShot = netbuffer.ReadVector2();
+                input.PendingShot = netbuffer.ReadVector2();
             }
 
-            return player;
+            return input;
         }
 
         // PLAYERSTATE:
@@ -148,6 +156,7 @@ namespace Frenetic.Network.Lidgren
             return playerstate;
         }
 
+        // PLAYERSETTINGS:
         public static void Write(this NetBuffer netbuffer, IPlayerSettings settings)
         {
             netbuffer.Write(settings.Color.PackedValue);
@@ -167,6 +176,7 @@ namespace Frenetic.Network.Lidgren
             return settings;
         }
 
+        // CHATLOG:
         public static void Write(this NetBuffer netbuffer, List<ChatMessage> chatlog)
         {
             netbuffer.Write(chatlog.Count);

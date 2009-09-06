@@ -20,9 +20,9 @@ namespace Frenetic.Player
             // We can't just do a direct assignment (Player[player.ID] = player) here because we need the service objects (physics components, etc.) to remain in tact
             //      Unfortunately, this means that every time another property gets added to Player that needs to be network synced, it needs to be assigned here.
             //      It may very well be that there is a better solution here... after all, we really shouldn't be sending unnecessary info over the network...
-            var receivedPlayer = (IPlayer)item.Data;
-            player.Position = receivedPlayer.Position;
-            player.PendingShot = receivedPlayer.PendingShot;
+            var receivedPlayerInput = (IPlayerInput)item.Data;
+            player.Position = receivedPlayerInput.Position;
+            player.PendingShot = receivedPlayerInput.PendingShot;
         }
         public void UpdatePlayerFromPlayerStateItem(Item stateItem)
         {

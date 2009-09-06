@@ -62,7 +62,6 @@ namespace Frenetic.Network.Lidgren
         public Message ReadNextMessage()
         {
             var inBuffer = _netClient.CreateBuffer();
-            //NetBuffer inBuffer = _netClient.CreateBuffer();
             NetMessageType type;
 
             bool messageExists = false;

@@ -24,6 +24,12 @@ namespace UnitTestLibrary
         }
 
         [Test]
+        [ExpectedException(ExceptionType=typeof(NotImplementedException))]
+        public void ThrowsExceptionWhenTryingToSerializeAnUnsoppertedType()
+        {
+            buffer.Write(new Message() { Items = new List<Item>() { new Item() { Type = ItemType.Event } } });
+        }
+        [Test]
         public void CanSerializeAndDeserializeAMessageWithManyItems()
         {
             var item1 = new Item() { Type = ItemType.Player, Data = new PlayerState() };
@@ -39,36 +45,20 @@ namespace UnitTestLibrary
         }
 
         [Test]
-        public void CanSerializeAndDeserializeItemWithPlayerState()
+        public void CanSerializeAndDeserializeItemTypes()
         {
             buffer.Write(new Item() { ClientID = 20, Type = ItemType.Player, Data = new PlayerState() });
+            Assert.AreEqual(typeof(PlayerState), buffer.ReadItem().Data.GetType());
 
-            Console.WriteLine("Serializing Item with PlayerState took " + buffer.Data.Length + " bytes");
-            var output = buffer.ReadItem();
-
-            Assert.AreEqual(20, output.ClientID);
-            Assert.AreEqual(ItemType.Player, output.Type);
-            Assert.AreEqual(typeof(PlayerState), output.Data.GetType());
-        }
-        [Test]
-        public void CanSerializeAndDeserializeItemWithPlayerSettings()
-        {
             buffer.Write(new Item() { ClientID = 100, Type = ItemType.PlayerSettings, Data = new NetworkPlayerSettings() });
+            Assert.AreEqual(typeof(NetworkPlayerSettings), buffer.ReadItem().Data.GetType());
 
-            var output = buffer.ReadItem();
-
-            Assert.AreEqual(typeof(NetworkPlayerSettings), output.Data.GetType());
+            buffer.Write(new Item() { ClientID = 10, Type = ItemType.PlayerInput, Data = new PlayerInput() });
+            Assert.AreEqual(typeof(PlayerInput), buffer.ReadItem().Data.GetType());
+            
+            buffer.Write(new Item() { ClientID = 10, Type = ItemType.ChatLog, Data = new List<Frenetic.ChatMessage>() });
+            Assert.AreEqual(typeof(List<Frenetic.ChatMessage>), buffer.ReadItem().Data.GetType());
         }
-        [Test]
-        public void CanSerializeAndDeserializeItemWithPlayerInput()
-        {
-            buffer.Write(new Item() { ClientID = 10, Type = ItemType.PlayerInput, Data = new LocalPlayer() });
-
-            var output = buffer.ReadItem();
-
-            Assert.AreEqual(typeof(LocalPlayer), output.Data.GetType());
-        }
-
         [Test]
         public void CanSerializeAndDeserializeThePlayerJoinAndDisconnectMessages()
         {
@@ -84,13 +74,13 @@ namespace UnitTestLibrary
         [Test]
         public void CanSerializeAndDeserializePlayerInput()
         {
-            buffer.Write(new LocalPlayer()
+            buffer.Write(new PlayerInput()
                             {
                                 Position = new Vector2(100, 200),
                                 PendingShot = new Vector2(300, 400)
                             }
                         );
-            buffer.Write(new LocalPlayer()
+            buffer.Write(new PlayerInput()
                             {
                                 Position = new Vector2(500, 600),
                                 PendingShot = null

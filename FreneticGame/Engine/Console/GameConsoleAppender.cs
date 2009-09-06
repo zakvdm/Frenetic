@@ -9,7 +9,7 @@ namespace Frenetic.Engine.Console
     {
         protected override void Append(log4net.Core.LoggingEvent loggingEvent)
         {
-            GameConsoleLog.AddMessage(RenderLoggingEvent(loggingEvent));
+            GameConsoleLog.Add(RenderLoggingEvent(loggingEvent));
         }
 
         public Log<string> GameConsoleLog { get; set; }

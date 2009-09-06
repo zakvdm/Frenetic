@@ -39,15 +39,15 @@ namespace UnitTestLibrary
 
             Assert.IsFalse(hudView.Visible);
 
-            stubConsole.Log.AddMessage("test");
+            stubConsole.Log.Add("test");
 
             Assert.IsTrue(hudView.Visible);
         }
         [Test]
         public void DrawsLog()
         {
-            stubConsole.Log.AddMessage("You suck.");
-            stubConsole.Log.AddMessage("I suck? Screw you!");
+            stubConsole.Log.Add("You suck.");
+            stubConsole.Log.Add("I suck? Screw you!");
             LogOverlayView<string> hudView = new LogOverlayView<string>(stubConsole, rectangle, stubFont, Color.Violet);
 
             hudView.Draw(stubSpriteBatch);

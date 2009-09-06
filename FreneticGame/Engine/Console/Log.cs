@@ -17,15 +17,7 @@ namespace Frenetic
             this.MessageList = new List<T>();
         }
 
-        /// <summary>
-        /// NOTE: This method is added just for the XmlSerializer. It's to be removed when we have better serialization. Rather use AddMessage(string message).
-        /// </summary>
-        public void Add(object justHereForSerializer)
-        {
-            AddMessage((T)justHereForSerializer);
-        }
-
-        public void AddMessage(T message)
+        public void Add(T message)
         {
             this.MessageList.Insert(0, message);
             this.DiffedList.Insert(0, message);

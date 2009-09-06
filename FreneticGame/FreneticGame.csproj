@@ -79,7 +79,9 @@
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
+    <Reference Include="System.Data" />
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Autofac\GameSessionModule.cs" />
@@ -114,9 +116,11 @@
     <Compile Include="Gameplay\PlayerScore.cs" />
     <Compile Include="Gameplay\HUD\ScoreHudView.cs" />
     <Compile Include="Gameplay\Player\INetworkPlayerProcessor.cs" />
+    <Compile Include="Gameplay\Player\IPlayerInput.cs" />
     <Compile Include="Gameplay\Player\IPlayerSettings.cs" />
     <Compile Include="Gameplay\Player\LocalPlayer.cs" />
     <Compile Include="Gameplay\Player\NetworkPlayer.cs" />
+    <Compile Include="Gameplay\Player\PlayerInput.cs" />
     <Compile Include="Gameplay\Player\PlayerState.cs" />
     <Compile Include="Gameplay\Player\PlayerUpdater.cs" />
     <Compile Include="Gameplay\Weapons\IRailGun.cs" />
