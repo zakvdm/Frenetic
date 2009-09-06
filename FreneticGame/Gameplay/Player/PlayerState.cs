@@ -49,7 +49,7 @@ namespace Frenetic.Player
         public void RefreshPlayerValuesFromState(IPlayer player)
         {
             // TODO: Implement a rolling average
-            player.UpdatePositionFromNetwork(this.Position, 0.40f);
+            player.UpdatePositionFromNetwork(this.Position, 0.1f);
 
             player.IsAlive = this.IsAlive;
             player.CurrentWeapon.Shots.AddRange(this.NewShots);

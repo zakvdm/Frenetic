@@ -247,9 +247,6 @@ namespace Frenetic
             #region HUD
             builder.RegisterModule(new OverlaysModule() { ScreenSize = new Vector2(_screenWidth, _screenHeight), InputBoxHeight = 24, ContentManager = this.Content });
             #endregion
-            // RAYCASTER:
-            //builder.Register<DumbRayCaster>().SingletonScoped();
-            //builder.Register<DumbRayCasterTestController>().ContainerScoped();
 
             // CAMERA:
             builder.Register((c, p) => (ICamera)new Camera(p.TypedAs<IPlayer>(), new Vector2(_screenWidth, _screenHeight))).ContainerScoped();
@@ -277,6 +274,6 @@ namespace Frenetic
         IContainer Container { get; set; }
         const int _screenWidth = 800;
         const int _screenHeight = 600;
-        Vector2 _gravity = new Vector2(0, 110f);
+        Vector2 _gravity = new Vector2(0, 140f);
     }
 }

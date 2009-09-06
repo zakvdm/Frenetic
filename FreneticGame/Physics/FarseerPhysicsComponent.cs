@@ -23,8 +23,7 @@ namespace Frenetic.Physics
             _geom = geom;
             _geom.Tag = this;
 
-            _geom.FrictionCoefficient = 1.1f;
-            //_body.IgnoreGravity = true;
+            _geom.FrictionCoefficient = 0.7f;
 
             _geom.OnCollision += new CollisionEventHandler((geom1, geom2, contactList) =>
                 {
