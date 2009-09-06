@@ -61,7 +61,7 @@ namespace Frenetic.Network
 
         void SendLocalPlayerAndPlayerSettings()
         {
-            this.OutgoingMessageQueue.AddToQueue(new Item() { ClientID = this.LocalClient.ID, Type = ItemType.Player, Data = this.LocalClient.Player });
+            this.OutgoingMessageQueue.AddToQueue(new Item() { ClientID = this.LocalClient.ID, Type = ItemType.PlayerInput, Data = this.LocalClient.Player });
 
             if (this.LocalClient.Player.PlayerSettings.IsDirty)
             {

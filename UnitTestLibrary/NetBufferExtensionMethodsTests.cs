@@ -50,7 +50,6 @@ namespace UnitTestLibrary
             Assert.AreEqual(ItemType.Player, output.Type);
             Assert.AreEqual(typeof(PlayerState), output.Data.GetType());
         }
-
         [Test]
         public void CanSerializeAndDeserializeItemWithPlayerSettings()
         {
@@ -59,6 +58,15 @@ namespace UnitTestLibrary
             var output = buffer.ReadItem();
 
             Assert.AreEqual(typeof(NetworkPlayerSettings), output.Data.GetType());
+        }
+        [Test]
+        public void CanSerializeAndDeserializeItemWithPlayerInput()
+        {
+            buffer.Write(new Item() { ClientID = 10, Type = ItemType.PlayerInput, Data = new LocalPlayer() });
+
+            var output = buffer.ReadItem();
+
+            Assert.AreEqual(typeof(LocalPlayer), output.Data.GetType());
         }
 
         [Test]
@@ -71,6 +79,32 @@ namespace UnitTestLibrary
             Assert.AreEqual(3, buffer.ReadItem().Data);
             Assert.AreEqual(4, buffer.ReadItem().Data);
             Assert.AreEqual(500, buffer.ReadItem().Data);
+        }
+
+        [Test]
+        public void CanSerializeAndDeserializePlayerInput()
+        {
+            buffer.Write(new LocalPlayer()
+                            {
+                                Position = new Vector2(100, 200),
+                                PendingShot = new Vector2(300, 400)
+                            }
+                        );
+            buffer.Write(new LocalPlayer()
+                            {
+                                Position = new Vector2(500, 600),
+                                PendingShot = null
+                            }
+                        );
+
+            var output = buffer.ReadPlayerInput();
+
+            Assert.AreEqual(new Vector2(100, 200), output.Position);
+            Assert.AreEqual(new Vector2(300, 400), output.PendingShot);
+
+            output = buffer.ReadPlayerInput();
+
+            Assert.IsNull(output.PendingShot);
         }
 
         [Test]

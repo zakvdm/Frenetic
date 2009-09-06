@@ -25,6 +25,7 @@ namespace Frenetic.Player
             this.Score = new PlayerScore();
         }
         public PlayerState(IPlayer player)
+            : this()
         {
             if (player != null)
             {
@@ -34,7 +35,7 @@ namespace Frenetic.Player
 
                 if (player.CurrentWeapon.Shots.IsDirty)
                 {
-                    this.NewShots = new List<Shot>(player.CurrentWeapon.Shots.GetDiff());
+                    this.NewShots.AddRange(player.CurrentWeapon.Shots.GetDiff());
                     player.CurrentWeapon.Shots.Clean();
                 }
             }

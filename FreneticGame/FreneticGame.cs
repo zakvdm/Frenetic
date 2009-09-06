@@ -1,13 +1,7 @@
-using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.GamerServices;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Net;
-using Microsoft.Xna.Framework.Storage;
 using Autofac;
 using Autofac.Builder;
 using Lidgren.Network;
@@ -16,14 +10,10 @@ using Frenetic.Network;
 using Frenetic.Graphics;
 using Frenetic.Physics;
 using Frenetic.Autofac;
-using Frenetic.Level;
 using Frenetic.UserInput;
 using Frenetic.Player;
 using System.Windows.Forms;
-using Frenetic.Weapons;
 using Frenetic.Engine;
-using Frenetic.Gameplay.HUD;
-using Frenetic.Gameplay;
 using Frenetic.Engine.Overlay;
 
 namespace Frenetic
@@ -193,7 +183,6 @@ namespace Frenetic
             builder.Register<LidgrenClientNetworkSession>().As<IClientNetworkSession>().ContainerScoped();
             builder.Register<IncomingMessageQueue>().As<IIncomingMessageQueue>().ContainerScoped();
             builder.Register<OutgoingMessageQueue>().As<IOutgoingMessageQueue>().ContainerScoped();
-            builder.Register<XmlMessageSerializer>().As<IMessageSerializer>().ContainerScoped();
 
             builder.Register<LocalClient>().ContainerScoped();
             builder.Register<Client>().FactoryScoped();

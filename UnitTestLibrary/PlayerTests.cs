@@ -1,5 +1,4 @@
 using System;
-using System.Xml.Serialization;
 using System.IO;
 using Microsoft.Xna.Framework;
 

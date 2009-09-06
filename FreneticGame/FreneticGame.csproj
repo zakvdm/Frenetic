@@ -72,21 +72,14 @@
     </Reference>
     <Reference Include="Microsoft.Xna.Framework, Version=3.0.0.0, Culture=neutral, PublicKeyToken=6d5c3888ef60e27d, processorArchitecture=x86" />
     <Reference Include="Microsoft.Xna.Framework.Game, Version=3.0.0.0, Culture=neutral, PublicKeyToken=6d5c3888ef60e27d, processorArchitecture=MSIL" />
-    <Reference Include="mscorlib">
-      <Private>False</Private>
-    </Reference>
+    <Reference Include="mscorlib" />
     <Reference Include="System">
       <Private>False</Private>
     </Reference>
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
-    <Reference Include="System.Data" />
     <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml" />
-    <Reference Include="System.Xml.Linq">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Autofac\GameSessionModule.cs" />
@@ -195,7 +188,6 @@
     <Compile Include="Network\IClientNetworkSession.cs" />
     <Compile Include="Network\IClientStateTracker.cs" />
     <Compile Include="Network\IIncomingMessageQueue.cs" />
-    <Compile Include="Network\IMessageSerializer.cs" />
     <Compile Include="Network\INetworkSession.cs" />
     <Compile Include="Gameplay\IGameSessionFactory.cs" />
     <Compile Include="Network\IOutgoingMessageQueue.cs" />
@@ -211,7 +203,6 @@
     <Compile Include="Network\IncomingMessageQueue.cs" />
     <Compile Include="Network\OutgoingMessageQueue.cs" />
     <Compile Include="Network\Server\ClientInputProcessor.cs" />
-    <Compile Include="Network\XmlMessageSerializer.cs" />
     <Compile Include="OperationCompletedEventArgs.cs" />
     <Compile Include="Physics\DummyPhysicsComponent.cs" />
     <Compile Include="Physics\FarseerPhysicsComponent.cs" />

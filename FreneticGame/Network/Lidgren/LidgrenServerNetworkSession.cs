@@ -8,11 +8,10 @@ namespace Frenetic.Network.Lidgren
 {
     public class LidgrenServerNetworkSession : IServerNetworkSession
     {
-        public LidgrenServerNetworkSession(INetServer netServer, IServerMessageSender serverMessageSender, IMessageSerializer messageSerializer, ILoggerFactory loggerFactory)
+        public LidgrenServerNetworkSession(INetServer netServer, IServerMessageSender serverMessageSender, ILoggerFactory loggerFactory)
         {
             _netServer = netServer;
             _serverMessageSender = serverMessageSender;
-            _messageSerializer = messageSerializer;
             _logger = loggerFactory.GetLogger(this.GetType());
 
             ActiveConnections = new Dictionary<int, INetConnection>();
@@ -96,7 +95,7 @@ namespace Frenetic.Network.Lidgren
                         _logger.Debug(inBuffer.ReadString());
                         break;
                     case NetMessageType.Data:
-                        return _messageSerializer.Deserialize(inBuffer.ReadBytes(inBuffer.LengthBytes));
+                        return inBuffer.ReadMessage();
                 }
             }
             return null;
@@ -163,7 +162,6 @@ namespace Frenetic.Network.Lidgren
 
         INetServer _netServer;
         IServerMessageSender _serverMessageSender;
-        IMessageSerializer _messageSerializer;
         ILog _logger;
     }
 }

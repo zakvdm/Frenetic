@@ -6,10 +6,9 @@ namespace Frenetic.Network.Lidgren
 {
     public class LidgrenServerMessageSender : IServerMessageSender
     {
-        public LidgrenServerMessageSender(INetServer netServer, IMessageSerializer messageSerializer, ILoggerFactory loggerFactory)
+        public LidgrenServerMessageSender(INetServer netServer, ILoggerFactory loggerFactory)
         {
             _netServer = netServer;
-            _messageSerializer = messageSerializer;
             this.Logger = loggerFactory.GetLogger(this.GetType());
         }
 
@@ -17,29 +16,26 @@ namespace Frenetic.Network.Lidgren
 
         public void SendTo(Message msg, global::Lidgren.Network.NetChannel channel, INetConnection destinationConnection)
         {
-            byte[] data = _messageSerializer.Serialize(msg);
-            NetBuffer buffer = _netServer.CreateBuffer(data.Length);
-            buffer.Write(data);
+            var buffer = _netServer.CreateBuffer();
+            buffer.Write(msg);
 
             _netServer.SendMessage(buffer, channel, destinationConnection);
         }
 
         public void SendToAll(Message msg, global::Lidgren.Network.NetChannel channel)
         {
-            byte[] data = _messageSerializer.Serialize(msg);
-            NetBuffer buffer = _netServer.CreateBuffer(data.Length);
-            buffer.Write(data);
+            var buffer = _netServer.CreateBuffer();
+            buffer.Write(msg);
 
             _netServer.SendToAll(buffer, channel);
 
-            this.Logger.Debug("Sent " + data.Length + " bytes to " + _netServer.ConnectionCount + " Clients.");
+            this.Logger.Debug("Sent " + buffer.Data.Length + " bytes to " + _netServer.ConnectionCount + " Clients.");
         }
 
         public void SendToAllExcept(Message msg, global::Lidgren.Network.NetChannel channel, INetConnection excludedConnection)
         {
-            byte[] data = _messageSerializer.Serialize(msg);
-            NetBuffer buffer = _netServer.CreateBuffer(data.Length);
-            buffer.Write(data);
+            var buffer = _netServer.CreateBuffer();
+            buffer.Write(msg);
 
             _netServer.SendToAll(buffer, channel, excludedConnection);
         }
@@ -47,7 +43,6 @@ namespace Frenetic.Network.Lidgren
         #endregion
 
         INetServer _netServer;
-        IMessageSerializer _messageSerializer;
 
         ILog Logger;
     }

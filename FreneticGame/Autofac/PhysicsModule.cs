@@ -44,7 +44,6 @@ namespace Frenetic.Autofac
         PhysicsComponentType CreatePhysicsComponent<PhysicsComponentType>(IContext container, IEnumerable<Parameter> parameters, Func<Body, Geom, PhysicsComponentType> create) where PhysicsComponentType : IPhysicsComponent
         {
             Vector2 size;
-            object tmp;
             if (parameters.Count() > 0)
             {
                 size = parameters.Named<Vector2>("size");

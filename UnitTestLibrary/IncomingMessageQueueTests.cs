@@ -5,7 +5,6 @@ using Frenetic;
 
 using NUnit.Framework;
 using Rhino.Mocks;
-using System.Xml.Serialization;
 using System.IO;
 using Frenetic.Network;
 

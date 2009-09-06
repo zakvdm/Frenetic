@@ -43,11 +43,14 @@ namespace Frenetic.Network.Lidgren
 
             switch (item.Type)
             {
+                case ItemType.PlayerInput:
+                    netbuffer.Write((IPlayer)item.Data);
+                    break;
                 case ItemType.Player:
-                    netbuffer.Write((PlayerState)item.Data);
+                    netbuffer.Write((IPlayerState)item.Data);
                     break;
                 case ItemType.PlayerSettings:
-                    netbuffer.Write((NetworkPlayerSettings)item.Data);
+                    netbuffer.Write((IPlayerSettings)item.Data);
                     break;
                 case ItemType.NewClient:
                 case ItemType.SuccessfulJoin:
@@ -65,6 +68,9 @@ namespace Frenetic.Network.Lidgren
 
             switch (item.Type)
             {
+                case ItemType.PlayerInput:
+                    item.Data = netbuffer.ReadPlayerInput();
+                    break;
                 case ItemType.Player:
                     item.Data = netbuffer.ReadPlayerState();
                     break;
@@ -74,15 +80,42 @@ namespace Frenetic.Network.Lidgren
                 case ItemType.NewClient:
                 case ItemType.SuccessfulJoin:
                 case ItemType.DisconnectingClient:
-                    item.Data = netbuffer.ReadUInt32();
+                    item.Data = netbuffer.ReadInt32();
                     break;
             }
 
             return item;
         }
 
+        // PLAYERINPUT:
+        public static void Write(this NetBuffer netbuffer, IPlayer player)
+        {
+            netbuffer.Write(player.Position);
+            if (player.PendingShot != null)
+            {
+                netbuffer.Write(true);
+                netbuffer.Write((Vector2)player.PendingShot);
+            }
+            else
+            {
+                netbuffer.Write(false);
+            }
+        }
+        public static IPlayer ReadPlayerInput(this NetBuffer netbuffer)
+        {
+            IPlayer player = new LocalPlayer();
+
+            player.Position = netbuffer.ReadVector2();
+            if (netbuffer.ReadBoolean())
+            {
+                player.PendingShot = netbuffer.ReadVector2();
+            }
+
+            return player;
+        }
+
         // PLAYERSTATE:
-        public static void Write(this NetBuffer netbuffer, PlayerState state)
+        public static void Write(this NetBuffer netbuffer, IPlayerState state)
         {
             netbuffer.Write(state.IsAlive);
             netbuffer.Write(state.NewShots.Count);
@@ -95,7 +128,7 @@ namespace Frenetic.Network.Lidgren
             netbuffer.Write(state.Score.Deaths);
             netbuffer.Write(state.Score.Kills);
         }
-        public static PlayerState ReadPlayerState(this NetBuffer netbuffer)
+        public static IPlayerState ReadPlayerState(this NetBuffer netbuffer)
         {
             PlayerState playerstate = new PlayerState();
            

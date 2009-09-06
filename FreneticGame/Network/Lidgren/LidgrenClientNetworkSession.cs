@@ -7,10 +7,9 @@ namespace Frenetic.Network.Lidgren
 {
     public class LidgrenClientNetworkSession : IClientNetworkSession
     {
-        public LidgrenClientNetworkSession(INetClient netClient, IMessageSerializer messageSerializer, ILoggerFactory loggerFactory)
+        public LidgrenClientNetworkSession(INetClient netClient, ILoggerFactory loggerFactory)
         {
             _netClient = netClient;
-            _messageSerializer = messageSerializer;
             _logger = loggerFactory.GetLogger(this.GetType());
 
             ClientDisconnected += (obj, args) => _logger.Info("ZAK HERE: Client disconnected");
@@ -42,13 +41,12 @@ namespace Frenetic.Network.Lidgren
             if (_netClient.Status != NetConnectionStatus.Connected)
                 throw new System.InvalidOperationException("Client not connected to server");
 
-            byte[] data = _messageSerializer.Serialize(msg);
-            NetBuffer buffer = _netClient.CreateBuffer(data.Length);
-            buffer.Write(data);
+            var buffer = _netClient.CreateBuffer();
+            buffer.Write(msg);
 
             _netClient.SendMessage(buffer, channel);
 
-            _logger.Debug("Sent Message with " + msg.Items.Count + " items and total length " + data.Length + " bytes to the server.");
+            _logger.Debug("Sent Message with " + msg.Items.Count + " items and total length " + buffer.Data.Length + " bytes to the server.");
         }
 
         #endregion
@@ -63,7 +61,8 @@ namespace Frenetic.Network.Lidgren
 
         public Message ReadNextMessage()
         {
-            NetBuffer inBuffer = _netClient.CreateBuffer();
+            var inBuffer = _netClient.CreateBuffer();
+            //NetBuffer inBuffer = _netClient.CreateBuffer();
             NetMessageType type;
 
             bool messageExists = false;
@@ -87,7 +86,7 @@ namespace Frenetic.Network.Lidgren
                         _logger.Debug(inBuffer.ReadString());
                         break;
                     case NetMessageType.Data:
-                        Message msg = _messageSerializer.Deserialize(inBuffer.ReadBytes(inBuffer.LengthBytes));
+                        Message msg = inBuffer.ReadMessage();
                 
                         if (HandleMessageFromServer(msg))
                             break;  // Message is handled in this class
@@ -140,7 +139,6 @@ namespace Frenetic.Network.Lidgren
 
 
         INetClient _netClient;
-        IMessageSerializer _messageSerializer;
         ILog _logger;
     }
 }

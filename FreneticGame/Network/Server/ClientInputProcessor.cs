@@ -26,9 +26,9 @@ namespace Frenetic.Network
                 AddClientChatMessagesToServerLog(item);
             }
             // Update player:
-            while (this.IncomingMessageQueue.HasAvailable(ItemType.Player))
+            while (this.IncomingMessageQueue.HasAvailable(ItemType.PlayerInput))
             {
-                var item = this.IncomingMessageQueue.ReadItem(ItemType.Player);
+                var item = this.IncomingMessageQueue.ReadItem(ItemType.PlayerInput);
 
                 this.NetworkPlayerProcessor.UpdatePlayerFromNetworkItem(item);
             }

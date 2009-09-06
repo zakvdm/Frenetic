@@ -1,8 +1,4 @@
-﻿using System;
-using System.Xml.Serialization;
-using System.IO;
-using System.Collections.Generic;
-using Frenetic.Network;
+﻿using Frenetic.Network;
 
 namespace Frenetic.Player
 {

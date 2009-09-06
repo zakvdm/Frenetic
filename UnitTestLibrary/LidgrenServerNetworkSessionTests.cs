@@ -12,8 +12,6 @@ namespace UnitTestLibrary
     [TestFixture]
     public class LidgrenServerNetworkSessionTests
     {
-        XmlMessageSerializer _serializer = new XmlMessageSerializer();
-
         INetServer stubNetServer;
         IServerMessageSender stubMessageSender;
         INetConnection stubNetConnection;
@@ -26,7 +24,7 @@ namespace UnitTestLibrary
             stubMessageSender = MockRepository.GenerateStub<IServerMessageSender>();
             stubNetConnection = MockRepository.GenerateStub<INetConnection>();
             stubDisconnectingConnection = MockRepository.GenerateStub<INetConnection>();
-            serverNetworkSession = new LidgrenServerNetworkSession(stubNetServer, stubMessageSender, _serializer, DummyLogger.Factory);
+            serverNetworkSession = new LidgrenServerNetworkSession(stubNetServer, stubMessageSender, DummyLogger.Factory);
 
             stubNetConnection.Stub(x => x.Status).Return(NetConnectionStatus.Connected);
             stubNetConnection.Stub(x => x.ConnectionID).Return(100);
@@ -60,7 +58,7 @@ namespace UnitTestLibrary
         public void ServerReceivesDataFromClientAndCreatesMessage()
         {
             NetBuffer tmpBuffer = new NetBuffer();
-            tmpBuffer.Write(_serializer.Serialize(new Message() { Items = { new Item() { Type = ItemType.Player, Data = 10 } } }));
+            tmpBuffer.Write(new Message() { Items = { new Item() { Type = ItemType.NewClient, Data = 10 } } });
             stubNetServer.Stub(x => x.CreateBuffer()).Return(tmpBuffer);
             stubNetServer.Stub(x => x.ReadMessage(Arg<NetBuffer>.Is.Anything,
                             out Arg<NetMessageType>.Out(NetMessageType.Data).Dummy,
@@ -72,7 +70,7 @@ namespace UnitTestLibrary
             stubNetServer.AssertWasCalled(x => x.ReadMessage(Arg<NetBuffer>.Is.Equal(tmpBuffer),
                                         out Arg<NetMessageType>.Out(NetMessageType.Data).Dummy,
                                         out Arg<INetConnection>.Out(stubNetConnection).Dummy));
-            Assert.AreEqual(ItemType.Player, msg.Items[0].Type);
+            Assert.AreEqual(ItemType.NewClient, msg.Items[0].Type);
             Assert.AreEqual(10, msg.Items[0].Data);
         }
 

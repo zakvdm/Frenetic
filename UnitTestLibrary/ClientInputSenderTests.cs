@@ -86,7 +86,7 @@ namespace UnitTestLibrary
 
             clientInputSender.Generate();
 
-            stubOutgoingMessageQueue.AssertWasCalled(x => x.AddToQueue(Arg<Item>.Matches(y => y.Type == ItemType.Player && ((IPlayer)y.Data).Position == new Vector2(100, 200))));
+            stubOutgoingMessageQueue.AssertWasCalled(x => x.AddToQueue(Arg<Item>.Matches(y => y.Type == ItemType.PlayerInput && ((IPlayer)y.Data).Position == new Vector2(100, 200))));
         }
         [Test]
         public void OnlySendsPendingShotOnce()

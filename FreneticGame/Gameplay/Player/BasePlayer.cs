@@ -6,7 +6,6 @@ using FarseerGames.FarseerPhysics.Dynamics;
 using Frenetic.Weapons;
 using Frenetic.Engine;
 using Frenetic.Gameplay;
-using System.Xml.Serialization;
 
 namespace Frenetic.Player
 {
@@ -41,11 +40,11 @@ namespace Frenetic.Player
         }
         public BasePlayer() 
         {
+            // TODO: REMOVE
             this.PhysicsComponent = new DummyPhysicsComponent();
         } // For XmlSerializer
 
         
-        [XmlIgnore]
         public IPlayerSettings PlayerSettings { get; protected set; }
 
         public bool IsAlive { get; set; }

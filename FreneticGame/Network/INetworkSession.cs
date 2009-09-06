@@ -2,7 +2,6 @@
 
 using Lidgren.Network;
 using Frenetic.Network.Lidgren;
-using System.Xml.Serialization;
 using Frenetic.Player;
 using Frenetic.Weapons;
 using System.Collections.Generic;
@@ -23,6 +22,7 @@ namespace Frenetic.Network
     public enum ItemType
     {
         Player,
+        PlayerInput,
         PlayerSettings,
         Event,
         SuccessfulJoin,
@@ -44,11 +44,6 @@ namespace Frenetic.Network
     }
 
    
-    [XmlInclude(typeof(LocalPlayer))]
-    [XmlInclude(typeof(PlayerState))]
-    [XmlInclude(typeof(NetworkPlayerSettings))]
-    [XmlInclude(typeof(LocalPlayerSettings))]
-    [XmlInclude(typeof(List<ChatMessage>))]
     public class Message
     {
         public Message() { Items = new List<Item>(); }

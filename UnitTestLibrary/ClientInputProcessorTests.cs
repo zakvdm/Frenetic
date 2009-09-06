@@ -31,8 +31,8 @@ namespace UnitTestLibrary
             playerSettingsQueueMessageHelper = new QueuedMessageHelper<Item, ItemType>();
             stubIncomingMessageQueue.Stub(x => x.ReadItem(Arg<ItemType>.Is.Equal(ItemType.ChatLog))).Do(chatLogQueueMessageHelper.GetNextQueuedMessage);
             stubIncomingMessageQueue.Stub(x => x.HasAvailable(ItemType.ChatLog)).Do(chatLogQueueMessageHelper.HasMessageAvailable);
-            stubIncomingMessageQueue.Stub(x => x.ReadItem(Arg<ItemType>.Is.Equal(ItemType.Player))).Do(playerQueueMessageHelper.GetNextQueuedMessage);
-            stubIncomingMessageQueue.Stub(x => x.HasAvailable(ItemType.Player)).Do(playerQueueMessageHelper.HasMessageAvailable);
+            stubIncomingMessageQueue.Stub(x => x.ReadItem(Arg<ItemType>.Is.Equal(ItemType.PlayerInput))).Do(playerQueueMessageHelper.GetNextQueuedMessage);
+            stubIncomingMessageQueue.Stub(x => x.HasAvailable(ItemType.PlayerInput)).Do(playerQueueMessageHelper.HasMessageAvailable);
             stubIncomingMessageQueue.Stub(x => x.ReadItem(Arg<ItemType>.Is.Equal(ItemType.PlayerSettings))).Do(playerSettingsQueueMessageHelper.GetNextQueuedMessage);
             stubIncomingMessageQueue.Stub(x => x.HasAvailable(ItemType.PlayerSettings)).Do(playerSettingsQueueMessageHelper.HasMessageAvailable);
             stubClientStateTracker = MockRepository.GenerateStub<IClientStateTracker>();
@@ -72,7 +72,7 @@ namespace UnitTestLibrary
             stubClientStateTracker.Stub(x => x.FindNetworkClient(3)).Return(client);
             var receivedPlayer = MockRepository.GenerateStub<IPlayer>();
             receivedPlayer.Position = new Vector2(-31, -92);
-            var item = new Item() { ClientID = 3, Type = ItemType.Player, Data = receivedPlayer };
+            var item = new Item() { ClientID = 3, Type = ItemType.PlayerInput, Data = receivedPlayer };
             playerQueueMessageHelper.QueuedMessages.Enqueue(item);
 
             clientInputProcessor.Process(1);
