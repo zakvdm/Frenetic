@@ -55,6 +55,7 @@ namespace Frenetic.Network
 
         public List<Item> Items { get; set; }
     }
+
     public class Item
     {
         public int ClientID { get; set; }

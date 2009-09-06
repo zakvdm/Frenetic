@@ -64,7 +64,7 @@ namespace UnitTestLibrary
             state.RefreshPlayerValuesFromState(player);
 
             Assert.IsTrue(state.IsAlive);
-            player.AssertWasCalled(me => me.UpdatePositionFromNetwork(state.Position, 0.05f));
+            player.AssertWasCalled(me => me.UpdatePositionFromNetwork(Arg<Vector2>.Is.Equal(state.Position), Arg<float>.Is.Anything));
             Assert.AreEqual(3, player.CurrentWeapon.Shots.Count);
             Assert.AreEqual(new Shot(Vector2.One, Vector2.UnitX), player.CurrentWeapon.Shots[1]);
             Assert.AreEqual(new Shot(Vector2.UnitY, Vector2.Zero), player.CurrentWeapon.Shots[2]);

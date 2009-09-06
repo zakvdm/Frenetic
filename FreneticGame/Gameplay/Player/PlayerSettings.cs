@@ -58,13 +58,5 @@ namespace Frenetic.Player
 
             Color = Color.Black;
         }
-/*
-        [Tweakable]
-        public string Name { get; set; }
-        [Tweakable]
-        public Color Color { get; set; }
-
-        public PlayerTexture Texture { get; set; }
- */
     }
 }

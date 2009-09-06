@@ -81,8 +81,6 @@ namespace UnitTestLibrary
         [Test]
         public void CanGetAndSetLinearVelocity()
         {
-            Assert.AreEqual(new Vector2(0, 0), farseerPComponent.LinearVelocity);
-
             farseerPComponent.LinearVelocity = new Vector2(3, 5);
 
             Assert.AreEqual(new Vector2(3, 5), farseerPComponent.LinearVelocity);

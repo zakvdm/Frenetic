@@ -123,7 +123,7 @@ namespace Frenetic.Player
 
         public static Vector2 JumpImpulse = new Vector2(0, -250000);
         public static Vector2 MoveForce = new Vector2(-500000f, 0);
-        static float MaxSpeed = 1000;
+        public static float MaxSpeed = 1000;
 
         internal bool InContactWithLevel { get; set; }
     }

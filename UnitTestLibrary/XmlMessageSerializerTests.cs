@@ -51,12 +51,12 @@ namespace UnitTestLibrary
         [Test]
         public void CanSerialiseAndDeserialisePlayerPosition()
         {
-            Player player = new Player(null, null, null, null, null);
+            BasePlayer player = new LocalPlayer(null, null, null, null, null);
             player.Position = new Vector2(100, 200);
             Message msg = new Message() { Items = { new Item() { Type = ItemType.Player, Data = player } } };
 
             byte[] serializedMsg = serializer.Serialize(msg);
-            Player recoveredPlayer = (Player)(serializer.Deserialize(serializedMsg)).Items[0].Data;
+            BasePlayer recoveredPlayer = (BasePlayer)(serializer.Deserialize(serializedMsg)).Items[0].Data;
 
             Assert.AreEqual(player.Position, recoveredPlayer.Position);
         }
@@ -107,11 +107,11 @@ namespace UnitTestLibrary
             Assert.AreEqual("Jean Pant", ((IPlayerSettings)recoveredMessage.Items[0].Data).Name);
         }
 
-        [Test]
+        //[Test]
         public void PrintOutSerializedData()
         {
             XmlSerializer realSerializer = new XmlSerializer(typeof(Message));
-            Player player = new Player(null, null, null, new RailGun(null), null);
+            BasePlayer player = new LocalPlayer(null, null, null, new RailGun(null), null);
             player.CurrentWeapon.Shots.Add(new Shot(player.Position, new Vector2(100, 200)));
             player.Position = new Vector2(100, 200);
             NetworkPlayerSettings playerSettings = new NetworkPlayerSettings() { Name = "test" };

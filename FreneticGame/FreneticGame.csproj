@@ -142,6 +142,7 @@
     <Compile Include="Network\Client\GameStateProcessor.cs" />
     <Compile Include="Network\IClientFactory.cs" />
     <Compile Include="Network\IServerMessageSender.cs" />
+    <Compile Include="Network\Lidgren\LidgrenSerializer.cs" />
     <Compile Include="Network\Lidgren\LidgrenServerMessageSender.cs" />
     <Compile Include="Network\Server\GameStateSender.cs" />
     <Compile Include="Engine\Console\Log.cs" />
@@ -290,6 +291,10 @@
     <ProjectReference Include="..\Dependencies\FarseerPhysics\FarseerPhysics.csproj">
       <Project>{95B40504-C1C2-4FCD-98B3-B63AD35D6336}</Project>
       <Name>FarseerPhysics</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Dependencies\Lidgren\Lidgren.Network.Xna\Lidgren.Network.Xna\Lidgren.Network.Xna.csproj">
+      <Project>{5B759C4B-0780-44F6-8E95-EAAA0E17B278}</Project>
+      <Name>Lidgren.Network.Xna</Name>
     </ProjectReference>
     <ProjectReference Include="..\Dependencies\Lidgren\Lidgren.Network\Lidgren.Network.csproj">
       <Project>{BA202214-F6F8-4853-BCC9-CA4F13C5F479}</Project>

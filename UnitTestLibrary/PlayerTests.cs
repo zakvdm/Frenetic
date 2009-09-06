@@ -105,7 +105,7 @@ namespace UnitTestLibrary
         [Test]
         public void PlayerVelocityIsCappedToTheLeft()
         {
-            stubPhysicsComponent.Stub(spc => spc.LinearVelocity).Return(new Vector2(-50, 0));
+            stubPhysicsComponent.LinearVelocity = new Vector2(-BasePlayer.MaxSpeed * 2, 0);
 
             player.MoveLeft();
 
@@ -114,7 +114,7 @@ namespace UnitTestLibrary
         [Test]
         public void PlayerVelocityIsCappedToTheRight()
         {
-            stubPhysicsComponent.Stub(spc => spc.LinearVelocity).Return(new Vector2(50, 0));
+            stubPhysicsComponent.LinearVelocity = new Vector2(BasePlayer.MaxSpeed * 2, 0);
 
             player.MoveRight();
 
