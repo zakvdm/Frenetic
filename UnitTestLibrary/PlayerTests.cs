@@ -37,11 +37,17 @@ namespace UnitTestLibrary
             player = new BasePlayer(stubPlayerSettings, stubPhysicsComponent, stubBoundaryCollider, stubRailGun, stubTimer);
         }
 
+        // SETUP:
         [Test]
         public void RegistersWithIPhysicsComponentForRelevantEvents()
         {
             stubPhysicsComponent.AssertWasCalled(me => me.CollidedWithWorld += Arg<Action>.Is.Anything);
             stubPhysicsComponent.AssertWasCalled(me => me.WasShot += Arg<Action<IPlayer>>.Is.Anything);
+        }
+        [Test]
+        public void SetsCollisionGroup()
+        {
+            Assert.AreEqual(BasePlayer.CollisionGroup, stubPhysicsComponent.CollisionGroup);
         }
 
         [Test]

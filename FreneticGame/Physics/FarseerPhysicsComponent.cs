@@ -16,8 +16,6 @@ namespace Frenetic.Physics
     }
     public class FarseerPhysicsComponent : IPhysicsComponent
     {
-        public delegate IPhysicsComponent Factory(Vector2 size);
-
         public FarseerPhysicsComponent(Body body, Geom geom)
         {
             _body = body;
@@ -87,6 +85,12 @@ namespace Frenetic.Physics
             {
                 _body.LinearVelocity = value;
             }
+        }
+
+        public int CollisionGroup
+        {
+            get { return _geom.CollisionGroup; }
+            set { _geom.CollisionGroup = value; }
         }
         #endregion
 

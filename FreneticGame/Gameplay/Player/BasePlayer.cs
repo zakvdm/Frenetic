@@ -11,6 +11,11 @@ namespace Frenetic.Player
 {
     public class BasePlayer : IPlayer
     {
+        public static Vector2 JumpImpulse = new Vector2(0, -250000);
+        public static Vector2 MoveForce = new Vector2(-500000f, 0);
+        public static float MaxSpeed = 1000;
+        public static int CollisionGroup = 1;
+
         public BasePlayer(IPlayerSettings playerSettings, IPhysicsComponent physicsComponent, IBoundaryCollider boundaryCollider, IRailGun weapon, ITimer timer)
         {
             this.PlayerSettings = playerSettings;
@@ -42,6 +47,8 @@ namespace Frenetic.Player
 
             IsAlive = true;
             Position = new Vector2(400, 100);
+
+            this.PhysicsComponent.CollisionGroup = BasePlayer.CollisionGroup;
         }
         
         public IPlayerSettings PlayerSettings { get; protected set; }
@@ -124,10 +131,6 @@ namespace Frenetic.Player
         protected IRailGun Weapon;
         protected ITimer Timer;
         IBoundaryCollider BoundaryCollider;
-
-        public static Vector2 JumpImpulse = new Vector2(0, -250000);
-        public static Vector2 MoveForce = new Vector2(-500000f, 0);
-        public static float MaxSpeed = 1000;
 
         internal bool InContactWithLevel { get; set; }
     }

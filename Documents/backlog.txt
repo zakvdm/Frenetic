@@ -64,8 +64,8 @@ DONE - 8 - Player settings are saved over multiple game sessions
 DONE - 20 - As the player, I can click on the screen and fire a railgun at the point where I click
 
 DONE - 5 - Keeps and distributes/shows scores
-ZAK - 2 - Players don't collide with each other
-3 - Player is disabled while dead
+DONE - 2 - Players don't collide with each other
+ZAK - 3 - Player is disabled while dead
 5 - Player respawn
 *****
 BUGS:

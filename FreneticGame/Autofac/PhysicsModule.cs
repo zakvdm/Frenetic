@@ -34,7 +34,6 @@ namespace Frenetic.Autofac
             //IPhysicsComponent
             builder.Register((c, p) => { return CreatePhysicsComponent<FarseerPhysicsComponent>(c, p, (body, geom) => new FarseerPhysicsComponent(body, geom)); }).As<IPhysicsComponent>().FactoryScoped();
             builder.Register((c, p) => { return CreatePhysicsComponent<LocalPlayerFarseerPhysicsComponent>(c, p, (body, geom) => new LocalPlayerFarseerPhysicsComponent(body, geom)); }).As<LocalPlayerFarseerPhysicsComponent>().ContainerScoped();
-            builder.RegisterGeneratedFactory<FarseerPhysicsComponent.Factory>(new TypedService(typeof(IPhysicsComponent))).ContainerScoped();
 
             builder.Register<PhysicsController>().ContainerScoped();
 
