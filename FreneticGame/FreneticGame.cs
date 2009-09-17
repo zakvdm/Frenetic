@@ -36,7 +36,7 @@ namespace Frenetic
 
             // Disable the title bar and border:
             Form frm = (Form)Form.FromHandle(this.Window.Handle);
-            frm.FormBorderStyle = FormBorderStyle.None;
+            //frm.FormBorderStyle = FormBorderStyle.None;
             
             // Disable fixed timestep
             this.IsFixedTimeStep = false;
@@ -162,7 +162,13 @@ namespace Frenetic
             builder.Register<Quitter>().SingletonScoped();
             builder.Register<SettingsPersister>().As<ISettingsPersister>().SingletonScoped();
 
-            builder.Register<Frenetic.Engine.Timer>().As<ITimer>().ContainerScoped();
+            builder.Register<Frenetic.Engine.TimerController>().ContainerScoped();
+            builder.Register((c, p) =>
+                                {
+                                    var timer = new Frenetic.Engine.Timer();
+                                    c.Resolve<TimerController>().Tick += timer.UpdateElapsedTime;
+                                    return timer;
+                                }).As<ITimer>().FactoryScoped();
 
             //builder.Register<log4net.ILog>((c, p) => log4net.LogManager.GetLogger(p.TypedAs<Type>())).FactoryScoped();
             builder.Register<log4netLoggerFactory>().As<ILoggerFactory>().SingletonScoped();

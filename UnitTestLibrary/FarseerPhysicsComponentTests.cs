@@ -8,10 +8,11 @@ using FarseerGames.FarseerPhysics.Collisions;
 using Frenetic.Physics;
 using Microsoft.Xna.Framework;
 using Rhino.Mocks;
+using Frenetic.Player;
 
 namespace UnitTestLibrary
 {
-    [TestFixture]
+    //[TestFixture]
     public class FarseerPhysicsComponentTests
     {
         PhysicsSimulator simulator = new PhysicsSimulator();
@@ -39,6 +40,16 @@ namespace UnitTestLibrary
             farseerPComponent.Position = new Vector2(100, 200);
 
             Assert.AreEqual(new Vector2(100, 200), farseerPComponent.Position);
+        }
+
+        [Test]
+        public void CanToggleEnabledStatus()
+        {
+            Assert.IsTrue(farseerPComponent.Enabled);
+
+            farseerPComponent.Enabled = false;
+
+            Assert.IsFalse(farseerPComponent.Enabled);
         }
 
         [Test]
@@ -90,9 +101,9 @@ namespace UnitTestLibrary
         public void RaisesEventWhenShot()
         {
             bool raisedEvent = false;
-            farseerPComponent.Shot += () => raisedEvent = true;
+            farseerPComponent.WasShot += (player) => raisedEvent = true;
 
-            farseerPComponent.OnShot();
+            farseerPComponent.OnWasShot(MockRepository.GenerateStub<IPlayer>());
 
             Assert.IsTrue(raisedEvent);
         }

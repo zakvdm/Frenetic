@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework;
 using System.Collections.Generic;
 using Frenetic.Physics;
+using Frenetic.Player;
 
 namespace Frenetic.Weapons
 {
@@ -17,22 +18,19 @@ namespace Frenetic.Weapons
 
         public Shots Shots { get; private set; }
 
-        public void Shoot(Vector2 origin, Vector2 direction)
+        public List<IPhysicsComponent> Shoot(Vector2 origin, Vector2 direction)
         {
             Vector2 endPoint;
 
             if (direction == Vector2.Zero)
-                return;
+                return new List<IPhysicsComponent>();
 
             Vector2 offsetOrigin = origin + (Vector2.Normalize(direction - origin) * RailGun.Offset);
             List<IPhysicsComponent> hitObjects = _rayCaster.ShootRay(offsetOrigin, direction, out endPoint);
 
-            foreach (IPhysicsComponent physicsComponent in hitObjects)
-            {
-                physicsComponent.OnShot();
-            }
-            
             this.Shots.Add(new Shot(origin, endPoint));
+
+            return hitObjects;
         }
 
 

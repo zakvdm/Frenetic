@@ -12,6 +12,7 @@ namespace Frenetic.Player
 {
     public class NetworkPlayer : BasePlayer
     {
+        public const float SMOOTHING_FACTOR = 0.8f;     // 1f tries to catch up completely between each tick and is likely to be unstable
         public NetworkPlayer(IPlayerSettings playerSettings, IPhysicsComponent physicsComponent, IRailGun weapon, ITimer timer)
             : base(playerSettings, physicsComponent, null, weapon, timer)
         {
@@ -25,8 +26,17 @@ namespace Frenetic.Player
 
         public override void UpdatePositionFromNetwork(Vector2 newestPosition, float deliveryTime)
         {
+            this.Position = newestPosition;
+        }
+
+        public void UpdatePositionFromNetworkWithOnlySmoothing(Vector2 newestPosition, float deliveryTime)
+        {
+            float roundTripTime = Math.Max(this.Timer.StopWatchReading, 0.01f);
+            this.Timer.StartStopWatch();
+            Console.WriteLine("Round Trip Time: " + roundTripTime.ToString());
             // SMOOTHING ONLY:
             var displacement = newestPosition - this.Position;
+            Console.WriteLine("Displacement length is: " + displacement.Length());
 
             if (displacement.Length() > 100f)
             {
@@ -37,7 +47,7 @@ namespace Frenetic.Player
                 return;
             }
 
-            var velocity = displacement / deliveryTime;
+            var velocity = (displacement / roundTripTime) * SMOOTHING_FACTOR;
             this.PhysicsComponent.LinearVelocity = velocity;
         }
 

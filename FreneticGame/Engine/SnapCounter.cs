@@ -9,7 +9,7 @@ namespace Frenetic
             CurrentSnap = 1;    // Start from 1
         }
 
-        public int SnapsPerSecond = 20;
+        public int SnapsPerSecond = 25;
 
         #region IController Members
 

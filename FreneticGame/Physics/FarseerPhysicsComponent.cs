@@ -2,6 +2,7 @@
 using FarseerGames.FarseerPhysics.Dynamics;
 using FarseerGames.FarseerPhysics.Collisions;
 using Microsoft.Xna.Framework;
+using Frenetic.Player;
 
 namespace Frenetic.Physics
 {
@@ -10,7 +11,7 @@ namespace Frenetic.Physics
         public LocalPlayerFarseerPhysicsComponent(Body body, Geom geom)
             : base(body, geom)
         {
-            //body.IgnoreGravity = false;
+            body.IgnoreGravity = false;
         }       
     }
     public class FarseerPhysicsComponent : IPhysicsComponent
@@ -25,6 +26,8 @@ namespace Frenetic.Physics
 
             _geom.FrictionCoefficient = 0.7f;
 
+            _body.IgnoreGravity = true;
+
             _geom.OnCollision += new CollisionEventHandler((geom1, geom2, contactList) =>
                 {
                     CollidedWithWorld();
@@ -33,6 +36,12 @@ namespace Frenetic.Physics
         }
 
         #region Properties
+        public bool Enabled
+        {
+            get { return _body.Enabled; }
+            set { _body.Enabled = value; }
+        }
+
         public bool IsStatic
         {
             get
@@ -91,12 +100,12 @@ namespace Frenetic.Physics
             _body.ApplyForce(force);
         }
 
-        public void OnShot()
+        public void OnWasShot(IPlayer shootingPlayer)
         {
-            Shot();
+            WasShot(shootingPlayer);
         }
 
-        public event Action Shot = delegate { };
+        public event Action<IPlayer> WasShot = delegate { };
         public event Action CollidedWithWorld = delegate { };
 
         Body _body;

@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework;
+using Frenetic.Player;
 
 namespace Frenetic.Physics
 {
     public interface IPhysicsComponent
     {
+        bool Enabled { get; set; }
         bool IsStatic { get; set; }
         Vector2 Position { get; set; }
         Vector2 LinearVelocity { get; set; }
@@ -16,9 +18,9 @@ namespace Frenetic.Physics
         void ApplyImpulse(Vector2 impulse);
         void ApplyForce(Vector2 force);
 
-        void OnShot();
+        void OnWasShot(IPlayer shootingPlayer);
 
         event Action CollidedWithWorld;
-        event Action Shot;
+        event Action<IPlayer> WasShot;
     }
 }

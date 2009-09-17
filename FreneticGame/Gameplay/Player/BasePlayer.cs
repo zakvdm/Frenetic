@@ -22,11 +22,16 @@ namespace Frenetic.Player
                 this.PhysicsComponent = physicsComponent;
 
             this.PhysicsComponent.CollidedWithWorld += () => InContactWithLevel = true;
-            this.PhysicsComponent.Shot += () =>
+            this.PhysicsComponent.WasShot += (shootingPlayer) =>
                 {
                     IsAlive = false;
                     this.OnDied();  // TODO: Do i really need this event? (currently used by nothing?)
+
+                    // UPDATE SCORES:
                     this.PlayerScore.Deaths += 1;
+                    shootingPlayer.PlayerScore.Kills += 1;
+
+                    // RESPAWN:
                     timer.AddActionTimer(2f, () => this.IsAlive = true);
                     return;
                 };
@@ -93,7 +98,13 @@ namespace Frenetic.Player
 
         public void Shoot(Vector2 targetPosition)
         {
-            this.Weapon.Shoot(this.Position, targetPosition);
+            var hitObjects = this.Weapon.Shoot(this.Position, targetPosition);
+
+            foreach (var physicsComponent in hitObjects)
+            {
+                // Notify everything that we hit
+                physicsComponent.OnWasShot(this);
+            }
         }
 
         public virtual void UpdatePositionFromNetwork(Vector2 newestPosition, float deliveryTime)

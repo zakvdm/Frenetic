@@ -61,10 +61,12 @@ DONE - Players/objects are not visible if they are in the "black" areas
 
 DONE - 8 - Basic visibility (All areas not directly visible from the current player position are black)
 DONE - 8 - Player settings are saved over multiple game sessions
-DONE - 20 - As the player, I can click on the screen and fire a railgun at the point where I click.
+DONE - 20 - As the player, I can click on the screen and fire a railgun at the point where I click
 
-ZAK - 5 - Keeps and distributes/shows scores
-5 - Player death... DUM DUM DUM DUUUUH
+DONE - 5 - Keeps and distributes/shows scores
+ZAK - 2 - Players don't collide with each other
+3 - Player is disabled while dead
+5 - Player respawn
 *****
 BUGS:
 1) When server dies, connected client has to shutdown gracefully

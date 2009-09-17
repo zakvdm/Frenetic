@@ -4,6 +4,16 @@ using System.Collections.Generic;
 
 namespace Frenetic.Engine
 {
+    public class TimerController : IController
+    {
+        public void Process(float elapsedSeconds)
+        {
+            Tick(elapsedSeconds);
+        }
+
+        public event Action<float> Tick = delegate { };
+    }
+
     public class Timer : ITimer
     {
         public void AddActionTimer(float durationOfTimer, Action action)
@@ -13,11 +23,22 @@ namespace Frenetic.Engine
             _timers = _timers.OrderBy((timer) => timer.ExpirationTime).ToList();
         }
 
+        public void StartStopWatch()
+        {
+            this.StopWatchElapsedTime = 0f;
+        }
+
+        public float StopWatchReading
+        {
+            get { return this.StopWatchElapsedTime; }
+        }
+
         #region IController Members
 
-        public void Process(float elapsedSeconds)
+        public void UpdateElapsedTime(float elapsedSeconds)
         {
             _elapsedTime += elapsedSeconds;
+            this.StopWatchElapsedTime += elapsedSeconds;
 
             while (_timers.Count > 0 && _timers[0].ExpirationTime <= _elapsedTime)
             {
@@ -29,6 +50,7 @@ namespace Frenetic.Engine
         #endregion
 
         float _elapsedTime = 0f;
+        float StopWatchElapsedTime = 0f;
 
         List<ActionTimer> _timers = new List<ActionTimer>();
 

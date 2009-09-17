@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework;
 using Rhino.Mocks;
 using Frenetic.Physics;
 using System.Collections.Generic;
+using Frenetic.Player;
 
 namespace UnitTestLibrary
 {
@@ -52,17 +53,17 @@ namespace UnitTestLibrary
         }
 
         [Test]
-        public void TellsEachHitPhysicsComponentThatItHasBeenHit()
+        public void ReturnsAListofHitPhysicsComponents()
         {
             var physicsComp1 = MockRepository.GenerateStub<IPhysicsComponent>();
             var physicsComp2 = MockRepository.GenerateStub<IPhysicsComponent>();
             hitObjects.Add(physicsComp1);
             hitObjects.Add(physicsComp2);
 
-            railGun.Shoot(Vector2.Zero, Vector2.One);
+            var returned_hitobjects = railGun.Shoot(Vector2.Zero, Vector2.One);
 
-            physicsComp1.AssertWasCalled(me => me.OnShot());
-            physicsComp2.AssertWasCalled(me => me.OnShot());
+            Assert.AreEqual(physicsComp1, returned_hitobjects[0]);
+            Assert.AreEqual(physicsComp2, returned_hitobjects[1]);
         }
 
         [Test]

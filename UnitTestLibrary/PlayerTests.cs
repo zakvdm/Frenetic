@@ -11,6 +11,8 @@ using FarseerGames.FarseerPhysics.Dynamics;
 using Frenetic.Player;
 using Frenetic.Weapons;
 using Frenetic.Engine;
+using System.Collections.Generic;
+using Frenetic.Gameplay;
 
 namespace UnitTestLibrary
 {
@@ -21,6 +23,7 @@ namespace UnitTestLibrary
         IPlayerSettings stubPlayerSettings;
         IPhysicsComponent stubPhysicsComponent;
         IBoundaryCollider stubBoundaryCollider;
+        IRailGun stubRailGun;
         ITimer stubTimer;
 
         [SetUp]
@@ -29,15 +32,16 @@ namespace UnitTestLibrary
             stubPlayerSettings = MockRepository.GenerateStub<IPlayerSettings>();
             stubPhysicsComponent = MockRepository.GenerateStub<IPhysicsComponent>();
             stubBoundaryCollider = MockRepository.GenerateStub<IBoundaryCollider>();
+            stubRailGun = MockRepository.GenerateStub<IRailGun>();
             stubTimer = MockRepository.GenerateStub<ITimer>();
-            player = new BasePlayer(stubPlayerSettings, stubPhysicsComponent, stubBoundaryCollider, MockRepository.GenerateStub<IRailGun>(), stubTimer);
+            player = new BasePlayer(stubPlayerSettings, stubPhysicsComponent, stubBoundaryCollider, stubRailGun, stubTimer);
         }
 
         [Test]
         public void RegistersWithIPhysicsComponentForRelevantEvents()
         {
             stubPhysicsComponent.AssertWasCalled(me => me.CollidedWithWorld += Arg<Action>.Is.Anything);
-            stubPhysicsComponent.AssertWasCalled(me => me.Shot += Arg<Action>.Is.Anything);
+            stubPhysicsComponent.AssertWasCalled(me => me.WasShot += Arg<Action<IPlayer>>.Is.Anything);
         }
 
         [Test]
@@ -124,6 +128,7 @@ namespace UnitTestLibrary
         [Test]
         public void ShootCallsShootOnCurrentWeapon()
         {
+            player.CurrentWeapon.Stub(me => me.Shoot(Arg<Vector2>.Is.Anything, Arg<Vector2>.Is.Anything) ).Return(new List<IPhysicsComponent>());
             player.Position = new Vector2(10, 20);
 
             player.Shoot(new Vector2(30, 40));
@@ -131,23 +136,40 @@ namespace UnitTestLibrary
             player.CurrentWeapon.AssertWasCalled(me => me.Shoot(new Vector2(10, 20), new Vector2(30, 40)));
         }
         [Test]
+        public void NotifiesAllShotPhysicsComponents()
+        {
+            var stubPhysicsComponent1 = MockRepository.GenerateStub<IPhysicsComponent>();
+            var stubPhysicsComponent2 = MockRepository.GenerateStub<IPhysicsComponent>();
+            stubRailGun.Stub(me => me.Shoot(Arg<Vector2>.Is.Anything, Arg<Vector2>.Is.Anything)).Return(new List<IPhysicsComponent>() { stubPhysicsComponent1, stubPhysicsComponent2 });
+
+            player.Shoot(new Vector2(100, 200));
+
+            stubPhysicsComponent1.AssertWasCalled(me => me.OnWasShot(player));
+            stubPhysicsComponent2.AssertWasCalled(me => me.OnWasShot(player));
+        }
+        [Test]
         public void GettingShotKillsThePlayer()
         {
+            var shootingPlayer = MockRepository.GenerateStub<IPlayer>();
+            shootingPlayer.Stub(me => me.PlayerScore).Return(new Frenetic.Gameplay.PlayerScore());
             bool raisedOnDeath = false;
             Assert.IsTrue(player.IsAlive);
             player.Died += () => raisedOnDeath = !raisedOnDeath;
 
-            stubPhysicsComponent.Raise(me => me.Shot += null);
+            stubPhysicsComponent.Raise(me => me.WasShot += null, shootingPlayer);
 
             Assert.IsFalse(player.IsAlive);
             Assert.IsTrue(raisedOnDeath);
             Assert.AreEqual(1, player.PlayerScore.Deaths);
+            Assert.AreEqual(1, shootingPlayer.PlayerScore.Kills);
         }
         [Test]
         public void SetsRespawnTimerOnDead()
         {
+            var shootingPlayer = MockRepository.GenerateStub<IPlayer>();
+            shootingPlayer.Stub(me => me.PlayerScore).Return(new PlayerScore());
             // At the moment just Shooting the player kills it...
-            stubPhysicsComponent.Raise(me => me.Shot += null);
+            stubPhysicsComponent.Raise(me => me.WasShot += null, shootingPlayer);
 
             stubTimer.AssertWasCalled(me => me.AddActionTimer(Arg<float>.Is.Anything, Arg<Action>.Is.Anything));
         }

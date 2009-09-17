@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.Xna.Framework;
+using Frenetic.Player;
 
 namespace Frenetic.Physics
 {
@@ -11,6 +12,7 @@ namespace Frenetic.Physics
         }
         #region IPhysicsComponent Members
 
+        public bool Enabled { get; set; }
         public bool IsStatic { get; set; }
         public Vector2 Position { get; set; }
         public Vector2 LinearVelocity { get; set; }
@@ -24,10 +26,10 @@ namespace Frenetic.Physics
         {
         }
 
-        public void OnShot() { }
+        public void OnWasShot(IPlayer shootingPlayer) { }
 
         public event Action CollidedWithWorld = delegate { };
-        public event Action Shot = delegate { };
+        public event Action<IPlayer> WasShot = delegate { };
 
         #endregion
     }

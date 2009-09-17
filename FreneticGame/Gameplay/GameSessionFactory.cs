@@ -70,7 +70,7 @@ namespace Frenetic
 
             SnapCounter snapCounter = (SnapCounter)ServerContainer.Resolve<ISnapCounter>();
             gameSession.Controllers.Add(snapCounter);
-            gameSession.Controllers.Add(ServerContainer.Resolve<ITimer>());
+            gameSession.Controllers.Add(ServerContainer.Resolve<TimerController>());
 
             Log<ChatMessage> serverLog = ServerContainer.Resolve<Log<ChatMessage>>();
 
@@ -122,6 +122,7 @@ namespace Frenetic
                 new TypedParameter(typeof(bool), false));
             GameSessionView gameSessionView = ClientContainer.Resolve<GameSessionView>();
 
+            gameSession.Controllers.Add(ClientContainer.Resolve<TimerController>());
 
             // THINGS TO SYNC OVER NETWORK:
             Log<ChatMessage> chatLog = _parentContainer.Resolve<IMessageConsole>().Log;
