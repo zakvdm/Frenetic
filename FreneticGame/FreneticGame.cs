@@ -136,6 +136,8 @@ namespace Frenetic
 
             loader.LoadTweakableProperties(Container.Resolve<LocalPlayerSettings>());
             loader.LoadTweakableProperties(Container.Resolve<PhysicsSettings>());
+            loader.LoadCommands(Container.Resolve<Quitter>());
+            loader.LoadCommands(Container.Resolve<MainMenuScreen>());
         }
 
         void PreloadTextures()

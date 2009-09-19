@@ -6,8 +6,9 @@ namespace Frenetic
     public interface IMediator
     {
         List<string> AvailableProperties { get; }
-        void Set(string name, string value);
-        string Get(string name);
+        List<string> AvailableActions { get; }
+        string Process(string name, params object[] args);
         void Register(PropertyInfo property, object instance);
+        void Register(MethodInfo method, string command, object instance);
     }
 }

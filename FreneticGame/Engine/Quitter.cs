@@ -13,6 +13,7 @@ namespace Frenetic
             _game = game;
         }
 
+        [Command("Exit")]
         public void Quit()
         {
             _settingsSaver.SaveSettings();

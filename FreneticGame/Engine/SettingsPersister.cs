@@ -24,7 +24,7 @@ namespace Frenetic
             {
                 foreach (string property in _mediator.AvailableProperties)
                 {
-                    string line = property + " " + _mediator.Get(property);
+                    string line = property + " " + _mediator.Process(property);
                     writer.WriteLine(line);
                 }
 

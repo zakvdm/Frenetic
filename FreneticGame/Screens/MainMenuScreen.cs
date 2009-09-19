@@ -254,6 +254,12 @@ namespace Frenetic
             _gameplayScreen = _screenFactory.MakeGameplayScreen(clientGameSessionCandV, null);
         }
 
+        [Command("Connect")]
+        public void JoinSession(string address, string port)
+        {
+            var clientGameSesssionCandV = _gameSessionFactory.MakeClientGameSession();
+        }
+
         #endregion
 
         #region Unused old network code

@@ -12,6 +12,17 @@ namespace Frenetic
     {
     }
 
+    [AttributeUsage(AttributeTargets.Method)]
+    class Command : Attribute
+    {
+        public Command(string commandName)
+        {
+            Name = commandName;
+        }
+
+        public string Name { get; set; }
+    }
+
     class TweakablePropertiesLoader
     {
         public TweakablePropertiesLoader(IMediator mediator)
@@ -29,6 +40,16 @@ namespace Frenetic
             }
         }
 
+        internal void LoadCommands(object instance)
+        {
+            Type type = instance.GetType();
+            var methods = type.GetMethods();
+            foreach (var method in methods)
+            {
+                RegisterMethodWithMediator(method, instance);
+            }
+        }
+
         void RegisterPropertyWithMediator(PropertyInfo propertyInfo, object instance, Predicate<PropertyInfo> isAValidProperty)
         {
             var tweakableAttribute = propertyInfo.GetCustomAttributes(typeof(TweakableAttribute), true);
@@ -38,6 +59,15 @@ namespace Frenetic
                 {
                     _mediator.Register(propertyInfo, instance);
                 }
+            }
+        }
+
+        void RegisterMethodWithMediator(MethodInfo methodInfo, object instance)
+        {
+            var commandAttributes = (Command[])methodInfo.GetCustomAttributes(typeof(Command), true);
+            if (commandAttributes != null && commandAttributes.Length > 0)
+            {
+                _mediator.Register(methodInfo, commandAttributes.First().Name, instance);
             }
         }
 

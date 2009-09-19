@@ -34,6 +34,17 @@ namespace UnitTestLibrary
         }
 
         [Test]
+        public void RegistersCommandForASpecifiedClassInstance()
+        {
+            TestCommandableClass testClass = new TestCommandableClass();
+            MethodInfo methodInfo = testClass.GetType().GetMethod("TestMethod");
+
+            loader.LoadCommands(testClass);
+
+            stubMediator.AssertWasCalled(me => me.Register(methodInfo, "Test", testClass));
+        }
+
+        [Test]
         [ExpectedException(typeof(InvalidOperationException), ExpectedMessage="Tweakable property {UnitTestLibrary.IncorrectTweakableClass.NonWritableProperty} is of the wrong type (should be public read/write)")]
         public void ChecksThatPropertyIsReadWrite()
         {
@@ -41,6 +52,15 @@ namespace UnitTestLibrary
             PropertyInfo propinfo = testClass.GetType().GetProperty("NonWritableProperty");
 
             loader.LoadTweakableProperties(testClass);
+        }
+    }
+
+    public class TestCommandableClass
+    {
+        [Command("Test")]
+        public void TestMethod()
+        {
+
         }
     }
 

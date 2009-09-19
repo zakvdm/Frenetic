@@ -16,6 +16,7 @@ namespace Frenetic
         {
             _logger = loggerFactory.GetLogger(this.GetType());
             _properties = new Dictionary<string, List<Delegate>>();
+            _actions = new Dictionary<string, List<Action<object[]>>>();
         }
 
         public List<string> AvailableProperties
@@ -23,6 +24,14 @@ namespace Frenetic
             get
             {
                 return _properties.Keys.ToList();
+            }
+        }
+
+        public List<string> AvailableActions
+        {
+            get
+            {
+                return _actions.Keys.ToList();
             }
         }
         
@@ -57,12 +66,50 @@ namespace Frenetic
             }
         }
 
-        public void Set(string name, string value)
+        public void Register(MethodInfo method, string command, object instance)
         {
-            if (!IsPropertyRegistered(name))
+            if (!_actions.ContainsKey(command))
+            {
+                _actions.Add(command, new List<Action<object[]>>());
+            }
+
+            _actions[command].Add(new Action<object[]>((parameters) => method.Invoke(instance, parameters)));
+        }
+
+        public string Process(string name, params object[] args)
+        {
+            if (IsProperty(name))
+            {
+                if (args.Length == 0)
+                {
+                    return Get(name);
+                }
+                else
+                {
+                    Set(name, args);
+                    return null;
+                }
+            }
+            else if (IsAction(name))
+            {
+                Execute(name, args);
+                return null;
+            }
+            else
+            {
+                _logger.Info("Unknown command: " + name);
+                return null;
+            }
+        }
+
+        private void Set(string name, params object[] args)
+        {
+            if (!IsProperty(name))
             {
                 return;
             }
+
+            string value = String.Join(" ", args.Select(a => a.ToString()).ToArray());
 
             Type type = GetTypeOfProperty(name);
 
@@ -88,12 +135,8 @@ namespace Frenetic
             }
         }
 
-        public string Get(string name)
+        private string Get(string name)
         {
-            if (!IsPropertyRegistered(name))
-            {
-                return null;
-            }
             Func<object> getter = (Func<object>)_properties[name][1];
 
             Type type = GetTypeOfProperty(name);
@@ -116,6 +159,13 @@ namespace Frenetic
 
             _logger.Info(name + " is : " + value);
             return value;
+        }
+
+        public void Execute(string method, params object[] parameters)
+        {
+            var action = (Action<object[]>)_actions[method].First();
+
+            action(parameters);
         }
         
         private void RegisterSetterAndGetter<PropertyType>(PropertyInfo property, object instance)
@@ -187,16 +237,28 @@ namespace Frenetic
         {
             return _properties[name][0].Method.GetParameters()[0].ParameterType;
         }
-        private bool IsPropertyRegistered(string name)
+        private bool IsProperty(string name)
         {
-            if (!_properties.ContainsKey(name))
+            if (_properties.ContainsKey(name))
             {
-                _logger.Info("Unknown command: " + name);
-                return false;
+                return true;
             }
 
-            return true;
+            _logger.Info("Unknown command: " + name);
+            return false;
         }
+
+        private bool IsAction(string name)
+        {
+            if (_actions.ContainsKey(name))
+            {
+                return true;
+            }
+
+            _logger.Info("Unknown action: " + name);
+            return false;
+        }
+
         private string GetNameOfProperty(PropertyInfo property)
         {
             // Get a name for the property in the form: {last piece of namespace} . {property name}
@@ -208,5 +270,6 @@ namespace Frenetic
 
         ILog _logger;
         private Dictionary<string, List<Delegate>> _properties;
+        private Dictionary<string, List<Action<object[]>>> _actions;
     }
 }

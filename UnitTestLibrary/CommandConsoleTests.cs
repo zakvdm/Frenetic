@@ -35,7 +35,7 @@ namespace UnitTestLibrary
         {
             console.ProcessInput("/command 1");
 
-            stubMediator.AssertWasCalled(x => x.Set("command", "1"));
+            stubMediator.AssertWasCalled(x => x.Process("command", "1"));
         }
 
         [Test]
@@ -43,7 +43,7 @@ namespace UnitTestLibrary
         {
             console.ProcessInput("/property");
 
-            stubMediator.AssertWasCalled(x => x.Get("property"));
+            stubMediator.AssertWasCalled(x => x.Process("property"));
         }
 
         [Test]
@@ -51,7 +51,7 @@ namespace UnitTestLibrary
         {
             console.ProcessInput("/command  arg1   arg2 arg3");
 
-            stubMediator.AssertWasCalled(x => x.Set("command", "arg1 arg2 arg3"));
+            stubMediator.AssertWasCalled(x => x.Process("command", "arg1", "arg2", "arg3"));
         }
 
         [Test]
@@ -61,8 +61,7 @@ namespace UnitTestLibrary
 
             console.ProcessInput(badinput);
 
-            stubMediator.AssertWasNotCalled(x => x.Set(Arg<string>.Is.Anything, Arg<string>.Is.Anything));
-            stubMediator.AssertWasNotCalled(x => x.Get(Arg<string>.Is.Anything));
+            stubMediator.AssertWasNotCalled(x => x.Process(Arg<string>.Is.Anything, Arg<string>.Is.Anything));
         }
 
         // TryToCompleteCurrentInput:
@@ -70,6 +69,7 @@ namespace UnitTestLibrary
         public void CompletesCommandWhenUnambiguousCompletionAvailable()
         {
             stubMediator.Stub(x => x.AvailableProperties).Return(new List<string>() { "Eat", "Die" });
+            stubMediator.Stub(x => x.AvailableActions).Return(new List<string>());
 
             string completed = console.TryToCompleteInput("E");
 
@@ -80,6 +80,7 @@ namespace UnitTestLibrary
         public void CompleteHandlesASlashInFront()
         {
             stubMediator.Stub(x => x.AvailableProperties).Return(new List<string>() { "Eat" });
+            stubMediator.Stub(x => x.AvailableActions).Return(new List<string>());
 
             string completed = console.TryToCompleteInput("/E");
 
@@ -89,6 +90,7 @@ namespace UnitTestLibrary
         public void CompleteIgnoresCaseVariations()
         {
             stubMediator.Stub(x => x.AvailableProperties).Return(new List<string>() { "EaT" });
+            stubMediator.Stub(x => x.AvailableActions).Return(new List<string>());
 
             string completed = console.TryToCompleteInput("eAt");
 
@@ -98,6 +100,7 @@ namespace UnitTestLibrary
         public void HandlesCurrentInputLongerThanCommandWithoutFailing()
         {
             stubMediator.Stub(x => x.AvailableProperties).Return(new List<string>() { "Eat" });
+            stubMediator.Stub(x => x.AvailableActions).Return(new List<string>());
 
             string completed = console.TryToCompleteInput("Eat shit");
 
@@ -107,6 +110,7 @@ namespace UnitTestLibrary
         public void DoesAPartialCompleteWhenAppropriate()
         {
             stubMediator.Stub(x => x.AvailableProperties).Return(new List<string>() { "GiveX", "GiveY" });
+            stubMediator.Stub(x => x.AvailableActions).Return(new List<string>());
 
             string completed = console.TryToCompleteInput("gi");
 
@@ -125,15 +129,17 @@ namespace UnitTestLibrary
 
         // FindPossibleInputCompletions:
         [Test]
-        public void ReturnsListOfAllPossibleCompletions()
+        public void ReturnsListOfAllPossibleCompletionsAlphabetically()
         {
-            stubMediator.Stub(x => x.AvailableProperties).Return(new List<string>() { "Eat", "Endear", "Die" });
+            stubMediator.Stub(x => x.AvailableProperties).Return(new List<string>() { "Expose", "Endear", "Die" });
+            stubMediator.Stub(x => x.AvailableActions).Return(new List<string>() { "Eat", "Spoon", "Cheat",  });
 
             Log<string> possibleCommands = console.FindPossibleInputCompletions("E");
 
-            Assert.AreEqual(2, possibleCommands.Count);
-            Assert.IsTrue(possibleCommands.Exists((x) => x.ToString() == "Eat"));
-            Assert.IsTrue(possibleCommands.Exists((x) => x.ToString() == "Endear"));
+            Assert.AreEqual(3, possibleCommands.Count);
+            Assert.AreEqual("Eat", possibleCommands[0]);
+            Assert.AreEqual("Endear", possibleCommands[1]);
+            Assert.AreEqual("Expose", possibleCommands[2]);
         }
 
         [Test]

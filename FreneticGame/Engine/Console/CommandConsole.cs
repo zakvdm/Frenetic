@@ -23,11 +23,11 @@ namespace Frenetic
                 string[] pieces = commandLine.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
                 if (pieces.Length > 1)
                 {
-                    _mediator.Set(pieces[0], String.Join(" ", pieces, 1, pieces.Length - 1));
+                    _mediator.Process(pieces[0], pieces.Skip(1).ToArray());
                 }
                 else
                 {
-                    _mediator.Get(pieces[0]);
+                    _mediator.Process(pieces[0]);
                 }
             }
         }
@@ -42,10 +42,14 @@ namespace Frenetic
 
             if (searchString.StartsWith("/"))
                 searchString = searchString.Substring(1);
-            
-            return new Log<string>((from command in _mediator.AvailableProperties
-                        where (command.ToString().Length >= searchString.Length)
-                        where (command.ToString().Substring(0, searchString.Length).ToLower() == searchString)
+
+            var possibilites = _mediator.AvailableProperties;
+            possibilites.AddRange(_mediator.AvailableActions);
+
+            return new Log<string>((from command in possibilites
+                        where (command.Length >= searchString.Length)
+                        where (command.Substring(0, searchString.Length).ToLower() == searchString)
+                        orderby command
                         select command).ToList<string>());
         }
 

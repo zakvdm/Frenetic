@@ -23,8 +23,8 @@ namespace UnitTestLibrary
         [Test]
         public void HandlesNonExistentProperties()
         {
-            mediator.Set("NonExistentProperty", "hole");
-            Assert.IsNull(mediator.Get("NonExistentProperty"));
+            mediator.Process("NonExistentProperty", "hole");
+            Assert.IsNull(mediator.Process("NonExistentProperty"));
         }
 
         [Test]
@@ -41,12 +41,12 @@ namespace UnitTestLibrary
         {
             var tweakableProp = typeof(TestClass).GetProperty("IntTestProperty");
             mediator.Register(tweakableProp, new TestClass());
-            mediator.Set("FakeName.IntTestProperty", "200");
+            mediator.Process("FakeName.IntTestProperty", "200");
 
             tweakableProp = null;
             GC.Collect();
 
-            Assert.AreEqual("200", mediator.Get("FakeName.IntTestProperty"));
+            Assert.AreEqual("200", mediator.Process("FakeName.IntTestProperty"));
         }
 
         [Test]
@@ -56,8 +56,36 @@ namespace UnitTestLibrary
 
             mediator.Register(tweakableProperty, new TestClass());
 
-            mediator.Set("FakeName.IntTestProperty", "11");
-            Assert.AreEqual("11", mediator.Get("FakeName.IntTestProperty"));
+            mediator.Process("FakeName.IntTestProperty", "11");
+            Assert.AreEqual("11", mediator.Process("FakeName.IntTestProperty"));
+        }
+
+        [Test]
+        public void CanRegisterAndUseAZeroParameterMethod()
+        {
+            var method = typeof(TestClass).GetMethod("ZeroParameterTestMethod");
+
+            var testClass = new TestClass();
+
+            mediator.Register(method, "Start", testClass);
+
+            Assert.IsFalse(testClass.ZeroParameterTestMethodCalled);
+            mediator.Execute("Start");
+            Assert.IsTrue(testClass.ZeroParameterTestMethodCalled);
+        }
+
+        [Test]
+        public void CanRegisterAndUseATwoParameterMethod()
+        {
+            var method = typeof(TestClass).GetMethod("TwoParameterTestMethod");
+
+            var testClass = new TestClass();
+
+            mediator.Register(method, "Connect", testClass);
+
+            mediator.Execute("Connect", "192.168.1.1", 2005);
+            Assert.AreEqual("192.168.1.1", testClass.StringTestProperty);
+            Assert.AreEqual(2005, testClass.IntTestProperty);
         }
 
         [Test]
@@ -66,9 +94,9 @@ namespace UnitTestLibrary
             var tweakableProp = typeof(TestClass).GetProperty("StringTestProperty");
             mediator.Register(tweakableProp, new TestClass());
 
-            mediator.Set("FakeName.StringTestProperty", "hello");
+            mediator.Process("FakeName.StringTestProperty", "hello");
 
-            Assert.AreEqual("hello", mediator.Get("FakeName.StringTestProperty"));
+            Assert.AreEqual("hello", mediator.Process("FakeName.StringTestProperty"));
         }
 
         [Test]
@@ -77,9 +105,9 @@ namespace UnitTestLibrary
             var tweakableProp = typeof(TestClass).GetProperty("Vector2TestProperty");
             mediator.Register(tweakableProp, new TestClass());
 
-            mediator.Set("FakeName.Vector2TestProperty", "100 200");
+            mediator.Process("FakeName.Vector2TestProperty", "100 200");
 
-            Assert.AreEqual("100 200", mediator.Get("FakeName.Vector2TestProperty"));
+            Assert.AreEqual("100 200", mediator.Process("FakeName.Vector2TestProperty"));
         }
 
         [Test]
@@ -88,9 +116,9 @@ namespace UnitTestLibrary
             var tweakableProp = typeof(TestClass).GetProperty("ColorTestProperty");
             mediator.Register(tweakableProp, new TestClass());
 
-            mediator.Set("FakeName.ColorTestProperty", "100 200 10");
+            mediator.Process("FakeName.ColorTestProperty", "100 200 10");
 
-            Assert.AreEqual("100 200 10", mediator.Get("FakeName.ColorTestProperty"));
+            Assert.AreEqual("100 200 10", mediator.Process("FakeName.ColorTestProperty"));
         }
 
         [Test]
@@ -99,9 +127,9 @@ namespace UnitTestLibrary
             var tweakProp = typeof(TestClass).GetProperty("FloatTestProperty");
             mediator.Register(tweakProp, new TestClass());
 
-            mediator.Set("FakeName.FloatTestProperty", "12.32231");
+            mediator.Process("FakeName.FloatTestProperty", "12.32231");
 
-            Assert.AreEqual("12.32231", mediator.Get("FakeName.FloatTestProperty"));
+            Assert.AreEqual("12.32231", mediator.Process("FakeName.FloatTestProperty"));
         }
 
         [Test]
@@ -137,9 +165,9 @@ namespace UnitTestLibrary
             mediator.Register(tweakProp, instance);
             instance.Vector2TestProperty = new Vector2(100, 200);
 
-            mediator.Set("FakeName.Vector2TestProperty", "300 ARG! BEEF");
+            mediator.Process("FakeName.Vector2TestProperty", "300 ARG! BEEF");
 
-            Assert.AreEqual("100 200", mediator.Get("FakeName.Vector2TestProperty"));
+            Assert.AreEqual("100 200", mediator.Process("FakeName.Vector2TestProperty"));
         }
 
         
@@ -156,6 +184,21 @@ namespace UnitTestLibrary
             public float FloatTestProperty { get; set; }
 
             public Decimal InvalidTypeProperty { get; set; }
+
+            public bool ZeroParameterTestMethodCalled { get; set; }
+
+            [Command("Start")]
+            public void ZeroParameterTestMethod()
+            {
+                ZeroParameterTestMethodCalled = true;
+            }
+
+            [Command("Connect")]
+            public void TwoParameterTestMethod(string stringParameter, int intParameter)
+            {
+                StringTestProperty = stringParameter;
+                IntTestProperty = intParameter;
+            }
         }
     }
 }
