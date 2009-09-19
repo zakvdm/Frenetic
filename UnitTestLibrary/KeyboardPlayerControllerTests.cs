@@ -76,10 +76,10 @@ namespace UnitTestLibrary
 
             kpc.Process(1);
             stubPlayer.AssertWasCalled(p => p.MoveRight());
-        }   
+        }
 
         [Test]
-        public void PressingTheLeftMouseButtonCreatesPendingShotOnPlayer()
+        public void PressingTheShootButtonCreatesPendingShotOnPlayer()
         {
             stubMouse.Stub(m => m.LeftButtonIsDown()).Return(true);
             stubCrosshair.Stub(c => c.WorldPosition).Return(Vector2.UnitX);

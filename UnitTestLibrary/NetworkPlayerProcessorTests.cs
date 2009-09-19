@@ -39,26 +39,17 @@ namespace UnitTestLibrary
             networkPlayerController.UpdatePlayerSettingsFromNetworkItem(new Item() { ClientID = 11, Type = ItemType.PlayerSettings, Data = MockRepository.GenerateStub<IPlayerSettings>() });
         }
 
+        // PlayerInput
         [Test]
-        public void UpdatesPositionBasedOnItem()
+        public void UpdatePlayerFromPlayerInputWorksCorrectly()
         {
-            var receivedPlayer = MockRepository.GenerateStub<IPlayer>();
-            receivedPlayer.Position = new Vector2(100, 200);
-            clientStateTracker.FindNetworkClient(10).Player.Position = Vector2.Zero;
+            var stubPlayerInput = MockRepository.GenerateStub<IPlayerInput>();
+            stubPlayerInput.PendingShot = new Vector2(100, 200);
+            stubPlayerInput.Position = new Vector2(300, 400);
 
-            networkPlayerController.UpdatePlayerFromNetworkItem(new Item() { ClientID = 10, Type = ItemType.Player, Data = receivedPlayer });
+            networkPlayerController.UpdatePlayerFromNetworkItem(new Item() { ClientID = 10, Type = ItemType.PlayerInput, Data = stubPlayerInput });
 
-            Assert.AreEqual(new Vector2(100, 200), clientStateTracker.FindNetworkClient(10).Player.Position);
-        }
-        [Test]
-        public void UpdatesPendingShotBasedOnItem()
-        {
-            var receivedPlayer = MockRepository.GenerateStub<IPlayer>();
-            receivedPlayer.PendingShot = Vector2.One;
-
-            networkPlayerController.UpdatePlayerFromNetworkItem(new Item() { ClientID = 10, Type = ItemType.Player, Data = receivedPlayer });
-
-            Assert.AreEqual(Vector2.One, clientStateTracker.FindNetworkClient(10).Player.PendingShot);
+            stubPlayerInput.AssertWasCalled(me => me.RefreshPlayerValuesFromInput(clientStateTracker.FindNetworkClient(10).Player));
         }
 
         // PlayerState

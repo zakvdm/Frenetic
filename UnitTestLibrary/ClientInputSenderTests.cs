@@ -80,13 +80,13 @@ namespace UnitTestLibrary
         }
 
         [Test]
-        public void SendsLocalPlayer()
+        public void SendsLocalPlayerInput()
         {
             client.Player.Position = new Vector2(100, 200);
 
             clientInputSender.Generate();
 
-            stubOutgoingMessageQueue.AssertWasCalled(x => x.AddToQueue(Arg<Item>.Matches(y => y.Type == ItemType.PlayerInput && ((IPlayer)y.Data).Position == new Vector2(100, 200))));
+            stubOutgoingMessageQueue.AssertWasCalled(x => x.AddToQueue(Arg<Item>.Matches(y => y.Type == ItemType.PlayerInput && ((IPlayerInput)y.Data).Position == new Vector2(100, 200))));
         }
         [Test]
         public void OnlySendsPendingShotOnce()

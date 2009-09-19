@@ -6,7 +6,6 @@ using Microsoft.Xna.Framework;
 using Frenetic.Physics;
 using Frenetic.Weapons;
 using Frenetic.Engine;
-using Frenetic.Gameplay;
 
 namespace Frenetic.Player
 {

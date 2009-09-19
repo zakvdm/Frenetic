@@ -1,6 +1,6 @@
 ﻿using System;
 
-using Frenetic.Level;
+using Frenetic.Gameplay.Level;
 
 using NUnit.Framework;
 using Autofac.Builder;

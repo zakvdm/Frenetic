@@ -1,15 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
-using Frenetic.Gameplay;
+using Frenetic.Gameplay.Level;
 
 namespace Frenetic.Player
 {
     public class PlayerUpdater : IController
     {
-        public PlayerUpdater(List<IPlayer> playerList)
+        public PlayerUpdater(List<IPlayer> playerList, IPlayerRespawner playerRespawner)
         {
-            Players = playerList;
+            this.Players = playerList;
+            this.PlayerRespawner = playerRespawner;
         }
         
         #region IController Members
@@ -20,9 +21,16 @@ namespace Frenetic.Player
             {
                 if (player.PendingShot != null)
                 {
-                    Vector2 direction = (Vector2)player.PendingShot;
-                    player.Shoot(direction);
-                    player.PendingShot = null;
+                    if (player.IsAlive)
+                    {
+                        Vector2 direction = (Vector2)player.PendingShot;
+                        player.Shoot(direction);
+                        player.PendingShot = null;
+                    }
+                    else
+                    {
+                        this.PlayerRespawner.RespawnPlayer(player);
+                    }
                 }
             }
         }
@@ -30,5 +38,6 @@ namespace Frenetic.Player
         #endregion
 
         public List<IPlayer> Players { get; private set; }
+        IPlayerRespawner PlayerRespawner;
     }
 }

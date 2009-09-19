@@ -35,9 +35,7 @@ namespace Frenetic.Player
                     // UPDATE SCORES:
                     this.PlayerScore.Deaths += 1;
                     shootingPlayer.PlayerScore.Kills += 1;
-
-                    // RESPAWN:
-                    timer.AddActionTimer(2f, () => this.IsAlive = true);
+                    
                     return;
                 };
 

@@ -4,6 +4,8 @@ namespace Frenetic.Player
 {
     public interface IPlayerInput
     {
+        void RefreshPlayerValuesFromInput(IPlayer player);
+
         Vector2? PendingShot { get; set; }
         Vector2 Position { get; set; }
     }

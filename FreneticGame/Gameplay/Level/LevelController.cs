@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Frenetic.Level
+namespace Frenetic.Gameplay.Level
 {
     public class LevelController : IController
     {

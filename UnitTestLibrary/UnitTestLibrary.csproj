@@ -74,6 +74,8 @@
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CameraTests.cs" />
@@ -108,7 +110,9 @@
     <Compile Include="ClientInputProcessorTests.cs" />
     <Compile Include="ClientInputSenderTests.cs" />
     <Compile Include="OutgoingMessageQueueTests.cs" />
+    <Compile Include="PlayerInputTests.cs" />
     <Compile Include="PlayerPacketsTests.cs" />
+    <Compile Include="PlayerRespawnerTests.cs" />
     <Compile Include="PlayerSettingsTests.cs" />
     <Compile Include="PlayerTextureBankTests.cs" />
     <Compile Include="PlayerUpdaterTests.cs" />

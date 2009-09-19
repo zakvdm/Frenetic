@@ -6,7 +6,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Frenetic.Physics;
 
-namespace Frenetic.Level
+namespace Frenetic.Gameplay.Level
 {
     public class LevelPiece
     {

@@ -10,7 +10,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Frenetic.Player;
 
-namespace Frenetic.Level
+namespace Frenetic.Gameplay.Level
 {
     public class VisibilityView : IView
     {

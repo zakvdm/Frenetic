@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Frenetic.Level
+namespace Frenetic.Gameplay.Level
 {
     public interface ILevel
     {

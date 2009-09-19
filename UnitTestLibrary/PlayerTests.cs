@@ -157,7 +157,7 @@ namespace UnitTestLibrary
         public void GettingShotKillsThePlayer()
         {
             var shootingPlayer = MockRepository.GenerateStub<IPlayer>();
-            shootingPlayer.Stub(me => me.PlayerScore).Return(new Frenetic.Gameplay.PlayerScore());
+            shootingPlayer.Stub(me => me.PlayerScore).Return(new PlayerScore());
             bool raisedOnDeath = false;
             Assert.IsTrue(player.IsAlive);
             player.Died += () => raisedOnDeath = !raisedOnDeath;
@@ -168,16 +168,6 @@ namespace UnitTestLibrary
             Assert.IsTrue(raisedOnDeath);
             Assert.AreEqual(1, player.PlayerScore.Deaths);
             Assert.AreEqual(1, shootingPlayer.PlayerScore.Kills);
-        }
-        [Test]
-        public void SetsRespawnTimerOnDead()
-        {
-            var shootingPlayer = MockRepository.GenerateStub<IPlayer>();
-            shootingPlayer.Stub(me => me.PlayerScore).Return(new PlayerScore());
-            // At the moment just Shooting the player kills it...
-            stubPhysicsComponent.Raise(me => me.WasShot += null, shootingPlayer);
-
-            stubTimer.AssertWasCalled(me => me.AddActionTimer(Arg<float>.Is.Anything, Arg<Action>.Is.Anything));
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿using System;
 using NUnit.Framework;
-using Frenetic.Level;
+using Frenetic.Gameplay.Level;
 using Microsoft.Xna.Framework;
 using Rhino.Mocks;
 using Frenetic.Graphics;

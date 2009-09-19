@@ -2,6 +2,7 @@
 using Lidgren.Network;
 using log4net;
 using Frenetic.Engine;
+using Frenetic.Player;
 
 namespace Frenetic.Network
 {
@@ -61,7 +62,8 @@ namespace Frenetic.Network
 
         void SendLocalPlayerAndPlayerSettings()
         {
-            this.OutgoingMessageQueue.AddToQueue(new Item() { ClientID = this.LocalClient.ID, Type = ItemType.PlayerInput, Data = this.LocalClient.Player });
+            IPlayerInput playerInput = new PlayerInput(this.LocalClient.Player);
+            this.OutgoingMessageQueue.AddToQueue(new Item() { ClientID = this.LocalClient.ID, Type = ItemType.PlayerInput, Data = playerInput });
 
             if (this.LocalClient.Player.PlayerSettings.IsDirty)
             {

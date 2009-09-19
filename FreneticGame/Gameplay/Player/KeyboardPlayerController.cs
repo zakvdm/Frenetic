@@ -7,21 +7,20 @@ namespace Frenetic.Player
 {
     public class KeyboardPlayerController : IController
     {
-        public IPlayer Player { get; private set; }
-        IKeyboard Keyboard { get; set; }
-        IMouse Mouse { get; set; }
-        ICrosshair Crosshair { get; set; }
-
+        public static float ShootTimer = 1;
+        public static float JumpTimer = 0.5f;
+        
         public KeyboardPlayerController(IPlayer player, IKeyboard keyboard, IMouse mouse, ICrosshair crosshair)
         {
-            Player = player;
-            Keyboard = keyboard;
-            Mouse = mouse;
-            Crosshair = crosshair;
+            this.Player = player;
+            this.Keyboard = keyboard;
+            this.Mouse = mouse;
+            this.Crosshair = crosshair;
 
             LastShootTime = float.MinValue;
             LastJumpTime = float.MinValue;
         }
+       
         #region IController Members
 
         public void Process(float elapsedTime)
@@ -47,10 +46,13 @@ namespace Frenetic.Player
                 Player.MoveRight();
             }
 
-            if (Mouse.LeftButtonIsDown() && CanShoot(TotalElapsedTime))
+            if (Mouse.LeftButtonIsDown())
             {
-                Player.PendingShot = Crosshair.WorldPosition;
-                LastShootTime = TotalElapsedTime;
+                if (CanShoot(TotalElapsedTime))
+                {
+                    Player.PendingShot = Crosshair.WorldPosition;
+                    LastShootTime = TotalElapsedTime;
+                }
             }
 
             Player.Update();
@@ -70,12 +72,14 @@ namespace Frenetic.Player
 
         #endregion
 
+        public IPlayer Player { get; private set; }
+        IKeyboard Keyboard { get; set; }
+        IMouse Mouse { get; set; }
+        ICrosshair Crosshair { get; set; }
+
         private float TotalElapsedTime { get; set; }
 
         private float LastShootTime { get; set; }
         private float LastJumpTime { get; set; }
-
-        public static float ShootTimer = 1;
-        public static float JumpTimer = 0.5f;
     }
 }

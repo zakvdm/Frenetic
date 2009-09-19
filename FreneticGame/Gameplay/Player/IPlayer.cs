@@ -3,10 +3,14 @@ using Microsoft.Xna.Framework;
 using FarseerGames.FarseerPhysics.Dynamics;
 using Frenetic.Weapons;
 using Frenetic.Gameplay;
+
 namespace Frenetic.Player
 {
-    public interface IPlayer : IPlayerInput
+    public interface IPlayer 
     {
+        Vector2? PendingShot { get; set; }
+        Vector2 Position { get; set; }
+
         bool IsAlive { get; set; }
 
         IRailGun CurrentWeapon { get; }

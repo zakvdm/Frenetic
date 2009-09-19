@@ -6,7 +6,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 using Frenetic.Graphics;
 
-namespace Frenetic.Level
+namespace Frenetic.Gameplay.Level
 {
     public class LevelView : IView
     {

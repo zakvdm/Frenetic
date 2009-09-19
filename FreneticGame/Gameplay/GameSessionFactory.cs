@@ -5,7 +5,7 @@ using Microsoft.Xna.Framework.Content;
 using Autofac.Builder;
 using Autofac;
 using Frenetic.Physics;
-using Frenetic.Level;
+using Frenetic.Gameplay.Level;
 using FarseerGames.FarseerPhysics;
 using FarseerGames.FarseerPhysics.Factories;
 using FarseerGames.FarseerPhysics.Dynamics;

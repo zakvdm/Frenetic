@@ -1,7 +1,7 @@
 ﻿using System;
 using Autofac;
 using Autofac.Builder;
-using Frenetic.Level;
+using Frenetic.Gameplay.Level;
 using Microsoft.Xna.Framework;
 using Frenetic.Physics;
 
@@ -22,10 +22,13 @@ namespace Frenetic.Autofac
 
             builder.RegisterGeneratedFactory<LevelPiece.Factory>(new TypedService(typeof(LevelPiece)));
             builder.Register<DumbLevelLoader>().As<ILevelLoader>().ContainerScoped();
-            builder.Register<Frenetic.Level.Level>().As<ILevel>().ContainerScoped();
+            builder.Register<Frenetic.Gameplay.Level.Level>().As<ILevel>().ContainerScoped();
             builder.Register<LevelController>().ContainerScoped();
             builder.Register<LevelView>().ContainerScoped();
+
             builder.Register<VisibilityView>().ContainerScoped();
+
+            builder.Register<PlayerRespawner>().As<IPlayerRespawner>().SingletonScoped();
         }
     }
 }
