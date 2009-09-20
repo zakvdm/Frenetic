@@ -29,7 +29,7 @@ namespace Frenetic.Player
             this.PhysicsComponent.CollidedWithWorld += () => InContactWithLevel = true;
             this.PhysicsComponent.WasShot += (shootingPlayer) =>
                 {
-                    IsAlive = false;
+                    this.Status = PlayerStatus.Dead;
                     this.OnDied();  // TODO: Do i really need this event? (currently used by nothing?)
 
                     // UPDATE SCORES:
@@ -43,7 +43,7 @@ namespace Frenetic.Player
             this.Timer = timer;
             this.BoundaryCollider = boundaryCollider;
 
-            IsAlive = true;
+            Status = PlayerStatus.Alive;
             Position = new Vector2(400, 100);
 
             this.PhysicsComponent.CollisionGroup = BasePlayer.CollisionGroup;
@@ -51,7 +51,7 @@ namespace Frenetic.Player
         
         public IPlayerSettings PlayerSettings { get; protected set; }
 
-        public bool IsAlive { get; set; }
+        public PlayerStatus Status { get; set; }
         public Vector2 Position
         {
             get
@@ -66,6 +66,8 @@ namespace Frenetic.Player
         }
 
         public PlayerScore PlayerScore { get; set; }
+
+        public bool InContactWithLevel { get; set; }
 
         public virtual void Update()
         {
@@ -122,6 +124,7 @@ namespace Frenetic.Player
         }
         public event Action Died = delegate { };
 
+        public PlayerStatus? PendingStatus { get; set; }
         public Vector2? PendingShot { get; set; }
 
         protected IPhysicsComponent PhysicsComponent;
@@ -129,7 +132,5 @@ namespace Frenetic.Player
         protected IRailGun Weapon;
         protected ITimer Timer;
         IBoundaryCollider BoundaryCollider;
-
-        internal bool InContactWithLevel { get; set; }
     }
 }

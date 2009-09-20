@@ -11,8 +11,7 @@ namespace Frenetic.Player
 {
     public class LocalPlayer : BasePlayer
     {
-        // TODO: Fix the LocalPlayerFarseerPhysicsComponent Autofac fiasco
-        public LocalPlayer(IPlayerSettings playerSettings, LocalPlayerFarseerPhysicsComponent physicsComponent, IBoundaryCollider boundaryCollider, IRailGun weapon, ITimer timer)
+        public LocalPlayer(IPlayerSettings playerSettings, IPhysicsComponent physicsComponent, IBoundaryCollider boundaryCollider, IRailGun weapon, ITimer timer)
             : base(playerSettings, physicsComponent, boundaryCollider, weapon, timer)
         { }
     }

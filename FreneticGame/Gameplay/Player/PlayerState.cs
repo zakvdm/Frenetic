@@ -8,7 +8,7 @@ namespace Frenetic.Player
 {
     public interface IPlayerState
     {
-        bool IsAlive { get; set; }
+        PlayerStatus Status { get; set; }
         Vector2 Position { get; set; }
         List<Shot> NewShots { get; set; }
 
@@ -29,7 +29,7 @@ namespace Frenetic.Player
         {
             if (player != null)
             {
-                this.IsAlive = player.IsAlive;
+                this.Status = player.Status;
                 this.Position = player.Position;
                 this.Score = player.PlayerScore;
 
@@ -41,7 +41,7 @@ namespace Frenetic.Player
             }
         }
 
-        public bool IsAlive { get; set; }
+        public PlayerStatus Status { get; set; }
         public Vector2 Position { get; set; }
         public List<Shot> NewShots { get; set; }
         public PlayerScore Score { get; set; }
@@ -51,7 +51,13 @@ namespace Frenetic.Player
             // TODO: Implement a rolling average
             player.UpdatePositionFromNetwork(this.Position, 0.1f);
 
-            player.IsAlive = this.IsAlive;
+            player.Status = this.Status;
+            if (player.Status == player.PendingStatus)
+            {
+                // When the PendingStatus is achieved, we can reset it
+                player.PendingStatus = null;
+            }
+
             player.CurrentWeapon.Shots.AddRange(this.NewShots);
 
             player.PlayerScore.Kills = this.Score.Kills;

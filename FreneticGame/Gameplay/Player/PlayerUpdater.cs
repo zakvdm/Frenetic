@@ -7,10 +7,9 @@ namespace Frenetic.Player
 {
     public class PlayerUpdater : IController
     {
-        public PlayerUpdater(List<IPlayer> playerList, IPlayerRespawner playerRespawner)
+        public PlayerUpdater(List<IPlayer> playerList)
         {
             this.Players = playerList;
-            this.PlayerRespawner = playerRespawner;
         }
         
         #region IController Members
@@ -19,18 +18,19 @@ namespace Frenetic.Player
         {
             foreach (IPlayer player in Players)
             {
-                if (player.PendingShot != null)
+                if (player.Status == PlayerStatus.Alive)
                 {
-                    if (player.IsAlive)
+                    if (player.PendingShot != null)
                     {
                         Vector2 direction = (Vector2)player.PendingShot;
                         player.Shoot(direction);
                         player.PendingShot = null;
                     }
-                    else
-                    {
-                        this.PlayerRespawner.RespawnPlayer(player);
-                    }
+                }
+                else if (player.PendingStatus == PlayerStatus.Alive)
+                {
+                    // Player has been respawned on Client side...
+                    player.Status = PlayerStatus.Alive;
                 }
             }
         }
@@ -38,6 +38,5 @@ namespace Frenetic.Player
         #endregion
 
         public List<IPlayer> Players { get; private set; }
-        IPlayerRespawner PlayerRespawner;
     }
 }

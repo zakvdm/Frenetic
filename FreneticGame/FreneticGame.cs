@@ -225,17 +225,7 @@ namespace Frenetic
             #endregion
 
             #region Player
-            builder.Register<PlayerUpdater>().ContainerScoped();
-            builder.Register<NetworkPlayerSettings>().As<IPlayerSettings>().FactoryScoped();
-            builder.Register<LocalPlayerSettings>().SingletonScoped();
-            builder.Register<NetworkPlayer>().As<IPlayer>().FactoryScoped();
-            builder.Register<LocalPlayer>().FactoryScoped();
-            builder.Register<List<IPlayer>>().ContainerScoped();
-            builder.Register<PlayerView>().ContainerScoped();
-            builder.Register((c) => (IBoundaryCollider)new WorldBoundaryCollider(_screenWidth, _screenHeight));
-            builder.Register<KeyboardPlayerController>().ContainerScoped();
-
-            builder.Register<XnaTextureBank<PlayerTexture>>().As<ITextureBank<PlayerTexture>>().SingletonScoped();
+            builder.RegisterModule(new PlayerModule() { ScreenWidth = _screenWidth, ScreenHeight = _screenHeight });
             #endregion
 
             #region Physics

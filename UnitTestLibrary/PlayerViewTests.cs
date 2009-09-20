@@ -33,7 +33,7 @@ namespace UnitTestLibrary
             stubCamera = MockRepository.GenerateStub<ICamera>();
             stubRailGunView = MockRepository.GenerateStub<IRailGunView>();
             player = MockRepository.GenerateStub<IPlayer>();
-            player.IsAlive = true;
+            player.Status = PlayerStatus.Alive;
             player.Stub(me => me.PlayerSettings).Return(new NetworkPlayerSettings());
             player.Stub(me => me.CurrentWeapon).Return(new RailGun(null));
             playerList.Add(player);
@@ -44,7 +44,7 @@ namespace UnitTestLibrary
         public void DrawsEachPlayer()
         {
             var player2 = MockRepository.GenerateStub<IPlayer>();
-            player2.IsAlive = true;
+            player2.Status = PlayerStatus.Alive;
             player2.Stub(me => me.PlayerSettings).Return(new NetworkPlayerSettings());
             playerList.Add(player2);
 
@@ -85,7 +85,7 @@ namespace UnitTestLibrary
         [Test]
         public void DoesntDrawDeadPlayer()
         {
-            player.IsAlive = false;
+            player.Status = PlayerStatus.Dead;
 
             playerView.Generate();
 

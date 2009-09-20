@@ -76,12 +76,14 @@ namespace UnitTestLibrary
         {
             buffer.Write(new PlayerInput()
                             {
+                                PendingStatus = null,
                                 Position = new Vector2(100, 200),
                                 PendingShot = new Vector2(300, 400)
                             }
                         );
             buffer.Write(new PlayerInput()
                             {
+                                PendingStatus = PlayerStatus.Dead,
                                 Position = new Vector2(500, 600),
                                 PendingShot = null
                             }
@@ -89,11 +91,13 @@ namespace UnitTestLibrary
 
             var output = buffer.ReadPlayerInput();
 
+            Assert.IsNull(output.PendingStatus);
             Assert.AreEqual(new Vector2(100, 200), output.Position);
             Assert.AreEqual(new Vector2(300, 400), output.PendingShot);
 
             output = buffer.ReadPlayerInput();
 
+            Assert.AreEqual(PlayerStatus.Dead, output.PendingStatus);
             Assert.IsNull(output.PendingShot);
         }
 
@@ -102,7 +106,7 @@ namespace UnitTestLibrary
         {
             buffer.Write(new PlayerState() 
                             { 
-                                IsAlive = true, 
+                                Status = PlayerStatus.Alive, 
                                 Position = new Vector2(5, 10), 
                                 NewShots = new List<Shot>() { new Shot() { EndPoint = Vector2.UnitX, StartPoint = Vector2.UnitY }, new Shot() { EndPoint = Vector2.Zero, StartPoint = Vector2.One} }, 
                                 Score = new PlayerScore() { Deaths = 5, Kills = 1 } 
@@ -112,7 +116,7 @@ namespace UnitTestLibrary
             Console.WriteLine("Serializing PlayerState took " + buffer.Data.Length + " bytes");
             var output = buffer.ReadPlayerState();
 
-            Assert.AreEqual(true, output.IsAlive);
+            Assert.AreEqual(PlayerStatus.Alive, output.Status);
             Assert.AreEqual(new Vector2(5, 10), output.Position);
             Assert.AreEqual(2, output.NewShots.Count);
             Assert.AreEqual(new Shot() { EndPoint = Vector2.UnitX, StartPoint = Vector2.UnitY }, output.NewShots[0]);

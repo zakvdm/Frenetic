@@ -11,8 +11,11 @@ namespace Frenetic.Gameplay.Level
     {
         public void RespawnPlayer(IPlayer player)
         {
-            player.IsAlive = true;
-            player.Position = new Vector2(400, 100);
+            if (player.PendingStatus != PlayerStatus.Alive)
+            {
+                player.PendingStatus = PlayerStatus.Alive;
+                player.Position = new Vector2(400, 100);
+            }
         }
     }
 }

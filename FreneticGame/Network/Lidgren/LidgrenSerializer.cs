@@ -99,6 +99,15 @@ namespace Frenetic.Network.Lidgren
         public static void Write(this NetBuffer netbuffer, IPlayerInput input)
         {
             netbuffer.Write(input.Position);
+            if (input.PendingStatus != null)
+            {
+                netbuffer.Write(true);
+                netbuffer.Write((ushort)input.PendingStatus);
+            }
+            else
+            {
+                netbuffer.Write(false);
+            }
             if (input.PendingShot != null)
             {
                 netbuffer.Write(true);
@@ -116,6 +125,10 @@ namespace Frenetic.Network.Lidgren
             input.Position = netbuffer.ReadVector2();
             if (netbuffer.ReadBoolean())
             {
+                input.PendingStatus = (PlayerStatus)netbuffer.ReadUInt16();
+            }
+            if (netbuffer.ReadBoolean())
+            {
                 input.PendingShot = netbuffer.ReadVector2();
             }
 
@@ -125,7 +138,7 @@ namespace Frenetic.Network.Lidgren
         // PLAYERSTATE:
         public static void Write(this NetBuffer netbuffer, IPlayerState state)
         {
-            netbuffer.Write(state.IsAlive);
+            netbuffer.Write((ushort)state.Status);
             netbuffer.Write(state.NewShots.Count);
             foreach (Shot shot in state.NewShots)
             {
@@ -140,7 +153,7 @@ namespace Frenetic.Network.Lidgren
         {
             PlayerState playerstate = new PlayerState();
            
-            playerstate.IsAlive = netbuffer.ReadBoolean();
+            playerstate.Status = (PlayerStatus)netbuffer.ReadUInt16();
             int number_of_new_shots = netbuffer.ReadInt32();
             for (int i = 0; i < number_of_new_shots; i++)
             {

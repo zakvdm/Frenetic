@@ -144,6 +144,7 @@ namespace Frenetic.Network.Lidgren
                     continue;   // We don't want to send the client to itself...
 
                 // TODO: Send all in one message
+                // TODO: This new Client is never going to get PlayerSettings from all the existing clients!
                 SendTo(new Message() { Items = { new Item() { Type = ItemType.NewClient, Data = connection.ConnectionID } } }, NetChannel.ReliableUnordered, newClientID);
             }
                 

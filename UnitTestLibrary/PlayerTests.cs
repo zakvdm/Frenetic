@@ -19,7 +19,7 @@ namespace UnitTestLibrary
     [TestFixture]
     public class PlayerTests
     {
-        Frenetic.Player.BasePlayer player;
+        IPlayer player;
         IPlayerSettings stubPlayerSettings;
         IPhysicsComponent stubPhysicsComponent;
         IBoundaryCollider stubBoundaryCollider;
@@ -76,6 +76,18 @@ namespace UnitTestLibrary
 
             Assert.AreEqual(3, player.PlayerScore.Deaths);
             Assert.AreEqual(1000, player.PlayerScore.Kills);
+        }
+
+        // NETWORK POSITION:
+        [Test]
+        public void LocalPlayerPositionNotUpdatedFromNetwork()
+        {
+            player = new LocalPlayer(stubPlayerSettings, stubPhysicsComponent, stubBoundaryCollider, stubRailGun, stubTimer);
+            player.Position = new Vector2(100, 200);
+
+            player.UpdatePositionFromNetwork(new Vector2(300, 400), 1f);
+            
+            Assert.AreEqual(new Vector2(100, 200), player.Position);
         }
 
         // MOVEMENT:
@@ -159,12 +171,12 @@ namespace UnitTestLibrary
             var shootingPlayer = MockRepository.GenerateStub<IPlayer>();
             shootingPlayer.Stub(me => me.PlayerScore).Return(new PlayerScore());
             bool raisedOnDeath = false;
-            Assert.IsTrue(player.IsAlive);
+            Assert.AreEqual(PlayerStatus.Alive, player.Status);
             player.Died += () => raisedOnDeath = !raisedOnDeath;
 
             stubPhysicsComponent.Raise(me => me.WasShot += null, shootingPlayer);
 
-            Assert.IsFalse(player.IsAlive);
+            Assert.AreEqual(PlayerStatus.Dead, player.Status);
             Assert.IsTrue(raisedOnDeath);
             Assert.AreEqual(1, player.PlayerScore.Deaths);
             Assert.AreEqual(1, shootingPlayer.PlayerScore.Kills);

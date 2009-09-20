@@ -10,6 +10,7 @@ using Microsoft.Xna.Framework.Input;
 using FarseerGames.FarseerPhysics.Dynamics;
 using Frenetic.UserInput;
 using Frenetic.Player;
+using Frenetic.Gameplay.Level;
 
 namespace UnitTestLibrary
 {
@@ -23,7 +24,8 @@ namespace UnitTestLibrary
             stubKeyboard = MockRepository.GenerateStub<IKeyboard>();
             stubMouse = MockRepository.GenerateStub<IMouse>();
             stubCrosshair = MockRepository.GenerateStub<ICrosshair>();
-            kpc = new KeyboardPlayerController(stubPlayer, stubKeyboard, stubMouse, stubCrosshair);
+            stubRespawner = MockRepository.GenerateStub<IPlayerRespawner>();
+            kpc = new KeyboardPlayerController(stubPlayer, stubKeyboard, stubMouse, stubCrosshair, stubRespawner);
         }
 
         [Test]
@@ -79,18 +81,18 @@ namespace UnitTestLibrary
         }
 
         [Test]
-        public void PressingTheShootButtonCreatesPendingShotOnPlayer()
+        public void PressingTheShootButtonCreatesPendingShotOnPlayerWhenPlayerIsAlive()
         {
             stubMouse.Stub(m => m.LeftButtonIsDown()).Return(true);
             stubCrosshair.Stub(c => c.WorldPosition).Return(Vector2.UnitX);
+            stubPlayer.Status = PlayerStatus.Alive;
 
             kpc.Process(1);
 
             Assert.AreEqual(Vector2.UnitX, stubPlayer.PendingShot);           
         }
-
         [Test]
-        public void PressingTheLeftMouseButtonASecondTimeTooSoonDoesNotRetriggerTheShot()
+        public void PressingTheShootButtonASecondTimeTooSoonDoesNotRetriggerTheShot()
         {
             var lessThanShootDelay = KeyboardPlayerController.ShootTimer / 2;
             var moreThanShootDelay = KeyboardPlayerController.ShootTimer - (lessThanShootDelay / 3);
@@ -106,10 +108,35 @@ namespace UnitTestLibrary
             Assert.AreEqual(Vector2.UnitX, stubPlayer.PendingShot);
         }
 
+        [Test]
+        public void PressingTheShootButtonWhenThePlayerIsDeadDoesARespawn()
+        {
+            stubMouse.Stub(m => m.LeftButtonIsDown()).Return(true);
+            stubPlayer.Status = PlayerStatus.Dead;
+
+            kpc.Process(100);
+
+            stubRespawner.AssertWasCalled(me => me.RespawnPlayer(stubPlayer));
+        }
+        [Test]
+        public void RespawnRequestStartsShootTimer()
+        {
+            stubMouse.Stub(m => m.LeftButtonIsDown()).Return(true);
+            stubPlayer.Status = PlayerStatus.Dead;
+            stubPlayer.PendingShot = null;
+
+            kpc.Process(1);
+            stubPlayer.Status = PlayerStatus.Alive;
+            kpc.Process(KeyboardPlayerController.ShootTimer / 2);
+
+            Assert.IsNull(stubPlayer.PendingShot);
+        }
+
         IPlayer stubPlayer;
         IKeyboard stubKeyboard;
         IMouse stubMouse;
         ICrosshair stubCrosshair;
+        IPlayerRespawner stubRespawner;
         KeyboardPlayerController kpc;
     }
 }

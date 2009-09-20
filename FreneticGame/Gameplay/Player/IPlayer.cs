@@ -6,18 +6,29 @@ using Frenetic.Gameplay;
 
 namespace Frenetic.Player
 {
+    public enum PlayerStatus
+    {
+        Alive,
+        Dead
+    }
     public interface IPlayer 
     {
+        // PROPERTIES:
+        PlayerStatus? PendingStatus { get; set; }
         Vector2? PendingShot { get; set; }
+
         Vector2 Position { get; set; }
 
-        bool IsAlive { get; set; }
+        PlayerStatus Status { get; set; }
 
         IRailGun CurrentWeapon { get; }
 
         IPlayerSettings PlayerSettings { get; }
         PlayerScore PlayerScore { get; }
 
+        bool InContactWithLevel { get; set; }
+
+        // METHODS:
         void Update();
         bool Jump();
         void MoveLeft();

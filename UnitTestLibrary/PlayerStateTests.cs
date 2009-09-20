@@ -10,19 +10,22 @@ using Frenetic.Gameplay;
 namespace UnitTestLibrary
 {
     [TestFixture]
-    public class PlayerPacketsTests
+    public class PlayerStateTests
     {
-        BasePlayer player;
+        IPlayer player;
         [SetUp]
         public void SetUp()
         {
-            player = new NetworkPlayer(null, null, new RailGun(null), null);
+            player = MockRepository.GenerateStub<IPlayer>();
+            player.Stub(me => me.CurrentWeapon).Return(MockRepository.GenerateStub<IRailGun>());
+            player.CurrentWeapon.Stub(me => me.Shots).Return(new Shots());
+            player.Stub(me => me.PlayerScore).Return(new PlayerScore());
         }
 
         [Test]
         public void CanSetPlayerStateValuesFromPlayerObject()
         {
-            player.IsAlive = false;
+            player.Status = PlayerStatus.Dead;
             player.CurrentWeapon.Shots.Add(new Shot(new Vector2(1, 2), new Vector2(3, 4)));
             player.Position = Vector2.One;
             player.PlayerScore.Kills = 4;
@@ -30,7 +33,7 @@ namespace UnitTestLibrary
 
             PlayerState state = new PlayerState(player);
 
-            Assert.IsFalse(state.IsAlive);
+            Assert.AreEqual(PlayerStatus.Dead, state.Status);
             Assert.AreEqual(Vector2.One, state.Position);
             Assert.AreEqual(1, state.NewShots.Count);
             Assert.AreEqual(new Shot(new Vector2(1, 2), new Vector2(3, 4)), state.NewShots[0]);
@@ -48,12 +51,9 @@ namespace UnitTestLibrary
         [Test]
         public void CanRefreshNetworkPlayerObjectWithPlayerState()
         {
-            var player = MockRepository.GenerateStub<IPlayer>();
-            player.Stub(me => me.CurrentWeapon).Return(new RailGun(null));
-            player.Stub(me => me.PlayerScore).Return(new PlayerScore());
             player.CurrentWeapon.Shots.Add(new Shot());
             PlayerState state = new PlayerState();
-            state.IsAlive = true;
+            state.Status = PlayerStatus.Alive;
             state.Position = new Vector2(4, 8);
             state.NewShots = new List<Shot>();
             // Add 2 new Shot objects:
@@ -63,13 +63,28 @@ namespace UnitTestLibrary
 
             state.RefreshPlayerValuesFromState(player);
 
-            Assert.IsTrue(state.IsAlive);
+            Assert.AreEqual(PlayerStatus.Alive, state.Status);
             player.AssertWasCalled(me => me.UpdatePositionFromNetwork(Arg<Vector2>.Is.Equal(state.Position), Arg<float>.Is.Anything));
             Assert.AreEqual(3, player.CurrentWeapon.Shots.Count);
             Assert.AreEqual(new Shot(Vector2.One, Vector2.UnitX), player.CurrentWeapon.Shots[1]);
             Assert.AreEqual(new Shot(Vector2.UnitY, Vector2.Zero), player.CurrentWeapon.Shots[2]);
             Assert.AreEqual(3, player.PlayerScore.Deaths);
             Assert.AreEqual(20, player.PlayerScore.Kills);
+        }
+        [Test]
+        public void ResetsPendingStateWhenItIsAchieved()
+        {
+            player.Status = PlayerStatus.Alive;
+            player.PendingStatus = PlayerStatus.Dead;
+            PlayerState state = new PlayerState();
+            state.Status = PlayerStatus.Alive;
+
+            state.RefreshPlayerValuesFromState(player);
+            Assert.AreEqual(PlayerStatus.Dead, player.PendingStatus);
+
+            state.Status = PlayerStatus.Dead;
+            state.RefreshPlayerValuesFromState(player);
+            Assert.IsNull(player.PendingStatus);
         }
     }
 }

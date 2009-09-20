@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Frenetic.UserInput;
+using Frenetic.Gameplay.Level;
 
 namespace Frenetic.Player
 {
@@ -10,12 +11,13 @@ namespace Frenetic.Player
         public static float ShootTimer = 1;
         public static float JumpTimer = 0.5f;
         
-        public KeyboardPlayerController(IPlayer player, IKeyboard keyboard, IMouse mouse, ICrosshair crosshair)
+        public KeyboardPlayerController(IPlayer player, IKeyboard keyboard, IMouse mouse, ICrosshair crosshair, IPlayerRespawner playerRespawner)
         {
             this.Player = player;
             this.Keyboard = keyboard;
             this.Mouse = mouse;
             this.Crosshair = crosshair;
+            this.PlayerRespawner = playerRespawner;
 
             LastShootTime = float.MinValue;
             LastJumpTime = float.MinValue;
@@ -50,7 +52,14 @@ namespace Frenetic.Player
             {
                 if (CanShoot(TotalElapsedTime))
                 {
-                    Player.PendingShot = Crosshair.WorldPosition;
+                    if (this.Player.Status == PlayerStatus.Alive)
+                    {
+                        this.Player.PendingShot = Crosshair.WorldPosition;
+                    }
+                    else
+                    {
+                        this.PlayerRespawner.RespawnPlayer(this.Player);
+                    }
                     LastShootTime = TotalElapsedTime;
                 }
             }
@@ -76,6 +85,7 @@ namespace Frenetic.Player
         IKeyboard Keyboard { get; set; }
         IMouse Mouse { get; set; }
         ICrosshair Crosshair { get; set; }
+        IPlayerRespawner PlayerRespawner { get; set; }
 
         private float TotalElapsedTime { get; set; }
 

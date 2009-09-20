@@ -31,7 +31,7 @@ namespace Frenetic.Player
 
                 if (_spriteBatch != null)
                 {
-                    if (player.IsAlive)
+                    if (player.Status == PlayerStatus.Alive)
                     {
                         _spriteBatch.Begin(_camera.TranslationMatrix);
                         _spriteBatch.Draw(texture, player.Position, null, playerSettings.Color, 0f,
