@@ -83,7 +83,7 @@ namespace Frenetic
         }
 
         
-        public GameSessionControllerAndView MakeClientGameSession()
+        public GameSessionControllerAndView MakeClientGameSession(string address, int port)
         {
             ClientContainer = _parentContainer.CreateInnerContainer();
             
@@ -107,8 +107,14 @@ namespace Frenetic
                     new TypedParameter(typeof(INetworkSession), clientNetworkSession));
             IOutgoingMessageQueue outgoingMessageQueue = ClientContainer.Resolve<IOutgoingMessageQueue>(
                     new TypedParameter(typeof(INetworkSession), clientNetworkSession));
-            clientNetworkSession.Join(14242);
-            //clientNetworkSession.Join("5.224.172.196", 14242);
+            if (address != "")
+            {
+                clientNetworkSession.Join(address, port);
+            }
+            else
+            {
+                clientNetworkSession.Join(port);
+            }
 
             gameSession.Controllers.Add(ClientContainer.Resolve<PhysicsController>());
             

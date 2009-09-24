@@ -70,7 +70,7 @@ namespace UnitTestLibrary
             mediator.Register(method, "Start", testClass);
 
             Assert.IsFalse(testClass.ZeroParameterTestMethodCalled);
-            mediator.Execute("Start");
+            mediator.Process("Start");
             Assert.IsTrue(testClass.ZeroParameterTestMethodCalled);
         }
 
@@ -83,9 +83,32 @@ namespace UnitTestLibrary
 
             mediator.Register(method, "Connect", testClass);
 
-            mediator.Execute("Connect", "192.168.1.1", 2005);
+            mediator.Process("Connect", "192.168.1.1", 2005);
             Assert.AreEqual("192.168.1.1", testClass.StringTestProperty);
             Assert.AreEqual(2005, testClass.IntTestProperty);
+        }
+
+        [Test]
+        public void WhenCallingAMethodItTriesToConvertParamatersToAppropriateType()
+        {
+            var method = typeof(TestClass).GetMethod("TwoParameterTestMethod");
+            var testClass = new TestClass();
+            mediator.Register(method, "Connect", testClass);
+
+            mediator.Process("Connect", "192.168.1.1", "2005");
+
+            Assert.AreEqual("192.168.1.1", testClass.StringTestProperty);
+            Assert.AreEqual(2005, testClass.IntTestProperty);
+        }
+        [Test]
+        [ExpectedException(typeof(ArgumentException), ExpectedMessage="This implementation of IMediator does not support Methods with Parameters of type System.Decimal")]
+        public void ThrowsExceptionWhenRegisteringMethodWithUnknownParameterType()
+        {
+            var method = typeof(TestClass).GetMethod("InvalidParameterTestMethod");
+            var testClass = new TestClass();
+            mediator.Register(method, "InvalidMethod", testClass);
+
+            mediator.Process("InvalidMethod", new System.Decimal(100));
         }
 
         [Test]
@@ -146,18 +169,22 @@ namespace UnitTestLibrary
         {
             var tweakableProp1 = typeof(TestClass).GetProperty("IntTestProperty");
             var tweakableProp2 = typeof(TestClass).GetProperty("StringTestProperty");
+            var method = typeof(TestClass).GetMethod("TwoParameterTestMethod");
             mediator.Register(tweakableProp1, new TestClass());
             mediator.Register(tweakableProp2, new TestClass());
+            mediator.Register(method, "TestCommandName", new TestClass());
 
-            List<string> possibleProperties = mediator.AvailableProperties;
+            List<string> possibleExecutables = mediator.AvailableProperties;
+            possibleExecutables.AddRange(mediator.AvailableActions);
 
-            Assert.AreEqual(2, possibleProperties.Count);
-            Assert.IsTrue(possibleProperties.Exists((searchString) => searchString == "FakeName.IntTestProperty"));
-            Assert.IsTrue(possibleProperties.Exists((searchString) => searchString == "FakeName.StringTestProperty"));
+            Assert.AreEqual(3, possibleExecutables.Count);
+            Assert.IsTrue(possibleExecutables.Exists((searchString) => searchString == "FakeName.IntTestProperty"));
+            Assert.IsTrue(possibleExecutables.Exists((searchString) => searchString == "FakeName.StringTestProperty"));
+            Assert.IsTrue(possibleExecutables.Exists((searchString) => searchString == "TestCommandName"));
         }
 
         [Test]
-        public void IgnoresInvalidInput()
+        public void IgnoresInvalidInputForProperties()
         {
             // NOTE: Just a basic test for now... prolly needs fleshing out at some point
             var tweakProp = typeof(TestClass).GetProperty("Vector2TestProperty");
@@ -170,6 +197,18 @@ namespace UnitTestLibrary
             Assert.AreEqual("100 200", mediator.Process("FakeName.Vector2TestProperty"));
         }
 
+        [Test]
+        public void IgnoresInvalidInputForMethods()
+        {
+            var method = typeof(TestClass).GetMethod("TwoParameterTestMethod");
+            var testClass = new TestClass();
+            mediator.Register(method, "Connect", testClass);
+
+            mediator.Process("Connect", "192.168.0.1", "100.3");
+
+            Assert.IsNull(testClass.StringTestProperty);
+            Assert.AreEqual(0, testClass.IntTestProperty);
+        }
         
     }
 
@@ -198,6 +237,11 @@ namespace UnitTestLibrary
             {
                 StringTestProperty = stringParameter;
                 IntTestProperty = intParameter;
+            }
+
+            [Command("InvalidCommand")]
+            public void InvalidParameterTestMethod(Decimal parameter)
+            {
             }
         }
     }

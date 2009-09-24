@@ -15,8 +15,8 @@ namespace Frenetic
         public Mediator(ILoggerFactory loggerFactory)
         {
             _logger = loggerFactory.GetLogger(this.GetType());
-            _properties = new Dictionary<string, List<Delegate>>();
-            _actions = new Dictionary<string, List<Action<object[]>>>();
+            _methods = new Dictionary<string, CommandContainer>();
+            _properties = new Dictionary<string, PropertyContainer>();
         }
 
         public List<string> AvailableProperties
@@ -26,54 +26,31 @@ namespace Frenetic
                 return _properties.Keys.ToList();
             }
         }
-
         public List<string> AvailableActions
         {
             get
             {
-                return _actions.Keys.ToList();
+                return _methods.Keys.ToList();
             }
         }
         
         public void Register(PropertyInfo property, object instance)
         {
-            _properties.Add(GetNameOfProperty(property), new List<Delegate>());
-
-            if (property.PropertyType == typeof(int))
-            {
-                RegisterSetterAndGetter<int>(property, instance);
-            }
-            else if (property.PropertyType == typeof(string))
-            {
-                RegisterSetterAndGetter<string>(property, instance);
-            }
-            else if (property.PropertyType == typeof(float))
-            {
-                RegisterSetterAndGetter<float>(property, instance);
-            }
-            else if (property.PropertyType == typeof(Vector2))
-            {
-                RegisterSetterAndGetter<Vector2>(property, instance);
-            }
-            else if (property.PropertyType == typeof(Color))
-            {
-                RegisterSetterAndGetter<Color>(property, instance);
-            }
-            else
+            if (!(property.PropertyType == typeof(int) ||
+                  property.PropertyType == typeof(string) ||
+                  property.PropertyType == typeof(float) ||
+                  property.PropertyType == typeof(Vector2) ||
+                  property.PropertyType == typeof(Color)))
             {
                 // Not a supported type...
                 throw new ArgumentException("This implementation of IMediator does not support Properties of type " + property.PropertyType);
             }
+            
+            _properties.Add(GetNameOfProperty(property), new PropertyContainer() { PropertyInfo = property, Instance = instance });
         }
-
         public void Register(MethodInfo method, string command, object instance)
         {
-            if (!_actions.ContainsKey(command))
-            {
-                _actions.Add(command, new List<Action<object[]>>());
-            }
-
-            _actions[command].Add(new Action<object[]>((parameters) => method.Invoke(instance, parameters)));
+            _methods.Add(command, new CommandContainer() { MethodInfo = method, Instance = instance });
         }
 
         public string Process(string name, params object[] args)
@@ -90,7 +67,7 @@ namespace Frenetic
                     return null;
                 }
             }
-            else if (IsAction(name))
+            else if (IsMethod(name))
             {
                 Execute(name, args);
                 return null;
@@ -113,84 +90,107 @@ namespace Frenetic
 
             Type type = GetTypeOfProperty(name);
 
-            if (type == typeof(int))
+            object parameter;
+            try
             {
-                Set<int>(name, value);
+                parameter = GetTypedParameter(value, type);
             }
-            if (type == typeof(string))
+            catch (FormatException)
             {
-                Set<string>(name, value);
+                _logger.Info(value + " is not valid for : " + name);
+                // NOTE: If the conversion from string to the parameter type fails, we just do nothing...
+                return;
             }
-            if (type == typeof(float))
-            {
-                Set<float>(name, value);
-            }
-            if (type == typeof(Vector2))
-            {
-                Set<Vector2>(name, value);
-            }
-            if (type == typeof(Color))
-            {
-                Set<Color>(name, value);
-            }
-        }
 
+            _properties[name].PropertyInfo.SetValue(_properties[name].Instance, parameter, null);
+            _logger.Info(name + " set to : " + value);
+        }
         private string Get(string name)
         {
-            Func<object> getter = (Func<object>)_properties[name][1];
+            object unconverted_value = _properties[name].PropertyInfo.GetValue(_properties[name].Instance, null);
+            //Func<object> getter = (Func<object>)_properties[name][1];
 
             Type type = GetTypeOfProperty(name);
             string value = "";
 
             if (type == typeof(Vector2))
             {
-                Vector2 tmp = (Vector2)getter();
+                Vector2 tmp = (Vector2)unconverted_value;
                 value = tmp.X + " " + tmp.Y;
             }
             else if (type == typeof(Color))
             {
-                Color tmp = (Color)getter();
+                Color tmp = (Color)unconverted_value;
                 value = tmp.R + " " + tmp.G + " " + tmp.B;
             }
             else
             {
-                value = getter().ToString();
+                value = unconverted_value.ToString();
             }
 
             _logger.Info(name + " is : " + value);
             return value;
         }
 
-        public void Execute(string method, params object[] parameters)
+        private void Execute(string method, params object[] parameters)
         {
-            var action = (Action<object[]>)_actions[method].First();
+            MethodInfo methodInfo = _methods[method].MethodInfo;
 
-            action(parameters);
-        }
-        
-        private void RegisterSetterAndGetter<PropertyType>(PropertyInfo property, object instance)
-        {
-            Action<PropertyType> setter = (value) => property.SetValue(instance, value, null);
-            _properties[GetNameOfProperty(property)].Add(setter);
-
-            Func<object> getter = () => property.GetValue(instance, null);
-            _properties[GetNameOfProperty(property)].Add(getter);
-        }
-
-        private void Set<PropertyType>(string name, string value)
-        {
-            Action<PropertyType> setter = (Action<PropertyType>)_properties[name][0];
-
+            object[] typedParams;
             try
             {
-                PropertyType convertedValue = ConvertTo<PropertyType>(value);
-                setter(convertedValue);
-                _logger.Info(name + " set to : " + value);
+                typedParams = GetTypedParameterArray(method, parameters);
             }
-            catch (FormatException)
+            catch (FormatException e)
             {
-                _logger.Info(value + " is not valid for : " + name);
-                // NOTE: If the conversion from string to the property type fails, we just do nothing...
+                _logger.Info("Invalid parameter values...");
+                // NOTE: If the conversion from string to the parameter type fails, we just do nothing...
+                return;
+            }
+
+            methodInfo.Invoke(_methods[method].Instance, typedParams);
+        }
+
+        private object[] GetTypedParameterArray(string method, object[] parameters)
+        {
+            var methodInfo = _methods[method].MethodInfo;
+            List<object> typedParams = new List<object>();
+            int parameterIndex = 0;
+            foreach (ParameterInfo paramInfo in methodInfo.GetParameters())
+            {
+                typedParams.Add(GetTypedParameter(parameters[parameterIndex].ToString(), paramInfo.ParameterType));
+                parameterIndex++;
+            }
+
+            return typedParams.ToArray();
+        }
+        private object GetTypedParameter(string value, Type type)
+        {
+            if (type == typeof(string))
+            {
+                return ConvertTo<string>(value);
+            }
+            else if (type == typeof(int))
+            {
+                return ConvertTo<int>(value);
+            }
+            else if (type == typeof(float))
+            {
+                return ConvertTo<float>(value);
+            }
+            else if (type == typeof(Vector2))
+            {
+                return ConvertTo<Vector2>(value);
+            }
+            else if (type == typeof(Color))
+            {
+                return ConvertTo<Color>(value);
+            }
+            else
+            {
+                // Not a supported type...
+                throw new ArgumentException("This implementation of IMediator does not support Methods with Parameters of type " + type);
+                _logger.Info("Cannot do a conversion for " + value + " to Type: " + type);
             }
         }
 
@@ -235,7 +235,7 @@ namespace Frenetic
 
         private Type GetTypeOfProperty(string name)
         {
-            return _properties[name][0].Method.GetParameters()[0].ParameterType;
+            return _properties[name].PropertyInfo.PropertyType;
         }
         private bool IsProperty(string name)
         {
@@ -248,14 +248,14 @@ namespace Frenetic
             return false;
         }
 
-        private bool IsAction(string name)
+        private bool IsMethod(string name)
         {
-            if (_actions.ContainsKey(name))
+            if (_methods.ContainsKey(name))
             {
                 return true;
             }
 
-            _logger.Info("Unknown action: " + name);
+            _logger.Info("Unknown method: " + name);
             return false;
         }
 
@@ -269,7 +269,18 @@ namespace Frenetic
         }
 
         ILog _logger;
-        private Dictionary<string, List<Delegate>> _properties;
-        private Dictionary<string, List<Action<object[]>>> _actions;
+        private Dictionary<string, CommandContainer> _methods;
+        private Dictionary<string, PropertyContainer> _properties;
+        
+        private class CommandContainer
+        {
+            public MethodInfo MethodInfo { get; set; }
+            public object Instance { get; set; }
+        }
+        private class PropertyContainer
+        {
+            public PropertyInfo PropertyInfo { get; set; }
+            public object Instance { get; set; }
+        }
     }
 }

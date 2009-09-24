@@ -119,7 +119,7 @@ namespace Frenetic
 
                             case 1: // Join System Link Session
                                 //FindSession(NetworkSessionType.SystemLink);
-                                JoinSession();
+                                JoinSession("", 14242);
                                 break;
 
                             case 2: // Exit
@@ -153,7 +153,7 @@ namespace Frenetic
         void CreateSession()
         {
             var serverGameSessionCandV = _gameSessionFactory.MakeServerGameSession();
-            var clientGameSessionCandV = _gameSessionFactory.MakeClientGameSession();
+            var clientGameSessionCandV = _gameSessionFactory.MakeClientGameSession("", 14242);
 
             _gameplayScreen = _screenFactory.MakeGameplayScreen(clientGameSessionCandV, serverGameSessionCandV);
 
@@ -247,17 +247,12 @@ namespace Frenetic
             #endregion
         }
 
-        void JoinSession()
-        {
-            var clientGameSessionCandV = _gameSessionFactory.MakeClientGameSession();
-
-            _gameplayScreen = _screenFactory.MakeGameplayScreen(clientGameSessionCandV, null);
-        }
-
         [Command("Connect")]
-        public void JoinSession(string address, string port)
+        public void JoinSession(string address, int port)
         {
-            var clientGameSesssionCandV = _gameSessionFactory.MakeClientGameSession();
+            var clientGameSesssionCandV = _gameSessionFactory.MakeClientGameSession(address, port);
+
+            _gameplayScreen = _screenFactory.MakeGameplayScreen(clientGameSesssionCandV, null);
         }
 
         #endregion

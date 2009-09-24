@@ -34,7 +34,7 @@ namespace UnitTestLibrary
             var clientGSCandV = new GameSessionControllerAndView(null, null, null);
 
             stubGameSessionFactory.Stub(x => x.MakeServerGameSession()).Return(serverGSCandV);
-            stubGameSessionFactory.Stub(x => x.MakeClientGameSession()).Return(clientGSCandV);
+            stubGameSessionFactory.Stub(x => x.MakeClientGameSession(Arg<String>.Is.Equal(""), Arg<int>.Is.Anything)).Return(clientGSCandV);
 
             mainMenuScreen.State = MainMenuScreen.MainMenuState.Network;
             mainMenuScreen.OnSelectEntry(0);    // Create a session selected
@@ -47,7 +47,7 @@ namespace UnitTestLibrary
         {
             var clientGSCandV = new GameSessionControllerAndView(null, null, null);
 
-            stubGameSessionFactory.Stub(x => x.MakeClientGameSession()).Return(clientGSCandV);
+            stubGameSessionFactory.Stub(x => x.MakeClientGameSession(Arg<string>.Is.Equal(""), Arg<int>.Is.Anything)).Return(clientGSCandV);
 
             mainMenuScreen.State = MainMenuScreen.MainMenuState.Network;
             mainMenuScreen.OnSelectEntry(1);    // Join a session selected

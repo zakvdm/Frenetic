@@ -1,37 +1,20 @@
 *********
 SPRINT 1:
 *********
-DONE - Player Input:  
-	Player should be able to move around screen, jump, and (possibly) aim with the mouse.
-
-DONE - Basic Player physics: 
-	Player collides with level, player motion applied by physics engine
-
-DONE - Basic Level:  
-	Level built up out of farseer Body objects. Player collides against level. Level is rendered.
-
-DONE - Abstract Drawing Code:  
-	Make ISpriteBatch, with methods Draw(.....), then make an XNASpriteBatch : ISpriteBatch, that just wraps SpriteBatch's Draw methods (the one we need for now) and takes a XNA SpriteBatch in its constructor. This way we can unit test all the IViews.
-
+DONE - Player Input:  Player should be able to move around screen, jump, and (possibly) aim with the mouse.
+DONE - Basic Player physics: Player collides with level, player motion applied by physics engine
+DONE - Basic Level:  Level built up out of farseer Body objects. Player collides against level. Level is rendered.
+DONE - Abstract Drawing Code:  Make ISpriteBatch, with methods Draw(.....), then make an XNASpriteBatch : ISpriteBatch, that just wraps SpriteBatch's Draw methods (the one we need for now) and takes a XNA SpriteBatch in its constructor. This way we can unit test all the IViews.
 ******************************
 SPRINT 2: Started on 2/02/2009
 ******************************
 DONE - 2 - As the player, when I move the camera follows me so I'm always at the centre of the screen
-	Just calculates a simple transformation matrix (code already implemented). Needs to be given to every IView?
-
 DONE - 5 - Move crosshair and click to print position
-
 DONE - 3 - Can properly exit game
-
 DONE - 5 - Resources (network sockets) properly disposed on exit 
-2 - Can recreate a game session once you've exited a running game
-
+DONE - 2 - Can recreate a game session once you've exited a running game
 DONE - 13 - As the client I can bring down the console and type in a command
-
-13 - Client types in a message and this message is shown on the screen of all clients connected to the server.
-
-******************************COMMITED UP TO HERE FOR SPRINT 2 (32 sp commited to -- 28 sp completed in about 6 weeks)
-
+DONE - 13 - Client types in a message and this message is shown on the screen of all clients connected to the server.
 *******************************
 SPRINT 3: Started on 21/03/2009
 *******************************
@@ -39,63 +22,55 @@ DONE - 3 - Console lifetime is changed to match game lifetime (so console can be
   DONE Console created as singleton service at top level
   DONE Solve the problem with instances of PlayerSettings, PhysicsSettings, etc.
   DONE Solve the problem with player textures... when do they get loaded?
-
 DONE - 5 - Player settings are synchronized over the network (eg. I can change my player name/color via the console, and all clients in the current game "see" it)
   DONE - Figure out how to serialize PlayerSettings with Player
   DONE - Test to see that the synchronization works properly
-
-CARRIED OVER FROM PREVIOUS SPRINT:
 DONE - 2 - Can recreate a game session once you've exited a running game
-
-CARRIED OVER FROM PREVIOUS SPRINT:
 DONE - 13 - Client types in a message and this message is shown on the screen of all clients connected to the server.
   DONE - Message on console (i.e. whatever's not a command) is sent reliably to the server
   DONE - Server sends messages reliably to all clients
   DONE - Messages are written to the console with the client name
-
 *****
 BUGS:
 DONE - When joining a network session and then exiting, the resources are properly disposed 
 DONE - Players/objects are not visible if they are in the "black" areas
 *****
-
 DONE - 8 - Basic visibility (All areas not directly visible from the current player position are black)
 DONE - 8 - Player settings are saved over multiple game sessions
 DONE - 20 - As the player, I can click on the screen and fire a railgun at the point where I click
-
 DONE - 5 - Keeps and distributes/shows scores
 DONE - 2 - Players don't collide with each other
-ZAK - 3 - Player is disabled while dead
-5 - Player respawn
-*****
-BUGS:
-1) When server dies, connected client has to shutdown gracefully
-2) When a client disconnects, we have to remove its associated physics objects (currently only removing it from PlayerView)
-3) PlayerSettings must be syncronized over network (currently they're not even sent by ChatLogSender (which also needs to be renamed))
-FIXED NetworkPlayerProcessor will have to also update the LocalClient state (like if the server sends new Health status, etc.)
-4) Fix the bug where you kill yourself if you click inside yourself...
-5) On the Client, the player scores aren't stored against the correct names
-*****
-
+DONE - 3 - Player is disabled while dead
+DONE - 5 - Player respawn
 DONE - 2 - Refactor Menu System: Change menu system to use same keyboard structure as game (this will allow the console to lock keyboard input during the menu stages)
-
 DONE - 5 - Add some kind of logging framework (so we can start doing debug output, etc.)
-
-3 - Create a system of console-executable commands (probably with an attribute similar to [Tweakable] -- [Runnable]?)
-
-13 - I can bring down the console and type "connect 196.21.23.4" and connect to a game hosted somewhere on the internet.
-
+DONE - 3 - Create a system of console-executable commands (probably with an attribute similar to [Tweakable] -- [Runnable]?)
 DONE - 13 - Network Code improvements:
   DONE - 3 - Send InputState instead of Player object
   DONE - 3 - Group data into single sends (so send one message that contains all UnreliableInOrder data, one for all ReliableOutOfOrder, and so forth)
   DONE - 5 - Only send objects when they change (Including Shots) (and eventually only send the changed bits...)
   DONE - 2 - Make everything consistent (i.e. fix Shots and Chat messages)
 DONE - 8 - Investigate more efficient serialization techniques.
+DONE - 2 - Cleanup Autofac's creation of PhysicsComponents
+FIXED NetworkPlayerProcessor will have to also update the LocalClient state (like if the server sends new Health status, etc.)
 
-ZAK - 8 - Client-side Prediction
-  DONE - 2 - Initial Implementation of smoothing
+*****
+BUGS:
+1) When server dies, connected client has to shutdown gracefully
+2) When a client disconnects, we have to remove its associated physics objects (currently only removing it from PlayerView)
+3) PlayerSettings of all existing Clients must be sent to new Clients -- tricky...
+4) Fix the bug where you kill yourself if you click inside yourself...
+5) Too many log files created
+*****
+
+ZAK - 5 - I can bring down the console and type "connect 196.21.23.4" and connect to a game hosted somewhere on the internet.
+5 - Player Health
+3 - Railgun damage depends on speed
+8 - Item pickups
+
+8 - Client-side Prediction
+  3 - Initial Implementation of smoothing
   3 - Track average round trip time
-  DONE - 2 - Cleanup Autofac's creation of PhysicsComponents
 
 40 - Games can be recorded and played back 
 	STEP 1:
