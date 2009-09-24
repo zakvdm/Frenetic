@@ -93,7 +93,7 @@ namespace Frenetic
             object parameter;
             try
             {
-                parameter = GetTypedParameter(value, type);
+                parameter = ConvertTo(type, value);
             }
             catch (FormatException)
             {
@@ -158,75 +158,48 @@ namespace Frenetic
             int parameterIndex = 0;
             foreach (ParameterInfo paramInfo in methodInfo.GetParameters())
             {
-                typedParams.Add(GetTypedParameter(parameters[parameterIndex].ToString(), paramInfo.ParameterType));
+                typedParams.Add(ConvertTo(paramInfo.ParameterType, parameters[parameterIndex].ToString()));
                 parameterIndex++;
             }
 
             return typedParams.ToArray();
         }
-        private object GetTypedParameter(string value, Type type)
+
+        object ConvertTo(Type type, string value)
         {
             if (type == typeof(string))
             {
-                return ConvertTo<string>(value);
+                return DoGenericConvert<string>(value);
             }
-            else if (type == typeof(int))
+            if (type == typeof(int))
             {
-                return ConvertTo<int>(value);
+                return DoGenericConvert<int>(value);
             }
-            else if (type == typeof(float))
+            if (type == typeof(float))
             {
-                return ConvertTo<float>(value);
+                return DoGenericConvert<float>(float.Parse(value));
             }
-            else if (type == typeof(Vector2))
-            {
-                return ConvertTo<Vector2>(value);
-            }
-            else if (type == typeof(Color))
-            {
-                return ConvertTo<Color>(value);
-            }
-            else
-            {
-                // Not a supported type...
-                throw new ArgumentException("This implementation of IMediator does not support Methods with Parameters of type " + type);
-                _logger.Info("Cannot do a conversion for " + value + " to Type: " + type);
-            }
-        }
-
-        PropertyType ConvertTo<PropertyType>(string value)
-        {
-            if (typeof(PropertyType) == typeof(string))
-            {
-                return DoGenericConvert<PropertyType>(value);
-            }
-            if (typeof(PropertyType) == typeof(int))
-            {
-                return DoGenericConvert<PropertyType>(value);
-            }
-            if (typeof(PropertyType) == typeof(float))
-            {
-                return DoGenericConvert<PropertyType>(float.Parse(value));
-            }
-            if (typeof(PropertyType) == typeof(Vector2))
+            if (type == typeof(Vector2))
             {
                 Vector2 tmpVector;
                 string[] args = value.Split(new char[] { ' ' }, 2);
                 tmpVector.X = float.Parse(args[0]);
                 tmpVector.Y = float.Parse(args[1]);
-                return DoGenericConvert<PropertyType>(tmpVector);
+                return DoGenericConvert<Vector2>(tmpVector);
             }
-            if (typeof(PropertyType) == typeof(Color))
+            if (type == typeof(Color))
             {
                 Color tmpColor = Color.White;
                 string[] args = value.Split(new char[] { ' ' }, 3);
                 tmpColor.R = (byte)(int.Parse(args[0]) % 255);
                 tmpColor.G = (byte)(int.Parse(args[1]) % 255);
                 tmpColor.B = (byte)(int.Parse(args[2]) % 255);
-                return DoGenericConvert<PropertyType>(tmpColor);
+                return DoGenericConvert<Color>(tmpColor);
             }
 
-            return default(PropertyType);
+            // Not a supported type...
+            _logger.Info("Cannot do a conversion for " + value + " to Type: " + type);
+            throw new ArgumentException("This implementation of IMediator does not support Methods with Parameters of type " + type);
         }
         PropertyType DoGenericConvert<PropertyType>(object value)
         {
