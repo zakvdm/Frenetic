@@ -11,6 +11,7 @@ namespace Frenetic.Player
 {
     public class BasePlayer : IPlayer
     {
+        public static int StartHealth = 100;
         public static Vector2 JumpImpulse = new Vector2(0, -250000);
         public static Vector2 MoveForce = new Vector2(-500000f, 0);
         public static float MaxSpeed = 1000;
@@ -27,30 +28,22 @@ namespace Frenetic.Player
                 this.PhysicsComponent = physicsComponent;
 
             this.PhysicsComponent.CollidedWithWorld += () => InContactWithLevel = true;
-            this.PhysicsComponent.WasShot += (shootingPlayer) =>
-                {
-                    this.Status = PlayerStatus.Dead;
-                    this.OnDied();  // TODO: Do i really need this event? (currently used by nothing?)
-
-                    // UPDATE SCORES:
-                    this.PlayerScore.Deaths += 1;
-                    shootingPlayer.PlayerScore.Kills += 1;
-                    
-                    return;
-                };
+            this.PhysicsComponent.WasShot += Damage;
 
             this.Weapon = weapon;
             this.Timer = timer;
             this.BoundaryCollider = boundaryCollider;
 
-            Status = PlayerStatus.Alive;
-            Position = new Vector2(400, 100);
+            this.Health = BasePlayer.StartHealth;
+            this.Status = PlayerStatus.Alive;
+            this.Position = new Vector2(400, 100);
 
             this.PhysicsComponent.CollisionGroup = BasePlayer.CollisionGroup;
         }
         
         public IPlayerSettings PlayerSettings { get; protected set; }
 
+        public int Health { get; set; }
         public PlayerStatus Status { get; set; }
         public Vector2 Position
         {
@@ -110,7 +103,22 @@ namespace Frenetic.Player
             foreach (var physicsComponent in hitObjects)
             {
                 // Notify everything that we hit
-                physicsComponent.OnWasShot(this);
+                physicsComponent.OnWasShot(this, this.Weapon.Damage);
+            }
+        }
+
+        private void Damage(IPlayer shootingPlayer, int damage)
+        {
+            this.Health -= damage;
+
+            if (this.Health <= 0)
+            {
+                this.Status = PlayerStatus.Dead;
+                this.OnDied();  // TODO: Do i really need this event? (currently used by nothing?)
+
+                // UPDATE SCORES:
+                this.PlayerScore.Deaths += 1;
+                shootingPlayer.PlayerScore.Kills += 1;
             }
         }
 

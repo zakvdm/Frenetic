@@ -8,6 +8,7 @@ namespace Frenetic.Weapons
 {
     public interface IRailGun
     {
+        int Damage { get; }
         List<IPhysicsComponent> Shoot(Vector2 origin, Vector2 direction);
         Shots Shots { get; }
     }

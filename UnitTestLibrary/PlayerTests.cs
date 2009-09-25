@@ -42,7 +42,7 @@ namespace UnitTestLibrary
         public void RegistersWithIPhysicsComponentForRelevantEvents()
         {
             stubPhysicsComponent.AssertWasCalled(me => me.CollidedWithWorld += Arg<Action>.Is.Anything);
-            stubPhysicsComponent.AssertWasCalled(me => me.WasShot += Arg<Action<IPlayer>>.Is.Anything);
+            stubPhysicsComponent.AssertWasCalled(me => me.WasShot += Arg<Action<IPlayer, int>>.Is.Anything);
         }
         [Test]
         public void SetsCollisionGroup()
@@ -162,19 +162,24 @@ namespace UnitTestLibrary
 
             player.Shoot(new Vector2(100, 200));
 
-            stubPhysicsComponent1.AssertWasCalled(me => me.OnWasShot(player));
-            stubPhysicsComponent2.AssertWasCalled(me => me.OnWasShot(player));
+            stubPhysicsComponent1.AssertWasCalled(me => me.OnWasShot(player, stubRailGun.Damage));
+            stubPhysicsComponent2.AssertWasCalled(me => me.OnWasShot(player, stubRailGun.Damage));
         }
         [Test]
-        public void GettingShotKillsThePlayer()
+        public void GettingShotDamagesThePlayer()
         {
             var shootingPlayer = MockRepository.GenerateStub<IPlayer>();
             shootingPlayer.Stub(me => me.PlayerScore).Return(new PlayerScore());
             bool raisedOnDeath = false;
             Assert.AreEqual(PlayerStatus.Alive, player.Status);
+            Assert.AreEqual(100, player.Health);
             player.Died += () => raisedOnDeath = !raisedOnDeath;
 
-            stubPhysicsComponent.Raise(me => me.WasShot += null, shootingPlayer);
+            stubPhysicsComponent.Raise(me => me.WasShot += null, shootingPlayer, 50);
+
+            Assert.AreEqual(50, player.Health);
+
+            stubPhysicsComponent.Raise(me => me.WasShot += null, shootingPlayer, 50);
 
             Assert.AreEqual(PlayerStatus.Dead, player.Status);
             Assert.IsTrue(raisedOnDeath);

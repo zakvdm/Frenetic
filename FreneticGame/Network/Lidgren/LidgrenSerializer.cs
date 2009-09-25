@@ -138,6 +138,7 @@ namespace Frenetic.Network.Lidgren
         // PLAYERSTATE:
         public static void Write(this NetBuffer netbuffer, IPlayerState state)
         {
+            netbuffer.Write(state.Health);
             netbuffer.Write((ushort)state.Status);
             netbuffer.Write(state.NewShots.Count);
             foreach (Shot shot in state.NewShots)
@@ -152,7 +153,8 @@ namespace Frenetic.Network.Lidgren
         public static IPlayerState ReadPlayerState(this NetBuffer netbuffer)
         {
             PlayerState playerstate = new PlayerState();
-           
+
+            playerstate.Health = netbuffer.ReadInt32();
             playerstate.Status = (PlayerStatus)netbuffer.ReadUInt16();
             int number_of_new_shots = netbuffer.ReadInt32();
             for (int i = 0; i < number_of_new_shots; i++)

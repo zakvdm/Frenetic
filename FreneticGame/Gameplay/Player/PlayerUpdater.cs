@@ -31,6 +31,7 @@ namespace Frenetic.Player
                 {
                     // Player has been respawned on Client side...
                     player.Status = PlayerStatus.Alive;
+                    player.Health = BasePlayer.StartHealth;
                 }
             }
         }

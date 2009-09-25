@@ -8,6 +8,7 @@ namespace Frenetic.Player
 {
     public interface IPlayerState
     {
+        int Health { get; set; }
         PlayerStatus Status { get; set; }
         Vector2 Position { get; set; }
         List<Shot> NewShots { get; set; }
@@ -29,6 +30,7 @@ namespace Frenetic.Player
         {
             if (player != null)
             {
+                this.Health = player.Health;
                 this.Status = player.Status;
                 this.Position = player.Position;
                 this.Score = player.PlayerScore;
@@ -41,6 +43,7 @@ namespace Frenetic.Player
             }
         }
 
+        public int Health { get; set; }
         public PlayerStatus Status { get; set; }
         public Vector2 Position { get; set; }
         public List<Shot> NewShots { get; set; }
@@ -51,6 +54,7 @@ namespace Frenetic.Player
             // TODO: Implement a rolling average
             player.UpdatePositionFromNetwork(this.Position, 0.1f);
 
+            player.Health = this.Health;
             player.Status = this.Status;
             if (player.Status == player.PendingStatus)
             {

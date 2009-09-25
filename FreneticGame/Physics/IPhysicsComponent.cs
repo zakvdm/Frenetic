@@ -20,9 +20,9 @@ namespace Frenetic.Physics
         void ApplyImpulse(Vector2 impulse);
         void ApplyForce(Vector2 force);
 
-        void OnWasShot(IPlayer shootingPlayer);
+        void OnWasShot(IPlayer shootingPlayer, int damage);
 
         event Action CollidedWithWorld;
-        event Action<IPlayer> WasShot;
+        event Action<IPlayer, int> WasShot;
     }
 }

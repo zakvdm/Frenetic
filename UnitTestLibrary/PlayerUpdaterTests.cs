@@ -36,6 +36,19 @@ namespace UnitTestLibrary
             Assert.AreEqual(PlayerStatus.Alive, player1.Status);
             Assert.AreEqual(PlayerStatus.Dead, player2.Status);
         }
+        [Test]
+        public void ResetsPlayerHealthWhenRespawningPlayer()
+        {
+            var player = MockRepository.GenerateStub<IPlayer>();
+            player.Status = PlayerStatus.Dead;
+            player.PendingStatus = PlayerStatus.Alive;
+            player.Health = 0;
+            playerList.Add(player);
+
+            updater.Process(1000);
+
+            Assert.AreEqual(100, player.Health);
+        }
 
         [Test]
         public void CallsShootOnEachAlivePlayer()

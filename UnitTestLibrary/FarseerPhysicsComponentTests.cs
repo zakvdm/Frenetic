@@ -101,9 +101,9 @@ namespace UnitTestLibrary
         public void RaisesEventWhenShot()
         {
             bool raisedEvent = false;
-            farseerPComponent.WasShot += (player) => raisedEvent = true;
+            farseerPComponent.WasShot += (player, damage) => raisedEvent = true;
 
-            farseerPComponent.OnWasShot(MockRepository.GenerateStub<IPlayer>());
+            farseerPComponent.OnWasShot(MockRepository.GenerateStub<IPlayer>(), 35);
 
             Assert.IsTrue(raisedEvent);
         }

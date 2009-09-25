@@ -25,6 +25,7 @@ namespace UnitTestLibrary
         [Test]
         public void CanSetPlayerStateValuesFromPlayerObject()
         {
+            player.Health = 97;
             player.Status = PlayerStatus.Dead;
             player.CurrentWeapon.Shots.Add(new Shot(new Vector2(1, 2), new Vector2(3, 4)));
             player.Position = Vector2.One;
@@ -33,6 +34,7 @@ namespace UnitTestLibrary
 
             PlayerState state = new PlayerState(player);
 
+            Assert.AreEqual(97, state.Health);
             Assert.AreEqual(PlayerStatus.Dead, state.Status);
             Assert.AreEqual(Vector2.One, state.Position);
             Assert.AreEqual(1, state.NewShots.Count);
@@ -53,6 +55,7 @@ namespace UnitTestLibrary
         {
             player.CurrentWeapon.Shots.Add(new Shot());
             PlayerState state = new PlayerState();
+            state.Health = 98;
             state.Status = PlayerStatus.Alive;
             state.Position = new Vector2(4, 8);
             state.NewShots = new List<Shot>();
@@ -63,6 +66,7 @@ namespace UnitTestLibrary
 
             state.RefreshPlayerValuesFromState(player);
 
+            Assert.AreEqual(98, player.Health);
             Assert.AreEqual(PlayerStatus.Alive, state.Status);
             player.AssertWasCalled(me => me.UpdatePositionFromNetwork(Arg<Vector2>.Is.Equal(state.Position), Arg<float>.Is.Anything));
             Assert.AreEqual(3, player.CurrentWeapon.Shots.Count);

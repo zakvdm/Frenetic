@@ -28,10 +28,10 @@ namespace Frenetic.Physics
         {
         }
 
-        public void OnWasShot(IPlayer shootingPlayer) { }
+        public void OnWasShot(IPlayer shootingPlayer, int damage) { }
 
         public event Action CollidedWithWorld = delegate { };
-        public event Action<IPlayer> WasShot = delegate { };
+        public event Action<IPlayer, int> WasShot = delegate { };
 
         #endregion
     }

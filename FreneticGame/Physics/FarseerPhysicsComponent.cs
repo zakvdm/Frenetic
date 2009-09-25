@@ -104,12 +104,12 @@ namespace Frenetic.Physics
             _body.ApplyForce(force);
         }
 
-        public void OnWasShot(IPlayer shootingPlayer)
+        public void OnWasShot(IPlayer shootingPlayer, int damage)
         {
-            WasShot(shootingPlayer);
+            WasShot(shootingPlayer, damage);
         }
 
-        public event Action<IPlayer> WasShot = delegate { };
+        public event Action<IPlayer, int> WasShot = delegate { };
         public event Action CollidedWithWorld = delegate { };
 
         Body _body;

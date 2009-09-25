@@ -17,6 +17,8 @@ namespace Frenetic.Player
         PlayerStatus? PendingStatus { get; set; }
         Vector2? PendingShot { get; set; }
 
+        int Health { get; set; }
+
         Vector2 Position { get; set; }
 
         PlayerStatus Status { get; set; }

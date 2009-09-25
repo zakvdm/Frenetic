@@ -14,8 +14,11 @@ namespace Frenetic.Weapons
         {
             _rayCaster = rayCaster;
             Shots = new Shots();
+
+            this.Damage = 50;
         }
 
+        public int Damage { get; set; }
         public Shots Shots { get; private set; }
 
         public List<IPhysicsComponent> Shoot(Vector2 origin, Vector2 direction)

@@ -106,6 +106,7 @@ namespace UnitTestLibrary
         {
             buffer.Write(new PlayerState() 
                             { 
+                                Health = 96,
                                 Status = PlayerStatus.Alive, 
                                 Position = new Vector2(5, 10), 
                                 NewShots = new List<Shot>() { new Shot() { EndPoint = Vector2.UnitX, StartPoint = Vector2.UnitY }, new Shot() { EndPoint = Vector2.Zero, StartPoint = Vector2.One} }, 
@@ -116,6 +117,7 @@ namespace UnitTestLibrary
             Console.WriteLine("Serializing PlayerState took " + buffer.Data.Length + " bytes");
             var output = buffer.ReadPlayerState();
 
+            Assert.AreEqual(96, output.Health);
             Assert.AreEqual(PlayerStatus.Alive, output.Status);
             Assert.AreEqual(new Vector2(5, 10), output.Position);
             Assert.AreEqual(2, output.NewShots.Count);
