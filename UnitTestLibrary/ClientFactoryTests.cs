@@ -12,7 +12,7 @@ namespace UnitTestLibrary
     [TestFixture]
     public class ClientFactoryTest
     {
-        List<IPlayer> playerList;
+        PlayerList playerList;
         ClientSideClientFactory clientFactory;
         LocalClient localClient;
         Client.Factory clientFactoryDelegate;
@@ -21,7 +21,7 @@ namespace UnitTestLibrary
         [SetUp]
         public void SetUp()
         {
-            playerList = new List<IPlayer>();
+            playerList = new PlayerList();
             localClient = new LocalClient(MockRepository.GenerateStub<IPlayer>());
             clientFactoryDelegate = () => createdClient;
             clientFactory = new ClientSideClientFactory(clientFactoryDelegate, playerList, localClient);
@@ -71,7 +71,7 @@ namespace UnitTestLibrary
         [ExpectedException(typeof(NotImplementedException))]
         public void ServerSideFactoryCantCreateLocalClient()
         {
-            ServerSideClientFactory factory = new ServerSideClientFactory(null, new List<IPlayer>());
+            ServerSideClientFactory factory = new ServerSideClientFactory(null, new PlayerList());
 
             factory.GetLocalClient();
         }

@@ -14,7 +14,7 @@ namespace UnitTestLibrary
     [TestFixture]
     public class PlayerViewTests
     {
-        List<IPlayer> playerList;
+        PlayerList playerList;
         ITexture stubTexture;
         ITextureBank<PlayerTexture> _stubTextureBank;
         ISpriteBatch stubSpriteBatch;
@@ -25,7 +25,7 @@ namespace UnitTestLibrary
         [SetUp]
         public void SetUp()
         {
-            playerList = new List<IPlayer>();
+            playerList = new PlayerList();
             stubTexture = MockRepository.GenerateStub<ITexture>();
             _stubTextureBank = MockRepository.GenerateStub<ITextureBank<PlayerTexture>>();
             _stubTextureBank.Stub(x => x[PlayerTexture.Ball]).Return(stubTexture);

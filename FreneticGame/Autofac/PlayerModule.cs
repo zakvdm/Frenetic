@@ -24,7 +24,7 @@ namespace Frenetic.Autofac
             builder.Register<NetworkPlayer>().As<IPlayer>().FactoryScoped();
             builder.Register((c,p) => new LocalPlayer(c.Resolve<LocalPlayerSettings>(), c.Resolve<LocalPlayerFarseerPhysicsComponent>(), c.Resolve<IBoundaryCollider>(), c.Resolve<IRailGun>(), c.Resolve<ITimer>())).As<LocalPlayer>().FactoryScoped();
 
-            builder.Register<List<IPlayer>>().ContainerScoped();
+            builder.Register<PlayerList>().As<IPlayerList>().ContainerScoped();
             builder.Register<PlayerView>().ContainerScoped();
             builder.Register((c) => (IBoundaryCollider)new WorldBoundaryCollider(this.ScreenWidth, this.ScreenHeight));
             builder.Register<KeyboardPlayerController>().ContainerScoped();

@@ -7,7 +7,7 @@ namespace Frenetic.Network
 {
     public class ServerSideClientFactory : IClientFactory
     {
-        public ServerSideClientFactory(Client.Factory clientFactory, List<IPlayer> playerList)
+        public ServerSideClientFactory(Client.Factory clientFactory, PlayerList playerList)
         {
             _playerList = playerList;
             _clientFactory = clientFactory;
@@ -39,13 +39,13 @@ namespace Frenetic.Network
 
         #endregion
 
-        protected List<IPlayer> _playerList;
+        protected PlayerList _playerList;
         Client.Factory _clientFactory;
     }
 
     public class ClientSideClientFactory : ServerSideClientFactory
     {
-        public ClientSideClientFactory(Client.Factory clientFactory, List<IPlayer> playerList, LocalClient localClient)
+        public ClientSideClientFactory(Client.Factory clientFactory, PlayerList playerList, LocalClient localClient)
             : base(clientFactory, playerList)
         {
             _localClient = localClient;

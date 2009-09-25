@@ -8,7 +8,7 @@ namespace Frenetic.Weapons
 {
     public class RailGunView : IRailGunView
     {
-        public RailGunView(List<IPlayer> playerList, MercuryParticleEffect.Factory particleEffectFactory)
+        public RailGunView(PlayerList playerList, MercuryParticleEffect.Factory particleEffectFactory)
         {
             _players = playerList;
             _particleEffectFactory = particleEffectFactory;
@@ -50,7 +50,7 @@ namespace Frenetic.Weapons
             }
         }
 
-        List<IPlayer> _players;
+        PlayerList _players;
         MercuryParticleEffect.Factory _particleEffectFactory;
 
         Dictionary<IRailGun, MercuryParticleEffect> _railGuns = new Dictionary<IRailGun, MercuryParticleEffect>();

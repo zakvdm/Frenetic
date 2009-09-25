@@ -7,7 +7,7 @@ namespace Frenetic.Player
 {
     public class PlayerUpdater : IController
     {
-        public PlayerUpdater(List<IPlayer> playerList)
+        public PlayerUpdater(PlayerList playerList)
         {
             this.Players = playerList;
         }
@@ -38,6 +38,6 @@ namespace Frenetic.Player
 
         #endregion
 
-        public List<IPlayer> Players { get; private set; }
+        public PlayerList Players { get; private set; }
     }
 }

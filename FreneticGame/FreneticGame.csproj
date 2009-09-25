@@ -124,6 +124,7 @@
     <Compile Include="Gameplay\Player\LocalPlayer.cs" />
     <Compile Include="Gameplay\Player\NetworkPlayer.cs" />
     <Compile Include="Gameplay\Player\PlayerInput.cs" />
+    <Compile Include="Gameplay\Player\PlayerList.cs" />
     <Compile Include="Gameplay\Player\PlayerState.cs" />
     <Compile Include="Gameplay\Player\PlayerUpdater.cs" />
     <Compile Include="Gameplay\Weapons\IRailGun.cs" />

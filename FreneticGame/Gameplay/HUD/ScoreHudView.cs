@@ -20,7 +20,7 @@ namespace Frenetic.Gameplay.HUD
 
         const int MAX_NAME_LENGTH = 20;
 
-        public ScoreOverlayView(List<IPlayer> playerList, Rectangle scoreWindow, IFont font)
+        public ScoreOverlayView(PlayerList playerList, Rectangle scoreWindow, IFont font)
         {
             _players = playerList;
             this.Window = scoreWindow;
@@ -44,12 +44,6 @@ namespace Frenetic.Gameplay.HUD
             spritebatch.DrawText(_font, ScoreOverlayView.DEATHS, currentTextPosition + DEATHS_OFFSET, HEADING_COLOR);
             currentTextPosition.Y += _font.LineSpacing;
 
-            List<IPlayer> playersSortedByScore = new List<IPlayer>();
-            //foreach (IPlayer player in _players)
-            //{
-                //int index = FindIndex((player_in_list) => player.PlayerScore > player_in_list.PlayerScore);
-                //playersSortedByScore.Insert((index == -1) ? 0: index, player);  
-            //}
             foreach (IPlayer player in _players.OrderByDescending((p) => p.PlayerScore))
             {
                 string name = player.PlayerSettings.Name;
@@ -60,7 +54,7 @@ namespace Frenetic.Gameplay.HUD
             }
         }
 
-        List<IPlayer> _players;
+        PlayerList _players;
         IFont _font;
 
         Vector2 SCORE_OFFSET;

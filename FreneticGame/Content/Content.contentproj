@@ -45,13 +45,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Fonts\NetRumbleFont.png">
-      <Name>NetRumbleFont</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="Textures\blank.png">
       <Name>blank</Name>
       <Importer>TextureImporter</Importer>
@@ -132,6 +125,13 @@
       <Name>point</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Fonts\BubbleText.spritefont">
+      <Name>BubbleText</Name>
+      <Importer>FontDescriptionImporter</Importer>
+      <Processor>FontDescriptionProcessor</Processor>
     </Compile>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\XNA Game Studio\v3.0\Microsoft.Xna.GameStudio.ContentPipeline.targets" />

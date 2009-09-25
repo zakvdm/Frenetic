@@ -11,7 +11,7 @@ namespace Frenetic.Player
 {
     public class PlayerView : IView
     {
-        public PlayerView(List<IPlayer> playerList, ITextureBank<PlayerTexture> playerTextureBank, ISpriteBatch spriteBatch, ICamera camera, IRailGunView railGunView)
+        public PlayerView(PlayerList playerList, ITextureBank<PlayerTexture> playerTextureBank, ISpriteBatch spriteBatch, ICamera camera, IRailGunView railGunView)
         {
             _players = playerList;
             _playerTextureBank = playerTextureBank;
@@ -48,7 +48,7 @@ namespace Frenetic.Player
 
         #endregion
 
-        List<IPlayer> _players;
+        PlayerList _players;
 
         ITextureBank<PlayerTexture> _playerTextureBank;
         ISpriteBatch _spriteBatch;

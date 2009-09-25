@@ -111,6 +111,7 @@
     <Compile Include="ClientInputSenderTests.cs" />
     <Compile Include="OutgoingMessageQueueTests.cs" />
     <Compile Include="PlayerInputTests.cs" />
+    <Compile Include="PlayerListTests.cs" />
     <Compile Include="PlayerStateTests.cs" />
     <Compile Include="PlayerRespawnerTests.cs" />
     <Compile Include="PlayerSettingsTests.cs" />

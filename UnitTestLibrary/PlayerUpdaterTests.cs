@@ -12,11 +12,11 @@ namespace UnitTestLibrary
     public class PlayerUpdaterTests
     {
         PlayerUpdater updater;
-        List<IPlayer> playerList;
+        PlayerList playerList;
         [SetUp]
         public void SetUp()
         {
-            playerList = new List<IPlayer>();
+            playerList = new PlayerList();
             updater = new PlayerUpdater(playerList);
         }
 
