@@ -52,8 +52,8 @@ namespace UnitTestLibrary
 
             hudView.Draw(stubSpriteBatch);
 
-            stubSpriteBatch.AssertWasCalled(x => x.DrawText(Arg<IFont>.Is.Equal(stubFont), Arg<string>.Is.Equal("You suck."), Arg<Vector2>.Is.Equal(new Vector2(rectangle.Left + OverlaySetView.TEXT_OFFSET.X, rectangle.Bottom - OverlaySetView.TEXT_OFFSET.Y - (2 * stubFont.LineSpacing))), Arg<Color>.Is.Equal(Color.Violet)));
-            stubSpriteBatch.AssertWasCalled(x => x.DrawText(Arg<IFont>.Is.Equal(stubFont), Arg<string>.Is.Equal("I suck? Screw you!"), Arg<Vector2>.Is.Equal(new Vector2(rectangle.Left + OverlaySetView.TEXT_OFFSET.X, rectangle.Bottom - OverlaySetView.TEXT_OFFSET.Y - stubFont.LineSpacing)), Arg<Color>.Is.Equal(Color.Violet)));
+            stubSpriteBatch.AssertWasCalled(x => x.DrawText(Arg<IFont>.Is.Equal(stubFont), Arg<string>.Is.Equal("You suck."), Arg<Vector2>.Is.Equal(new Vector2(rectangle.Left + OverlaySetView.TEXT_OFFSET.X, rectangle.Bottom - OverlaySetView.TEXT_OFFSET.Y - (2 * stubFont.LineSpacing))), Arg<Color>.Is.Equal(Color.Violet), Arg<float>.Is.Anything));
+            stubSpriteBatch.AssertWasCalled(x => x.DrawText(Arg<IFont>.Is.Equal(stubFont), Arg<string>.Is.Equal("I suck? Screw you!"), Arg<Vector2>.Is.Equal(new Vector2(rectangle.Left + OverlaySetView.TEXT_OFFSET.X, rectangle.Bottom - OverlaySetView.TEXT_OFFSET.Y - stubFont.LineSpacing)), Arg<Color>.Is.Equal(Color.Violet), Arg<float>.Is.Anything));
         }
 
         [Test]
@@ -65,7 +65,7 @@ namespace UnitTestLibrary
 
             hudView.Draw(stubSpriteBatch);
 
-            stubSpriteBatch.AssertWasCalled(x => x.DrawText(Arg<IFont>.Is.Equal(stubFont), Arg<string>.Is.Equal(InputOverlayView.CursorText + "Hey there"), Arg<Vector2>.Is.Equal(new Vector2(rectangle.Left + OverlaySetView.TEXT_OFFSET.X, rectangle.Bottom - OverlaySetView.TEXT_OFFSET.Y)), Arg<Color>.Is.Anything));
+            stubSpriteBatch.AssertWasCalled(x => x.DrawText(Arg<IFont>.Is.Equal(stubFont), Arg<string>.Is.Equal(InputOverlayView.CursorText + "Hey there"), Arg<Vector2>.Is.Equal(new Vector2(rectangle.Left + OverlaySetView.TEXT_OFFSET.X, rectangle.Bottom - OverlaySetView.TEXT_OFFSET.Y)), Arg<Color>.Is.Anything, Arg<float>.Is.Anything));
         }
 
         [Test]
@@ -102,8 +102,8 @@ namespace UnitTestLibrary
 
             hudView.Draw(stubSpriteBatch);
 
-            stubSpriteBatch.AssertWasCalled(x => x.DrawText(Arg<IFont>.Is.Equal(stubFont), Arg<string>.Is.Equal("Hey"), Arg<Vector2>.Is.Equal(new Vector2(possibleCommandsWindow.Left + OverlaySetView.TEXT_OFFSET.Y, possibleCommandsWindow.Bottom - OverlaySetView.TEXT_OFFSET.Y - (2 * stubFont.LineSpacing))), Arg<Color>.Is.Equal(Color.Blue)));
-            stubSpriteBatch.AssertWasCalled(x => x.DrawText(Arg<IFont>.Is.Equal(stubFont), Arg<string>.Is.Equal("Yo"), Arg<Vector2>.Is.Equal(new Vector2(possibleCommandsWindow.Left + OverlaySetView.TEXT_OFFSET.Y, possibleCommandsWindow.Bottom - OverlaySetView.TEXT_OFFSET.Y - stubFont.LineSpacing)), Arg<Color>.Is.Equal(Color.Blue)));
+            stubSpriteBatch.AssertWasCalled(x => x.DrawText(Arg<IFont>.Is.Equal(stubFont), Arg<string>.Is.Equal("Hey"), Arg<Vector2>.Is.Equal(new Vector2(possibleCommandsWindow.Left + OverlaySetView.TEXT_OFFSET.Y, possibleCommandsWindow.Bottom - OverlaySetView.TEXT_OFFSET.Y - (2 * stubFont.LineSpacing))), Arg<Color>.Is.Equal(Color.Blue), Arg<float>.Is.Anything));
+            stubSpriteBatch.AssertWasCalled(x => x.DrawText(Arg<IFont>.Is.Equal(stubFont), Arg<string>.Is.Equal("Yo"), Arg<Vector2>.Is.Equal(new Vector2(possibleCommandsWindow.Left + OverlaySetView.TEXT_OFFSET.Y, possibleCommandsWindow.Bottom - OverlaySetView.TEXT_OFFSET.Y - stubFont.LineSpacing)), Arg<Color>.Is.Equal(Color.Blue), Arg<float>.Is.Anything));
         }
     }
 }

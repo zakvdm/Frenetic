@@ -141,7 +141,7 @@ namespace Frenetic
             {
                 typedParams = GetTypedParameterArray(method, parameters);
             }
-            catch (FormatException e)
+            catch (FormatException)
             {
                 _logger.Info("Invalid parameter values...");
                 // NOTE: If the conversion from string to the parameter type fails, we just do nothing...

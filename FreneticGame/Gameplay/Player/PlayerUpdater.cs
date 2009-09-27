@@ -7,16 +7,16 @@ namespace Frenetic.Player
 {
     public class PlayerUpdater : IController
     {
-        public PlayerUpdater(PlayerList playerList)
+        public PlayerUpdater(IPlayerList playerList)
         {
-            this.Players = playerList;
+            this.PlayerList = playerList;
         }
         
         #region IController Members
 
         public void Process(float elapsedSeconds)
         {
-            foreach (IPlayer player in Players)
+            foreach (IPlayer player in PlayerList.Players)
             {
                 if (player.Status == PlayerStatus.Alive)
                 {
@@ -38,6 +38,6 @@ namespace Frenetic.Player
 
         #endregion
 
-        public PlayerList Players { get; private set; }
+        public IPlayerList PlayerList { get; private set; }
     }
 }

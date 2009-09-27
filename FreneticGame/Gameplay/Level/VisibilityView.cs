@@ -26,7 +26,7 @@ namespace Frenetic.Gameplay.Level
 
         #region IView Members
 
-        public void Generate()
+        public void Generate(float elapsedSeconds)
         {
             foreach (LevelPiece piece in _level.Pieces)
             {

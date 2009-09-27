@@ -42,7 +42,7 @@ namespace UnitTestLibrary
         [Test]
         public void OnlyDrawsVisibleHudViews()
         {
-            hudView.Generate();
+            hudView.Generate(1f);
 
             stubSpriteBatch.AssertWasNotCalled(me => me.Begin());
         }
@@ -53,7 +53,7 @@ namespace UnitTestLibrary
             stubInputView.Visible = true;
             stubInputView.Window = new Rectangle(10, 20, 30, 40);
 
-            hudView.Generate();
+            hudView.Generate(1f);
 
             // WINDOW:
             stubSpriteBatch.AssertWasCalled(me => me.Draw(Arg<ITexture>.Is.Equal(stubTexture),
@@ -68,7 +68,7 @@ namespace UnitTestLibrary
         {
             stubInputView.Visible = true;
 
-            hudView.Generate();
+            hudView.Generate(1f);
 
             stubSpriteBatch.AssertWasCalled(x => x.Begin());
             stubSpriteBatch.AssertWasCalled(x => x.End());

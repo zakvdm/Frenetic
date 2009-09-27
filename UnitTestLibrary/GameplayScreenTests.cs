@@ -32,7 +32,7 @@ namespace UnitTestLibrary
 
             gpScreen.Draw(new Microsoft.Xna.Framework.GameTime());
 
-            stubGSV.AssertWasCalled(x => x.Generate());
+            stubGSV.AssertWasCalled(x => x.Generate(Arg<float>.Is.Anything));
         }
 
         [Test]
@@ -59,8 +59,8 @@ namespace UnitTestLibrary
 
             gpScreen.Draw(new Microsoft.Xna.Framework.GameTime());
 
-            stubGSVserver.AssertWasCalled(x => x.Generate());
-            stubGSVclient.AssertWasCalled(x => x.Generate());
+            stubGSVserver.AssertWasCalled(x => x.Generate(Arg<float>.Is.Anything));
+            stubGSVclient.AssertWasCalled(x => x.Generate(Arg<float>.Is.Anything));
         }
     }
 }

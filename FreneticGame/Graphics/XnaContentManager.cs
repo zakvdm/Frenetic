@@ -20,6 +20,10 @@ namespace Frenetic.Graphics
             {
                 return (T)(ITexture)new XnaTexture(ContentManager.Load<Texture2D>(assetName));
             }
+            if (typeof(T) == typeof(IFont))
+            {
+                return (T)(IFont)new XnaFont(ContentManager.Load<SpriteFont>(assetName));
+            }
 
             return default(T);
         }

@@ -42,5 +42,6 @@ namespace Frenetic.Player
 
         // EVENTS:
         event Action Died;
+        event Action<IPlayer, int> HealthChanged;
     }
 }

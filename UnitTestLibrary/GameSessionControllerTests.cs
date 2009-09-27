@@ -36,8 +36,8 @@ namespace UnitTestLibrary
 
             stubController1.AssertWasCalled(x => x.Process(1));
             stubController2.AssertWasCalled(x => x.Process(1));
-            stubView1.AssertWasNotCalled(x => x.Generate());
-            stubView2.AssertWasNotCalled(x => x.Generate());
+            stubView1.AssertWasNotCalled(x => x.Generate(1f));
+            stubView2.AssertWasNotCalled(x => x.Generate(1f));
         }
         
     }

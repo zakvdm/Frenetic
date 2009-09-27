@@ -7,12 +7,12 @@ namespace Frenetic.Network
 {
     public class ServerSideClientFactory : IClientFactory
     {
-        public ServerSideClientFactory(Client.Factory clientFactory, PlayerList playerList)
+        public ServerSideClientFactory(Client.Factory clientFactory, IPlayerList playerList)
         {
             _playerList = playerList;
             _clientFactory = clientFactory;
 
-            _playerList.Clear();
+            _playerList.Players.Clear();
         }
 
         #region IClientFactory Members
@@ -34,18 +34,18 @@ namespace Frenetic.Network
 
         public virtual void DeleteClient(Client client)
         {
-            _playerList.Remove(client.Player);
+            _playerList.Players.Remove(client.Player);
         }
 
         #endregion
 
-        protected PlayerList _playerList;
+        protected IPlayerList _playerList;
         Client.Factory _clientFactory;
     }
 
     public class ClientSideClientFactory : ServerSideClientFactory
     {
-        public ClientSideClientFactory(Client.Factory clientFactory, PlayerList playerList, LocalClient localClient)
+        public ClientSideClientFactory(Client.Factory clientFactory, IPlayerList playerList, LocalClient localClient)
             : base(clientFactory, playerList)
         {
             _localClient = localClient;
@@ -60,7 +60,7 @@ namespace Frenetic.Network
 
         public override LocalClient GetLocalClient()
         {
-            if (!_playerList.Contains(_localClient.Player))
+            if (!_playerList.Players.Contains(_localClient.Player))
             {
                 _playerList.Add(_localClient.Player);
             }

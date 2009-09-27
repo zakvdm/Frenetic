@@ -15,7 +15,7 @@ namespace Frenetic
         }
         #region IView Members
 
-        public void Generate()
+        public void Generate(float elapsedSeconds)
         {
             _spriteBatch.Begin();
             Rectangle destinationRectangle = new Rectangle(

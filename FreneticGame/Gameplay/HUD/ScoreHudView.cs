@@ -20,9 +20,9 @@ namespace Frenetic.Gameplay.HUD
 
         const int MAX_NAME_LENGTH = 20;
 
-        public ScoreOverlayView(PlayerList playerList, Rectangle scoreWindow, IFont font)
+        public ScoreOverlayView(IPlayerList playerList, Rectangle scoreWindow, IFont font)
         {
-            _players = playerList;
+            _playerList = playerList;
             this.Window = scoreWindow;
             _font = font;
 
@@ -39,22 +39,22 @@ namespace Frenetic.Gameplay.HUD
         public void Draw(ISpriteBatch spritebatch)
         {
             Vector2 currentTextPosition = new Vector2(this.Window.Left + OverlaySetView.TEXT_OFFSET.X, this.Window.Top + OverlaySetView.TEXT_OFFSET.Y);
-            spritebatch.DrawText(_font, ScoreOverlayView.PLAYER, currentTextPosition, HEADING_COLOR);
-            spritebatch.DrawText(_font, ScoreOverlayView.SCORE, currentTextPosition + SCORE_OFFSET, HEADING_COLOR);
-            spritebatch.DrawText(_font, ScoreOverlayView.DEATHS, currentTextPosition + DEATHS_OFFSET, HEADING_COLOR);
+            spritebatch.DrawText(_font, ScoreOverlayView.PLAYER, currentTextPosition, HEADING_COLOR, 1);
+            spritebatch.DrawText(_font, ScoreOverlayView.SCORE, currentTextPosition + SCORE_OFFSET, HEADING_COLOR, 1);
+            spritebatch.DrawText(_font, ScoreOverlayView.DEATHS, currentTextPosition + DEATHS_OFFSET, HEADING_COLOR, 1);
             currentTextPosition.Y += _font.LineSpacing;
 
-            foreach (IPlayer player in _players.OrderByDescending((p) => p.PlayerScore))
+            foreach (IPlayer player in _playerList.Players.OrderByDescending((p) => p.PlayerScore))
             {
                 string name = player.PlayerSettings.Name;
-                spritebatch.DrawText(_font, name.Substring(0, name.Length > MAX_NAME_LENGTH ? MAX_NAME_LENGTH : name.Length), currentTextPosition, VALUES_COLOR);
-                spritebatch.DrawText(_font, player.PlayerScore.Kills.ToString(), currentTextPosition + SCORE_OFFSET, VALUES_COLOR);
-                spritebatch.DrawText(_font, player.PlayerScore.Deaths.ToString(), currentTextPosition + DEATHS_OFFSET, VALUES_COLOR);
+                spritebatch.DrawText(_font, name.Substring(0, name.Length > MAX_NAME_LENGTH ? MAX_NAME_LENGTH : name.Length), currentTextPosition, VALUES_COLOR, 1);
+                spritebatch.DrawText(_font, player.PlayerScore.Kills.ToString(), currentTextPosition + SCORE_OFFSET, VALUES_COLOR, 1);
+                spritebatch.DrawText(_font, player.PlayerScore.Deaths.ToString(), currentTextPosition + DEATHS_OFFSET, VALUES_COLOR, 1);
                 currentTextPosition.Y += _font.LineSpacing;
             }
         }
 
-        PlayerList _players;
+        IPlayerList _playerList;
         IFont _font;
 
         Vector2 SCORE_OFFSET;

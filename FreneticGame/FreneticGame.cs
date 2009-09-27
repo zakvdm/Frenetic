@@ -107,7 +107,7 @@ namespace Frenetic
             base.Draw(gameTime);
 
             // NOTE: The console is drawn over everything else, so it's drawn last...
-            _consoleView.Generate();
+            _consoleView.Generate((float)gameTime.ElapsedGameTime.TotalSeconds);
         }
 
         protected override void Dispose(bool disposing)
@@ -215,6 +215,7 @@ namespace Frenetic
             builder.Register<XnaTexture>().As<ITexture>().FactoryScoped();
             builder.Register<XnaFont>().As<IFont>().FactoryScoped();
             builder.Register<XnaPrimitiveDrawer>().As<IPrimitiveDrawer>().ContainerScoped();
+            builder.Register<BubbleTextDrawer>((c, p) => new BubbleTextDrawer(c.Resolve<IContentManager>().Load<IFont>("Fonts/BubbleText"))).As<IBubbleTextDrawer>().SingletonScoped();
             #endregion
 
             #region GameSession

@@ -35,9 +35,9 @@ namespace Frenetic.Graphics
             _spriteBatch.Draw(texture.Texture2D, position, sourceRectangle, color, rotation, origin, scale, effects, layerDepth);
         }
 
-        public void DrawText(IFont font, string text, Vector2 position, Color color)
+        public void DrawText(IFont font, string text, Vector2 position, Color color, float scale)
         {
-            _spriteBatch.DrawString(font.SpriteFont, text, position, color);
+            _spriteBatch.DrawString(font.SpriteFont, text, position, color, 0f, Vector2.Zero, scale, SpriteEffects.None, 0);
         }
 
         SpriteBatch _spriteBatch;

@@ -54,6 +54,7 @@ DONE - 8 - Investigate more efficient serialization techniques.
 DONE - 2 - Cleanup Autofac's creation of PhysicsComponents
 FIXED NetworkPlayerProcessor will have to also update the LocalClient state (like if the server sends new Health status, etc.)
 DONE - 5 - I can bring down the console and type "connect 196.21.23.4" and connect to a game hosted somewhere on the internet.
+DONE - 5 - Player Health
 
 *****
 BUGS:
@@ -64,10 +65,10 @@ BUGS:
 5) Too many log files created
 *****
 
-ZAK - 5 - Player Health
-3 - Railgun damage depends on speed
+ZAK - 13 - Rocket Launcher
 8 - Item pickups
 
+3 - Railgun damage depends on speed
 8 - Client-side Prediction
   3 - Initial Implementation of smoothing
   3 - Track average round trip time

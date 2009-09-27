@@ -6,53 +6,75 @@ using Microsoft.Xna.Framework.Content;
 using System.Collections.Generic;
 using System.Linq;
 using Frenetic.Weapons;
+using Frenetic.Graphics;
 
 namespace Frenetic.Player
 {
     public class PlayerView : IView
     {
-        public PlayerView(PlayerList playerList, ITextureBank<PlayerTexture> playerTextureBank, ISpriteBatch spriteBatch, ICamera camera, IRailGunView railGunView)
+        public PlayerView(IPlayerList playerList, ITextureBank<PlayerTexture> playerTextureBank, ISpriteBatch spriteBatch, ICamera camera, IRailGunView railGunView, IBubbleTextDrawer bubbleText)
         {
-            _players = playerList;
-            _playerTextureBank = playerTextureBank;
-            _spriteBatch = spriteBatch;
-            _camera = camera;
-            _railGunView = railGunView;
+            this.PlayerList = playerList;
+            this.PlayerTextureBank = playerTextureBank;
+            this.SpriteBatch = spriteBatch;
+            this.Camera = camera;
+            this.RailGunView = railGunView;
+            this.BubbleText = bubbleText;
+
+            this.PlayerList.PlayerAdded += RegisterNewPlayer;
         }
         #region IView Members
 
-        public void Generate()
+        public void Generate(float elapsedSeconds)
         {
-            foreach (IPlayer player in _players)
+            this.SpriteBatch.Begin(this.Camera.TranslationMatrix);
+            foreach (IPlayer player in this.PlayerList.Players)
             {
                 IPlayerSettings playerSettings = player.PlayerSettings;
 
-                ITexture texture = _playerTextureBank[playerSettings.Texture];
+                ITexture texture = this.PlayerTextureBank[playerSettings.Texture];
 
-                if (_spriteBatch != null)
+                if (this.SpriteBatch != null)
                 {
                     if (player.Status == PlayerStatus.Alive)
                     {
-                        _spriteBatch.Begin(_camera.TranslationMatrix);
-                        _spriteBatch.Draw(texture, player.Position, null, playerSettings.Color, 0f,
+                        this.SpriteBatch.Draw(texture, player.Position, null, playerSettings.Color, 0f,
                             new Vector2(texture.Width / 2f, texture.Height / 2f),
                             new Vector2(1, 1),
                             SpriteEffects.None, 1f);
-                        _spriteBatch.End();
                     }
                 }
             }
+            this.BubbleText.DrawText(this.SpriteBatch, elapsedSeconds);
+            this.SpriteBatch.End();
 
-            _railGunView.Draw(_camera.TranslationMatrix);
+            this.RailGunView.Draw(this.Camera.TranslationMatrix);
         }
 
         #endregion
 
-        PlayerList _players;
+        private void RegisterNewPlayer(IPlayer newPlayer)
+        {
+            newPlayer.HealthChanged += HandleHealthChanged;
+        }
+        private void HandleHealthChanged(IPlayer player, int changedAmount)
+        {
+            if (changedAmount > 0)
+            {
+                this.BubbleText.AddText(changedAmount.ToString(), player.Position, Color.Green, 1f);
+            }
+            else
+            {
+                this.BubbleText.AddText(changedAmount.ToString(), player.Position, Color.Red, 0.8f);
+            }
+        }
 
-        ITextureBank<PlayerTexture> _playerTextureBank;
-        ISpriteBatch _spriteBatch;
-        ICamera _camera;
-        IRailGunView _railGunView;
+        IPlayerList PlayerList;
+
+        ITextureBank<PlayerTexture> PlayerTextureBank;
+        ISpriteBatch SpriteBatch;
+        ICamera Camera;
+        IRailGunView RailGunView;
+        IBubbleTextDrawer BubbleText;
     }
 }

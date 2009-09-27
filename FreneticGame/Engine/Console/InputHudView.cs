@@ -26,7 +26,7 @@ namespace Frenetic.Engine.Overlay
 
         public void Draw(Frenetic.Graphics.ISpriteBatch spritebatch)
         {
-            spritebatch.DrawText(_font, InputOverlayView.CursorText + _inputLine.CurrentInput, new Vector2(this.Window.Left + OverlaySetView.TEXT_OFFSET.X, this.Window.Bottom - OverlaySetView.TEXT_OFFSET.Y), Color.Yellow);
+            spritebatch.DrawText(_font, InputOverlayView.CursorText + _inputLine.CurrentInput, new Vector2(this.Window.Left + OverlaySetView.TEXT_OFFSET.X, this.Window.Bottom - OverlaySetView.TEXT_OFFSET.Y), Color.Yellow, 1);
         }
 
         #endregion

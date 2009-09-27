@@ -37,7 +37,7 @@ namespace UnitTestLibrary
         {
             client.ID = 0;
 
-            clientInputSender.Generate();
+            clientInputSender.Generate(1f);
 
             stubOutgoingMessageQueue.AssertWasNotCalled(me => me.AddToQueue(Arg<Item>.Is.Anything));
         }
@@ -47,11 +47,11 @@ namespace UnitTestLibrary
         {
             stubSnapCounter.CurrentSnap = 0;
 
-            clientInputSender.Generate();
+            clientInputSender.Generate(1f);
             stubOutgoingMessageQueue.AssertWasNotCalled(me => me.AddToQueue(Arg<Item>.Is.Anything));
             stubSnapCounter.CurrentSnap = 2;
             
-            clientInputSender.Generate();
+            clientInputSender.Generate(1f);
 
             stubOutgoingMessageQueue.AssertWasCalled(me => me.AddToQueue(Arg<Item>.Is.Anything), o => o.Repeat.AtLeastOnce());
         }
@@ -61,7 +61,7 @@ namespace UnitTestLibrary
         {
             stubSnapCounter.CurrentSnap = 100;
 
-            clientInputSender.Generate();
+            clientInputSender.Generate(1f);
 
             stubOutgoingMessageQueue.AssertWasCalled(me => me.SendMessagesOnQueue());
         }
@@ -74,7 +74,7 @@ namespace UnitTestLibrary
             chatLog.Add(new ChatMessage() { Message = "new message 2" });
             chatLog.Add(new ChatMessage() { Message = "new message 3" });
 
-            clientInputSender.Generate();
+            clientInputSender.Generate(1f);
 
             stubOutgoingMessageQueue.AssertWasCalled(me => me.AddToReliableQueue(Arg<Item>.Matches(y => y.ClientID == 9 && y.Type == ItemType.ChatLog && ((List<ChatMessage>)y.Data).Count == 3 && ((List<ChatMessage>)y.Data)[0].Message == "new message 3")), o => o.Repeat.Once());
         }
@@ -84,7 +84,7 @@ namespace UnitTestLibrary
         {
             client.Player.Position = new Vector2(100, 200);
 
-            clientInputSender.Generate();
+            clientInputSender.Generate(1f);
 
             stubOutgoingMessageQueue.AssertWasCalled(x => x.AddToQueue(Arg<Item>.Matches(y => y.Type == ItemType.PlayerInput && ((IPlayerInput)y.Data).Position == new Vector2(100, 200))));
         }
@@ -93,7 +93,7 @@ namespace UnitTestLibrary
         {
             client.Player.PendingShot = new Vector2(10, 20);
 
-            clientInputSender.Generate();
+            clientInputSender.Generate(1f);
 
             Assert.IsNull(client.Player.PendingShot);
         }
@@ -105,7 +105,7 @@ namespace UnitTestLibrary
             client.Player.PlayerSettings.Stub(me => me.IsDirty).Return(true);
             client.Player.PlayerSettings.Stub(me => me.GetDiff()).Return(client.Player.PlayerSettings);
 
-            clientInputSender.Generate();
+            clientInputSender.Generate(1f);
 
             stubOutgoingMessageQueue.AssertWasCalled(x => x.AddToReliableQueue(Arg<Item>.Matches(y => y.Type == ItemType.PlayerSettings && ((IPlayerSettings)y.Data).Name == "zak")));
         }

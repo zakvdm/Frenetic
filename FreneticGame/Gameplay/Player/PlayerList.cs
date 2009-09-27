@@ -7,18 +7,27 @@ namespace Frenetic.Player
 {
     public interface IPlayerList
     {
-        event Action<IPlayer> PlayerJoined;
+        void Add(IPlayer player);
+
+        List<IPlayer> Players { get; }
+        event Action<IPlayer> PlayerAdded;
     }
 
-    public class PlayerList : List<IPlayer>, IPlayerList
+    public class PlayerList : IPlayerList
     {
-        public event Action<IPlayer> PlayerJoined = delegate { };
-
-        public new void Add(IPlayer player)
+        public PlayerList()
         {
-            base.Add(player);
+            this.Players = new List<IPlayer>();
+        }
 
-            this.PlayerJoined(player);
+        public List<IPlayer> Players { get; set; }
+        public event Action<IPlayer> PlayerAdded = delegate { };
+
+        public void Add(IPlayer player)
+        {
+            this.Players.Add(player);
+
+            this.PlayerAdded(player);
         }
     }
 }

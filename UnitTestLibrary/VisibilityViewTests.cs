@@ -38,7 +38,7 @@ namespace UnitTestLibrary
         [Test]
         public void DoesntDoAnythingWithAnEmptyLevel()
         {
-            visibilityView.Generate();
+            visibilityView.Generate(1f);
 
             stubPrimitiveDrawer.AssertWasNotCalled(me => me.DrawTriangleFan(Arg<VertexPositionColor[]>.Is.Anything));
         }
@@ -56,7 +56,7 @@ namespace UnitTestLibrary
             farLeftVertex = new VertexPositionColor(nearLeftVertex.Position + new Vector3(-120 * VisibilityView.ShadowLength, -90 * VisibilityView.ShadowLength, 0), VisibilityView.ShadowColor);
             farRightVertex = new VertexPositionColor(nearRightVertex.Position + new Vector3(-80 * VisibilityView.ShadowLength, -90 * VisibilityView.ShadowLength, 0), VisibilityView.ShadowColor);
 
-            visibilityView.Generate();
+            visibilityView.Generate(1f);
 
             stubPrimitiveDrawer.AssertWasCalled(me => me.DrawTriangleFan(Arg<VertexPositionColor[]>.Is.Equal(new VertexPositionColor[4] { nearLeftVertex, farLeftVertex, farRightVertex, nearRightVertex })));
         }
@@ -74,7 +74,7 @@ namespace UnitTestLibrary
             farLeftVertex = new VertexPositionColor(nearLeftVertex.Position + new Vector3(210 * VisibilityView.ShadowLength, 290 * VisibilityView.ShadowLength, 0), VisibilityView.ShadowColor);
             farRightVertex = new VertexPositionColor(nearRightVertex.Position + new Vector3(190 * VisibilityView.ShadowLength, 290 * VisibilityView.ShadowLength, 0), VisibilityView.ShadowColor);
 
-            visibilityView.Generate();
+            visibilityView.Generate(1f);
 
             stubPrimitiveDrawer.AssertWasCalled(me => me.DrawTriangleFan(Arg<VertexPositionColor[]>.Is.Equal(new VertexPositionColor[4] { nearLeftVertex, farLeftVertex, farRightVertex, nearRightVertex })));
         }
@@ -92,7 +92,7 @@ namespace UnitTestLibrary
             farLeftVertex = new VertexPositionColor(nearLeftVertex.Position + new Vector3(190 * VisibilityView.ShadowLength, 290 * VisibilityView.ShadowLength, 0), VisibilityView.ShadowColor);
             farRightVertex = new VertexPositionColor(nearRightVertex.Position + new Vector3(190 * VisibilityView.ShadowLength, 310 * VisibilityView.ShadowLength, 0), VisibilityView.ShadowColor);
 
-            visibilityView.Generate();
+            visibilityView.Generate(1f);
 
             stubPrimitiveDrawer.AssertWasCalled(me => me.DrawTriangleFan(Arg<VertexPositionColor[]>.Is.Equal(new VertexPositionColor[4] { nearLeftVertex, farLeftVertex, farRightVertex, nearRightVertex })));
         }
@@ -110,7 +110,7 @@ namespace UnitTestLibrary
             farLeftVertex = new VertexPositionColor(nearLeftVertex.Position + new Vector3(-190 * VisibilityView.ShadowLength, 10 * VisibilityView.ShadowLength, 0), VisibilityView.ShadowColor);
             farRightVertex = new VertexPositionColor(nearRightVertex.Position + new Vector3(-190 * VisibilityView.ShadowLength, -10 * VisibilityView.ShadowLength, 0), VisibilityView.ShadowColor);
 
-            visibilityView.Generate();
+            visibilityView.Generate(1f);
 
             stubPrimitiveDrawer.AssertWasCalled(me => me.DrawTriangleFan(Arg<VertexPositionColor[]>.Is.Equal(new VertexPositionColor[4] { nearLeftVertex, farLeftVertex, farRightVertex, nearRightVertex })));
         }
@@ -123,7 +123,7 @@ namespace UnitTestLibrary
             stubLevel.Pieces.Add(piece);
             stubPlayer.Position = new Vector2(305, 397);
 
-            visibilityView.Generate();
+            visibilityView.Generate(1f);
 
             stubPrimitiveDrawer.AssertWasNotCalled(me => me.DrawTriangleFan(Arg<VertexPositionColor[]>.Is.Anything));
         }

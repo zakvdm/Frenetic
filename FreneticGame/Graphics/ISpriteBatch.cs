@@ -13,6 +13,6 @@ namespace Frenetic.Graphics
         void Draw(ITexture texture, Vector2 position, Rectangle? sourceRectangle, Color color, 
             float rotation, Vector2 origin, Vector2 scale, SpriteEffects effects, float layerDepth);
 
-        void DrawText(IFont font, string text, Vector2 position, Color color);
+        void DrawText(IFont font, string text, Vector2 position, Color color, float scale);
     }
 }

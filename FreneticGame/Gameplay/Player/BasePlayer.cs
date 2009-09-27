@@ -43,7 +43,21 @@ namespace Frenetic.Player
         
         public IPlayerSettings PlayerSettings { get; protected set; }
 
-        public int Health { get; set; }
+        public int Health 
+        {
+            get { return _health; }
+            set
+            {
+                int healthChange = value - this.Health;
+                _health = value;
+
+                if (healthChange != 0)
+                {
+                    this.HealthChanged(this, healthChange);
+                }
+            }
+        }
+
         public PlayerStatus Status { get; set; }
         public Vector2 Position
         {
@@ -126,6 +140,8 @@ namespace Frenetic.Player
         {
         }
 
+        public event Action<IPlayer, int> HealthChanged = delegate { };
+
         protected void OnDied()
         {
             this.Died();
@@ -140,5 +156,7 @@ namespace Frenetic.Player
         protected IRailGun Weapon;
         protected ITimer Timer;
         IBoundaryCollider BoundaryCollider;
+
+        int _health;
     }
 }

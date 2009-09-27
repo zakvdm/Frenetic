@@ -56,7 +56,7 @@ namespace Frenetic.Engine.Overlay
             Vector2 currentTextPosition = new Vector2(window.Left + OverlaySetView.TEXT_OFFSET.X, window.Bottom - OverlaySetView.TEXT_OFFSET.Y - _font.LineSpacing);
             foreach (LogType line in log) // Read the log contents from newest message to oldest
             {
-                spritebatch.DrawText(_font, line.ToString(), currentTextPosition, _textColor);
+                spritebatch.DrawText(_font, line.ToString(), currentTextPosition, _textColor, 1);
                 currentTextPosition.Y -= _font.LineSpacing;
             }
         }

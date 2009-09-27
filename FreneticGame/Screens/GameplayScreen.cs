@@ -66,9 +66,9 @@ namespace Frenetic
         public override void Draw(GameTime gameTime)
         {
             if (_serverGameSessionView != null)
-                _serverGameSessionView.Generate();
+                _serverGameSessionView.Generate((float)gameTime.ElapsedGameTime.TotalSeconds);
 
-            _clientGameSessionView.Generate();
+            _clientGameSessionView.Generate((float)gameTime.ElapsedGameTime.TotalSeconds);
         }
         #endregion
 

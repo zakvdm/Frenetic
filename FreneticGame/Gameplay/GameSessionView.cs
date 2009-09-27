@@ -11,11 +11,11 @@ namespace Frenetic
 
         #region IView Members
 
-        public void Generate()
+        public void Generate(float elapsedSeconds)
         {
             foreach (IView view in _gameSession.Views)
             {
-                view.Generate();
+                view.Generate(elapsedSeconds);
             }
         }
 

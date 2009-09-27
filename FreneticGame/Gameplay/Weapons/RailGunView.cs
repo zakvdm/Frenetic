@@ -8,9 +8,9 @@ namespace Frenetic.Weapons
 {
     public class RailGunView : IRailGunView
     {
-        public RailGunView(PlayerList playerList, MercuryParticleEffect.Factory particleEffectFactory)
+        public RailGunView(IPlayerList playerList, MercuryParticleEffect.Factory particleEffectFactory)
         {
-            _players = playerList;
+            _playersList = playerList;
             _particleEffectFactory = particleEffectFactory;
         }
 
@@ -41,7 +41,7 @@ namespace Frenetic.Weapons
 
         void LookForNewPlayers()
         {
-            foreach (IPlayer player in _players)
+            foreach (IPlayer player in _playersList.Players)
             {
                 if (!_railGuns.ContainsKey(player.CurrentWeapon))
                 {
@@ -50,7 +50,7 @@ namespace Frenetic.Weapons
             }
         }
 
-        PlayerList _players;
+        IPlayerList _playersList;
         MercuryParticleEffect.Factory _particleEffectFactory;
 
         Dictionary<IRailGun, MercuryParticleEffect> _railGuns = new Dictionary<IRailGun, MercuryParticleEffect>();

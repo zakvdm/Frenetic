@@ -17,7 +17,7 @@ namespace Frenetic
 
         #region IView Members
 
-        public void Generate()
+        public void Generate(float elapsedSeconds)
         {
             if (this.SnapCounter.CurrentSnap > this.LastSentSnap)   // Time to send out state
             {

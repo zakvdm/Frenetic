@@ -42,7 +42,7 @@ namespace UnitTestLibrary
         [Test]
         public void GenerateFlushesOutgoingQueueAtEnd()
         {
-            serverChatLogView.Generate();
+            serverChatLogView.Generate(1f);
 
             stubOutgoingMessageQueue.AssertWasCalled(me => me.SendMessagesOnQueue(), x => x.Repeat.Once());
         }
@@ -53,7 +53,7 @@ namespace UnitTestLibrary
             ChatMessage chatMsg = new ChatMessage() { ClientName = "terence", Message = "Test" };
             chatLog.Add(chatMsg);
 
-            serverChatLogView.Generate();
+            serverChatLogView.Generate(1f);
 
             stubOutgoingMessageQueue.AssertWasCalled(x => x.AddToReliableQueue(Arg<Item>.Matches(y => y.Type == ItemType.ChatLog && ((List<ChatMessage>)y.Data)[0].ClientName == "terence")));
         }
@@ -64,7 +64,7 @@ namespace UnitTestLibrary
             chatLog.Add(new ChatMessage() { Message = "Woohoo" });
             chatLog.Add(new ChatMessage() { Message = "boohoo" });
 
-            serverChatLogView.Generate();
+            serverChatLogView.Generate(1f);
 
             stubOutgoingMessageQueue.AssertWasCalled(me => me.AddToReliableQueue(Arg<Item>.Matches(y => (y.Type == ItemType.ChatLog) && ((List<ChatMessage>)y.Data).Count == 2 && ((List<ChatMessage>)y.Data)[0].Message == "boohoo")));
         }
@@ -78,7 +78,7 @@ namespace UnitTestLibrary
             client.Player.Position = new Vector2(100, 200);
             client.Player.Stub(me => me.CurrentWeapon).Return(new RailGun(null));
 
-            serverChatLogView.Generate();
+            serverChatLogView.Generate(1f);
 
             stubOutgoingMessageQueue.AssertWasCalled(x => x.AddToQueue(Arg<Item>.Matches(y => y.Type == ItemType.Player && y.ClientID == 7 && ((IPlayerState)y.Data).Position == new Vector2(100, 200))));
         }
@@ -94,7 +94,7 @@ namespace UnitTestLibrary
             client.Player.Stub(me => me.PlayerSettings).Return(playerSettings);
             client.Player.Stub(me => me.CurrentWeapon).Return(new RailGun(null));
 
-            serverChatLogView.Generate();
+            serverChatLogView.Generate(1f);
 
             stubOutgoingMessageQueue.AssertWasCalled(x => x.AddToReliableQueue(Arg<Item>.Matches(y => y.Type == ItemType.PlayerSettings && y.ClientID == 123 && ((IPlayerSettings)y.Data == playerSettings))));
         }

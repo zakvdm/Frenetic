@@ -3,6 +3,6 @@ namespace Frenetic
 {
     public interface IView
     {
-        void Generate();
+        void Generate(float elapsedSeconds);
     }
 }

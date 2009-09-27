@@ -19,7 +19,7 @@ namespace Frenetic.Network
 
         #region IView Members
 
-        public void Generate()
+        public void Generate(float elapsedSeconds)
         {
             // If the client ID is still 0 then we can't be connected yet, so no point in trying to send...
             if (this.LocalClient.ID == 0)

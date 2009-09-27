@@ -25,7 +25,7 @@ namespace Frenetic.Graphics
             float angle = (float)Math.Atan2(lineAtOrigin.Y, lineAtOrigin.X);
             Vector2 midPoint = midPointFromOrigin + startPoint;
 
-            _emitter.Length = (int)length;
+            _emitter.Length = Math.Max((int)length, 1);
             _emitter.Angle = angle;
 
             _emitter.Trigger(midPoint);

@@ -23,7 +23,7 @@ namespace UnitTestLibrary
             var stubTexture = MockRepository.GenerateStub<ITexture>();
             LevelView levelView = new LevelView(level, stubSpriteBatch, stubTexture, MockRepository.GenerateStub<ICamera>());
 
-            levelView.Generate();
+            levelView.Generate(1f);
 
             stubSpriteBatch.AssertWasCalled(x => x.Draw(Arg<ITexture>.Is.Equal(stubTexture), Arg<Vector2>.Is.Equal(new Vector2(-49, -49)),
                 Arg<Rectangle>.Is.Equal(null), Arg<Color>.Is.Equal(level.Pieces[0].Color), Arg<float>.Is.Equal(0f), 
@@ -42,7 +42,7 @@ namespace UnitTestLibrary
             var stubTexture = MockRepository.GenerateStub<ITexture>();
             LevelView levelView = new LevelView(level, stubSpriteBatch, stubTexture, MockRepository.GenerateStub<ICamera>());
 
-            levelView.Generate();
+            levelView.Generate(1f);
 
             stubSpriteBatch.AssertWasCalled(x => x.Draw(Arg<ITexture>.Is.Anything, Arg<Vector2>.Is.Equal(new Vector2(-49, -49)),
                 Arg<Rectangle>.Is.Anything, Arg<Color>.Is.Anything, Arg<float>.Is.Anything, Arg<Vector2>.Is.Anything,
@@ -63,7 +63,7 @@ namespace UnitTestLibrary
             Camera camera = new Camera(MockRepository.GenerateStub<IPlayer>(), new Vector2(100, 200));
             LevelView levelView = new LevelView(level, stubSpriteBatch, stubTexture, camera);
 
-            levelView.Generate();
+            levelView.Generate(1f);
 
             stubSpriteBatch.AssertWasCalled(x => x.Begin(camera.TranslationMatrix));
         }

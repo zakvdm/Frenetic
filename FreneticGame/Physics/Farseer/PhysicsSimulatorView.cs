@@ -426,7 +426,7 @@ namespace FarseerGames.AdvancedSamplesXNA
             _sliderJointRectangleBrush.Load(graphicsDevice);
         }
 
-        public void Generate()
+        public void Generate(float elapsedSeconds)
         {
             _spriteBatch.Begin(SpriteBlendMode.AlphaBlend, SpriteSortMode.Deferred, SaveStateMode.None, _camera.TranslationMatrix);
             Draw(_spriteBatch);

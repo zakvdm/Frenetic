@@ -78,6 +78,28 @@ namespace UnitTestLibrary
             Assert.AreEqual(1000, player.PlayerScore.Kills);
         }
 
+        // EVENTS:
+        [Test]
+        public void ChangingPlayerHealthRaisesHealthChangedEvent()
+        {
+            bool eventRaised = false;
+            player.HealthChanged += (p, amount) => { if (amount == -33 && p == player) eventRaised = true; };
+
+            player.Health = BasePlayer.StartHealth - 33;
+
+            Assert.IsTrue(eventRaised);
+        }
+        [Test]
+        public void HealthChangedEventOnlyRaisedWhenHealthIsDifferentFromBefore()
+        {
+            bool eventRaised = false;
+            player.HealthChanged += (p, amount) => eventRaised = true;
+
+            player.Health = player.Health;
+
+            Assert.IsFalse(eventRaised);
+        }
+
         // NETWORK POSITION:
         [Test]
         public void LocalPlayerPositionNotUpdatedFromNetwork()

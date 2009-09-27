@@ -58,7 +58,7 @@ namespace UnitTestLibrary
             var stubSpriteBatch = MockRepository.GenerateStub<ISpriteBatch>();
             CrosshairView crosshairView = new CrosshairView(stubCrosshair, stubSpriteBatch, stubTexture);
             
-            crosshairView.Generate();
+            crosshairView.Generate(1f);
 
             stubSpriteBatch.AssertWasCalled(x => x.Begin());
             stubSpriteBatch.AssertWasCalled(x => x.Draw

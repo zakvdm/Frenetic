@@ -23,7 +23,7 @@ namespace Frenetic.Engine.Overlay
 
         #region IView Members
 
-        public void Generate()
+        public void Generate(float elapsedSeconds)
         {
             foreach (IOverlayView overlay in _overlays)
             {

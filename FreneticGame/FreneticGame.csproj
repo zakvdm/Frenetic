@@ -93,6 +93,8 @@
     <Compile Include="Engine\Camera.cs" />
     <Compile Include="Engine\Console\ChatMessage.cs" />
     <Compile Include="Engine\Console\ConsoleOverlaySetView.cs" />
+    <Compile Include="Graphics\BubbleTextDrawer.cs" />
+    <Compile Include="Graphics\IBubbleTextDrawer.cs" />
     <Compile Include="Engine\IDiffable.cs" />
     <Compile Include="Engine\Console\InputLine.cs" />
     <Compile Include="Engine\Console\IConsole.cs" />

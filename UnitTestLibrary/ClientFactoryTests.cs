@@ -34,7 +34,7 @@ namespace UnitTestLibrary
 
             Client newClient = serverClientFactory.MakeNewClient(300);
 
-            Assert.IsTrue(playerList.Contains(newClient.Player));
+            Assert.IsTrue(playerList.Players.Contains(newClient.Player));
             Assert.AreEqual(300, newClient.ID);
         }
         [Test]
@@ -45,7 +45,7 @@ namespace UnitTestLibrary
 
             serverClientFactory.DeleteClient(client);
 
-            Assert.AreEqual(0, playerList.Count);
+            Assert.AreEqual(0, playerList.Players.Count);
         }
 
         [Test]
@@ -54,8 +54,8 @@ namespace UnitTestLibrary
             clientFactory.GetLocalClient();
 
             Assert.AreEqual(localClient, clientFactory.GetLocalClient());
-            Assert.AreEqual(1, playerList.Count);
-            Assert.IsTrue(playerList.Contains(localClient.Player));
+            Assert.AreEqual(1, playerList.Players.Count);
+            Assert.IsTrue(playerList.Players.Contains(localClient.Player));
         }
 
         [Test]
@@ -64,7 +64,7 @@ namespace UnitTestLibrary
             clientFactory.GetLocalClient();
             clientFactory.GetLocalClient();
 
-            Assert.AreEqual(1, playerList.Count);
+            Assert.AreEqual(1, playerList.Players.Count);
         }
 
         [Test]
@@ -83,7 +83,7 @@ namespace UnitTestLibrary
 
             clientFactory.DeleteClient(client);
 
-            Assert.AreEqual(0, playerList.Count);
+            Assert.AreEqual(0, playerList.Players.Count);
         }
     }
 

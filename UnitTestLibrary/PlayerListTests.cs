@@ -15,9 +15,9 @@ namespace UnitTestLibrary
         public void AddingPlayersToPlayerListRaisesPlayerJoinedEvent()
         {
             bool eventRaised = false;
-            PlayerList playerList = new PlayerList();
+            IPlayerList playerList = new PlayerList();
             IPlayer player = MockRepository.GenerateStub<IPlayer>();
-            playerList.PlayerJoined += (newPlayer) => { if (newPlayer == player) eventRaised = true; };
+            playerList.PlayerAdded += (newPlayer) => { if (newPlayer == player) eventRaised = true; };
 
             playerList.Add(player);
 
