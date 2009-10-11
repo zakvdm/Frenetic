@@ -53,17 +53,20 @@ namespace UnitTestLibrary
         }
 
         [Test]
-        public void ReturnsAListofHitPhysicsComponents()
+        public void FiresEventForEachDamagedPhysicsComponents()
         {
             var physicsComp1 = MockRepository.GenerateStub<IPhysicsComponent>();
             var physicsComp2 = MockRepository.GenerateStub<IPhysicsComponent>();
             hitObjects.Add(physicsComp1);
             hitObjects.Add(physicsComp2);
+            bool event1Raised = false, event2Raised = false;
+            railGun.DamagedAPlayer += (physicsComponent) => { if (physicsComponent == physicsComp1) event1Raised = true; };
+            railGun.DamagedAPlayer += (physicsComponent) => { if (physicsComponent == physicsComp2) event2Raised = true; };
 
-            var returned_hitobjects = railGun.Shoot(Vector2.Zero, Vector2.One);
+            railGun.Shoot(Vector2.Zero, Vector2.One);
 
-            Assert.AreEqual(physicsComp1, returned_hitobjects[0]);
-            Assert.AreEqual(physicsComp2, returned_hitobjects[1]);
+            Assert.IsTrue(event1Raised);
+            Assert.IsTrue(event2Raised);
         }
 
         [Test]

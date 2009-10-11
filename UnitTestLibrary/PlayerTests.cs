@@ -168,24 +168,26 @@ namespace UnitTestLibrary
         [Test]
         public void ShootCallsShootOnCurrentWeapon()
         {
-            player.CurrentWeapon.Stub(me => me.Shoot(Arg<Vector2>.Is.Anything, Arg<Vector2>.Is.Anything) ).Return(new List<IPhysicsComponent>());
             player.Position = new Vector2(10, 20);
 
             player.Shoot(new Vector2(30, 40));
 
             player.CurrentWeapon.AssertWasCalled(me => me.Shoot(new Vector2(10, 20), new Vector2(30, 40)));
         }
+        // SETUP:
         [Test]
-        public void NotifiesAllShotPhysicsComponents()
+        public void RegistersWithIWeaponForDamagedAPlayerEvent()
         {
-            var stubPhysicsComponent1 = MockRepository.GenerateStub<IPhysicsComponent>();
-            var stubPhysicsComponent2 = MockRepository.GenerateStub<IPhysicsComponent>();
-            stubRailGun.Stub(me => me.Shoot(Arg<Vector2>.Is.Anything, Arg<Vector2>.Is.Anything)).Return(new List<IPhysicsComponent>() { stubPhysicsComponent1, stubPhysicsComponent2 });
+            stubRailGun.AssertWasCalled(me => me.DamagedAPlayer += Arg<Action<IPhysicsComponent>>.Is.Anything);
+        }
+        [Test]
+        public void NotifiesADamagedPhysicsComponent()
+        {
+            var stubPhysicsComponent = MockRepository.GenerateStub<IPhysicsComponent>();
 
-            player.Shoot(new Vector2(100, 200));
+            stubRailGun.Raise(me => me.DamagedAPlayer += null, stubPhysicsComponent);
 
-            stubPhysicsComponent1.AssertWasCalled(me => me.OnWasShot(player, stubRailGun.Damage));
-            stubPhysicsComponent2.AssertWasCalled(me => me.OnWasShot(player, stubRailGun.Damage));
+            stubPhysicsComponent.AssertWasCalled(me => me.OnWasShot(player, stubRailGun.Damage));
         }
         [Test]
         public void GettingShotDamagesThePlayer()

@@ -30,7 +30,12 @@ namespace Frenetic.Player
             this.PhysicsComponent.CollidedWithWorld += () => InContactWithLevel = true;
             this.PhysicsComponent.WasShot += Damage;
 
-            this.Weapon = weapon;
+            this.CurrentWeapon = weapon;
+            if (this.CurrentWeapon != null)
+            {
+                this.CurrentWeapon.DamagedAPlayer += (physicsComp) => physicsComp.OnWasShot(this, this.CurrentWeapon.Damage); // Notify the other object that we damaged it...
+            }
+
             this.Timer = timer;
             this.BoundaryCollider = boundaryCollider;
 
@@ -67,10 +72,7 @@ namespace Frenetic.Player
             { this.PhysicsComponent.Position = value; }
         }
 
-        public IRailGun CurrentWeapon
-        {
-            get { return this.Weapon; }
-        }
+        public IRailGun CurrentWeapon { get; private set; }
 
         public PlayerScore PlayerScore { get; set; }
 
@@ -112,12 +114,12 @@ namespace Frenetic.Player
 
         public void Shoot(Vector2 targetPosition)
         {
-            var hitObjects = this.Weapon.Shoot(this.Position, targetPosition);
+            this.CurrentWeapon.Shoot(this.Position, targetPosition);
 
-            foreach (var physicsComponent in hitObjects)
+            //foreach (var physicsComponent in hitObjects)
             {
                 // Notify everything that we hit
-                physicsComponent.OnWasShot(this, this.Weapon.Damage);
+                //physicsComponent.OnWasShot(this, this.Weapon.Damage);
             }
         }
 
@@ -153,7 +155,6 @@ namespace Frenetic.Player
 
         protected IPhysicsComponent PhysicsComponent;
 
-        protected IRailGun Weapon;
         protected ITimer Timer;
         IBoundaryCollider BoundaryCollider;
 

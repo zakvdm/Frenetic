@@ -21,21 +21,25 @@ namespace Frenetic.Weapons
         public int Damage { get; set; }
         public Shots Shots { get; private set; }
 
-        public List<IPhysicsComponent> Shoot(Vector2 origin, Vector2 direction)
+        public void Shoot(Vector2 origin, Vector2 direction)
         {
             Vector2 endPoint;
 
             if (direction == Vector2.Zero)
-                return new List<IPhysicsComponent>();
+                return;
 
             Vector2 offsetOrigin = origin + (Vector2.Normalize(direction - origin) * RailGun.Offset);
             List<IPhysicsComponent> hitObjects = _rayCaster.ShootRay(offsetOrigin, direction, out endPoint);
 
             this.Shots.Add(new Shot(origin, endPoint));
 
-            return hitObjects;
+            foreach (var physicsComponent in hitObjects)
+            {
+                this.DamagedAPlayer(physicsComponent);
+            }
         }
 
+        public event Action<IPhysicsComponent> DamagedAPlayer = delegate { };
 
         IRayCaster _rayCaster;
     }
