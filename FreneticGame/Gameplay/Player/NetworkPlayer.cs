@@ -13,7 +13,7 @@ namespace Frenetic.Player
     public class NetworkPlayer : BasePlayer
     {
         public const float SMOOTHING_FACTOR = 0.8f;     // 1f tries to catch up completely between each tick and is likely to be unstable
-        public NetworkPlayer(IPlayerSettings playerSettings, IPhysicsComponent physicsComponent, IRailGun weapon, ITimer timer)
+        public NetworkPlayer(IPlayerSettings playerSettings, IPhysicsComponent physicsComponent, IWeapon weapon, ITimer timer)
             : base(playerSettings, physicsComponent, null, weapon, timer)
         {
             LastReceivedPosition = this.Position;

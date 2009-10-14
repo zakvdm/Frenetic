@@ -23,7 +23,7 @@ namespace Frenetic.Player
 
         PlayerStatus Status { get; set; }
 
-        IRailGun CurrentWeapon { get; }
+        IWeapon CurrentWeapon { get; }
 
         IPlayerSettings PlayerSettings { get; }
         PlayerScore PlayerScore { get; }

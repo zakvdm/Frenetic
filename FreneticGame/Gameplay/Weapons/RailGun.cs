@@ -6,7 +6,7 @@ using Frenetic.Player;
 
 namespace Frenetic.Weapons
 {
-    public class RailGun : IRailGun
+    public class RailGun : IWeapon
     {
         public static int Offset = 50;
 

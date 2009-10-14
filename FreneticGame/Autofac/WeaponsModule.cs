@@ -40,7 +40,12 @@ namespace Frenetic.Autofac
             builder.RegisterGeneratedFactory<MercuryParticleEffect.Factory>(new TypedService(typeof(IEffect)));
 
             // WEAPONS:
-            builder.Register<RailGun>().As<IRailGun>().FactoryScoped();
+            builder.Register<RailGun>().As<IWeapon>().FactoryScoped();
+            builder.Register<RocketLauncher>().As<IWeapon>().FactoryScoped();
+            
+            builder.Register<Rocket>().FactoryScoped();
+            builder.RegisterGeneratedFactory<Rocket.Factory>(new TypedService(typeof(Rocket)));
+
             builder.Register<RailGunView>().As<IRailGunView>().FactoryScoped();
         }
     }

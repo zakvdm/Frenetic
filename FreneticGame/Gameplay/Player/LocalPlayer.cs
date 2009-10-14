@@ -11,7 +11,7 @@ namespace Frenetic.Player
 {
     public class LocalPlayer : BasePlayer
     {
-        public LocalPlayer(IPlayerSettings playerSettings, IPhysicsComponent physicsComponent, IBoundaryCollider boundaryCollider, IRailGun weapon, ITimer timer)
+        public LocalPlayer(IPlayerSettings playerSettings, IPhysicsComponent physicsComponent, IBoundaryCollider boundaryCollider, IWeapon weapon, ITimer timer)
             : base(playerSettings, physicsComponent, boundaryCollider, weapon, timer)
         { }
     }

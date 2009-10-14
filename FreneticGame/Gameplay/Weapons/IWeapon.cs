@@ -6,7 +6,7 @@ using Frenetic.Physics;
 
 namespace Frenetic.Weapons
 {
-    public interface IRailGun
+    public interface IWeapon
     {
         int Damage { get; }
         void Shoot(Vector2 origin, Vector2 direction);

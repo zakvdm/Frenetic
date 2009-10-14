@@ -17,7 +17,7 @@ namespace UnitTestLibrary
         public void SetUp()
         {
             player = MockRepository.GenerateStub<IPlayer>();
-            player.Stub(me => me.CurrentWeapon).Return(MockRepository.GenerateStub<IRailGun>());
+            player.Stub(me => me.CurrentWeapon).Return(MockRepository.GenerateStub<IWeapon>());
             player.CurrentWeapon.Stub(me => me.Shots).Return(new Shots());
             player.Stub(me => me.PlayerScore).Return(new PlayerScore());
         }

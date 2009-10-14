@@ -17,7 +17,7 @@ namespace Frenetic.Player
         public static float MaxSpeed = 1000;
         public static int CollisionGroup = 1;
 
-        public BasePlayer(IPlayerSettings playerSettings, IPhysicsComponent physicsComponent, IBoundaryCollider boundaryCollider, IRailGun weapon, ITimer timer)
+        public BasePlayer(IPlayerSettings playerSettings, IPhysicsComponent physicsComponent, IBoundaryCollider boundaryCollider, IWeapon weapon, ITimer timer)
         {
             this.PlayerSettings = playerSettings;
             this.PlayerScore = new PlayerScore();
@@ -72,7 +72,7 @@ namespace Frenetic.Player
             { this.PhysicsComponent.Position = value; }
         }
 
-        public IRailGun CurrentWeapon { get; private set; }
+        public IWeapon CurrentWeapon { get; private set; }
 
         public PlayerScore PlayerScore { get; set; }
 

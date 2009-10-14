@@ -29,7 +29,7 @@ namespace UnitTestLibrary
             stubClientStateTracker.Stub(x => x.NetworkClients).Return(clientList);
             client = new Client(MockRepository.GenerateStub<IPlayer>());
             client.Player.Stub(me => me.PlayerSettings).Return(MockRepository.GenerateStub<IPlayerSettings>());
-            client.Player.Stub(me => me.CurrentWeapon).Return(MockRepository.GenerateStub<IRailGun>());
+            client.Player.Stub(me => me.CurrentWeapon).Return(MockRepository.GenerateStub<IWeapon>());
             client.Player.CurrentWeapon.Stub(me => me.Shots).Return(new Shots());
             stubClientStateTracker.NetworkClients.Add(client);
             chatLog = new Log<ChatMessage>();

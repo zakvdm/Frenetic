@@ -70,8 +70,7 @@ namespace Frenetic.Physics
             }
             set
             {
-                throw new NotImplementedException();
-                //_geom.SetVertices(Vertices.CreateSimpleRectangle(value.X, value.Y));
+                _geom.SetVertices(Vertices.CreateSimpleRectangle(value.X, value.Y));
                 //_geom.SetBody(_body);
             }
         }

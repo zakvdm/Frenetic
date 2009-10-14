@@ -23,7 +23,7 @@ namespace UnitTestLibrary
         IPlayerSettings stubPlayerSettings;
         IPhysicsComponent stubPhysicsComponent;
         IBoundaryCollider stubBoundaryCollider;
-        IRailGun stubRailGun;
+        IWeapon stubRailGun;
         ITimer stubTimer;
 
         [SetUp]
@@ -32,7 +32,7 @@ namespace UnitTestLibrary
             stubPlayerSettings = MockRepository.GenerateStub<IPlayerSettings>();
             stubPhysicsComponent = MockRepository.GenerateStub<IPhysicsComponent>();
             stubBoundaryCollider = MockRepository.GenerateStub<IBoundaryCollider>();
-            stubRailGun = MockRepository.GenerateStub<IRailGun>();
+            stubRailGun = MockRepository.GenerateStub<IWeapon>();
             stubTimer = MockRepository.GenerateStub<ITimer>();
             player = new BasePlayer(stubPlayerSettings, stubPhysicsComponent, stubBoundaryCollider, stubRailGun, stubTimer);
         }
@@ -166,13 +166,13 @@ namespace UnitTestLibrary
 
         // SHOOTING AND BEING SHOT:
         [Test]
-        public void ShootCallsShootOnCurrentWeapon()
+        public void ShootCallsShootOnCurrentWeaponWithPositionAndDirection()
         {
             player.Position = new Vector2(10, 20);
 
             player.Shoot(new Vector2(30, 40));
 
-            player.CurrentWeapon.AssertWasCalled(me => me.Shoot(new Vector2(10, 20), new Vector2(30, 40)));
+            player.CurrentWeapon.AssertWasCalled(me => me.Shoot(new Vector2(10, 20), new Vector2(20, 20)));
         }
         // SETUP:
         [Test]

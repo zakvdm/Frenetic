@@ -20,7 +20,7 @@ namespace Frenetic.Weapons
         {
             LookForNewPlayers();
 
-            foreach (KeyValuePair<IRailGun, MercuryParticleEffect> railGunInfo in _railGuns)
+            foreach (KeyValuePair<IWeapon, MercuryParticleEffect> railGunInfo in _railGuns)
             {
                 var railGun = railGunInfo.Key;
                 var particleEffect = railGunInfo.Value;
@@ -53,6 +53,6 @@ namespace Frenetic.Weapons
         IPlayerList _playersList;
         MercuryParticleEffect.Factory _particleEffectFactory;
 
-        Dictionary<IRailGun, MercuryParticleEffect> _railGuns = new Dictionary<IRailGun, MercuryParticleEffect>();
+        Dictionary<IWeapon, MercuryParticleEffect> _railGuns = new Dictionary<IWeapon, MercuryParticleEffect>();
     }
 }

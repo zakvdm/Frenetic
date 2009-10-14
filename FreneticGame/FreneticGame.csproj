@@ -93,6 +93,8 @@
     <Compile Include="Engine\Camera.cs" />
     <Compile Include="Engine\Console\ChatMessage.cs" />
     <Compile Include="Engine\Console\ConsoleOverlaySetView.cs" />
+    <Compile Include="Gameplay\Weapons\Rocket.cs" />
+    <Compile Include="Gameplay\Weapons\RocketLauncher.cs" />
     <Compile Include="Graphics\BubbleTextDrawer.cs" />
     <Compile Include="Graphics\IBubbleTextDrawer.cs" />
     <Compile Include="Engine\IDiffable.cs" />
@@ -129,7 +131,7 @@
     <Compile Include="Gameplay\Player\PlayerList.cs" />
     <Compile Include="Gameplay\Player\PlayerState.cs" />
     <Compile Include="Gameplay\Player\PlayerUpdater.cs" />
-    <Compile Include="Gameplay\Weapons\IRailGun.cs" />
+    <Compile Include="Gameplay\Weapons\IWeapon.cs" />
     <Compile Include="Gameplay\Weapons\IRailGunView.cs" />
     <Compile Include="Gameplay\Weapons\RailGun.cs" />
     <Compile Include="Gameplay\Weapons\RailGunView.cs" />

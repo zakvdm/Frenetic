@@ -22,7 +22,7 @@ namespace Frenetic.Autofac
             builder.Register<LocalPlayerSettings>().SingletonScoped();
 
             builder.Register<NetworkPlayer>().As<IPlayer>().FactoryScoped();
-            builder.Register((c,p) => new LocalPlayer(c.Resolve<LocalPlayerSettings>(), c.Resolve<LocalPlayerFarseerPhysicsComponent>(), c.Resolve<IBoundaryCollider>(), c.Resolve<IRailGun>(), c.Resolve<ITimer>())).As<LocalPlayer>().FactoryScoped();
+            builder.Register((c,p) => new LocalPlayer(c.Resolve<LocalPlayerSettings>(), c.Resolve<LocalPlayerFarseerPhysicsComponent>(), c.Resolve<IBoundaryCollider>(), c.Resolve<IWeapon>(), c.Resolve<ITimer>())).As<LocalPlayer>().FactoryScoped();
 
             builder.Register<PlayerList>().As<IPlayerList>().ContainerScoped();
             builder.Register<PlayerView>().ContainerScoped();

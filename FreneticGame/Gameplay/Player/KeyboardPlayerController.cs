@@ -54,7 +54,8 @@ namespace Frenetic.Player
                 {
                     if (this.Player.Status == PlayerStatus.Alive)
                     {
-                        this.Player.PendingShot = Crosshair.WorldPosition;
+                        //this.Player.PendingShot = Crosshair.WorldPosition;
+                        this.Player.Shoot(Crosshair.WorldPosition);
                     }
                     else
                     {
