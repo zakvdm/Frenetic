@@ -7,7 +7,7 @@ namespace Frenetic.Graphics
 {
     public class MercuryParticleEffect : IEffect
     {
-        public delegate MercuryParticleEffect Factory();
+        public delegate IEffect Factory();
 
         public MercuryParticleEffect(Renderer renderer, Emitter emitter)
         {

@@ -46,7 +46,7 @@ namespace Frenetic.Autofac
             builder.Register<Rocket>().FactoryScoped();
             builder.RegisterGeneratedFactory<Rocket.Factory>(new TypedService(typeof(Rocket)));
 
-            builder.Register<RailGunView>().As<IRailGunView>().FactoryScoped();
+            builder.Register<RailGunView>().As<IWeaponView>().FactoryScoped();
         }
     }
 }

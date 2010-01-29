@@ -6,13 +6,12 @@ using Microsoft.Xna.Framework.Content;
 using System.Collections.Generic;
 using System.Linq;
 using Frenetic.Weapons;
-using Frenetic.Graphics;
 
 namespace Frenetic.Player
 {
     public class PlayerView : IView
     {
-        public PlayerView(IPlayerList playerList, ITextureBank<PlayerTexture> playerTextureBank, ISpriteBatch spriteBatch, ICamera camera, IRailGunView railGunView, IBubbleTextDrawer bubbleText)
+        public PlayerView(IPlayerList playerList, ITextureBank<PlayerTexture> playerTextureBank, ISpriteBatch spriteBatch, ICamera camera, IWeaponView railGunView, IBubbleTextDrawer bubbleText)
         {
             this.PlayerList = playerList;
             this.PlayerTextureBank = playerTextureBank;
@@ -74,7 +73,7 @@ namespace Frenetic.Player
         ITextureBank<PlayerTexture> PlayerTextureBank;
         ISpriteBatch SpriteBatch;
         ICamera Camera;
-        IRailGunView RailGunView;
+        IWeaponView RailGunView;
         IBubbleTextDrawer BubbleText;
     }
 }

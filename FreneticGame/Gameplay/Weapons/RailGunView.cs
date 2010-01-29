@@ -6,11 +6,10 @@ using Frenetic.Player;
 
 namespace Frenetic.Weapons
 {
-    public class RailGunView : IRailGunView
+    public class RailGunView : BaseWeaponView, IWeaponView
     {
-        public RailGunView(IPlayerList playerList, MercuryParticleEffect.Factory particleEffectFactory)
+        public RailGunView(IPlayerList playerList, MercuryParticleEffect.Factory particleEffectFactory) : base(playerList)
         {
-            _playersList = playerList;
             _particleEffectFactory = particleEffectFactory;
         }
 
@@ -18,9 +17,7 @@ namespace Frenetic.Weapons
 
         public void Draw(Matrix translationMatrix)
         {
-            LookForNewPlayers();
-
-            foreach (KeyValuePair<IWeapon, MercuryParticleEffect> railGunInfo in _railGuns)
+            foreach (KeyValuePair<IWeapon, IEffect> railGunInfo in _railGuns)
             {
                 var railGun = railGunInfo.Key;
                 var particleEffect = railGunInfo.Value;
@@ -39,20 +36,13 @@ namespace Frenetic.Weapons
 
         #endregion
 
-        void LookForNewPlayers()
+        protected override void HandleNewPlayer(IPlayer newPlayer)
         {
-            foreach (IPlayer player in _playersList.Players)
-            {
-                if (!_railGuns.ContainsKey(player.CurrentWeapon))
-                {
-                    _railGuns.Add(player.CurrentWeapon, _particleEffectFactory());
-                }
-            }
+            _railGuns.Add(newPlayer.CurrentWeapon, _particleEffectFactory());
         }
 
-        IPlayerList _playersList;
         MercuryParticleEffect.Factory _particleEffectFactory;
 
-        Dictionary<IWeapon, MercuryParticleEffect> _railGuns = new Dictionary<IWeapon, MercuryParticleEffect>();
+        Dictionary<IWeapon, IEffect> _railGuns = new Dictionary<IWeapon, IEffect>();
     }
 }

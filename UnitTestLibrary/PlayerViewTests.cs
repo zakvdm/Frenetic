@@ -19,7 +19,7 @@ namespace UnitTestLibrary
         ITextureBank<PlayerTexture> _stubTextureBank;
         ISpriteBatch stubSpriteBatch;
         ICamera stubCamera;
-        IRailGunView stubRailGunView;
+        IWeaponView stubRailGunView;
         IBubbleTextDrawer stubBubbleText;
         IPlayer player;
         PlayerView playerView;
@@ -33,7 +33,7 @@ namespace UnitTestLibrary
             _stubTextureBank.Stub(x => x[PlayerTexture.Ball]).Return(stubTexture);
             stubSpriteBatch = MockRepository.GenerateStub<ISpriteBatch>();
             stubCamera = MockRepository.GenerateStub<ICamera>();
-            stubRailGunView = MockRepository.GenerateStub<IRailGunView>();
+            stubRailGunView = MockRepository.GenerateStub<IWeaponView>();
             stubBubbleText = MockRepository.GenerateStub<IBubbleTextDrawer>();
             player = MockRepository.GenerateStub<IPlayer>();
             player.Status = PlayerStatus.Alive;

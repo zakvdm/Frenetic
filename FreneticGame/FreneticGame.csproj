@@ -93,8 +93,10 @@
     <Compile Include="Engine\Camera.cs" />
     <Compile Include="Engine\Console\ChatMessage.cs" />
     <Compile Include="Engine\Console\ConsoleOverlaySetView.cs" />
+    <Compile Include="Gameplay\Weapons\BaseWeaponView.cs" />
     <Compile Include="Gameplay\Weapons\Rocket.cs" />
     <Compile Include="Gameplay\Weapons\RocketLauncher.cs" />
+    <Compile Include="Gameplay\Weapons\RocketLauncherView.cs" />
     <Compile Include="Graphics\BubbleTextDrawer.cs" />
     <Compile Include="Graphics\IBubbleTextDrawer.cs" />
     <Compile Include="Engine\IDiffable.cs" />
