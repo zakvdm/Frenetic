@@ -62,7 +62,10 @@ namespace Frenetic.Player
                 player.PendingStatus = null;
             }
 
-            player.CurrentWeapon.Shots.AddRange(this.NewShots);
+            foreach (var shot in this.NewShots)
+            {
+                player.Shoot(shot.EndPoint);
+            }
 
             player.PlayerScore.Kills = this.Score.Kills;
             player.PlayerScore.Deaths = this.Score.Deaths;

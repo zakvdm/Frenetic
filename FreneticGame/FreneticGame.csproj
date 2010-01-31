@@ -134,7 +134,7 @@
     <Compile Include="Gameplay\Player\PlayerState.cs" />
     <Compile Include="Gameplay\Player\PlayerUpdater.cs" />
     <Compile Include="Gameplay\Weapons\IWeapon.cs" />
-    <Compile Include="Gameplay\Weapons\IRailGunView.cs" />
+    <Compile Include="Gameplay\Weapons\IWeaponView.cs" />
     <Compile Include="Gameplay\Weapons\RailGun.cs" />
     <Compile Include="Gameplay\Weapons\RailGunView.cs" />
     <Compile Include="Gameplay\Weapons\Shot.cs" />

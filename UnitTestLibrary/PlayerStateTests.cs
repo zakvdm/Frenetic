@@ -69,11 +69,21 @@ namespace UnitTestLibrary
             Assert.AreEqual(98, player.Health);
             Assert.AreEqual(PlayerStatus.Alive, state.Status);
             player.AssertWasCalled(me => me.UpdatePositionFromNetwork(Arg<Vector2>.Is.Equal(state.Position), Arg<float>.Is.Anything));
-            Assert.AreEqual(3, player.CurrentWeapon.Shots.Count);
-            Assert.AreEqual(new Shot(Vector2.One, Vector2.UnitX), player.CurrentWeapon.Shots[1]);
-            Assert.AreEqual(new Shot(Vector2.UnitY, Vector2.Zero), player.CurrentWeapon.Shots[2]);
             Assert.AreEqual(3, player.PlayerScore.Deaths);
             Assert.AreEqual(20, player.PlayerScore.Kills);
+        }
+        [Test]
+        public void ShouldCallShootForEveryNewShot()
+        {
+            PlayerState state = new PlayerState();
+            state.NewShots = new List<Shot>();
+            state.NewShots.Add(new Shot(Vector2.Zero, new Vector2(1, 2)));
+            state.NewShots.Add(new Shot(Vector2.Zero, new Vector2(3, 4)));
+
+            state.RefreshPlayerValuesFromState(player);
+
+            player.AssertWasCalled(me => me.Shoot(new Vector2(1, 2)));
+            player.AssertWasCalled(me => me.Shoot(new Vector2(3, 4)));
         }
         [Test]
         public void ResetsPendingStateWhenItIsAchieved()

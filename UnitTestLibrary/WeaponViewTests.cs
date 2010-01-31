@@ -15,7 +15,7 @@ namespace UnitTestLibrary
     {
         IPlayerList playerList;
         RailGunView railGunView;
-        RocketLauncher rocketLauncherView;
+        RocketLauncherView rocketLauncherView;
         bool effectFactoryWasUsed;
         IPlayer stubPlayer;
         [SetUp]
@@ -28,11 +28,6 @@ namespace UnitTestLibrary
 
             railGunView = new RailGunView(playerList, () => { effectFactoryWasUsed = true; return MockRepository.GenerateStub<IEffect>(); });
             rocketLauncherView = new RocketLauncherView(playerList);
-        }
-        [Test]
-        public void WeaponViewRegistersForPlayerAddedEvent()
-        {
-            playerList.AssertWasCalled(me => me.PlayerAdded += Arg<Action<IPlayer>>.Is.Anything);
         }
         [Test]
         public void AddsANewRailGunForNewPlayers()

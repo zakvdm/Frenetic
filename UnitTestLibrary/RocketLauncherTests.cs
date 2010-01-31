@@ -22,11 +22,11 @@ namespace UnitTestLibrary
         [Test]
         public void ShootCreatesNewRocket()
         {
-            rocketLauncher.Shoot(Vector2.One, Vector2.One);
+            rocketLauncher.Shoot(Vector2.One, new Vector2(3, 4));
 
             Assert.AreEqual(1, rocketLauncher.Rockets.Count);
-            Assert.AreEqual(Vector2.One, rocketLauncher.Rockets[0].Position);
-            Assert.AreEqual(Rocket.Speed * Vector2.Normalize(Vector2.One), rocketLauncher.Rockets[0].Velocity);
+            Assert.AreEqual(Vector2.One + (RocketLauncher.RocketOffset * Vector2.Normalize(new Vector2(3, 4) - Vector2.One)), rocketLauncher.Rockets[0].Position);
+            Assert.AreEqual(Rocket.Speed * Vector2.Normalize(new Vector2(3, 4) - Vector2.One), rocketLauncher.Rockets[0].Velocity);
         }
 
         [Test]

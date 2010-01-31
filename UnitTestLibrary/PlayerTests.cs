@@ -23,7 +23,7 @@ namespace UnitTestLibrary
         IPlayerSettings stubPlayerSettings;
         IPhysicsComponent stubPhysicsComponent;
         IBoundaryCollider stubBoundaryCollider;
-        IWeapon stubRailGun;
+        IWeapon stubWeapon;
         ITimer stubTimer;
 
         [SetUp]
@@ -32,9 +32,9 @@ namespace UnitTestLibrary
             stubPlayerSettings = MockRepository.GenerateStub<IPlayerSettings>();
             stubPhysicsComponent = MockRepository.GenerateStub<IPhysicsComponent>();
             stubBoundaryCollider = MockRepository.GenerateStub<IBoundaryCollider>();
-            stubRailGun = MockRepository.GenerateStub<IWeapon>();
+            stubWeapon = MockRepository.GenerateStub<IWeapon>();
             stubTimer = MockRepository.GenerateStub<ITimer>();
-            player = new BasePlayer(stubPlayerSettings, stubPhysicsComponent, stubBoundaryCollider, stubRailGun, stubTimer);
+            player = new BasePlayer(stubPlayerSettings, stubPhysicsComponent, stubBoundaryCollider, stubWeapon, stubTimer);
         }
 
         // SETUP:
@@ -104,7 +104,7 @@ namespace UnitTestLibrary
         [Test]
         public void LocalPlayerPositionNotUpdatedFromNetwork()
         {
-            player = new LocalPlayer(stubPlayerSettings, stubPhysicsComponent, stubBoundaryCollider, stubRailGun, stubTimer);
+            player = new LocalPlayer(stubPlayerSettings, stubPhysicsComponent, stubBoundaryCollider, stubWeapon, stubTimer);
             player.Position = new Vector2(100, 200);
 
             player.UpdatePositionFromNetwork(new Vector2(300, 400), 1f);
@@ -172,22 +172,22 @@ namespace UnitTestLibrary
 
             player.Shoot(new Vector2(30, 40));
 
-            player.CurrentWeapon.AssertWasCalled(me => me.Shoot(new Vector2(10, 20), new Vector2(20, 20)));
+            player.CurrentWeapon.AssertWasCalled(me => me.Shoot(new Vector2(10, 20), new Vector2(30, 40)));
         }
         // SETUP:
         [Test]
         public void RegistersWithIWeaponForDamagedAPlayerEvent()
         {
-            stubRailGun.AssertWasCalled(me => me.DamagedAPlayer += Arg<Action<IPhysicsComponent>>.Is.Anything);
+            stubWeapon.AssertWasCalled(me => me.DamagedAPlayer += Arg<Action<IPhysicsComponent>>.Is.Anything);
         }
         [Test]
         public void NotifiesADamagedPhysicsComponent()
         {
             var stubPhysicsComponent = MockRepository.GenerateStub<IPhysicsComponent>();
 
-            stubRailGun.Raise(me => me.DamagedAPlayer += null, stubPhysicsComponent);
+            stubWeapon.Raise(me => me.DamagedAPlayer += null, stubPhysicsComponent);
 
-            stubPhysicsComponent.AssertWasCalled(me => me.OnWasShot(player, stubRailGun.Damage));
+            stubPhysicsComponent.AssertWasCalled(me => me.OnWasShot(player, stubWeapon.Damage));
         }
         [Test]
         public void GettingShotDamagesThePlayer()
