@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Frenetic.Player
 {
-    public interface IPlayerList
+    public interface IPlayerList : IEnumerable<IPlayer>
     {
         void Add(IPlayer player);
 
@@ -28,6 +28,16 @@ namespace Frenetic.Player
             this.Players.Add(player);
 
             this.PlayerAdded(player);
+        }
+
+        public IEnumerator<IPlayer> GetEnumerator()
+        {
+            foreach (IPlayer player in this.Players)
+                yield return player;
+        }
+        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+        {
+            throw new NotImplementedException();
         }
     }
 }
