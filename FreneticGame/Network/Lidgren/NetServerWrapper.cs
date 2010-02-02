@@ -18,7 +18,9 @@ namespace Frenetic.Network.Lidgren
             //_netServer.Simulate(0.1f, 0.1f, 0.2f, 0.1f);
 
             _netServer.SetMessageTypeEnabled(NetMessageType.ConnectionApproval, true);
+#if DEBUG
             _netServer.SetMessageTypeEnabled(NetMessageType.VerboseDebugMessage, true);
+#endif
 
         }
 
