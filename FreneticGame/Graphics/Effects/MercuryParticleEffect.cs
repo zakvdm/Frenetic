@@ -3,20 +3,23 @@ using ProjectMercury.Renderers;
 using ProjectMercury.Emitters;
 using Microsoft.Xna.Framework;
 
-namespace Frenetic.Graphics
+namespace Frenetic.Graphics.Effects
 {
     public class MercuryParticleEffect : IEffect
     {
-        public delegate IEffect Factory();
-
         public MercuryParticleEffect(Renderer renderer, Emitter emitter)
         {
             _renderer = renderer;
             _emitter = (LineEmitter)emitter;
         }
 
+        public Vector2 Position { get; set; }
         public int ShotsDrawn { get; set; }
 
+        public void Trigger(EffectType effectType)
+        {
+            throw new NotImplementedException();
+        }
         public void Trigger(Vector2 startPoint, Vector2 endPoint)
         {
             Vector2 lineAtOrigin = (endPoint - startPoint);
@@ -38,7 +41,6 @@ namespace Frenetic.Graphics
 
         public void Update(float totalSeconds, float elapsedSeconds)
         {
-            //_emitter.Update((float)gameTime.TotalGameTime.TotalSeconds, (float)gameTime.ElapsedGameTime.TotalSeconds);
             _emitter.Update(totalSeconds, elapsedSeconds);
         }
 

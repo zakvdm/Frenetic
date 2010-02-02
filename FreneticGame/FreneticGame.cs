@@ -102,7 +102,8 @@ namespace Frenetic
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            graphics.GraphicsDevice.Clear(new Color(20, 20, 20));
+            //graphics.GraphicsDevice.Clear(new Color(20, 20, 20));
+            graphics.GraphicsDevice.Clear(Color.Black);
 
             base.Draw(gameTime);
 

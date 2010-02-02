@@ -1,5 +1,5 @@
 ﻿using System;
-using Frenetic.Graphics;
+using Frenetic.Graphics.Effects;
 using Microsoft.Xna.Framework;
 using System.Collections.Generic;
 using Frenetic.Player;
@@ -8,9 +8,9 @@ namespace Frenetic.Weapons
 {
     public class RailGunView : BaseWeaponView, IWeaponView
     {
-        public RailGunView(IPlayerList playerList, MercuryParticleEffect.Factory particleEffectFactory) : base(playerList)
+        public RailGunView(IPlayerList playerList, Effect.Factory particleEffectFactory) : base(playerList)
         {
-            _particleEffectFactory = particleEffectFactory;
+            this.ParticleEffectFactory = particleEffectFactory;
         }
 
         #region IRailGunView Members
@@ -38,10 +38,10 @@ namespace Frenetic.Weapons
 
         protected override void HandleNewPlayer(IPlayer newPlayer)
         {
-            this.RailGuns.Add(newPlayer.CurrentWeapon, _particleEffectFactory());
+            this.RailGuns.Add(newPlayer.CurrentWeapon, this.ParticleEffectFactory());
         }
 
-        MercuryParticleEffect.Factory _particleEffectFactory;
+        Effect.Factory ParticleEffectFactory;
 
         Dictionary<IWeapon, IEffect> RailGuns = new Dictionary<IWeapon, IEffect>();
     }

@@ -2,30 +2,62 @@
 using Microsoft.Xna.Framework;
 
 using Frenetic.Player;
-using Frenetic.Graphics;
+using Frenetic.Graphics.Effects;
 using System.Collections.Generic;
 
 namespace Frenetic.Weapons
 {
     public class RocketLauncherView : BaseWeaponView, IWeaponView
     {
-        public RocketLauncherView(IPlayerList playerList)
+        public RocketLauncherView(IPlayerController playerController, IPlayerList playerList, IEffect particleEffects)
             : base(playerList)
-        { }
+        {
+            this.PlayerController = playerController;
+            this.PlayerList = playerList;
+            this.ParticleEffects = particleEffects;
+        }
         #region IWeaponView Members
 
         public void Draw(Matrix translationMatrix)
         {
-            throw new NotImplementedException();
+            foreach (var player in this.PlayerList)
+            {
+                var rocketLauncher = (RocketLauncher)player.CurrentWeapon;
+
+                foreach (var rocket in rocketLauncher.Rockets)
+                {
+                    this.ParticleEffects.Position = rocket.Position;
+                    if (rocket.IsAlive)
+                    {
+                        this.ParticleEffects.Trigger(EffectType.RocketTrail);
+                    }
+                    else
+                    {
+                        this.ParticleEffects.Trigger(EffectType.RocketExplosion);
+                    }
+                }
+
+                this.ParticleEffects.Draw(ref translationMatrix);
+
+                UpdatePlayerAfterDraw();
+            }
         }
 
         #endregion
 
+        private void UpdatePlayerAfterDraw()
+        {
+            // Once we've drawn explosions, we clear the dead projectiles.
+            this.PlayerController.RemoveDeadProjectiles();
+        }
+
         protected override void HandleNewPlayer(IPlayer newPlayer)
         {
-            this.RocketLaunchers.Add(newPlayer.CurrentWeapon, null);
+            //this.PlayersList.Add(newPlayer, this.ParticleEffectFactory());
         }
-        
-        Dictionary<IWeapon, IEffect> RocketLaunchers = new Dictionary<IWeapon, IEffect>();
+
+        IPlayerController PlayerController;
+        IPlayerList PlayerList;
+        IEffect ParticleEffects;
     }
 }

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Frenetic.Graphics;
+using Frenetic.Graphics.Effects;
 
 namespace Frenetic
 {

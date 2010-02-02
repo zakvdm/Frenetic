@@ -28,7 +28,6 @@ namespace UnitTestLibrary
             Assert.AreEqual(Vector2.One + (RocketLauncher.RocketOffset * Vector2.Normalize(new Vector2(3, 4) - Vector2.One)), rocketLauncher.Rockets[0].Position);
             Assert.AreEqual(Rocket.Speed * Vector2.Normalize(new Vector2(3, 4) - Vector2.One), rocketLauncher.Rockets[0].Velocity);
         }
-
         [Test]
         public void ShootCreatesNewShot()
         {
@@ -36,6 +35,18 @@ namespace UnitTestLibrary
 
             Assert.AreEqual(1, rocketLauncher.Shots.Count);
             Assert.AreEqual(new Shot(Vector2.One, Vector2.UnitX), rocketLauncher.Shots[0]);
+        }
+
+        [Test]
+        public void shouldDieWhenRocketHitLevel()
+        {
+            var stubPhysicsComponent = MockRepository.GenerateStub<IPhysicsComponent>();
+            Rocket rocket = new Rocket(Vector2.Zero, Vector2.Zero, stubPhysicsComponent);
+            Assert.IsTrue(rocket.IsAlive);
+
+            stubPhysicsComponent.Raise(me => me.CollidedWithWorld += null);
+
+            Assert.IsFalse(rocket.IsAlive);
         }
     }
     public static class RocketLauncherHelper

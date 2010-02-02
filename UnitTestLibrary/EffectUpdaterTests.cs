@@ -2,7 +2,7 @@
 using NUnit.Framework;
 using Rhino.Mocks;
 using Microsoft.Xna.Framework;
-using Frenetic.Graphics;
+using Frenetic.Graphics.Effects;
 using Frenetic;
 
 namespace UnitTestLibrary

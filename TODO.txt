@@ -1,3 +1,7 @@
+Destroy Rockets (cleanup PhysicsComponents)
+Trigger Rocket trail at consistent rate.
+Consolidate WeaponViews into single class
+Work out how the Player stores more than 1 weapon. Switch between them!
 Client asks to shoot -> Server shoots and says "okay!" -> client gets notified and responds HOW?
   Why do the weapons store "Shots" and "Rockets"?
   The player model (and its weapons) shouldn't store Shots (these are network messages)
@@ -5,3 +9,5 @@ Shoot's interface is too inconsistent (either store just the end point, or alway
 Why does the WeaponViews need to know about PlayerList? Why can't the playerView just call DrawPlayerWeapon(player) for each player in playerList?
 Rename PlayerView to PlayersView?
 Think about when resources get allocated. Better to allocate all up front?
+  Treat Particle Effects as Singletons?
+Move ShootTimer onto the individual weapons...
