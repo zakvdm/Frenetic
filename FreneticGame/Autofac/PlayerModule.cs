@@ -27,7 +27,7 @@ namespace Frenetic.Autofac
             builder.Register<PlayerList>().As<IPlayerList>().ContainerScoped();
             builder.Register<PlayerView>().ContainerScoped();
             builder.Register((c) => (IBoundaryCollider)new WorldBoundaryCollider(this.ScreenWidth, this.ScreenHeight));
-            builder.Register<KeyboardPlayerController>().ContainerScoped();
+            builder.Register<KeyboardPlayerController>().As<IPlayerController>().ContainerScoped();
 
             builder.Register<XnaTextureBank<PlayerTexture>>().As<ITextureBank<PlayerTexture>>().SingletonScoped();
         }

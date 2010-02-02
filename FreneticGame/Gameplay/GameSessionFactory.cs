@@ -157,7 +157,7 @@ namespace Frenetic
                                             new TypedParameter(typeof(Vector2), new Vector2(_screenWidth, _screenHeight))
                                             );
 
-            gameSession.Controllers.Add(ClientContainer.Resolve<KeyboardPlayerController>(new TypedParameter(typeof(IPlayer), localPlayer)));
+            gameSession.Controllers.Add(ClientContainer.Resolve<IPlayerController>(new TypedParameter(typeof(IPlayer), localPlayer)));
 
             gameSession.Controllers.Add(ClientContainer.Resolve<EffectUpdater>());
 

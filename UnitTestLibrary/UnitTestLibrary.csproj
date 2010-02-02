@@ -122,6 +122,7 @@
     <Compile Include="RailGunTests.cs" />
     <Compile Include="PlayerScoreTests.cs" />
     <Compile Include="RocketLauncherTests.cs" />
+    <Compile Include="RocketLauncherViewTests.cs" />
     <Compile Include="SettingsPersisterTests.cs" />
     <Compile Include="ShotsTests.cs" />
     <Compile Include="SnapCounterTests.cs" />

@@ -12,6 +12,19 @@ namespace UnitTestLibrary
     public class PlayerListTests
     {
         [Test]
+        public void ShouldAllowIterationOverPlayerList()
+        {
+            PlayerList playerList = new PlayerList() { MockRepository.GenerateStub<IPlayer>(), MockRepository.GenerateStub<IPlayer>() };
+            int count = 0;
+
+            foreach (var player in playerList)
+            {
+                count++;
+            }
+
+            Assert.AreEqual(2, count);
+        }
+        [Test]
         public void AddingPlayersToPlayerListRaisesPlayerJoinedEvent()
         {
             bool eventRaised = false;

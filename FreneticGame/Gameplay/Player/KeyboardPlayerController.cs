@@ -3,12 +3,13 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Frenetic.UserInput;
 using Frenetic.Gameplay.Level;
+using Frenetic.Weapons;
 
 namespace Frenetic.Player
 {
-    public class KeyboardPlayerController : IController
+    public class KeyboardPlayerController : IPlayerController
     {
-        public static float ShootTimer = 1;
+        public static float ShootTimer = 0.5f;
         public static float JumpTimer = 0.5f;
         
         public KeyboardPlayerController(IPlayer player, IKeyboard keyboard, IMouse mouse, ICrosshair crosshair, IPlayerRespawner playerRespawner)
@@ -21,6 +22,13 @@ namespace Frenetic.Player
 
             LastShootTime = float.MinValue;
             LastJumpTime = float.MinValue;
+        }
+
+        public void RemoveDeadProjectiles()
+        {
+            RocketLauncher currentWeapon = (RocketLauncher)this.Player.CurrentWeapon;
+
+            currentWeapon.Rockets.RemoveAll((rocket) => !rocket.IsAlive);
         }
        
         #region IController Members

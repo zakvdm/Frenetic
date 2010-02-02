@@ -11,6 +11,7 @@ using FarseerGames.FarseerPhysics.Dynamics;
 using Frenetic.UserInput;
 using Frenetic.Player;
 using Frenetic.Gameplay.Level;
+using Frenetic.Weapons;
 
 namespace UnitTestLibrary
 {
@@ -34,6 +35,20 @@ namespace UnitTestLibrary
             kpc.Process(1);
 
             stubPlayer.AssertWasCalled(x => x.Update());
+        }
+
+        [Test]
+        public void ShouldDeleteAllDeadProjectiles()
+        {
+            stubPlayer.Stub(me => me.CurrentWeapon).Return(new RocketLauncher(null));
+            var aliveRocket = new Rocket(Vector2.Zero, Vector2.Zero, MockRepository.GenerateStub<IPhysicsComponent>()) { IsAlive = true }; 
+            var deadRocket = new Rocket(Vector2.Zero, Vector2.Zero, MockRepository.GenerateStub<IPhysicsComponent>()) { IsAlive = false }; 
+            ((RocketLauncher)stubPlayer.CurrentWeapon).Rockets.AddRange(new System.Collections.Generic.List<Rocket>() { aliveRocket, deadRocket });
+
+            kpc.RemoveDeadProjectiles();
+
+            Assert.AreEqual(1, ((RocketLauncher)stubPlayer.CurrentWeapon).Rockets.Count);
+            Assert.AreEqual(aliveRocket, ((RocketLauncher)stubPlayer.CurrentWeapon).Rockets[0]);
         }
 
         [Test]
