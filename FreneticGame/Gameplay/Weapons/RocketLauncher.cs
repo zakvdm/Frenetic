@@ -7,7 +7,7 @@ using Microsoft.Xna.Framework;
 
 namespace Frenetic.Weapons
 {
-    public class RocketLauncher : IWeapon
+    public class RocketLauncher : IProjectileWeapon
     {
         public const int RocketOffset = 50;
         public RocketLauncher(Rocket.Factory rocketFactory)
@@ -31,6 +31,18 @@ namespace Frenetic.Weapons
             // Create a rocket:
             this.Rockets.Add(this.RocketFactory(origin + (RocketLauncher.RocketOffset * Vector2.Normalize(direction - origin)), Vector2.Normalize(direction - origin)));
             Console.WriteLine("Creating rocket at position " + origin.ToString() + " with velocity " + this.Rockets.Last<Rocket>().Velocity.ToString());
+        }
+
+        public void RemoveDeadProjectiles()
+        {
+            foreach (var rocket in this.Rockets)
+            {
+                if (!rocket.IsAlive)
+                {
+                    rocket.Destroy();
+                }
+            }
+            this.Rockets.RemoveAll(rocket => !rocket.IsAlive);
         }
 
         public event Action<IPhysicsComponent> DamagedAPlayer;

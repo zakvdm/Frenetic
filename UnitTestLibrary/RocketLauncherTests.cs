@@ -19,6 +19,7 @@ namespace UnitTestLibrary
         {
             rocketLauncher = new RocketLauncher(RocketLauncherHelper.MakeRocket);
         }
+
         [Test]
         public void ShootCreatesNewRocket()
         {
@@ -47,6 +48,30 @@ namespace UnitTestLibrary
             stubPhysicsComponent.Raise(me => me.CollidedWithWorld += null);
 
             Assert.IsFalse(rocket.IsAlive);
+        }
+
+        [Test]
+        public void ShouldRemoveDeadRocketsFromList()
+        {
+            var aliveRocket = new Rocket(Vector2.Zero, Vector2.Zero, MockRepository.GenerateStub<IPhysicsComponent>()) { IsAlive = true };
+            var deadRocket = new Rocket(Vector2.Zero, Vector2.Zero, MockRepository.GenerateStub<IPhysicsComponent>()) { IsAlive = false };
+            rocketLauncher.Rockets.AddRange(new System.Collections.Generic.List<Rocket>() { aliveRocket, deadRocket });
+
+            rocketLauncher.RemoveDeadProjectiles();
+
+            Assert.Contains(aliveRocket, rocketLauncher.Rockets);
+            Assert.AreEqual(1, rocketLauncher.Rockets.Count);
+        }
+        [Test]
+        public void ShouldRemoveDeadRocketPhysicsComponents()
+        {
+            var mockPhysicsComponent = MockRepository.GenerateStub<IPhysicsComponent>();
+            mockPhysicsComponent.Enabled = true;
+            rocketLauncher.Rockets.Add(new Rocket(Vector2.Zero, Vector2.Zero, mockPhysicsComponent) { IsAlive = false });
+
+            rocketLauncher.RemoveDeadProjectiles();
+
+            Assert.IsFalse(mockPhysicsComponent.Enabled);
         }
     }
     public static class RocketLauncherHelper

@@ -40,15 +40,12 @@ namespace UnitTestLibrary
         [Test]
         public void ShouldDeleteAllDeadProjectiles()
         {
-            stubPlayer.Stub(me => me.CurrentWeapon).Return(new RocketLauncher(null));
-            var aliveRocket = new Rocket(Vector2.Zero, Vector2.Zero, MockRepository.GenerateStub<IPhysicsComponent>()) { IsAlive = true }; 
-            var deadRocket = new Rocket(Vector2.Zero, Vector2.Zero, MockRepository.GenerateStub<IPhysicsComponent>()) { IsAlive = false }; 
-            ((RocketLauncher)stubPlayer.CurrentWeapon).Rockets.AddRange(new System.Collections.Generic.List<Rocket>() { aliveRocket, deadRocket });
+            var stubProjectileWeapon = MockRepository.GenerateStub<IProjectileWeapon>();
+            stubPlayer.Stub(me => me.CurrentWeapon).Return(stubProjectileWeapon);
 
             kpc.RemoveDeadProjectiles();
 
-            Assert.AreEqual(1, ((RocketLauncher)stubPlayer.CurrentWeapon).Rockets.Count);
-            Assert.AreEqual(aliveRocket, ((RocketLauncher)stubPlayer.CurrentWeapon).Rockets[0]);
+            stubProjectileWeapon.AssertWasCalled(me => me.RemoveDeadProjectiles());
         }
 
         [Test]

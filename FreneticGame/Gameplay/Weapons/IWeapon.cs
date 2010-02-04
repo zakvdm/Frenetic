@@ -14,4 +14,11 @@ namespace Frenetic.Weapons
 
         event Action<IPhysicsComponent> DamagedAPlayer;
     }
+
+    public interface IProjectileWeapon : IWeapon
+    {
+        List<Rocket> Rockets { get; }
+
+        void RemoveDeadProjectiles();
+    }
 }

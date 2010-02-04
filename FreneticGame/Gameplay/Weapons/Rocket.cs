@@ -32,6 +32,11 @@ namespace Frenetic.Weapons
         public Vector2 Position { get { return this.PhysicsComponent.Position; } }
         public Vector2 Velocity { get { return this.PhysicsComponent.LinearVelocity; } }
 
+        public void Destroy()
+        {
+            this.PhysicsComponent.Enabled = false;
+        }
+
         IPhysicsComponent PhysicsComponent;
     }
 }
