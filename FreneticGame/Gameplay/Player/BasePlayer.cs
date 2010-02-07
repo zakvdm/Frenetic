@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework;
 
 using Frenetic.Physics;
 using FarseerGames.FarseerPhysics.Dynamics;
-using Frenetic.Weapons;
+using Frenetic.Gameplay.Weapons;
 using Frenetic.Engine;
 using Frenetic.Gameplay;
 

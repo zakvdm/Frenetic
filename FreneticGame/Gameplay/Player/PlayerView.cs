@@ -5,7 +5,7 @@ using Frenetic.Graphics;
 using Microsoft.Xna.Framework.Content;
 using System.Collections.Generic;
 using System.Linq;
-using Frenetic.Weapons;
+using Frenetic.Gameplay.Weapons;
 
 namespace Frenetic.Player
 {

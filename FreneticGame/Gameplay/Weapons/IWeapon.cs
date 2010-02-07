@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using Frenetic.Player;
 using Frenetic.Physics;
 
-namespace Frenetic.Weapons
+namespace Frenetic.Gameplay.Weapons
 {
     public interface IWeapon
     {

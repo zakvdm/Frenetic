@@ -7,7 +7,7 @@ using Frenetic.Network.Lidgren;
 using Lidgren.Network;
 using Frenetic.Player;
 using Microsoft.Xna.Framework;
-using Frenetic.Weapons;
+using Frenetic.Gameplay.Weapons;
 using Frenetic.Gameplay;
 using Frenetic.Network;
 

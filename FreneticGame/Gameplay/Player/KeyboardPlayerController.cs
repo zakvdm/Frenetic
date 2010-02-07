@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Frenetic.UserInput;
 using Frenetic.Gameplay.Level;
-using Frenetic.Weapons;
+using Frenetic.Gameplay.Weapons;
 
 namespace Frenetic.Player
 {
@@ -75,19 +75,6 @@ namespace Frenetic.Player
 
             Player.Update();
         }
-
-        internal bool CanShoot(float time)
-        {
-            var diff = time - LastShootTime;
-            return diff > ShootTimer || diff < 0;
-        }
-
-        internal bool CanJump(float time)
-        {
-            var diff = time - LastJumpTime;
-            return diff > JumpTimer || diff < 0;
-        }
-
         #endregion
 
         public IPlayer Player { get; private set; }
@@ -96,6 +83,16 @@ namespace Frenetic.Player
         ICrosshair Crosshair { get; set; }
         IPlayerRespawner PlayerRespawner { get; set; }
 
+        internal bool CanShoot(float time)
+        {
+            var diff = time - LastShootTime;
+            return diff > ShootTimer || diff < 0;
+        }
+        internal bool CanJump(float time)
+        {
+            var diff = time - LastJumpTime;
+            return diff > JumpTimer || diff < 0;
+        }
         private float TotalElapsedTime { get; set; }
 
         private float LastShootTime { get; set; }

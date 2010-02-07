@@ -5,7 +5,7 @@ using System.Text;
 using Microsoft.Xna.Framework;
 using Frenetic.Physics;
 
-namespace Frenetic.Weapons
+namespace Frenetic.Gameplay.Weapons
 {
     public class Rocket
     {

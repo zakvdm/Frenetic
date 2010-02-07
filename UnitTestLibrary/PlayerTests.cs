@@ -9,7 +9,7 @@ using NUnit.Framework;
 using Rhino.Mocks;
 using FarseerGames.FarseerPhysics.Dynamics;
 using Frenetic.Player;
-using Frenetic.Weapons;
+using Frenetic.Gameplay.Weapons;
 using Frenetic.Engine;
 using System.Collections.Generic;
 using Frenetic.Gameplay;

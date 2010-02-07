@@ -1,7 +1,7 @@
 ﻿using System;
 using Frenetic.Player;
 
-namespace Frenetic.Weapons
+namespace Frenetic.Gameplay.Weapons
 {
     public abstract class BaseWeaponView
     {

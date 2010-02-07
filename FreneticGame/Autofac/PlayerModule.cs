@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using Frenetic.Physics;
 using Frenetic.Graphics;
 using Autofac;
-using Frenetic.Weapons;
+using Frenetic.Gameplay.Weapons;
 using Frenetic.Engine;
 
 namespace Frenetic.Autofac

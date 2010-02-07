@@ -18,7 +18,7 @@ using Frenetic.Network;
 using Frenetic.Autofac;
 using Frenetic.UserInput;
 using Frenetic.Player;
-using Frenetic.Weapons;
+using Frenetic.Gameplay.Weapons;
 using Frenetic.Engine;
 using Frenetic.Gameplay.HUD;
 using log4net;

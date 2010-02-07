@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.Xna.Framework;
 
-namespace Frenetic.Weapons
+namespace Frenetic.Gameplay.Weapons
 {
     public interface IWeaponView
     {

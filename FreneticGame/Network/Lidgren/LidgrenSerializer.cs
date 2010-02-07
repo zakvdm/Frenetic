@@ -5,7 +5,7 @@ using System.Text;
 using Frenetic.Player;
 using Lidgren.Network;
 using Lidgren.Network.Xna;
-using Frenetic.Weapons;
+using Frenetic.Gameplay.Weapons;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 

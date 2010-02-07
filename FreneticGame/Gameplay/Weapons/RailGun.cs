@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using Frenetic.Physics;
 using Frenetic.Player;
 
-namespace Frenetic.Weapons
+namespace Frenetic.Gameplay.Weapons
 {
     public class RailGun : IWeapon
     {

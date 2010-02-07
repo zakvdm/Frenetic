@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.Xna.Framework;
 using FarseerGames.FarseerPhysics.Dynamics;
-using Frenetic.Weapons;
+using Frenetic.Gameplay.Weapons;
 using Frenetic.Gameplay;
 
 namespace Frenetic.Player

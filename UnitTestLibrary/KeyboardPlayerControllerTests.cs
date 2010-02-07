@@ -11,7 +11,7 @@ using FarseerGames.FarseerPhysics.Dynamics;
 using Frenetic.UserInput;
 using Frenetic.Player;
 using Frenetic.Gameplay.Level;
-using Frenetic.Weapons;
+using Frenetic.Gameplay.Weapons;
 
 namespace UnitTestLibrary
 {
@@ -26,6 +26,7 @@ namespace UnitTestLibrary
             stubMouse = MockRepository.GenerateStub<IMouse>();
             stubCrosshair = MockRepository.GenerateStub<ICrosshair>();
             stubRespawner = MockRepository.GenerateStub<IPlayerRespawner>();
+            stubWeapons = MockRepository.GenerateStub<IWeapons>();
             kpc = new KeyboardPlayerController(stubPlayer, stubKeyboard, stubMouse, stubCrosshair, stubRespawner);
         }
 
@@ -144,11 +145,23 @@ namespace UnitTestLibrary
             Assert.IsNull(stubPlayer.PendingShot);
         }
 
+        // WEAPON SWITCHING:
+        [Test]
+        public void ShouldChangeCurrentWeaponWhenButtonIsPressed()
+        {
+            stubKeyboard.Stub(k => k.IsGameKeyDown(Arg<GameKey>.Is.Equal(GameKey.RocketLauncher))).Return(true);
+
+            kpc.Process(1);
+
+            stubWeapons.AssertWasCalled(weapons => weapons.ChangeWeapon(WeaponType.RocketLauncher));
+        }
+
         IPlayer stubPlayer;
         IKeyboard stubKeyboard;
         IMouse stubMouse;
         ICrosshair stubCrosshair;
         IPlayerRespawner stubRespawner;
+        IWeapons stubWeapons;
         KeyboardPlayerController kpc;
     }
 }

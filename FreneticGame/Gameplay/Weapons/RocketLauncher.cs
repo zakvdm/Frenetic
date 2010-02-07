@@ -5,7 +5,7 @@ using System.Text;
 using Frenetic.Physics;
 using Microsoft.Xna.Framework;
 
-namespace Frenetic.Weapons
+namespace Frenetic.Gameplay.Weapons
 {
     public class RocketLauncher : IProjectileWeapon
     {

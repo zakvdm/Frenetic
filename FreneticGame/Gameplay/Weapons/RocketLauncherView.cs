@@ -5,7 +5,7 @@ using Frenetic.Player;
 using Frenetic.Graphics.Effects;
 using System.Collections.Generic;
 
-namespace Frenetic.Weapons
+namespace Frenetic.Gameplay.Weapons
 {
     public class RocketLauncherView : BaseWeaponView, IWeaponView
     {

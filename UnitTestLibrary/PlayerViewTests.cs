@@ -6,7 +6,7 @@ using Frenetic.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Frenetic.Player;
-using Frenetic.Weapons;
+using Frenetic.Gameplay.Weapons;
 using System.Collections.Generic;
 
 namespace UnitTestLibrary

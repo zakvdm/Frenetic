@@ -6,7 +6,7 @@ using NUnit.Framework;
 using Rhino.Mocks;
 using Microsoft.Xna.Framework;
 using Frenetic.Player;
-using Frenetic.Weapons;
+using Frenetic.Gameplay.Weapons;
 using Frenetic.Graphics.Effects;
 
 namespace UnitTestLibrary

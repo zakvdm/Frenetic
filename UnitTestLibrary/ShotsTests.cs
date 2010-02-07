@@ -1,6 +1,6 @@
 ﻿using System;
 using NUnit.Framework;
-using Frenetic.Weapons;
+using Frenetic.Gameplay.Weapons;
 
 namespace UnitTestLibrary
 {

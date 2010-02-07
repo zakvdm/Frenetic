@@ -8,6 +8,10 @@ namespace Frenetic.UserInput
 {
     public class XnaKeyboard : IKeyboard
     {
+        public bool IsGameKeyDown(GameKey gamekey)
+        {
+            throw new NotImplementedException();
+        }
         public bool IsKeyDown(Keys key)
         {
             if (Locked)

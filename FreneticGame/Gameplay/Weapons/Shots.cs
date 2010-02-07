@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using Frenetic.Engine;
 
-namespace Frenetic.Weapons
+namespace Frenetic.Gameplay.Weapons
 {
     public class Shots : List<Shot>, IDiffable<List<Shot>>
     {

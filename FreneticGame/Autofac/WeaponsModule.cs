@@ -1,6 +1,6 @@
 ﻿using System;
 using Autofac.Builder;
-using Frenetic.Weapons;
+using Frenetic.Gameplay.Weapons;
 using ProjectMercury.Renderers;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;

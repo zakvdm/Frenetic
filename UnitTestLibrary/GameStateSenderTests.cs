@@ -7,7 +7,7 @@ using Lidgren.Network;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Frenetic.Player;
-using Frenetic.Weapons;
+using Frenetic.Gameplay.Weapons;
 
 namespace UnitTestLibrary
 {

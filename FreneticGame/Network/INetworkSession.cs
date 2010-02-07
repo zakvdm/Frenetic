@@ -3,7 +3,7 @@
 using Lidgren.Network;
 using Frenetic.Network.Lidgren;
 using Frenetic.Player;
-using Frenetic.Weapons;
+using Frenetic.Gameplay.Weapons;
 using System.Collections.Generic;
 
 namespace Frenetic.Network

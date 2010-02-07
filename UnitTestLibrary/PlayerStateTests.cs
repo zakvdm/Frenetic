@@ -3,7 +3,7 @@ using NUnit.Framework;
 using Rhino.Mocks;
 using Frenetic.Player;
 using Microsoft.Xna.Framework;
-using Frenetic.Weapons;
+using Frenetic.Gameplay.Weapons;
 using System.Collections.Generic;
 using Frenetic.Gameplay;
 
