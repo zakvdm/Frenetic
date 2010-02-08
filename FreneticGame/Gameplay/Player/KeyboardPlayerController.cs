@@ -73,6 +73,8 @@ namespace Frenetic.Player
                 }
             }
 
+            ProcessGameKeys();
+
             Player.Update();
         }
         #endregion
@@ -93,6 +95,19 @@ namespace Frenetic.Player
             var diff = time - LastJumpTime;
             return diff > JumpTimer || diff < 0;
         }
+
+        private void ProcessGameKeys()
+        {
+            if (Keyboard.IsGameKeyDown(GameKey.RocketLauncher))
+            {
+                this.Player.Weapons.ChangeWeapon(WeaponType.RocketLauncher);
+            }
+            if (Keyboard.IsGameKeyDown(GameKey.RailGun))
+            {
+                this.Player.Weapons.ChangeWeapon(WeaponType.RailGun);
+            }
+        }
+
         private float TotalElapsedTime { get; set; }
 
         private float LastShootTime { get; set; }

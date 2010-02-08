@@ -26,7 +26,6 @@ namespace UnitTestLibrary
             stubMouse = MockRepository.GenerateStub<IMouse>();
             stubCrosshair = MockRepository.GenerateStub<ICrosshair>();
             stubRespawner = MockRepository.GenerateStub<IPlayerRespawner>();
-            stubWeapons = MockRepository.GenerateStub<IWeapons>();
             kpc = new KeyboardPlayerController(stubPlayer, stubKeyboard, stubMouse, stubCrosshair, stubRespawner);
         }
 
@@ -63,11 +62,12 @@ namespace UnitTestLibrary
         {
             var lessThanJumpDelay = KeyboardPlayerController.JumpTimer / 3;
             var moreThanJumpDelay = KeyboardPlayerController.JumpTimer - (lessThanJumpDelay / 2);
-
             int callCount = 0;
             stubKeyboard.Stub(k => k.IsKeyDown(Arg<Keys>.Is.Equal(Keys.Space))).Return(true);
             stubPlayer.Stub(p => p.Jump()).Do(new Func<bool>(() => { callCount++; return true; }));
+
             kpc.Process(KeyboardPlayerController.JumpTimer);
+
             Assert.AreEqual(1, callCount);
             kpc.Process(lessThanJumpDelay);
             Assert.AreEqual(1, callCount);
@@ -149,11 +149,14 @@ namespace UnitTestLibrary
         [Test]
         public void ShouldChangeCurrentWeaponWhenButtonIsPressed()
         {
+            var mockWeapons = MockRepository.GenerateStub<IWeapons>();
+            stubPlayer.Stub(player => player.Weapons).Return(mockWeapons);
             stubKeyboard.Stub(k => k.IsGameKeyDown(Arg<GameKey>.Is.Equal(GameKey.RocketLauncher))).Return(true);
 
             kpc.Process(1);
 
-            stubWeapons.AssertWasCalled(weapons => weapons.ChangeWeapon(WeaponType.RocketLauncher));
+            mockWeapons.AssertWasCalled(weapons => weapons.ChangeWeapon(WeaponType.RocketLauncher));
+            mockWeapons.AssertWasNotCalled(weapons => weapons.ChangeWeapon(WeaponType.RailGun));
         }
 
         IPlayer stubPlayer;
@@ -161,7 +164,6 @@ namespace UnitTestLibrary
         IMouse stubMouse;
         ICrosshair stubCrosshair;
         IPlayerRespawner stubRespawner;
-        IWeapons stubWeapons;
         KeyboardPlayerController kpc;
     }
 }

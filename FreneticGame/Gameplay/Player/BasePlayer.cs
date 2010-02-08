@@ -17,7 +17,7 @@ namespace Frenetic.Player
         public static float MaxSpeed = 1000;
         public static int CollisionGroup = 1;
 
-        public BasePlayer(IPlayerSettings playerSettings, IPhysicsComponent physicsComponent, IBoundaryCollider boundaryCollider, IWeapon weapon, ITimer timer)
+        public BasePlayer(IPlayerSettings playerSettings, IPhysicsComponent physicsComponent, IBoundaryCollider boundaryCollider, IWeapon weapon, IWeapons weapons, ITimer timer)
         {
             this.PlayerSettings = playerSettings;
             this.PlayerScore = new PlayerScore();
@@ -31,6 +31,7 @@ namespace Frenetic.Player
             this.PhysicsComponent.WasShot += Damage;
 
             this.CurrentWeapon = weapon;
+            this.Weapons = weapons;
             if (this.CurrentWeapon != null)
             {
                 this.CurrentWeapon.DamagedAPlayer += (physicsComp) => physicsComp.OnWasShot(this, this.CurrentWeapon.Damage); // Notify the other object that we damaged it...
@@ -73,6 +74,7 @@ namespace Frenetic.Player
         }
 
         public IWeapon CurrentWeapon { get; private set; }
+        public IWeapons Weapons { get; private set; }
 
         public PlayerScore PlayerScore { get; set; }
 
@@ -115,12 +117,6 @@ namespace Frenetic.Player
         public void Shoot(Vector2 targetPosition)
         {
             this.CurrentWeapon.Shoot(this.Position, targetPosition);
-
-            //foreach (var physicsComponent in hitObjects)
-            {
-                // Notify everything that we hit
-                //physicsComponent.OnWasShot(this, this.Weapon.Damage);
-            }
         }
 
         private void Damage(IPlayer shootingPlayer, int damage)

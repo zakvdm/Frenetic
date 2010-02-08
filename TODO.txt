@@ -1,5 +1,5 @@
-Consolidate WeaponViews into single class
 Work out how the Player stores more than 1 weapon. Switch between them!
+Consolidate WeaponViews into single class
 Abstract Weapon Switching from specific keyboard buttons.
 Client asks to shoot -> Server shoots and says "okay!" -> client gets notified and responds HOW?
   Why do the weapons store "Shots" and "Rockets"?

@@ -24,6 +24,7 @@ namespace UnitTestLibrary
         IPhysicsComponent stubPhysicsComponent;
         IBoundaryCollider stubBoundaryCollider;
         IWeapon stubWeapon;
+        IWeapons stubWeapons;
         ITimer stubTimer;
 
         [SetUp]
@@ -34,7 +35,7 @@ namespace UnitTestLibrary
             stubBoundaryCollider = MockRepository.GenerateStub<IBoundaryCollider>();
             stubWeapon = MockRepository.GenerateStub<IWeapon>();
             stubTimer = MockRepository.GenerateStub<ITimer>();
-            player = new BasePlayer(stubPlayerSettings, stubPhysicsComponent, stubBoundaryCollider, stubWeapon, stubTimer);
+            player = new BasePlayer(stubPlayerSettings, stubPhysicsComponent, stubBoundaryCollider, stubWeapon, stubWeapons, stubTimer);
         }
 
         // SETUP:
@@ -104,7 +105,7 @@ namespace UnitTestLibrary
         [Test]
         public void LocalPlayerPositionNotUpdatedFromNetwork()
         {
-            player = new LocalPlayer(stubPlayerSettings, stubPhysicsComponent, stubBoundaryCollider, stubWeapon, stubTimer);
+            player = new LocalPlayer(stubPlayerSettings, stubPhysicsComponent, stubBoundaryCollider, stubWeapon, stubWeapons, stubTimer);
             player.Position = new Vector2(100, 200);
 
             player.UpdatePositionFromNetwork(new Vector2(300, 400), 1f);

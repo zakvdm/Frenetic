@@ -19,7 +19,7 @@ namespace UnitTestLibrary
         public void SetUp()
         {
             stubPhysicsComponent = MockRepository.GenerateStub<IPhysicsComponent>();
-            player = new NetworkPlayer(null, stubPhysicsComponent, null, null);
+            player = new NetworkPlayer(null, stubPhysicsComponent, null, null, null);
         }
 
         [Test]
