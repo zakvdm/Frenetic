@@ -9,6 +9,7 @@ using Microsoft.Xna.Framework.Content;
 using Frenetic.Graphics.Effects;
 using Autofac;
 using System.Collections.Generic;
+using Frenetic.Player;
 
 namespace Frenetic.Autofac
 {
@@ -37,17 +38,21 @@ namespace Frenetic.Autofac
                     return emitter;
                 }).FactoryScoped();
 
-            builder.Register<EffectUpdater>().ContainerScoped();
-
-            builder.Register<MercuryParticleEffect>().As<IEffect>().FactoryScoped();
+            builder.Register<MercuryLineParticleEffect>
+                (c => new MercuryLineParticleEffect
+                    (
+                        c.Resolve<Renderer>(),
+                        c.Resolve<Emitter>(new TypedParameter(typeof(string), "line"))
+                    )).As<ILineEffect>().SingletonScoped();
             builder.Register<MercuryPointParticleEffect>
-                ( c => new MercuryPointParticleEffect
+                (c => new MercuryPointParticleEffect
                     (
                         c.Resolve<Renderer>(),
                         c.Resolve<Emitter>(new TypedParameter(typeof(string), "point")),
                         c.Resolve<Emitter>(new TypedParameter(typeof(string), "explosion"))
                     )).As<IEffect>().SingletonScoped();
-            builder.RegisterGeneratedFactory<Frenetic.Graphics.Effects.Effect.Factory>(new TypedService(typeof(IEffect)));
+            builder.RegisterGeneratedFactory<Frenetic.Graphics.Effects.LineEffect.Factory>(new TypedService(typeof(ILineEffect)));
+            builder.Register<EffectUpdater>().ContainerScoped();
 
             // WEAPONS:
             builder.Register<RailGun>().As<RailGun>().FactoryScoped();
@@ -65,8 +70,14 @@ namespace Frenetic.Autofac
             builder.Register<Rocket>().FactoryScoped();
             builder.RegisterGeneratedFactory<Rocket.Factory>(new TypedService(typeof(Rocket)));
 
-            builder.Register<RailGunView>().As<IWeaponView>().FactoryScoped();
-            builder.Register<RocketLauncherView>().As<IWeaponView>().FactoryScoped();
+            builder.Register<RocketLauncherView>().FactoryScoped();
+            builder.Register<RailGunView>().FactoryScoped();
+
+            builder.Register((container) =>
+                {
+                    List<IWeaponView> weaponViews = new List<IWeaponView>() { container.Resolve<RocketLauncherView>(), container.Resolve<RailGunView>() };
+                    return new WeaponDrawer(container.Resolve<IPlayerController>(), container.Resolve<IPlayerList>(), weaponViews);
+                }).As<IWeaponDrawer>().ContainerScoped();
         }
     }
 }

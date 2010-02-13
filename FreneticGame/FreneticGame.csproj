@@ -94,7 +94,7 @@
     <Compile Include="Engine\Console\ChatMessage.cs" />
     <Compile Include="Engine\Console\ConsoleOverlaySetView.cs" />
     <Compile Include="Gameplay\Player\IPlayerController.cs" />
-    <Compile Include="Gameplay\Weapons\BaseWeaponView.cs" />
+    <Compile Include="Gameplay\Weapons\WeaponDrawer.cs" />
     <Compile Include="Gameplay\Weapons\IWeapons.cs" />
     <Compile Include="Gameplay\Weapons\Rocket.cs" />
     <Compile Include="Gameplay\Weapons\RocketLauncher.cs" />
@@ -146,7 +146,7 @@
     <Compile Include="Gameplay\Weapons\Shots.cs" />
     <Compile Include="Graphics\Effects\IEffect.cs" />
     <Compile Include="Graphics\IPrimitiveDrawer.cs" />
-    <Compile Include="Graphics\Effects\MercuryParticleEffect.cs" />
+    <Compile Include="Graphics\Effects\MercuryLineParticleEffect.cs" />
     <Compile Include="Graphics\XnaPrimitiveDrawer.cs" />
     <Compile Include="Gameplay\Level\ILevel.cs" />
     <Compile Include="Gameplay\Level\VisibilityView.cs" />

@@ -1,10 +1,12 @@
 ﻿using System;
 using Microsoft.Xna.Framework;
+using Frenetic.Player;
 
 namespace Frenetic.Gameplay.Weapons
 {
     public interface IWeaponView
     {
-        void Draw(Matrix translationMatrix);
+        void DrawWeapon(IWeapons weapon);
+        void DrawEffects(Matrix translationMatrix);
     }
 }

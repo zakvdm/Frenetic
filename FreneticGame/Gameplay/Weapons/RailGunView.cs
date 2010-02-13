@@ -6,43 +6,58 @@ using Frenetic.Player;
 
 namespace Frenetic.Gameplay.Weapons
 {
-    public class RailGunView : BaseWeaponView, IWeaponView
+    public class RailGunView : IWeaponView
     {
-        public RailGunView(IPlayerList playerList, Effect.Factory particleEffectFactory) : base(playerList)
+        public RailGunView(IPlayerList playerList, ILineEffect lineEffect)
         {
-            this.ParticleEffectFactory = particleEffectFactory;
+            this.playerList = playerList;
+            this.lineEffect = lineEffect;
         }
 
         #region IRailGunView Members
 
-        public void Draw(Matrix translationMatrix)
+        public void DrawWeapon(IWeapons weapons)
         {
-            foreach (KeyValuePair<IWeapons, IEffect> railGunInfo in this.railGuns)
-            {
-                var railGun = railGunInfo.Key;
-                var particleEffect = railGunInfo.Value;
+            var railGun = weapons[WeaponType.RailGun] as RailGun;
 
-                if (railGun.Shots.Count > particleEffect.ShotsDrawn)
-                {
-                    particleEffect.ShotsDrawn = railGun.Shots.Count;
+            DrawRailgun(weapons, railGun);
+        }
 
-                    Shot shot = railGun.Shots[particleEffect.ShotsDrawn - 1];
-                    particleEffect.Trigger(shot.StartPoint, shot.EndPoint);
-                }
-
-                particleEffect.Draw(ref translationMatrix);
-            }
+        public void DrawEffects(Matrix translationMatrix)
+        {
+            this.lineEffect.Draw(ref translationMatrix);
         }
 
         #endregion
 
-        protected override void HandleNewPlayer(IPlayer newPlayer)
+        void DrawRailgun(IWeapons weapons, RailGun railgun)
         {
-            this.railGuns.Add(newPlayer.Weapons, this.ParticleEffectFactory());
+            if (weapons.Shots.Count > this.lineEffect.ShotsDrawn)
+            {
+                this.lineEffect.ShotsDrawn = weapons.Shots.Count;
+
+                Shot shot = weapons.Shots[this.lineEffect.ShotsDrawn - 1];
+
+                SetAndTriggerEffectParameters(shot);
+            }
         }
 
-        Effect.Factory ParticleEffectFactory;
+        public void SetAndTriggerEffectParameters(Shot shot)
+        {
+            Vector2 lineAtOrigin = (shot.EndPoint - shot.StartPoint);
+            Vector2 midPointFromOrigin = lineAtOrigin / 2;
+            float length = lineAtOrigin.Length();
+            float angle = (float)Math.Atan2(lineAtOrigin.Y, lineAtOrigin.X);
+            Vector2 midPoint = midPointFromOrigin + shot.StartPoint;
 
-        Dictionary<IWeapons, IEffect> railGuns = new Dictionary<IWeapons, IEffect>();
+            this.lineEffect.Position = midPoint;
+            this.lineEffect.Length = Math.Max((int)length, 1);
+            this.lineEffect.Angle = angle;
+
+            this.lineEffect.Trigger(EffectType.Rail);
+        }
+
+        IPlayerList playerList;
+        ILineEffect lineEffect;
     }
 }

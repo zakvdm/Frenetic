@@ -9,7 +9,7 @@ namespace Frenetic.Gameplay.Weapons
     {
         public WeaponList(Dictionary<WeaponType, IWeapon> weaponList)
         {
-            currentWeapon = WeaponType.RocketLauncher;
+            currentWeapon = WeaponType.RailGun;
             this.Shots = new Shots();
 
             weapons = weaponList;

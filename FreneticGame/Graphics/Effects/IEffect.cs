@@ -5,6 +5,7 @@ namespace Frenetic.Graphics.Effects
 {
     public enum EffectType
     {
+        Rail,
         RocketTrail,
         RocketExplosion
     }
@@ -16,13 +17,16 @@ namespace Frenetic.Graphics.Effects
         Vector2 Position { get; set; }
         void Trigger(EffectType effectType);
 
-        [Obsolete]
-        void Trigger(Vector2 startPoint, Vector2 endPoint);
         void Draw(ref Matrix transform);
         void Update(float totalSeconds, float elapsedSeconds);
     }
-    public class Effect
+    public interface ILineEffect : IEffect
     {
-        public delegate IEffect Factory();
+        int Length { get; set; }
+        float Angle { get; set; }
+    }
+    public class LineEffect
+    {
+        public delegate ILineEffect Factory();
     }
 }

@@ -19,7 +19,7 @@ namespace UnitTestLibrary
         ITextureBank<PlayerTexture> _stubTextureBank;
         ISpriteBatch stubSpriteBatch;
         ICamera stubCamera;
-        IWeaponView stubRailGunView;
+        IWeaponDrawer stubWeaponDrawer;
         IBubbleTextDrawer stubBubbleText;
         IPlayer player;
         PlayerView playerView;
@@ -33,14 +33,14 @@ namespace UnitTestLibrary
             _stubTextureBank.Stub(x => x[PlayerTexture.Ball]).Return(stubTexture);
             stubSpriteBatch = MockRepository.GenerateStub<ISpriteBatch>();
             stubCamera = MockRepository.GenerateStub<ICamera>();
-            stubRailGunView = MockRepository.GenerateStub<IWeaponView>();
+            stubWeaponDrawer = MockRepository.GenerateStub<IWeaponDrawer>();
             stubBubbleText = MockRepository.GenerateStub<IBubbleTextDrawer>();
             player = MockRepository.GenerateStub<IPlayer>();
             player.Status = PlayerStatus.Alive;
             player.Stub(me => me.PlayerSettings).Return(new NetworkPlayerSettings());
             player.Stub(me => me.Weapons).Return(MockRepository.GenerateStub<IWeapons>());
             playerList.Players.Add(player);
-            playerView = new PlayerView(playerList, _stubTextureBank, stubSpriteBatch, stubCamera, stubRailGunView, stubBubbleText);
+            playerView = new PlayerView(playerList, _stubTextureBank, stubSpriteBatch, stubCamera, stubWeaponDrawer, stubBubbleText);
         }
 
         // EVENT REGISTRATIONS:
@@ -102,7 +102,7 @@ namespace UnitTestLibrary
         public void UsesCameraCorrectly()
         {
             ICamera camera = new Camera(player, new Vector2(100, 100));
-            playerView = new PlayerView(playerList, _stubTextureBank, stubSpriteBatch, camera, stubRailGunView, stubBubbleText);
+            playerView = new PlayerView(playerList, _stubTextureBank, stubSpriteBatch, camera, stubWeaponDrawer, stubBubbleText);
 
             playerView.Generate(1f);
 
@@ -127,7 +127,7 @@ namespace UnitTestLibrary
 
             playerView.Generate(1f);
 
-            stubRailGunView.AssertWasCalled(me => me.Draw(Matrix.Identity));
+            stubWeaponDrawer.AssertWasCalled(me => me.Draw(Matrix.Identity));
         }
 
         // BUBBLETEXT:

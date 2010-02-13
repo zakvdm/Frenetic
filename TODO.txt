@@ -1,3 +1,4 @@
+Make RailGunView work without counting Shots.
 Work out how the Player stores more than 1 weapon. Switch between them!
 Consolidate WeaponViews into single class
 Abstract Weapon Switching from specific keyboard buttons.

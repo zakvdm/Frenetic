@@ -11,13 +11,13 @@ namespace Frenetic.Player
 {
     public class PlayerView : IView
     {
-        public PlayerView(IPlayerList playerList, ITextureBank<PlayerTexture> playerTextureBank, ISpriteBatch spriteBatch, ICamera camera, IWeaponView weaponView, IBubbleTextDrawer bubbleText)
+        public PlayerView(IPlayerList playerList, ITextureBank<PlayerTexture> playerTextureBank, ISpriteBatch spriteBatch, ICamera camera, IWeaponDrawer weaponDrawer, IBubbleTextDrawer bubbleText)
         {
             this.PlayerList = playerList;
             this.PlayerTextureBank = playerTextureBank;
             this.SpriteBatch = spriteBatch;
             this.Camera = camera;
-            this.RailGunView = weaponView;
+            this.weaponDrawer = weaponDrawer;
             this.BubbleText = bubbleText;
 
             this.PlayerList.PlayerAdded += RegisterNewPlayer;
@@ -47,7 +47,7 @@ namespace Frenetic.Player
             this.BubbleText.DrawText(this.SpriteBatch, elapsedSeconds);
             this.SpriteBatch.End();
 
-            this.RailGunView.Draw(this.Camera.TranslationMatrix);
+            this.weaponDrawer.Draw(this.Camera.TranslationMatrix);
         }
 
         #endregion
@@ -73,7 +73,7 @@ namespace Frenetic.Player
         ITextureBank<PlayerTexture> PlayerTextureBank;
         ISpriteBatch SpriteBatch;
         ICamera Camera;
-        IWeaponView RailGunView;
+        IWeaponDrawer weaponDrawer;
         IBubbleTextDrawer BubbleText;
     }
 }

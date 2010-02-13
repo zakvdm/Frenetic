@@ -14,18 +14,20 @@ namespace UnitTestLibrary
         public void UpdatesAllEffects()
         {
             var effect = MockRepository.GenerateStub<IEffect>();
-            EffectUpdater effectUpdater = new EffectUpdater(effect);
+            var lineEffect = MockRepository.GenerateStub<ILineEffect>();
+            EffectUpdater effectUpdater = new EffectUpdater(effect, lineEffect);
 
             effectUpdater.Process(0.2f);
 
             effect.AssertWasCalled(me => me.Update(0.2f, 0.2f));
+            lineEffect.AssertWasCalled(me => me.Update(0.2f, 0.2f));
         }
 
         [Test]
         public void AddsUpTotalGameTimeCorrectly()
         {
             var effect = MockRepository.GenerateStub<IEffect>();
-            EffectUpdater effectUpdater = new EffectUpdater(effect);
+            EffectUpdater effectUpdater = new EffectUpdater(effect, MockRepository.GenerateStub<ILineEffect>());
 
             effectUpdater.Process(0.2f);
             effectUpdater.Process(0.4f);

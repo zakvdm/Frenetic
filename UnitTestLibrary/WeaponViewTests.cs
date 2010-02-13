@@ -7,33 +7,48 @@ using Frenetic.Gameplay.Weapons;
 using Frenetic.Player;
 using Rhino.Mocks;
 using Frenetic.Graphics.Effects;
+using Microsoft.Xna.Framework;
 
 namespace UnitTestLibrary
 {
     [TestFixture]
     public class WeaponViewTests
     {
+        IPlayerController stubPlayerController;
         IPlayerList playerList;
-        RailGunView railGunView;
-        bool effectFactoryWasUsed;
-        IPlayer stubPlayer;
+        List<IWeaponView> weaponViews;
+        WeaponDrawer view;
         [SetUp]
         public void SetUp()
         {
-            playerList = MockRepository.GenerateStub<IPlayerList>();
-            effectFactoryWasUsed = false;
-            stubPlayer = MockRepository.GenerateStub<IPlayer>();
-            stubPlayer.Stub(me => me.Weapons).Return(MockRepository.GenerateStub<IWeapons>());
-
-            Effect.Factory factoryMethod = () => { effectFactoryWasUsed = true; return MockRepository.GenerateStub<IEffect>(); };
-            railGunView = new RailGunView(playerList, factoryMethod);
+            stubPlayerController = MockRepository.GenerateStub<IPlayerController>();
+            playerList = new PlayerList();
+            playerList.Add(MockRepository.GenerateStub<IPlayer>());
+            playerList.Players[0].Stub(me => me.Weapons).Return(MockRepository.GenerateStub<IWeapons>());
+            playerList.Add(MockRepository.GenerateStub<IPlayer>());
+            playerList.Players[1].Stub(me => me.Weapons).Return(MockRepository.GenerateStub<IWeapons>());
+            weaponViews = new List<IWeaponView>();
+            weaponViews.Add(MockRepository.GenerateStub<IWeaponView>());
+            weaponViews.Add(MockRepository.GenerateStub<IWeaponView>());
+            view = new WeaponDrawer(stubPlayerController, playerList, weaponViews);
         }
         [Test]
-        public void AddsANewRailGunForNewPlayers()
+        public void ShouldCallDrawForEachWeaponViewForEachPlayer()
         {
-            playerList.Raise(me => me.PlayerAdded += null, stubPlayer);
+            view.Draw(Matrix.Identity);
 
-            Assert.IsTrue(effectFactoryWasUsed);
+            foreach (var player in playerList)
+            {
+                weaponViews[0].AssertWasCalled(me => me.DrawWeapon(player.Weapons));
+                weaponViews[1].AssertWasCalled(me => me.DrawWeapon(player.Weapons));
+            }
+        }
+        [Test]
+        public void ShouldClearDeadProjectiles()
+        {
+            view.Draw(Matrix.Identity);
+
+            stubPlayerController.AssertWasCalled(me => me.RemoveDeadProjectiles());
         }
     }
 }

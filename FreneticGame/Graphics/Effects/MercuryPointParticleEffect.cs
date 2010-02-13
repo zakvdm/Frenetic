@@ -33,10 +33,6 @@ namespace Frenetic.Graphics.Effects
                     }
             }
         }
-        public void Trigger(Vector2 startPoint, Vector2 endPoint)
-        {
-            throw new NotImplementedException();
-        }
 
         public void Draw(ref Matrix transform)
         {

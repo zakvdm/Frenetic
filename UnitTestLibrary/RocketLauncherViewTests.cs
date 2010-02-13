@@ -36,7 +36,7 @@ namespace UnitTestLibrary
         [Test]
         public void ShouldDrawTrailForRocketsThatAreAlive()
         {
-            view.Draw(Matrix.Identity);
+            view.DrawWeapon(stubPlayer.Weapons);
 
             mockEffects.AssertWasCalled(me => me.Trigger(EffectType.RocketTrail));
         }
@@ -45,18 +45,9 @@ namespace UnitTestLibrary
         {
             ((RocketLauncher)stubPlayer.Weapons[WeaponType.RocketLauncher]).Rockets[0].IsAlive = false;
 
-            view.Draw(Matrix.Identity);
+            view.DrawWeapon(stubPlayer.Weapons);
 
             mockEffects.AssertWasCalled(me => me.Trigger(EffectType.RocketExplosion));
-        }
-        [Test]
-        public void ShouldClearDeadProjectilesAfterDrawingExplosions()
-        {
-            ((RocketLauncher)stubPlayer.Weapons[WeaponType.RocketLauncher]).Rockets[0].IsAlive = false;
-
-            view.Draw(Matrix.Identity);
-
-            mockPlayerController.AssertWasCalled(me => me.RemoveDeadProjectiles());
         }
     }
 }

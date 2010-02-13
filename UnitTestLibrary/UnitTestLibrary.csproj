@@ -121,6 +121,7 @@
     <Compile Include="QuitterTests.cs" />
     <Compile Include="RailGunTests.cs" />
     <Compile Include="PlayerScoreTests.cs" />
+    <Compile Include="RailGunViewTests.cs" />
     <Compile Include="RocketLauncherTests.cs" />
     <Compile Include="RocketLauncherViewTests.cs" />
     <Compile Include="SettingsPersisterTests.cs" />
