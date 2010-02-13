@@ -99,6 +99,7 @@
     <Compile Include="Gameplay\Weapons\Rocket.cs" />
     <Compile Include="Gameplay\Weapons\RocketLauncher.cs" />
     <Compile Include="Gameplay\Weapons\RocketLauncherView.cs" />
+    <Compile Include="Gameplay\Weapons\Slug.cs" />
     <Compile Include="Gameplay\Weapons\WeaponList.cs" />
     <Compile Include="Graphics\BubbleTextDrawer.cs" />
     <Compile Include="Graphics\Effects\MercuryPointParticleEffect.cs" />

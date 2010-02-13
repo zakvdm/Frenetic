@@ -26,7 +26,7 @@ namespace UnitTestLibrary
         {
             stubPlayer = MockRepository.GenerateStub<IPlayer>();
             stubPlayer.Stub(me => me.Weapons).Return(MockRepository.GenerateStub<IWeapons>());
-            stubPlayer.Weapons[WeaponType.RocketLauncher] = new RocketLauncher(null);
+            stubPlayer.Weapons.Stub(me => me[WeaponType.RocketLauncher]).Return(new RocketLauncher(null));
             ((RocketLauncher)stubPlayer.Weapons[WeaponType.RocketLauncher]).Rockets.Add(new Rocket(Vector2.Zero, Vector2.Zero, new Frenetic.Physics.DummyPhysicsComponent()));
             playerList = new PlayerList() { stubPlayer };
             mockEffects = MockRepository.GenerateStub<IEffect>();

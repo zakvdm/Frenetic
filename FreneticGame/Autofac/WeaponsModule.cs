@@ -8,6 +8,7 @@ using ProjectMercury.Emitters;
 using Microsoft.Xna.Framework.Content;
 using Frenetic.Graphics.Effects;
 using Autofac;
+using System.Collections.Generic;
 
 namespace Frenetic.Autofac
 {
@@ -46,11 +47,20 @@ namespace Frenetic.Autofac
                         c.Resolve<Emitter>(new TypedParameter(typeof(string), "point")),
                         c.Resolve<Emitter>(new TypedParameter(typeof(string), "explosion"))
                     )).As<IEffect>().SingletonScoped();
-            //builder.RegisterGeneratedFactory<Frenetic.Graphics.Effects.Effect.Factory>(new TypedService(typeof(IEffect)));
+            builder.RegisterGeneratedFactory<Frenetic.Graphics.Effects.Effect.Factory>(new TypedService(typeof(IEffect)));
 
             // WEAPONS:
-            builder.Register<RailGun>().As<IWeapon>().FactoryScoped();
-            builder.Register<RocketLauncher>().As<IWeapon>().FactoryScoped();
+            builder.Register<RailGun>().As<RailGun>().FactoryScoped();
+            builder.Register<RocketLauncher>().As<RocketLauncher>().FactoryScoped();
+
+            builder.Register((container) =>
+                {
+                    Dictionary<WeaponType, IWeapon> weapons = new Dictionary<WeaponType, IWeapon>();
+                    weapons.Add(WeaponType.RailGun, container.Resolve<RailGun>());
+                    weapons.Add(WeaponType.RocketLauncher, container.Resolve<RocketLauncher>());
+
+                    return new WeaponList(weapons);
+                }).As<IWeapons>().ContainerScoped();
             
             builder.Register<Rocket>().FactoryScoped();
             builder.RegisterGeneratedFactory<Rocket.Factory>(new TypedService(typeof(Rocket)));

@@ -25,31 +25,23 @@ namespace UnitTestLibrary
         }
 
         [Test]
-        public void CantShootWithDirectionZero()
-        {
-            railGun.Shoot(Vector2.Zero, Vector2.Zero);
-
-            Assert.AreEqual(0, railGun.Shots.Count);
-        }
-
-        [Test]
-        public void UsesRayCasterToFindShotEndPoint()
-        {
-            stubRayCaster.Stub(me => me.ShootRay(Arg<Vector2>.Is.Anything, Arg<Vector2>.Is.Equal(Vector2.UnitX), out Arg<Vector2>.Out(new Vector2(100, 200)).Dummy)).Return(new List<IPhysicsComponent>());
-
-            railGun.Shoot(Vector2.Zero, Vector2.UnitX);
-
-            Assert.AreEqual(new Vector2(100, 200), railGun.Shots[0].EndPoint);
-        }
-
-        [Test]
-        public void SetsShotStartPoint()
+        public void ShouldCreateSlug()
         {
             stubRayCaster.Stub(me => me.ShootRay(Arg<Vector2>.Is.Anything, Arg<Vector2>.Is.Equal(Vector2.UnitY), out Arg<Vector2>.Out(Vector2.Zero).Dummy)).Return(new List<IPhysicsComponent>());
 
             railGun.Shoot(new Vector2(10, 20), Vector2.UnitY);
 
-            Assert.AreEqual(new Vector2(10, 20), railGun.Shots[0].StartPoint);
+            Assert.AreEqual(1, railGun.Slugs.Count);
+            Assert.AreEqual(new Vector2(10, 20), railGun.Slugs[0].StartPoint);
+        }
+        [Test]
+        public void ShouldUseRayCasterToFindSlugEndPoint()
+        {
+            stubRayCaster.Stub(me => me.ShootRay(Arg<Vector2>.Is.Anything, Arg<Vector2>.Is.Equal(Vector2.UnitX), out Arg<Vector2>.Out(new Vector2(100, 200)).Dummy)).Return(new List<IPhysicsComponent>());
+
+            railGun.Shoot(Vector2.Zero, Vector2.UnitX);
+
+            Assert.AreEqual(new Vector2(100, 200), railGun.Slugs[0].EndPoint);
         }
 
         [Test]

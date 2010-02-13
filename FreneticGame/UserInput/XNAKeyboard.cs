@@ -10,7 +10,7 @@ namespace Frenetic.UserInput
     {
         public bool IsGameKeyDown(GameKey gamekey)
         {
-            throw new NotImplementedException();
+            return false;
         }
         public bool IsKeyDown(Keys key)
         {

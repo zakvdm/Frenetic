@@ -13,25 +13,22 @@ namespace Frenetic.Gameplay.Weapons
         public RailGun(IRayCaster rayCaster)
         {
             _rayCaster = rayCaster;
-            Shots = new Shots();
+            Slugs = new Shots();
 
             this.Damage = 50;
         }
 
         public int Damage { get; set; }
-        public Shots Shots { get; private set; }
+        public Shots Slugs { get; private set; }
 
         public void Shoot(Vector2 origin, Vector2 direction)
         {
             Vector2 endPoint;
 
-            if (direction == Vector2.Zero)
-                return;
-
             Vector2 offsetOrigin = origin + (Vector2.Normalize(direction - origin) * RailGun.Offset);
             List<IPhysicsComponent> hitObjects = _rayCaster.ShootRay(offsetOrigin, direction, out endPoint);
 
-            this.Shots.Add(new Shot(origin, endPoint));
+            this.Slugs.Add(new Shot(origin, endPoint));
 
             foreach (var physicsComponent in hitObjects)
             {

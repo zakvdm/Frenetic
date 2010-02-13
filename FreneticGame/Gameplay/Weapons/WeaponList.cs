@@ -7,13 +7,16 @@ namespace Frenetic.Gameplay.Weapons
 {
     public class WeaponList : IWeapons, IEnumerable<IWeapon>
     {
-        public WeaponList(List<IWeapon> weaponList)
+        public WeaponList(Dictionary<WeaponType, IWeapon> weaponList)
         {
+            currentWeapon = WeaponType.RocketLauncher;
+            this.Shots = new Shots();
+
             weapons = weaponList;
 
-            foreach (var weapon in weaponList)
+            foreach (var kvPair  in weaponList)
             {
-                weapon.DamagedAPlayer += (weap, physicsComp) => physicsComp.OnWasShot(null, weap.Damage);
+                kvPair.Value.DamagedAPlayer += (weap, physicsComp) => physicsComp.OnWasShot(null, weap.Damage);
             }
         }
         #region IWeapons Members
@@ -22,34 +25,39 @@ namespace Frenetic.Gameplay.Weapons
         {
             get
             {
-                throw new NotImplementedException();
-            }
-            set
-            {
-                throw new NotImplementedException();
+                return this.weapons[type];
             }
         }
 
-        public event Action<IWeapon, Frenetic.Physics.IPhysicsComponent> DamagedAPlayer;
-
         public void Shoot(Microsoft.Xna.Framework.Vector2 from, Microsoft.Xna.Framework.Vector2 towards)
         {
-            throw new NotImplementedException();
+            if (from == towards)
+                return;
+
+            this[currentWeapon].Shoot(from, towards);
+            this.Shots.Add(new Shot(from, towards));
         }
 
         public void ChangeWeapon(WeaponType weaponType)
         {
-            throw new NotImplementedException();
+            currentWeapon = weaponType;
         }
 
         public void RemoveDeadProjectiles()
         {
-            throw new NotImplementedException();
+            foreach (var weapon in this)
+            {
+                if (weapon is IProjectileWeapon)
+                {
+                    (weapon as IProjectileWeapon).RemoveDeadProjectiles();
+                }
+            }
         }
 
         public Shots Shots
         {
-            get { throw new NotImplementedException(); }
+            get;
+            private set;
         }
 
         #endregion
@@ -58,7 +66,7 @@ namespace Frenetic.Gameplay.Weapons
 
         public IEnumerator<IWeapon> GetEnumerator()
         {
-            foreach (var weapon in this.weapons)
+            foreach (var weapon in this.weapons.Values)
                 yield return weapon;
         }
 
@@ -73,6 +81,7 @@ namespace Frenetic.Gameplay.Weapons
 
         #endregion
 
-        List<IWeapon> weapons;
+        Dictionary<WeaponType, IWeapon> weapons;
+        WeaponType currentWeapon;
     }
 }
