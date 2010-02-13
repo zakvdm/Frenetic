@@ -23,7 +23,7 @@ namespace UnitTestLibrary
             playerList = MockRepository.GenerateStub<IPlayerList>();
             effectFactoryWasUsed = false;
             stubPlayer = MockRepository.GenerateStub<IPlayer>();
-            stubPlayer.Stub(me => me.CurrentWeapon).Return(MockRepository.GenerateStub<IWeapon>());
+            stubPlayer.Stub(me => me.Weapons).Return(MockRepository.GenerateStub<IWeapons>());
 
             Effect.Factory factoryMethod = () => { effectFactoryWasUsed = true; return MockRepository.GenerateStub<IEffect>(); };
             railGunView = new RailGunView(playerList, factoryMethod);

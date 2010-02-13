@@ -129,6 +129,7 @@
     <Compile Include="TimerTests.cs" />
     <Compile Include="TweakablePropertiesLoaderTests.cs" />
     <Compile Include="VisibilityViewTests.cs" />
+    <Compile Include="WeaponListTests.cs" />
     <Compile Include="WeaponViewTests.cs" />
     <Compile Include="WorldBoundaryColliderTests.cs" />
     <Compile Include="GameplayScreenTests.cs" />

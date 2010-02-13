@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Frenetic.Physics;
+using Microsoft.Xna.Framework;
 
 namespace Frenetic.Gameplay.Weapons
 {
@@ -12,6 +14,13 @@ namespace Frenetic.Gameplay.Weapons
     }
     public interface IWeapons
     {
+        IWeapon this[WeaponType type] { get; set; }
+
+        void Shoot(Vector2 from, Vector2 towards);
         void ChangeWeapon(WeaponType weaponType);
+
+        void RemoveDeadProjectiles();
+
+        Shots Shots { get; }
     }
 }

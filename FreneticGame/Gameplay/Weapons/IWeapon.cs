@@ -10,9 +10,8 @@ namespace Frenetic.Gameplay.Weapons
     {
         int Damage { get; }
         void Shoot(Vector2 origin, Vector2 direction);
-        Shots Shots { get; }
 
-        event Action<IPhysicsComponent> DamagedAPlayer;
+        event Action<IWeapon, IPhysicsComponent> DamagedAPlayer;
     }
 
     public interface IProjectileWeapon : IWeapon

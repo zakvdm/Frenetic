@@ -35,10 +35,10 @@ namespace Frenetic.Player
                 this.Position = player.Position;
                 this.Score = player.PlayerScore;
 
-                if (player.CurrentWeapon.Shots.IsDirty)
+                if (player.Weapons.Shots.IsDirty)
                 {
-                    this.NewShots.AddRange(player.CurrentWeapon.Shots.GetDiff());
-                    player.CurrentWeapon.Shots.Clean();
+                    this.NewShots.AddRange(player.Weapons.Shots.GetDiff());
+                    player.Weapons.Shots.Clean();
                 }
             }
         }

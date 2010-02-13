@@ -38,7 +38,7 @@ namespace UnitTestLibrary
             player = MockRepository.GenerateStub<IPlayer>();
             player.Status = PlayerStatus.Alive;
             player.Stub(me => me.PlayerSettings).Return(new NetworkPlayerSettings());
-            player.Stub(me => me.CurrentWeapon).Return(new RailGun(null));
+            player.Stub(me => me.Weapons).Return(MockRepository.GenerateStub<IWeapons>());
             playerList.Players.Add(player);
             playerView = new PlayerView(playerList, _stubTextureBank, stubSpriteBatch, stubCamera, stubRailGunView, stubBubbleText);
         }

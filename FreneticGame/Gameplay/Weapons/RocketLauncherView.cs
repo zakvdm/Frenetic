@@ -22,7 +22,7 @@ namespace Frenetic.Gameplay.Weapons
         {
             foreach (var player in this.PlayerList)
             {
-                var rocketLauncher = (RocketLauncher)player.CurrentWeapon;
+                var rocketLauncher = (RocketLauncher)player.Weapons[WeaponType.RocketLauncher];
 
                 foreach (var rocket in rocketLauncher.Rockets)
                 {

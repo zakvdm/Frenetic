@@ -17,8 +17,8 @@ namespace UnitTestLibrary
         public void SetUp()
         {
             player = MockRepository.GenerateStub<IPlayer>();
-            player.Stub(me => me.CurrentWeapon).Return(MockRepository.GenerateStub<IWeapon>());
-            player.CurrentWeapon.Stub(me => me.Shots).Return(new Shots());
+            player.Stub(me => me.Weapons).Return(MockRepository.GenerateStub<IWeapons>());
+            player.Weapons.Stub(me => me.Shots).Return(new Shots());
             player.Stub(me => me.PlayerScore).Return(new PlayerScore());
         }
 
@@ -27,7 +27,7 @@ namespace UnitTestLibrary
         {
             player.Health = 97;
             player.Status = PlayerStatus.Dead;
-            player.CurrentWeapon.Shots.Add(new Shot(new Vector2(1, 2), new Vector2(3, 4)));
+            player.Weapons.Shots.Add(new Shot(new Vector2(1, 2), new Vector2(3, 4)));
             player.Position = Vector2.One;
             player.PlayerScore.Kills = 4;
             player.PlayerScore.Deaths = 100;
@@ -53,7 +53,7 @@ namespace UnitTestLibrary
         [Test]
         public void CanRefreshNetworkPlayerObjectWithPlayerState()
         {
-            player.CurrentWeapon.Shots.Add(new Shot());
+            player.Weapons.Shots.Add(new Shot());
             PlayerState state = new PlayerState();
             state.Health = 98;
             state.Status = PlayerStatus.Alive;

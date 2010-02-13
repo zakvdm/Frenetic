@@ -45,7 +45,7 @@ namespace Frenetic.Gameplay.Weapons
             this.Rockets.RemoveAll(rocket => !rocket.IsAlive);
         }
 
-        public event Action<IPhysicsComponent> DamagedAPlayer;
+        public event Action<IWeapon, IPhysicsComponent> DamagedAPlayer;
 
         Rocket.Factory RocketFactory;
     }

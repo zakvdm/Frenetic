@@ -29,8 +29,8 @@ namespace UnitTestLibrary
             stubClientStateTracker.Stub(x => x.NetworkClients).Return(clientList);
             client = new Client(MockRepository.GenerateStub<IPlayer>());
             client.Player.Stub(me => me.PlayerSettings).Return(MockRepository.GenerateStub<IPlayerSettings>());
-            client.Player.Stub(me => me.CurrentWeapon).Return(MockRepository.GenerateStub<IWeapon>());
-            client.Player.CurrentWeapon.Stub(me => me.Shots).Return(new Shots());
+            client.Player.Stub(me => me.Weapons).Return(MockRepository.GenerateStub<IWeapons>());
+            client.Player.Weapons.Stub(me => me.Shots).Return(new Shots());
             stubClientStateTracker.NetworkClients.Add(client);
             chatLog = new Log<ChatMessage>();
             stubSnapCounter = MockRepository.GenerateStub<ISnapCounter>();
@@ -73,10 +73,7 @@ namespace UnitTestLibrary
         public void SendsPlayerStateToAllClients()
         {
             client.ID = 7;
-            client.Player = MockRepository.GenerateStub<IPlayer>();
-            client.Player.Stub(me => me.PlayerSettings).Return(MockRepository.GenerateStub<IPlayerSettings>());
             client.Player.Position = new Vector2(100, 200);
-            client.Player.Stub(me => me.CurrentWeapon).Return(new RailGun(null));
 
             serverChatLogView.Generate(1f);
 
@@ -87,12 +84,9 @@ namespace UnitTestLibrary
         public void SendsDirtyPlayerSettingsToAllClients()
         {
             client.ID = 123;
-            client.Player = MockRepository.GenerateStub<IPlayer>();
-            var playerSettings = MockRepository.GenerateStub<IPlayerSettings>();
+            var playerSettings = client.Player.PlayerSettings;
             playerSettings.Stub(me => me.IsDirty).Return(true);
             playerSettings.Stub(me => me.GetDiff()).Return(playerSettings);
-            client.Player.Stub(me => me.PlayerSettings).Return(playerSettings);
-            client.Player.Stub(me => me.CurrentWeapon).Return(new RailGun(null));
 
             serverChatLogView.Generate(1f);
 

@@ -26,9 +26,7 @@ namespace Frenetic.Player
 
         public void RemoveDeadProjectiles()
         {
-            var currentWeapon = (IProjectileWeapon)this.Player.CurrentWeapon;
-
-            currentWeapon.RemoveDeadProjectiles();
+            this.Player.Weapons.RemoveDeadProjectiles();
         }
        
         #region IController Members

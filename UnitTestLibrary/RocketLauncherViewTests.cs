@@ -25,8 +25,9 @@ namespace UnitTestLibrary
         public void Setup()
         {
             stubPlayer = MockRepository.GenerateStub<IPlayer>();
-            stubPlayer.Stub(me => me.CurrentWeapon).Return(new RocketLauncher(null));
-            ((RocketLauncher)stubPlayer.CurrentWeapon).Rockets.Add(new Rocket(Vector2.Zero, Vector2.Zero, new Frenetic.Physics.DummyPhysicsComponent()));
+            stubPlayer.Stub(me => me.Weapons).Return(MockRepository.GenerateStub<IWeapons>());
+            stubPlayer.Weapons[WeaponType.RocketLauncher] = new RocketLauncher(null);
+            ((RocketLauncher)stubPlayer.Weapons[WeaponType.RocketLauncher]).Rockets.Add(new Rocket(Vector2.Zero, Vector2.Zero, new Frenetic.Physics.DummyPhysicsComponent()));
             playerList = new PlayerList() { stubPlayer };
             mockEffects = MockRepository.GenerateStub<IEffect>();
             mockPlayerController = MockRepository.GenerateStub<IPlayerController>();
@@ -42,7 +43,7 @@ namespace UnitTestLibrary
         [Test]
         public void ShouldDrawExplosionWhenRocketsAreNotAlive()
         {
-            ((RocketLauncher)stubPlayer.CurrentWeapon).Rockets[0].IsAlive = false;
+            ((RocketLauncher)stubPlayer.Weapons[WeaponType.RocketLauncher]).Rockets[0].IsAlive = false;
 
             view.Draw(Matrix.Identity);
 
@@ -51,7 +52,7 @@ namespace UnitTestLibrary
         [Test]
         public void ShouldClearDeadProjectilesAfterDrawingExplosions()
         {
-            ((RocketLauncher)stubPlayer.CurrentWeapon).Rockets[0].IsAlive = false;
+            ((RocketLauncher)stubPlayer.Weapons[WeaponType.RocketLauncher]).Rockets[0].IsAlive = false;
 
             view.Draw(Matrix.Identity);
 

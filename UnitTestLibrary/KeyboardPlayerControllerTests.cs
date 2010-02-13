@@ -40,12 +40,12 @@ namespace UnitTestLibrary
         [Test]
         public void ShouldDeleteAllDeadProjectiles()
         {
-            var stubProjectileWeapon = MockRepository.GenerateStub<IProjectileWeapon>();
-            stubPlayer.Stub(me => me.CurrentWeapon).Return(stubProjectileWeapon);
+            var stubWeapons = MockRepository.GenerateStub<IWeapons>();
+            stubPlayer.Stub(me => me.Weapons).Return(stubWeapons);
 
             kpc.RemoveDeadProjectiles();
 
-            stubProjectileWeapon.AssertWasCalled(me => me.RemoveDeadProjectiles());
+            stubWeapons.AssertWasCalled(me => me.RemoveDeadProjectiles());
         }
 
         [Test]

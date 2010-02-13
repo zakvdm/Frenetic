@@ -17,7 +17,7 @@ namespace Frenetic.Gameplay.Weapons
 
         public void Draw(Matrix translationMatrix)
         {
-            foreach (KeyValuePair<IWeapon, IEffect> railGunInfo in this.RailGuns)
+            foreach (KeyValuePair<IWeapons, IEffect> railGunInfo in this.railGuns)
             {
                 var railGun = railGunInfo.Key;
                 var particleEffect = railGunInfo.Value;
@@ -38,11 +38,11 @@ namespace Frenetic.Gameplay.Weapons
 
         protected override void HandleNewPlayer(IPlayer newPlayer)
         {
-            this.RailGuns.Add(newPlayer.CurrentWeapon, this.ParticleEffectFactory());
+            this.railGuns.Add(newPlayer.Weapons, this.ParticleEffectFactory());
         }
 
         Effect.Factory ParticleEffectFactory;
 
-        Dictionary<IWeapon, IEffect> RailGuns = new Dictionary<IWeapon, IEffect>();
+        Dictionary<IWeapons, IEffect> railGuns = new Dictionary<IWeapons, IEffect>();
     }
 }
