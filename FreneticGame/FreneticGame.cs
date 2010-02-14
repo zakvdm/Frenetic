@@ -249,15 +249,9 @@ namespace Frenetic
             // CAMERA:
             builder.Register((c, p) => (ICamera)new Camera(p.TypedAs<IPlayer>(), new Vector2(_screenWidth, _screenHeight))).ContainerScoped();
 
-            // CROSSHAIR:
-            builder.Register<Crosshair>().As<ICrosshair>().ContainerScoped();
-            builder.Register<CrosshairView>().ContainerScoped();
-
-            // KEYBOARD:
-            builder.Register<XnaKeyboard>().As<IKeyboard>().SingletonScoped();
-
-            // MOUSE:
-            builder.Register<FreneticMouse>().As<IMouse>().SingletonScoped();
+            #region Input
+            builder.RegisterModule(new InputModule());
+            #endregion
 
             // Mediator:
             builder.Register<TweakablePropertiesLoader>().SingletonScoped();

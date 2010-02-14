@@ -12,11 +12,10 @@ namespace Frenetic.Player
         public static float ShootTimer = 0.5f;
         public static float JumpTimer = 0.5f;
         
-        public KeyboardPlayerController(IPlayer player, IKeyboard keyboard, IMouse mouse, ICrosshair crosshair, IPlayerRespawner playerRespawner)
+        public KeyboardPlayerController(IPlayer player, IGameInput gameInput, ICrosshair crosshair, IPlayerRespawner playerRespawner)
         {
             this.Player = player;
-            this.Keyboard = keyboard;
-            this.Mouse = mouse;
+            this.GameInput = gameInput;
             this.Crosshair = crosshair;
             this.PlayerRespawner = playerRespawner;
 
@@ -35,7 +34,7 @@ namespace Frenetic.Player
         {
             TotalElapsedTime += elapsedTime;
 
-            if ((Keyboard.IsKeyDown(Keys.Space) || Keyboard.IsKeyDown(Keys.W)) && CanJump(TotalElapsedTime))
+            if (this.GameInput.IsGameKeyDown(GameKey.Jump) && CanJump(TotalElapsedTime))
             {
                 var jumped = Player.Jump();
                 if (jumped)
@@ -44,17 +43,17 @@ namespace Frenetic.Player
                 }
             }
 
-            if (Keyboard.IsKeyDown(Keys.Left) || Keyboard.IsKeyDown(Keys.A))
+            if (this.GameInput.IsGameKeyDown(GameKey.MoveLeft))
             {
                 Player.MoveLeft();
             }
 
-            if (Keyboard.IsKeyDown(Keys.Right) || Keyboard.IsKeyDown(Keys.D))
+            if (this.GameInput.IsGameKeyDown(GameKey.MoveRight))
             {
                 Player.MoveRight();
             }
 
-            if (Mouse.LeftButtonIsDown())
+            if (this.GameInput.IsGameKeyDown(GameKey.Shoot))
             {
                 if (CanShoot(TotalElapsedTime))
                 {
@@ -78,10 +77,6 @@ namespace Frenetic.Player
         #endregion
 
         public IPlayer Player { get; private set; }
-        IKeyboard Keyboard { get; set; }
-        IMouse Mouse { get; set; }
-        ICrosshair Crosshair { get; set; }
-        IPlayerRespawner PlayerRespawner { get; set; }
 
         internal bool CanShoot(float time)
         {
@@ -96,11 +91,11 @@ namespace Frenetic.Player
 
         private void ProcessGameKeys()
         {
-            if (Keyboard.IsGameKeyDown(GameKey.RocketLauncher))
+            if (this.GameInput.IsGameKeyDown(GameKey.RocketLauncher))
             {
                 this.Player.Weapons.ChangeWeapon(WeaponType.RocketLauncher);
             }
-            if (Keyboard.IsGameKeyDown(GameKey.RailGun))
+            if (this.GameInput.IsGameKeyDown(GameKey.RailGun))
             {
                 this.Player.Weapons.ChangeWeapon(WeaponType.RailGun);
             }
@@ -110,5 +105,9 @@ namespace Frenetic.Player
 
         private float LastShootTime { get; set; }
         private float LastJumpTime { get; set; }
+
+        IGameInput GameInput { get; set; }
+        ICrosshair Crosshair { get; set; }
+        IPlayerRespawner PlayerRespawner { get; set; }
     }
 }

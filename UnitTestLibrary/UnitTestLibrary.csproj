@@ -84,6 +84,7 @@
     <Compile Include="ClientStateTrackerTests.cs" />
     <Compile Include="DummyLogger.cs" />
     <Compile Include="EffectUpdaterTests.cs" />
+    <Compile Include="Input\GameInputTests.cs" />
     <Compile Include="HudControllerTests.cs" />
     <Compile Include="MenuInputStateTests.cs" />
     <Compile Include="NetBufferExtensionMethodsTests.cs" />

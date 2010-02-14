@@ -85,6 +85,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Autofac\GameSessionModule.cs" />
+    <Compile Include="Autofac\InputModule.cs" />
     <Compile Include="Autofac\OverlaysModule.cs" />
     <Compile Include="Autofac\LevelModule.cs" />
     <Compile Include="Autofac\PhysicsModule.cs" />
@@ -255,10 +256,13 @@
     <Compile Include="Screens\NetworkBusyScreen.cs" />
     <Compile Include="Screens\ScreenFactory.cs" />
     <Compile Include="Screens\SearchResultsScreen.cs" />
+    <Compile Include="UserInput\GameInput.cs" />
+    <Compile Include="UserInput\IGameInput.cs" />
     <Compile Include="UserInput\IKeyboard.cs" />
+    <Compile Include="UserInput\IKeyMapping.cs" />
     <Compile Include="UserInput\XNAKeyboard.cs" />
     <Compile Include="UserInput\IMouse.cs" />
-    <Compile Include="UserInput\Mouse.cs" />
+    <Compile Include="UserInput\XnaMouse.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Game.ico" />

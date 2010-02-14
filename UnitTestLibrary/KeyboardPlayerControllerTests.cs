@@ -18,15 +18,19 @@ namespace UnitTestLibrary
     [TestFixture]
     public class KeyboardPlayerControllerTests
     {
+        IPlayer stubPlayer;
+        IGameInput stubGameInput;
+        ICrosshair stubCrosshair;
+        IPlayerRespawner stubRespawner;
+        KeyboardPlayerController kpc;
         [SetUp]
         public void SetUp()
         {
             stubPlayer = MockRepository.GenerateStub<IPlayer>();
-            stubKeyboard = MockRepository.GenerateStub<IKeyboard>();
-            stubMouse = MockRepository.GenerateStub<IMouse>();
+            stubGameInput = MockRepository.GenerateStub<IGameInput>();
             stubCrosshair = MockRepository.GenerateStub<ICrosshair>();
             stubRespawner = MockRepository.GenerateStub<IPlayerRespawner>();
-            kpc = new KeyboardPlayerController(stubPlayer, stubKeyboard, stubMouse, stubCrosshair, stubRespawner);
+            kpc = new KeyboardPlayerController(stubPlayer, stubGameInput, stubCrosshair, stubRespawner);
         }
 
         [Test]
@@ -49,21 +53,22 @@ namespace UnitTestLibrary
         }
 
         [Test]
-        public void PressingTheSpacebarExertsJumpImpulseOnPlayer()
+        public void ShouldJumpWhenJumpKeyIsPressed()
         {
-            stubKeyboard.Stub(k => k.IsKeyDown(Arg<Keys>.Is.Equal(Keys.Space))).Return(true);
+            stubGameInput.Stub(gi => gi.IsGameKeyDown(Arg<GameKey>.Is.Equal(GameKey.Jump))).Return(true);
 
             kpc.Process(1);
+
             stubPlayer.AssertWasCalled(p => p.Jump());
         }
 
         [Test]
-        public void PlayerCannotDoubleJump()
+        public void ShouldNotLetPlayerDoubleJump()
         {
             var lessThanJumpDelay = KeyboardPlayerController.JumpTimer / 3;
             var moreThanJumpDelay = KeyboardPlayerController.JumpTimer - (lessThanJumpDelay / 2);
             int callCount = 0;
-            stubKeyboard.Stub(k => k.IsKeyDown(Arg<Keys>.Is.Equal(Keys.Space))).Return(true);
+            stubGameInput.Stub(gi => gi.IsGameKeyDown(Arg<GameKey>.Is.Equal(GameKey.Jump))).Return(true);
             stubPlayer.Stub(p => p.Jump()).Do(new Func<bool>(() => { callCount++; return true; }));
 
             kpc.Process(KeyboardPlayerController.JumpTimer);
@@ -76,27 +81,29 @@ namespace UnitTestLibrary
         }
 
         [Test]
-        public void PressingTheLeftArrowExertsMovementForceOnPlayer()
+        public void ShouldMoveLeftWhenMoveLeftKeyIsPressed()
         {
-            stubKeyboard.Stub(k => k.IsKeyDown(Arg<Keys>.Is.Equal(Keys.Left))).Return(true);
+            stubGameInput.Stub(gi => gi.IsGameKeyDown(Arg<GameKey>.Is.Equal(GameKey.MoveLeft))).Return(true);
 
             kpc.Process(1);
+
             stubPlayer.AssertWasCalled(p => p.MoveLeft());
         }
 
         [Test]
-        public void PressingTheRightArrowExertsMovementForceOnPlayer()
+        public void ShouldMoveRightWhenMoveRightKeyIsPressed()
         {
-            stubKeyboard.Stub(k => k.IsKeyDown(Arg<Keys>.Is.Equal(Keys.Right))).Return(true);
+            stubGameInput.Stub(gi => gi.IsGameKeyDown(Arg<GameKey>.Is.Equal(GameKey.MoveRight))).Return(true);
 
             kpc.Process(1);
+
             stubPlayer.AssertWasCalled(p => p.MoveRight());
         }
 
         [Test]
-        public void PressingTheShootButtonCreatesPendingShotOnPlayerWhenPlayerIsAlive()
+        public void ShouldCreatePendingShotOnAlivePlayersWhenPressingShootButton()
         {
-            stubMouse.Stub(m => m.LeftButtonIsDown()).Return(true);
+            stubGameInput.Stub(gi => gi.IsGameKeyDown(Arg<GameKey>.Is.Equal(GameKey.Shoot))).Return(true);
             stubCrosshair.Stub(c => c.WorldPosition).Return(Vector2.UnitX);
             stubPlayer.Status = PlayerStatus.Alive;
 
@@ -105,11 +112,11 @@ namespace UnitTestLibrary
             Assert.AreEqual(Vector2.UnitX, stubPlayer.PendingShot);           
         }
         [Test]
-        public void PressingTheShootButtonASecondTimeTooSoonDoesNotRetriggerTheShot()
+        public void ShouldNotLetPlayerShootAgainBeforeReloaded()
         {
             var lessThanShootDelay = KeyboardPlayerController.ShootTimer / 2;
             var moreThanShootDelay = KeyboardPlayerController.ShootTimer - (lessThanShootDelay / 3);
-            stubMouse.Stub(m => m.LeftButtonIsDown()).Return(true);
+            stubGameInput.Stub(gi => gi.IsGameKeyDown(Arg<GameKey>.Is.Equal(GameKey.Shoot))).Return(true);
             stubCrosshair.Stub(c => c.WorldPosition).Return(Vector2.UnitX);
 
             kpc.Process(KeyboardPlayerController.ShootTimer);
@@ -122,9 +129,9 @@ namespace UnitTestLibrary
         }
 
         [Test]
-        public void PressingTheShootButtonWhenThePlayerIsDeadDoesARespawn()
+        public void ShouldRespawnDeadPlayersWhenPressingShootKey()
         {
-            stubMouse.Stub(m => m.LeftButtonIsDown()).Return(true);
+            stubGameInput.Stub(gi => gi.IsGameKeyDown(Arg<GameKey>.Is.Equal(GameKey.Shoot))).Return(true);
             stubPlayer.Status = PlayerStatus.Dead;
 
             kpc.Process(100);
@@ -132,9 +139,9 @@ namespace UnitTestLibrary
             stubRespawner.AssertWasCalled(me => me.RespawnPlayer(stubPlayer));
         }
         [Test]
-        public void RespawnRequestStartsShootTimer()
+        public void ShouldStartTimerWhenRespawning()
         {
-            stubMouse.Stub(m => m.LeftButtonIsDown()).Return(true);
+            stubGameInput.Stub(gi => gi.IsGameKeyDown(Arg<GameKey>.Is.Equal(GameKey.Shoot))).Return(true);
             stubPlayer.Status = PlayerStatus.Dead;
             stubPlayer.PendingShot = null;
 
@@ -151,19 +158,12 @@ namespace UnitTestLibrary
         {
             var mockWeapons = MockRepository.GenerateStub<IWeapons>();
             stubPlayer.Stub(player => player.Weapons).Return(mockWeapons);
-            stubKeyboard.Stub(k => k.IsGameKeyDown(Arg<GameKey>.Is.Equal(GameKey.RocketLauncher))).Return(true);
+            stubGameInput.Stub(gi => gi.IsGameKeyDown(Arg<GameKey>.Is.Equal(GameKey.RocketLauncher))).Return(true);
 
             kpc.Process(1);
 
             mockWeapons.AssertWasCalled(weapons => weapons.ChangeWeapon(WeaponType.RocketLauncher));
             mockWeapons.AssertWasNotCalled(weapons => weapons.ChangeWeapon(WeaponType.RailGun));
         }
-
-        IPlayer stubPlayer;
-        IKeyboard stubKeyboard;
-        IMouse stubMouse;
-        ICrosshair stubCrosshair;
-        IPlayerRespawner stubRespawner;
-        KeyboardPlayerController kpc;
     }
 }

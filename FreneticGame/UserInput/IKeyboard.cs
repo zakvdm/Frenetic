@@ -10,19 +10,12 @@ namespace Frenetic.UserInput
     public interface IKeyboard
     {
         bool IsKeyDown(Keys key);
-        bool IsGameKeyDown(GameKey gamekey);
         bool WasKeyDown(Keys key);
 
         void Lock();
         void Unlock();
         bool Locked { get; }
         void SaveState();
-    }
-
-    public enum GameKey
-    {
-        RocketLauncher = Keys.Q,
-        RailGun = Keys.E
     }
 
     public static class KeysExtensions
