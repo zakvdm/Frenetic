@@ -75,16 +75,13 @@ namespace UnitTestLibrary
         }
 
         [Test]
-        public void ShouldCallRemoveDeadProjectilesForAllProjectileWeapons()
+        public void ShouldCallRemoveDeadProjectilesForAllWeapons()
         {
             weaponList.RemoveDeadProjectiles();
 
             foreach (var weapon in weaponList)
             {
-                if (weapon is IProjectileWeapon)
-                {
-                    weapon.AssertWasCalled(weap => (weap as IProjectileWeapon).RemoveDeadProjectiles());
-                }
+                weapon.AssertWasCalled(weap => weap.RemoveDeadProjectiles());
             }
         }
     }

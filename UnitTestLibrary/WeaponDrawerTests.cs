@@ -12,7 +12,7 @@ using Microsoft.Xna.Framework;
 namespace UnitTestLibrary
 {
     [TestFixture]
-    public class WeaponViewTests
+    public class WeaponDrawerTests
     {
         IPlayerController stubPlayerController;
         IPlayerList playerList;
@@ -42,6 +42,15 @@ namespace UnitTestLibrary
                 weaponViews[0].AssertWasCalled(me => me.DrawWeapon(player.Weapons));
                 weaponViews[1].AssertWasCalled(me => me.DrawWeapon(player.Weapons));
             }
+        }
+        [Test]
+        public void ShouldCallDrawEffectsForEachWeaponView()
+        {
+            var translationMatrix = Matrix.CreateTranslation(new Vector3(100, 200, 300));
+            view.Draw(translationMatrix);
+
+            weaponViews[0].AssertWasCalled(me => me.DrawEffects(translationMatrix));
+            weaponViews[1].AssertWasCalled(me => me.DrawEffects(translationMatrix));
         }
         [Test]
         public void ShouldClearDeadProjectiles()

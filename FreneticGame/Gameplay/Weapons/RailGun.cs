@@ -13,13 +13,13 @@ namespace Frenetic.Gameplay.Weapons
         public RailGun(IRayCaster rayCaster)
         {
             _rayCaster = rayCaster;
-            Slugs = new Shots();
+            Slugs = new List<Slug>();
 
             this.Damage = 50;
         }
 
         public int Damage { get; set; }
-        public Shots Slugs { get; private set; }
+        public List<Slug> Slugs { get; private set; }
 
         public void Shoot(Vector2 origin, Vector2 direction)
         {
@@ -28,12 +28,18 @@ namespace Frenetic.Gameplay.Weapons
             Vector2 offsetOrigin = origin + (Vector2.Normalize(direction - origin) * RailGun.Offset);
             List<IPhysicsComponent> hitObjects = _rayCaster.ShootRay(offsetOrigin, direction, out endPoint);
 
-            this.Slugs.Add(new Shot(origin, endPoint));
+            this.Slugs.Add(new Slug(origin, endPoint));
 
             foreach (var physicsComponent in hitObjects)
             {
                 this.DamagedAPlayer(this, physicsComponent);
             }
+        }
+
+        public void RemoveDeadProjectiles()
+        {
+            // A Slug only lives for one frame (once we draw it we're done with it)
+            this.Slugs.Clear();
         }
 
         public event Action<IWeapon, IPhysicsComponent> DamagedAPlayer = delegate { };

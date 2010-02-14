@@ -9,10 +9,8 @@ namespace Frenetic.Gameplay.Weapons
 {
     public class RocketLauncherView : IWeaponView
     {
-        public RocketLauncherView(IPlayerController playerController, IPlayerList playerList, IEffect particleEffects)
+        public RocketLauncherView(IEffect particleEffects)
         {
-            this.PlayerController = playerController;
-            this.PlayerList = playerList;
             this.ParticleEffects = particleEffects;
         }
         #region IWeaponView Members
@@ -42,18 +40,6 @@ namespace Frenetic.Gameplay.Weapons
 
         #endregion
 
-
-        IPlayerController PlayerController;
-        IPlayerList PlayerList;
         IEffect ParticleEffects;
-
-        #region IWeaponView Members
-
-        public void DrawForPlayer(IPlayer player)
-        {
-            throw new NotImplementedException();
-        }
-
-        #endregion
     }
 }

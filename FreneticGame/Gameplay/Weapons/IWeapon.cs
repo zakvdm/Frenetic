@@ -12,12 +12,12 @@ namespace Frenetic.Gameplay.Weapons
         void Shoot(Vector2 origin, Vector2 direction);
 
         event Action<IWeapon, IPhysicsComponent> DamagedAPlayer;
+
+        void RemoveDeadProjectiles();
     }
 
     public interface IProjectileWeapon : IWeapon
     {
         List<Rocket> Rockets { get; }
-
-        void RemoveDeadProjectiles();
     }
 }

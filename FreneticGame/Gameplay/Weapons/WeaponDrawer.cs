@@ -27,8 +27,11 @@ namespace Frenetic.Gameplay.Weapons
                 foreach (var weaponView in weaponViews)
                 {
                     weaponView.DrawWeapon(player.Weapons);
-                    weaponView.DrawEffects(translationMatrix);
                 }
+            }
+            foreach (var weaponView in weaponViews)
+            {
+                weaponView.DrawEffects(translationMatrix);
             }
 
             UpdatePlayerAfterDraw();

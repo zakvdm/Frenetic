@@ -45,6 +45,17 @@ namespace UnitTestLibrary
         }
 
         [Test]
+        public void ShouldRemoveAllSlugsEveryTime()
+        {
+            railGun.Slugs.Add(new Slug(Vector2.Zero, Vector2.One));
+            railGun.Slugs.Add(new Slug(Vector2.Zero, Vector2.One));
+
+            railGun.RemoveDeadProjectiles();
+
+            Assert.AreEqual(0, railGun.Slugs.Count);
+        }
+
+        [Test]
         public void FiresEventForEachDamagedPhysicsComponents()
         {
             var physicsComp1 = MockRepository.GenerateStub<IPhysicsComponent>();

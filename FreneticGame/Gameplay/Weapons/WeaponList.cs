@@ -47,10 +47,7 @@ namespace Frenetic.Gameplay.Weapons
         {
             foreach (var weapon in this)
             {
-                if (weapon is IProjectileWeapon)
-                {
-                    (weapon as IProjectileWeapon).RemoveDeadProjectiles();
-                }
+                weapon.RemoveDeadProjectiles();
             }
         }
 

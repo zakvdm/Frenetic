@@ -14,7 +14,7 @@ namespace UnitTestLibrary
     [TestFixture]
     public class RailGunViewTests
     {
-        IPlayer stubPlayer;
+        IWeapons stubWeapons;
         PlayerList playerList;
         ILineEffect mockEffect;
         IPlayerController mockPlayerController;
@@ -24,13 +24,22 @@ namespace UnitTestLibrary
         [SetUp]
         public void Setup()
         {
-            stubPlayer = MockRepository.GenerateStub<IPlayer>();
-            stubPlayer.Stub(me => me.Weapons).Return(MockRepository.GenerateStub<IWeapons>());
-            stubPlayer.Weapons.Stub(me => me[WeaponType.RailGun]).Return(new RailGun(null));
-            playerList = new PlayerList() { stubPlayer };
+            stubWeapons = MockRepository.GenerateStub<IWeapons>();
+            stubWeapons.Stub(me => me[WeaponType.RailGun]).Return(new RailGun(null));
             mockEffect = MockRepository.GenerateStub<ILineEffect>();
-            mockPlayerController = MockRepository.GenerateStub<IPlayerController>();
-            view = new RailGunView(playerList, mockEffect);
+            view = new RailGunView(mockEffect);
+        }
+
+        [Test]
+        public void ShouldDrawAllSlugsOnRailgun()
+        {
+            var railGun = stubWeapons[WeaponType.RailGun] as RailGun;
+            railGun.Slugs.Add(new Slug(Vector2.Zero, Vector2.One));
+            railGun.Slugs.Add(new Slug(Vector2.Zero, Vector2.One));
+
+            view.DrawWeapon(stubWeapons);
+
+            mockEffect.AssertWasCalled(effect => effect.Trigger(EffectType.Rail), constraint => constraint.Repeat.Twice());
         }
 
         [Test]
@@ -39,7 +48,7 @@ namespace UnitTestLibrary
             var startPoint = Vector2.One;
             var endPoint = new Vector2(3, 5);
 
-            view.SetAndTriggerEffectParameters(new Shot(startPoint, endPoint));
+            view.SetAndTriggerEffectParameters(new Slug(startPoint, endPoint));
 
             Assert.AreEqual(startPoint + ((endPoint - startPoint) / 2), mockEffect.Position);
             Assert.AreEqual(1.1f, mockEffect.Angle, 0.05f);
