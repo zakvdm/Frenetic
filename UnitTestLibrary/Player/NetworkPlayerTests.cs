@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework;
 using Rhino.Mocks;
 using Frenetic.Physics;
 using Frenetic.Player;
+using Frenetic.Gameplay.Weapons;
 
 namespace UnitTestLibrary
 {
@@ -19,7 +20,7 @@ namespace UnitTestLibrary
         public void SetUp()
         {
             stubPhysicsComponent = MockRepository.GenerateStub<IPhysicsComponent>();
-            player = new NetworkPlayer(null, stubPhysicsComponent, null, null);
+            player = new NetworkPlayer(null, stubPhysicsComponent, MockRepository.GenerateStub<IWeapons>(), null);
         }
 
         [Test]
