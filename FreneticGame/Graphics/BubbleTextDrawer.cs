@@ -16,6 +16,7 @@ namespace Frenetic.Graphics
 
         public void AddText(string text, Vector2 position, Color color, float fadeOutTime)
         {
+            Console.WriteLine("Adding BubbleText: " + text + ":" + color.ToString());
             this.BubbleTexts.Add(new BubbleText() { Text = text, Position = position, Color = color, TotalTime = fadeOutTime });
         }
 

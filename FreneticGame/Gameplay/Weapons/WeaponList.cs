@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Frenetic.Player;
+using Frenetic.Physics;
 
 namespace Frenetic.Gameplay.Weapons
 {
@@ -14,9 +16,9 @@ namespace Frenetic.Gameplay.Weapons
 
             weapons = weaponList;
 
-            foreach (var kvPair  in weaponList)
+            foreach (var kvPair in weaponList)
             {
-                kvPair.Value.DamagedAPlayer += (weap, physicsComp) => physicsComp.OnWasShot(null, weap.Damage);
+                kvPair.Value.HitAPhysicsComponent += (weap, physicsComp) => this.DamagedAPlayer(weap.Damage, physicsComp);
             }
         }
         #region IWeapons Members
@@ -50,6 +52,8 @@ namespace Frenetic.Gameplay.Weapons
                 weapon.RemoveDeadProjectiles();
             }
         }
+
+        public event Action<int, IPhysicsComponent> DamagedAPlayer = delegate { };
 
         public Shots Shots
         {

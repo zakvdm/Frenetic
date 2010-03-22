@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Frenetic.Physics;
 using Microsoft.Xna.Framework;
+using Frenetic.Player;
 
 namespace Frenetic.Gameplay.Weapons
 {
@@ -20,6 +21,8 @@ namespace Frenetic.Gameplay.Weapons
         void ChangeWeapon(WeaponType weaponType);
 
         void RemoveDeadProjectiles();
+
+        event Action<int, IPhysicsComponent> DamagedAPlayer;
 
         Shots Shots { get; }
     }

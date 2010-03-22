@@ -23,26 +23,27 @@ namespace UnitTestLibrary
         }
 
         [Test]
-        public void ShouldRegistersWithWeaponsForDamagedAPlayerEvent()
+        public void ShouldRegistersWithWeaponsForHitAPhysicsComponentEvent()
         {
             foreach (var stubWeapon in weaponList)
             {
-                stubWeapon.AssertWasCalled(weapon => weapon.DamagedAPlayer += Arg<Action<IWeapon, IPhysicsComponent>>.Is.Anything);
+                stubWeapon.AssertWasCalled(weapon => weapon.HitAPhysicsComponent += Arg<Action<IWeapon, IPhysicsComponent>>.Is.Anything);
             }
         }
         [Test]
-        public void ShouldNotifyDamagedPhysicsComponents()
+        public void ShouldRaiseDamagedAPlayerEventWheneverAWeaponHitsAPhysicsComponent()
         {
             var stubPhysicsComponent = MockRepository.GenerateStub<IPhysicsComponent>();
-            IWeapon stubWeapon = null;
+            int raisedCount = 0;
+            weaponList.DamagedAPlayer += (damage, physicsComp) => raisedCount++;
+
             foreach (var weapon in weaponList)
             {
                 weapon.Stub(me => me.Damage).Return(12);
-                weapon.Raise(me => me.DamagedAPlayer += null, weapon, stubPhysicsComponent);
-                break;
+                weapon.Raise(me => me.HitAPhysicsComponent += null, weapon, stubPhysicsComponent);
             }
 
-            stubPhysicsComponent.AssertWasCalled(me => me.OnWasShot(null, 12));
+            Assert.AreEqual(2, raisedCount);
         }
 
         [Test]

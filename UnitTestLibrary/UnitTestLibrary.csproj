@@ -88,7 +88,7 @@
     <Compile Include="HudControllerTests.cs" />
     <Compile Include="MenuInputStateTests.cs" />
     <Compile Include="NetBufferExtensionMethodsTests.cs" />
-    <Compile Include="NetworkPlayerTests.cs" />
+    <Compile Include="Player\NetworkPlayerTests.cs" />
     <Compile Include="OverlayViewImplementationTests.cs" />
     <Compile Include="LidgrenServerMessageSenderTests.cs" />
     <Compile Include="MessageConsoleTests.cs" />
@@ -111,17 +111,17 @@
     <Compile Include="ClientInputProcessorTests.cs" />
     <Compile Include="ClientInputSenderTests.cs" />
     <Compile Include="OutgoingMessageQueueTests.cs" />
-    <Compile Include="PlayerInputTests.cs" />
-    <Compile Include="PlayerListTests.cs" />
-    <Compile Include="PlayerStateTests.cs" />
-    <Compile Include="PlayerRespawnerTests.cs" />
-    <Compile Include="PlayerSettingsTests.cs" />
-    <Compile Include="PlayerTextureBankTests.cs" />
-    <Compile Include="PlayerUpdaterTests.cs" />
-    <Compile Include="PlayerViewTests.cs" />
+    <Compile Include="Player\PlayerInputTests.cs" />
+    <Compile Include="Player\PlayerListTests.cs" />
+    <Compile Include="Player\PlayerStateTests.cs" />
+    <Compile Include="Player\PlayerRespawnerTests.cs" />
+    <Compile Include="Player\PlayerSettingsTests.cs" />
+    <Compile Include="Player\PlayerTextureBankTests.cs" />
+    <Compile Include="Player\PlayerUpdaterTests.cs" />
+    <Compile Include="Player\PlayerViewTests.cs" />
     <Compile Include="QuitterTests.cs" />
     <Compile Include="RailGunTests.cs" />
-    <Compile Include="PlayerScoreTests.cs" />
+    <Compile Include="Player\PlayerScoreTests.cs" />
     <Compile Include="RailGunViewTests.cs" />
     <Compile Include="RocketLauncherTests.cs" />
     <Compile Include="RocketLauncherViewTests.cs" />
@@ -131,7 +131,7 @@
     <Compile Include="TimerTests.cs" />
     <Compile Include="TweakablePropertiesLoaderTests.cs" />
     <Compile Include="VisibilityViewTests.cs" />
-    <Compile Include="WeaponListTests.cs" />
+    <Compile Include="Weapons\WeaponListTests.cs" />
     <Compile Include="WeaponDrawerTests.cs" />
     <Compile Include="WorldBoundaryColliderTests.cs" />
     <Compile Include="GameplayScreenTests.cs" />
@@ -141,7 +141,7 @@
     <Compile Include="GameSessionTests.cs" />
     <Compile Include="MainMenuScreenTests.cs" />
     <Compile Include="NetworkPlayerProcessorTests.cs" />
-    <Compile Include="PlayerTests.cs" />
+    <Compile Include="Player\PlayerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

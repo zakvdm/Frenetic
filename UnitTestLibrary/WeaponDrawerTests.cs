@@ -53,11 +53,11 @@ namespace UnitTestLibrary
             weaponViews[1].AssertWasCalled(me => me.DrawEffects(translationMatrix));
         }
         [Test]
-        public void ShouldClearDeadProjectiles()
+        public void ShouldClearDeadProjectilesForEachPlayer()
         {
             view.Draw(Matrix.Identity);
 
-            stubPlayerController.AssertWasCalled(me => me.RemoveDeadProjectiles());
+            playerList.Players.ForEach((player) => player.Weapons.AssertWasCalled(weapons => weapons.RemoveDeadProjectiles()));
         }
     }
 }

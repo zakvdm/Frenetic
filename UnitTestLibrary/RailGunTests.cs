@@ -63,8 +63,8 @@ namespace UnitTestLibrary
             hitObjects.Add(physicsComp1);
             hitObjects.Add(physicsComp2);
             bool event1Raised = false, event2Raised = false;
-            railGun.DamagedAPlayer += (rail, physicsComponent) => { if (physicsComponent == physicsComp1) event1Raised = true; };
-            railGun.DamagedAPlayer += (rail, physicsComponent) => { if (physicsComponent == physicsComp2) event2Raised = true; };
+            railGun.HitAPhysicsComponent += (rail, physicsComponent) => { if (physicsComponent == physicsComp1) event1Raised = true; };
+            railGun.HitAPhysicsComponent += (rail, physicsComponent) => { if (physicsComponent == physicsComp2) event2Raised = true; };
 
             railGun.Shoot(Vector2.Zero, Vector2.One);
 

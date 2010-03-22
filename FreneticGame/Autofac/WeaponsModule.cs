@@ -65,7 +65,7 @@ namespace Frenetic.Autofac
                     weapons.Add(WeaponType.RocketLauncher, container.Resolve<RocketLauncher>());
 
                     return new WeaponList(weapons);
-                }).As<IWeapons>().ContainerScoped();
+                }).As<IWeapons>().FactoryScoped();
             
             builder.Register<Rocket>().FactoryScoped();
             builder.RegisterGeneratedFactory<Rocket.Factory>(new TypedService(typeof(Rocket)));

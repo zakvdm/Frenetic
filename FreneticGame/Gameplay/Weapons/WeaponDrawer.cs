@@ -28,21 +28,22 @@ namespace Frenetic.Gameplay.Weapons
                 {
                     weaponView.DrawWeapon(player.Weapons);
                 }
+            
+                UpdatePlayerWeaponsAfterDraw(player.Weapons);
             }
             foreach (var weaponView in weaponViews)
             {
                 weaponView.DrawEffects(translationMatrix);
             }
 
-            UpdatePlayerAfterDraw();
         }
 
         #endregion
 
-        private void UpdatePlayerAfterDraw()
+        private void UpdatePlayerWeaponsAfterDraw(IWeapons weapons)
         {
             // Once we've drawn explosions, we clear the dead projectiles.
-            this.playerController.RemoveDeadProjectiles();
+            weapons.RemoveDeadProjectiles();
         }
 
         IPlayerController playerController;

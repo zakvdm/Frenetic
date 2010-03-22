@@ -13,6 +13,8 @@ namespace Frenetic.Player
     {
         public LocalPlayer(IPlayerSettings playerSettings, IPhysicsComponent physicsComponent, IBoundaryCollider boundaryCollider, IWeapons weapons, ITimer timer)
             : base(playerSettings, physicsComponent, boundaryCollider, weapons, timer)
-        { }
+        {
+            Console.Write("Creating Local Player");
+        }
     }
 }

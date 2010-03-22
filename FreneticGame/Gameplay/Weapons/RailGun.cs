@@ -32,7 +32,7 @@ namespace Frenetic.Gameplay.Weapons
 
             foreach (var physicsComponent in hitObjects)
             {
-                this.DamagedAPlayer(this, physicsComponent);
+                this.HitAPhysicsComponent(this, physicsComponent);
             }
         }
 
@@ -42,7 +42,7 @@ namespace Frenetic.Gameplay.Weapons
             this.Slugs.Clear();
         }
 
-        public event Action<IWeapon, IPhysicsComponent> DamagedAPlayer = delegate { };
+        public event Action<IWeapon, IPhysicsComponent> HitAPhysicsComponent = delegate { };
 
         IRayCaster _rayCaster;
     }

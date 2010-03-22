@@ -31,6 +31,7 @@ namespace Frenetic.Player
             this.PhysicsComponent.WasShot += Damage;
 
             this.Weapons = weapons;
+            this.Weapons.DamagedAPlayer += (damage, physicsComp) => physicsComp.OnWasShot(this, damage);
 
             this.Timer = timer;
             this.BoundaryCollider = boundaryCollider;

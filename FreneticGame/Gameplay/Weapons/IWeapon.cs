@@ -11,7 +11,7 @@ namespace Frenetic.Gameplay.Weapons
         int Damage { get; }
         void Shoot(Vector2 origin, Vector2 direction);
 
-        event Action<IWeapon, IPhysicsComponent> DamagedAPlayer;
+        event Action<IWeapon, IPhysicsComponent> HitAPhysicsComponent;
 
         void RemoveDeadProjectiles();
     }

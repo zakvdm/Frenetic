@@ -45,6 +45,11 @@ namespace UnitTestLibrary
             stubPhysicsComponent.AssertWasCalled(me => me.WasShot += Arg<Action<IPlayer, int>>.Is.Anything);
         }
         [Test]
+        public void ShouldRegisterWithWeaponListForDamagedAPlayerEvent()
+        {
+            stubWeapons.AssertWasCalled(me => me.DamagedAPlayer += Arg<Action<int, IPhysicsComponent>>.Is.Anything);
+        }
+        [Test]
         public void SetsCollisionGroup()
         {
             Assert.AreEqual(BasePlayer.CollisionGroup, stubPhysicsComponent.CollisionGroup);
@@ -173,6 +178,15 @@ namespace UnitTestLibrary
             player.Shoot(new Vector2(30, 40));
 
             player.Weapons.AssertWasCalled(me => me.Shoot(new Vector2(10, 20), new Vector2(30, 40)));
+        }
+
+        [Test]
+        public void ShouldNotifyPhysicsComponentWhenTheyGetDamaged()
+        {
+            var stubHitPhysicsComp = MockRepository.GenerateStub<IPhysicsComponent>();
+            stubWeapons.Raise(weapons => weapons.DamagedAPlayer += null, 30, stubHitPhysicsComp);
+
+            stubHitPhysicsComp.AssertWasCalled(pc => pc.OnWasShot(player, 30));
         }
 
         [Test]

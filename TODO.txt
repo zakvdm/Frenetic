@@ -1,7 +1,9 @@
-Client asks to shoot -> Server shoots and says "okay!" -> client gets notified and responds HOW?
+* Physics simulation happening on the Server and Client, so, e.g., Player gets "damaged" twice, once when receiving state update, and once when client-side physics discovers that Player has been hit...
+* Client asks to shoot -> Server shoots and says "okay!" -> client gets notified and responds HOW?
   The player model (and its weapons) shouldn't store Shots (these are network messages)
-Shoot's interface is too inconsistent (either store just the end point, or always ask for both!)
-Trigger Rocket trail at consistent rate.
-Rename PlayerView to PlayersView?
-Think about when resources get allocated. Better to allocate all up front?
+* BUG: When shooting, visibility is broken (you can see everything suddenly)
+* PlayerSettings of existing players don't get sent to new joining players!
+* Shoot's interface is too inconsistent (either store just the end point, or always ask for both!)
+* Trigger Rocket trail at consistent rate.
+* Think about when resources get allocated. Better to allocate all up front?
 Move ShootTimer onto the individual weapons...
